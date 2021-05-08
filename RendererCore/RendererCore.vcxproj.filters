@@ -15,24 +15,24 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="pch.h">
+    <ClInclude Include="..\include\RendererCore\GPUBuffer.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="GPUResource.h">
+    <ClInclude Include="..\include\RendererCore\GPUResource.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="GPUBuffer.h">
+    <ClInclude Include="..\include\RendererCore\pch.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\RendererCore\d3dx12.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="pch.cpp">
+    <ClCompile Include="..\src\RendererCore\GPUBuffer.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="GPUResource.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="GPUBuffer.cpp">
+    <ClCompile Include="..\src\RendererCore\pch.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

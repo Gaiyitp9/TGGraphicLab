@@ -10,5 +10,5 @@
 //
 // Author:  James Stanard 
 //
-
+#include "pch.h"
 #include "GPUBuffer.h"
