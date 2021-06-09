@@ -79,7 +79,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
     <TargetExt>.lib</TargetExt>
-    <IncludePath>D:\lch\RenderLab\HJRenderer\include\RendererCore;$(IncludePath)</IncludePath>
+    <IncludePath>D:\lch\RenderLab\RenderLab\include\RendererCore;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
@@ -147,10 +147,12 @@
     <ClInclude Include="..\include\RendererCore\GPUBuffer.h" />
     <ClInclude Include="..\include\RendererCore\GPUResource.h" />
     <ClInclude Include="..\include\RendererCore\pch.h" />
+    <ClInclude Include="..\include\RendererCore\Utility.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\RendererCore\GPUBuffer.cpp" />
     <ClCompile Include="..\src\RendererCore\pch.cpp" />
+    <ClCompile Include="..\src\RendererCore\Utility.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -27,12 +27,18 @@
     <ClInclude Include="..\include\RendererCore\d3dx12.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="..\include\RendererCore\Utility.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\RendererCore\GPUBuffer.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="..\src\RendererCore\pch.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\RendererCore\Utility.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

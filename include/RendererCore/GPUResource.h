@@ -13,8 +13,6 @@
 
 #pragma once
 
-#include "pch.h"
-
 class GPUResource
 {
 public:
@@ -58,5 +56,6 @@ protected:
 	D3D12_RESOURCE_STATES m_TransitionState;
 	D3D12_GPU_VIRTUAL_ADDRESS m_GPUVirtualAddress;
 
+	// Used to identify when a resource changes so descriptors can be copied etc.
 	uint32_t m_VersionID = 0;
 };
