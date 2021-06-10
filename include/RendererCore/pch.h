@@ -42,3 +42,15 @@
 #define D3D12_GPU_VIRTUAL_ADDRESS_UNKNOWN ((D3D12_GPU_VIRTUAL_ADDRESS)-1)
 
 #include <cstdint>
+#include <cstdio>
+#include <cstdarg>
+#include <vector>
+#include <memory>
+#include <string>
+#include <cwctype>
+#include <exception>
+
+#include <ppltasks.h>
+#include <functional>
+
+#include "Utility.h"

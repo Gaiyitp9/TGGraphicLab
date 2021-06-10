@@ -12,6 +12,7 @@
 //
 
 #include "Utility.h"
+#include <locale>
 
 std::wstring Utility::AnsiToWideString(const std::string& str)
 {
@@ -31,5 +32,30 @@ std::string Utility::WideStringToAnsi(const std::wstring& wstr)
 
 std::string Utility::ToLower(const std::string& str)
 {
-
+	std::string lower_case = str;
+	std::locale loc;
+	for (char& s : lower_case)
+		s = std::tolower(s, loc);
+	return lower_case;
 }
+
+std::wstring Utility::ToLower(const std::wstring& wstr)
+{
+	std::wstring lower_case = wstr;
+	std::locale loc;
+	for (wchar_t& s : lower_case)
+		s = std::tolower(s, loc);
+	return lower_case;
+}
+
+std::string Utility::GetBasePath(const std::string& filePath)
+{
+	size_t lastSlash;
+	if ((lastSlash = filePath.rfind('/')) != std::string::npos)
+		return filePath.substr(0, lastSlash + 1);
+	else if ((lastSlash = filePath.rfind('\\')) != std::string::npos)
+		return filePath.substr(0, lastSlash + 1);
+	else
+		return "";
+}
+
