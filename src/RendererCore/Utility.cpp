@@ -59,3 +59,35 @@ std::string Utility::GetBasePath(const std::string& filePath)
 		return "";
 }
 
+std::wstring Utility::GetBasePath(const std::wstring& filePath)
+{
+	size_t lastSlash;
+	if ((lastSlash = filePath.rfind(L'/')) != std::wstring::npos)
+		return filePath.substr(0, lastSlash + 1);
+	else if ((lastSlash = filePath.rfind(L'\\')) != std::wstring::npos)
+		return filePath.substr(0, lastSlash + 1);
+	else
+		return L"";
+}
+
+std::string Utility::RemoveBasePath(const std::string& filePath)
+{
+	size_t lastSlash;
+	if ((lastSlash = filePath.rfind('/')) != std::string::npos)
+		return filePath.substr(lastSlash + 1, std::string::npos);
+	else if ((lastSlash = filePath.rfind('\\')) != std::string::npos)
+		return filePath.substr(lastSlash + 1, std::string::npos);
+	else
+		return filePath;
+}
+
+std::wstring Utility::RemoveBasePath(const std::wstring& filePath)
+{
+	size_t lastSlash;
+	if ((lastSlash = filePath.rfind(L'/')) != std::wstring::npos)
+		return filePath.substr(lastSlash + 1, std::wstring::npos);
+	else if ((lastSlash = filePath.rfind(L'\\')) != std::wstring::npos)
+		return filePath.substr(lastSlash + 1, std::wstring::npos);
+	else
+		return filePath;
+}
