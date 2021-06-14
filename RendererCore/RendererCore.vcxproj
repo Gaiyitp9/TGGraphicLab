@@ -79,7 +79,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
     <TargetExt>.lib</TargetExt>
-    <IncludePath>D:\lch\RenderLab\RenderLab\include\RendererCore;$(IncludePath)</IncludePath>
+    <IncludePath>.\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
@@ -143,16 +143,17 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="..\include\RendererCore\d3dx12.h" />
-    <ClInclude Include="..\include\RendererCore\GPUBuffer.h" />
-    <ClInclude Include="..\include\RendererCore\GPUResource.h" />
-    <ClInclude Include="..\include\RendererCore\pch.h" />
-    <ClInclude Include="..\include\RendererCore\Utility.h" />
+    <ClInclude Include="include\d3dx12.h" />
+    <ClInclude Include="include\GPUBuffer.h" />
+    <ClInclude Include="include\GPUResource.h" />
+    <ClInclude Include="include\Math\Common.h" />
+    <ClInclude Include="include\pch.h" />
+    <ClInclude Include="include\Utility.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\src\RendererCore\GPUBuffer.cpp" />
-    <ClCompile Include="..\src\RendererCore\pch.cpp" />
-    <ClCompile Include="..\src\RendererCore\Utility.cpp" />
+    <ClCompile Include="src\GPUBuffer.cpp" />
+    <ClCompile Include="src\pch.cpp" />
+    <ClCompile Include="src\Utility.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

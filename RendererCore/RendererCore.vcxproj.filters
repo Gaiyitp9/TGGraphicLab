@@ -13,32 +13,38 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="头文件\Math">
+      <UniqueIdentifier>{7598275a-1fca-4bc6-ade6-100371401d0f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\include\RendererCore\GPUBuffer.h">
+    <ClInclude Include="include\d3dx12.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\RendererCore\GPUResource.h">
+    <ClInclude Include="include\GPUBuffer.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\RendererCore\pch.h">
+    <ClInclude Include="include\GPUResource.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\RendererCore\d3dx12.h">
+    <ClInclude Include="include\pch.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\RendererCore\Utility.h">
+    <ClInclude Include="include\Utility.h">
       <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Math\Common.h">
+      <Filter>头文件\Math</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\src\RendererCore\GPUBuffer.cpp">
+    <ClCompile Include="src\GPUBuffer.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\RendererCore\pch.cpp">
+    <ClCompile Include="src\pch.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\RendererCore\Utility.cpp">
+    <ClCompile Include="src\Utility.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

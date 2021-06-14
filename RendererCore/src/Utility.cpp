@@ -14,6 +14,44 @@
 #include "Utility.h"
 #include <locale>
 
+// A faster version of memcopy that uses SSE instructions. 
+void SIMDMemCopy(void* __restrict dest, const void* __restrict source, size_t numQuadwords)
+{
+	ASSERT(Math::IsAligned(dest, 16));
+	ASSERT(Math::IsAligned(source, 16));
+
+	__m128i* __restrict _dest = (__m128i* __restrict)dest;
+	const __m128i* __restrict _source = (const __m128i* __restrict)source;
+	// Cache line size is 64 bytes
+	size_t initialQuadwordCount = (4 - ((size_t)_source >> 4) & 3) & 3;
+	if (initialQuadwordCount > numQuadwords)
+		initialQuadwordCount = numQuadwords;
+
+	switch (initialQuadwordCount)
+	{
+	case 3: _mm_stream_si128(_dest + 2, _mm_load_si128(_source + 2));
+	case 2: _mm_stream_si128(_dest + 1, _mm_load_si128(_source + 1));
+	case 1: _mm_stream_si128(_dest, _mm_load_si128(_source));
+	default:
+		break;
+	}
+
+	if (numQuadwords == initialQuadwordCount)
+		return;
+
+	_dest += initialQuadwordCount;
+	_source += initialQuadwordCount;
+	numQuadwords -= initialQuadwordCount;
+
+	size_t cacheLines = numQuadwords >> 2;
+
+	switch (cacheLines)
+	{
+	default:
+	case 10: _mm_prefetch((char*)(_source + 36), _MM_HINT_NTA);
+	}
+}
+
 std::wstring Utility::AnsiToWideString(const std::string& str)
 {
 	wchar_t wstr[MAX_PATH];
@@ -74,9 +112,9 @@ std::string Utility::RemoveBasePath(const std::string& filePath)
 {
 	size_t lastSlash;
 	if ((lastSlash = filePath.rfind('/')) != std::string::npos)
-		return filePath.substr(lastSlash + 1, std::string::npos);
+		return filePath.substr(lastSlash + 1);
 	else if ((lastSlash = filePath.rfind('\\')) != std::string::npos)
-		return filePath.substr(lastSlash + 1, std::string::npos);
+		return filePath.substr(lastSlash + 1);
 	else
 		return filePath;
 }
@@ -85,9 +123,39 @@ std::wstring Utility::RemoveBasePath(const std::wstring& filePath)
 {
 	size_t lastSlash;
 	if ((lastSlash = filePath.rfind(L'/')) != std::wstring::npos)
-		return filePath.substr(lastSlash + 1, std::wstring::npos);
+		return filePath.substr(lastSlash + 1);
 	else if ((lastSlash = filePath.rfind(L'\\')) != std::wstring::npos)
-		return filePath.substr(lastSlash + 1, std::wstring::npos);
+		return filePath.substr(lastSlash + 1);
 	else
 		return filePath;
+}
+
+std::string Utility::GetFileExtension(const std::string& filePath)
+{
+	std::string fileName = RemoveBasePath(filePath);
+	size_t extOffset = fileName.rfind('.');
+	if (extOffset == std::string::npos)
+		return "";
+
+	return fileName.substr(extOffset + 1);
+}
+
+std::wstring Utility::GetFileExtension(const std::wstring& filePath)
+{
+	std::wstring fileName = RemoveBasePath(filePath);
+	size_t extOffset = fileName.rfind(L'.');
+	if (extOffset == std::wstring::npos)
+		return L"";
+
+	return fileName.substr(extOffset + 1);
+}
+
+std::string Utility::RemoveExtension(const std::string& filePath)
+{
+	return filePath.substr(0, filePath.rfind('.'));
+}
+
+std::wstring Utility::RemoveExtension(const std::wstring& filePath)
+{
+	return filePath.substr(0, filePath.rfind(L'.'));
 }

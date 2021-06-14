@@ -43,14 +43,15 @@
 
 #include <cstdint>
 #include <cstdio>
-#include <cstdarg>
-#include <vector>
-#include <memory>
-#include <string>
-#include <cwctype>
-#include <exception>
+//#include <cstdarg>
+//#include <vector>
+//#include <memory>
+//#include <string>
+//#include <cwctype>
+//#include <exception>
 
-#include <ppltasks.h>
-#include <functional>
+//#include <ppltasks.h>
+//#include <functional>
 
 #include "Utility.h"
+#include "Math/Common.h"
