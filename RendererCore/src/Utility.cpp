@@ -49,7 +49,43 @@ void SIMDMemCopy(void* __restrict dest, const void* __restrict source, size_t nu
 	{
 	default:
 	case 10: _mm_prefetch((char*)(_source + 36), _MM_HINT_NTA);
+	case 9:  _mm_prefetch((char*)(_source + 32), _MM_HINT_NTA);
+	case 8:  _mm_prefetch((char*)(_source + 28), _MM_HINT_NTA);
+	case 7:  _mm_prefetch((char*)(_source + 24), _MM_HINT_NTA);
+	case 6:  _mm_prefetch((char*)(_source + 20), _MM_HINT_NTA);
+	case 5:  _mm_prefetch((char*)(_source + 16), _MM_HINT_NTA);
+	case 4:  _mm_prefetch((char*)(_source + 12), _MM_HINT_NTA);
+	case 3:  _mm_prefetch((char*)(_source + 8 ), _MM_HINT_NTA);
+	case 2:  _mm_prefetch((char*)(_source + 4 ), _MM_HINT_NTA);
+	case 1:  _mm_prefetch((char*)(_source),		 _MM_HINT_NTA);
+
+		for (size_t i = cacheLines; i > 0; --i)
+		{
+			if (i >= 10)
+				_mm_prefetch((char*)(_source + 40), _MM_HINT_NTA);
+
+			_mm_stream_si128(_dest, _mm_load_si128(_source));
+			_mm_stream_si128(_dest + 1, _mm_load_si128(_source + 1));
+			_mm_stream_si128(_dest + 2, _mm_load_si128(_source + 2));
+			_mm_stream_si128(_dest + 3, _mm_load_si128(_source + 3));
+
+			_dest += 4;
+			_source += 4;
+		}
+	case 0:
+		break;
 	}
+
+	switch (numQuadwords & 3)
+	{
+	case 3: _mm_stream_si128(_dest + 2, _mm_load_si128(_source + 2));
+	case 2: _mm_stream_si128(_dest + 1, _mm_load_si128(_source + 1));
+	case 1: _mm_stream_si128(_dest,		_mm_load_si128(_source));
+	default:
+		break;
+	}
+
+	_mm_sfence();
 }
 
 std::wstring Utility::AnsiToWideString(const std::string& str)
