@@ -31,7 +31,7 @@ void SIMDMemCopy(void* __restrict dest, const void* __restrict source, size_t nu
 	{
 	case 3: _mm_stream_si128(_dest + 2, _mm_load_si128(_source + 2));
 	case 2: _mm_stream_si128(_dest + 1, _mm_load_si128(_source + 1));
-	case 1: _mm_stream_si128(_dest, _mm_load_si128(_source));
+	case 1: _mm_stream_si128(_dest,		_mm_load_si128(_source));
 	default:
 		break;
 	}
@@ -81,6 +81,45 @@ void SIMDMemCopy(void* __restrict dest, const void* __restrict source, size_t nu
 	case 3: _mm_stream_si128(_dest + 2, _mm_load_si128(_source + 2));
 	case 2: _mm_stream_si128(_dest + 1, _mm_load_si128(_source + 1));
 	case 1: _mm_stream_si128(_dest,		_mm_load_si128(_source));
+	default:
+		break;
+	}
+
+	_mm_sfence();
+}
+
+void SIMDMemFill(void* __restrict dest, __m128 fillVector, size_t numQuadwords)
+{
+	ASSERT(Math::IsAligned(dest, 16));
+
+	register const __m128i source = _mm_castps_si128(fillVector);
+	__m128i* __restrict _dest = (__m128i* __restrict)dest;
+
+	switch (((size_t)_dest >> 4) & 3)
+	{
+	case 1: _mm_stream_si128(_dest++, source); --numQuadwords;
+	case 2: _mm_stream_si128(_dest++, source); --numQuadwords;
+	case 3: _mm_stream_si128(_dest++, source); --numQuadwords;
+	default:
+		break;
+	}
+
+	size_t wholeCacheLines = numQuadwords >> 2;
+	// Do four quadwords per loop to minimize stalls.
+	while (wholeCacheLines--)
+	{
+		_mm_stream_si128(_dest++, source);
+		_mm_stream_si128(_dest++, source);
+		_mm_stream_si128(_dest++, source);
+		_mm_stream_si128(_dest++, source);
+	}
+
+	// Copy the remaining quadwords
+	switch (numQuadwords & 3)
+	{
+	case 3: _mm_stream_si128(_dest++, source);
+	case 2: _mm_stream_si128(_dest++, source);
+	case 1: _mm_stream_si128(_dest++, source);
 	default:
 		break;
 	}
