@@ -36,6 +36,12 @@
     <ClInclude Include="include\Math\Common.h">
       <Filter>头文件\Math</Filter>
     </ClInclude>
+    <ClInclude Include="include\Window.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\GameTimer.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\GPUBuffer.cpp">

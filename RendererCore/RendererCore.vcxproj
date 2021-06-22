@@ -120,6 +120,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Create</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -144,6 +145,8 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="include\d3dx12.h" />
+    <ClInclude Include="include\Window.h" />
+    <ClInclude Include="include\GameTimer.h" />
     <ClInclude Include="include\GPUBuffer.h" />
     <ClInclude Include="include\GPUResource.h" />
     <ClInclude Include="include\Math\Common.h" />
