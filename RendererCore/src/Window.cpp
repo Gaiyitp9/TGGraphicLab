@@ -8,4 +8,4 @@
 * PURPOSE, MERCHANTABILITY, OR NON-INFRINGEMENT.		*
 *********************************************************/
 
-#pragma once
+#include "Window.h"
