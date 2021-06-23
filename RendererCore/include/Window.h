@@ -34,7 +34,7 @@ namespace LCH
 		~Window();
 
 	private:
-		// 窗口注册器
+		// 窗口类注册器单例
 		static WindowClassRegister wcRegister;
 
 	public:
