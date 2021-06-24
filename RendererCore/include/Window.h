@@ -23,6 +23,7 @@ namespace LCH
 	{
 	public:
 		WindowClassRegister();
+
 	public:
 		std::unordered_map<WindowType, std::string> windowClassMap;
 	};

@@ -9,3 +9,14 @@
 *********************************************************/
 
 #include "Window.h"
+
+LCH::WindowClassRegister::WindowClassRegister()
+{
+	WNDCLASSEX wc = {};
+	wc.cbSize = sizeof(WNDCLASSEX);
+	wc.style = CS_HREDRAW | CS_VREDRAW;
+}
+
+LCH::Window::Window(HINSTANCE hInstance, float width, float height, WindowType type)
+{
+}
