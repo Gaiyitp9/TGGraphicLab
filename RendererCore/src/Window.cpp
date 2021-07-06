@@ -1,22 +1,39 @@
-/********************************************************
-* Copyright (c) LiaoChenhan. All rights reserved.		*
-*														*
-* This code is licensed under the MIT License (MIT).	*
-* THIS CODE IS PROVIDED *AS IS* WITHOUT WARRANTY OF		*
-* ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING ANY	*
-* IMPLIED WARRANTIES OF FITNESS FOR A PARTICULAR		*
-* PURPOSE, MERCHANTABILITY, OR NON-INFRINGEMENT.		*
-*********************************************************/
+/****************************************************************
+* Copyright (c) IGOTGAMES(IGG ShenZhen). All rights reserved.	*
+*																*
+* This code is licensed under the MIT License (MIT).			*
+* THIS CODE IS PROVIDED *AS IS* WITHOUT WARRANTY OF				*
+* ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING ANY			*
+* IMPLIED WARRANTIES OF FITNESS FOR A PARTICULAR				*
+* PURPOSE, MERCHANTABILITY, OR NON-INFRINGEMENT.				*
+*																*
+* Author: LiaoChenhan											*
+*****************************************************************/
 
 #include "Window.h"
 
-LCH::WindowClassRegister::WindowClassRegister()
+namespace IGGSZLab
 {
-	WNDCLASSEX wc = {};
-	wc.cbSize = sizeof(WNDCLASSEX);
-	wc.style = CS_HREDRAW | CS_VREDRAW;
-}
+	WindowClassRegister* WindowClassRegister::instance = nullptr;
+	std::mutex WindowClassRegister::mutex;
 
-LCH::Window::Window(HINSTANCE hInstance, float width, float height, WindowType type)
-{
+	WindowClassRegister::WindowClassRegister()
+	{
+		WNDCLASSEX wc = {};
+		wc.cbSize = sizeof(WNDCLASSEX);
+		wc.style = CS_HREDRAW | CS_VREDRAW;
+	}
+
+	const WindowClassRegister* WindowClassRegister::GetInstance()
+	{
+		std::lock_guard<std::mutex> lock(mutex);
+		if (instance == nullptr)
+			instance = new WindowClassRegister();
+		return instance;
+	}
+
+	Window::Window(HINSTANCE hInstance, float width, float height, WindowType type)
+	{
+
+	}
 }
