@@ -26,20 +26,22 @@ namespace IGGSZLab
 	class WindowClassRegister
 	{
 	public:
-		// 窗口注册器单例
 		static const WindowClassRegister* GetInstance();
 
-	protected:
-		WindowClassRegister();
 	private:
+		WindowClassRegister();
 		WindowClassRegister(WindowClassRegister&) = delete;
 		void operator=(const WindowClassRegister&) = delete;
+
+		static LRESULT CALLBACK WindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 	public:
 		std::unordered_map<WindowType, std::string> windowClassMap;
 
 	private:
+		// 窗口注册器单例
 		static WindowClassRegister* instance;
+		// 互斥锁，用于多线程访问窗口注册器单例
 		static std::mutex mutex;
 	};
 

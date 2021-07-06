@@ -22,6 +22,7 @@ namespace IGGSZLab
 		WNDCLASSEX wc = {};
 		wc.cbSize = sizeof(WNDCLASSEX);
 		wc.style = CS_HREDRAW | CS_VREDRAW;
+		wc.lpfnWndProc = WindowProc;
 	}
 
 	const WindowClassRegister* WindowClassRegister::GetInstance()
@@ -30,6 +31,11 @@ namespace IGGSZLab
 		if (instance == nullptr)
 			instance = new WindowClassRegister();
 		return instance;
+	}
+
+	LRESULT CALLBACK WindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
+	{
+
 	}
 
 	Window::Window(HINSTANCE hInstance, float width, float height, WindowType type)
