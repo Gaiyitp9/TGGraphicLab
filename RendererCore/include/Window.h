@@ -33,8 +33,8 @@ namespace IGGSZLab
 		WindowClassRegister(WindowClassRegister&) = delete;
 		void operator=(const WindowClassRegister&) = delete;
 
-		static LRESULT CALLBACK WindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
-
+		static LRESULT CALLBACK WindowProcSetup(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
+		static LRESULT CALLBACK WindowProcThunk(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 	public:
 		std::unordered_map<WindowType, std::string> windowClassMap;
 
@@ -51,6 +51,7 @@ namespace IGGSZLab
 		Window(HINSTANCE hInstance, float width, float height, WindowType type = WindowType::Default);
 		~Window();
 
+		virtual LRESULT CALLBACK WindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 	public:
 		HWND hwnd;
 		HINSTANCE hInstance;
