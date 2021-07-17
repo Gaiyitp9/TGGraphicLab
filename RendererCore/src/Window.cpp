@@ -36,7 +36,7 @@ namespace IGGSZLab
 		wc.lpszMenuName = nullptr;
 		wc.lpszClassName = L"Default";
 
-		RegisterClassEx(&wc);
+		ASSERT(RegisterClassEx(&wc), true);
 		windowClassMap[WindowType::Default] =  L"Default";
 	}
 
@@ -52,8 +52,17 @@ namespace IGGSZLab
 		{
 			const CREATESTRUCT* const pCreate = reinterpret_cast<CREATESTRUCT*>(lParam);
 			Window* const pWnd = static_cast<Window*>(pCreate->lpCreateParams);
+#ifdef _DEBUG
+			SetLastError(0);
+#endif
 			SetWindowLongPtr(hwnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(pWnd));
+#ifdef _DEBUG
+			ASSERT_SUCCEEDED(GetLastError());
+#endif
 			SetWindowLongPtr(hwnd, GWLP_WNDPROC, reinterpret_cast<LONG_PTR>(WindowProcThunk));
+#ifdef _DEBUG
+			ASSERT_SUCCEEDED(GetLastError());
+#endif
 			return pWnd->WindowProc(hwnd, msg, wParam, lParam);
 		}
 		return DefWindowProc(hwnd, msg, wParam, lParam);
@@ -80,20 +89,17 @@ namespace IGGSZLab
 		WindowClassRegister* const windowRegister = WindowClassRegister::GetInstance();
 		std::wstring wndClassName = windowRegister->windowClassMap[type];
 
-		// 根据客户区域宽和高计算整个窗口的宽和高
-		RECT rect;
-		rect.left = 0;
-		rect.right = rect.left + width;
-		rect.top = 0;
-		rect.bottom = rect.top + height;
+		RECT rect = {0, 0, rect.left + width, rect.top + height};
 
 		switch (type)
 		{
 		case WindowType::Default:
-			AdjustWindowRect(&rect, WS_OVERLAPPEDWINDOW, false);
-			hwnd = CreateWindow(wndClassName.c_str(), title, WS_OVERLAPPEDWINDOW,
+			// 根据客户区域宽和高计算整个窗口的宽和高
+			ASSERT(AdjustWindowRect(&rect, WS_OVERLAPPEDWINDOW, false), true);
+			// 创建窗口
+			ASSERT(hwnd = CreateWindow(wndClassName.c_str(), title, WS_OVERLAPPEDWINDOW,
 				CW_USEDEFAULT, CW_USEDEFAULT, rect.right - rect.left, rect.bottom - rect.top, 
-				nullptr, nullptr, windowRegister->hInstance, this);
+				nullptr, nullptr, windowRegister->hInstance, this), true);
 			break;
 		}
 

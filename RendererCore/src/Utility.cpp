@@ -1,15 +1,14 @@
-//
-// Copyright (c) Microsoft. All rights reserved.
-// This code is licensed under the MIT License (MIT).
-// THIS CODE IS PROVIDED *AS IS* WITHOUT WARRANTY OF
-// ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING ANY
-// IMPLIED WARRANTIES OF FITNESS FOR A PARTICULAR
-// PURPOSE, MERCHANTABILITY, OR NON-INFRINGEMENT.
-//
-// Developed by Minigraph
-//
-// Author:  James Stanard 
-//
+/****************************************************************
+* Copyright (c) IGOTGAMES(IGG ShenZhen). All rights reserved.	*
+*																*
+* This code is licensed under the MIT License (MIT).			*
+* THIS CODE IS PROVIDED *AS IS* WITHOUT WARRANTY OF				*
+* ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING ANY			*
+* IMPLIED WARRANTIES OF FITNESS FOR A PARTICULAR				*
+* PURPOSE, MERCHANTABILITY, OR NON-INFRINGEMENT.				*
+*																*
+* Author: LiaoChenhan											*
+*****************************************************************/
 
 #include "Utility.h"
 #include "Debug.h"
@@ -20,8 +19,8 @@ namespace IGGSZLab
 	// A faster version of memcopy that uses SSE instructions. 
 	void Utility::SIMDMemCopy(void* __restrict dest, const void* __restrict source, size_t numQuadwords)
 	{
-		ASSERT(Math::IsAligned(dest, 16));
-		ASSERT(Math::IsAligned(source, 16));
+		ASSERT(Math::IsAligned(dest, 16), false);
+		ASSERT(Math::IsAligned(source, 16), false);
 
 		__m128i* __restrict _dest = (__m128i * __restrict)dest;
 		const __m128i* __restrict _source = (const __m128i * __restrict)source;
@@ -93,7 +92,7 @@ namespace IGGSZLab
 
 	void Utility::SIMDMemFill(void* __restrict dest, __m128 fillVector, size_t numQuadwords)
 	{
-		ASSERT(Math::IsAligned(dest, 16));
+		ASSERT(Math::IsAligned(dest, 16), false);
 
 		register const __m128i source = _mm_castps_si128(fillVector);
 		__m128i* __restrict _dest = (__m128i * __restrict)dest;

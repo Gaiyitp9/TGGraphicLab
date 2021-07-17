@@ -1,6 +1,7 @@
 #pragma once
 
 #include "pch.h"
+#include <comdef.h>
 
 namespace IGGSZLab
 {
@@ -30,7 +31,6 @@ namespace IGGSZLab
 #ifdef _CONSOLE
 		inline static void Log(const char* msg) { printf("%s", msg); }
 		inline static void Log(const wchar_t* msg) { wprintf(L"%ws", msg); }
-		inline static void Log() {}
 #else
 		inline static void Log(const char* msg) { OutputDebugStringA(msg); }
 		inline static void Log(const wchar_t* msg) { OutputDebugStringW(msg); }
@@ -41,28 +41,32 @@ namespace IGGSZLab
 #undef ASSERT
 #endif
 
-#ifdef RELEASE
-#define ASSERT(isTrue, ...) (void)(isTrue)
-#define ASSERT_SUCCEEDED(hr, ...) (void)(hr)
+#ifdef NDEBUG
+#define ASSERT(isTrue) isTrue
+#define ASSERT_SUCCEEDED(hr) hr
 #else
 #define STRINGIFY(x) #x
-#define ASSERT(isTrue, ...)\
-		if (!(bool)(isTrue))\
+// checkHrError表示是否要检查错误码(因为有些函数不返回错误码，需要用GetLastError来查询)
+#define ASSERT(isTrue, checkHrError)\
+		if (!(isTrue))\
 		{\
 			Debug::Log("\nAssertion failed in " STRINGIFY(__FILE__) " @ " STRINGIFY(__LINE__) "\n");\
-			Debug::Log("\'" #isTrue "\' is false");\
-			Debug::Log(__VA_ARGS__);\
-			Debug::Log("\n");\
+			Debug::Log("\'" #isTrue "\' is false.\n");\
+			if (checkHrError)\
+			{\
+				_com_error err(GetLastError());\
+				Debug::Log(err.ErrorMessage());\
+			}\
 			__debugbreak();\
 		}
 
-#define ASSERT_SUCCEEDED(hr, ...)\
+#define ASSERT_SUCCEEDED(hr)\
 		if (FAILED(hr))\
 		{\
 			Debug::Log("\nHRESULT failed in " STRINGIFY(__FILE__) " @ " STRINGIFY(__LINE__) "\n");\
-			Debug::Log("hr = 0x%08X", hr);\
-			Debug::Log(__VA_ARGS__);\
-			Debug::Log("\n");\
+			Debug::LogFormat("hr = 0x%08X\n", hr);\
+			_com_error err(hr);\
+			Debug::Log(err.ErrorMessage());\
 			__debugbreak();\
 		}
 #endif
