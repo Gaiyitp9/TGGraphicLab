@@ -19,13 +19,31 @@ namespace IGGSZLab
 
 	WindowClassRegister::WindowClassRegister()
 	{
+		hInstance = GetModuleHandle(nullptr);
+
 		WNDCLASSEX wc = {};
 		wc.cbSize = sizeof(WNDCLASSEX);
 		wc.style = CS_HREDRAW | CS_VREDRAW;
 		wc.lpfnWndProc = WindowProcSetup;
 		wc.cbClsExtra = 0;
 		wc.cbWndExtra = 0;
-		wc.hInstance = GetModuleHandle(nullptr);
+		wc.hInstance = hInstance;
+		wc.hIcon = static_cast<HICON>(LoadImage(hInstance, MAKEINTRESOURCE(IDI_ICON1), 
+			IMAGE_ICON, 32, 32, 0));
+		wc.hCursor = nullptr;
+		wc.hbrBackground = nullptr;
+		wc.hIconSm = nullptr;
+		wc.lpszMenuName = nullptr;
+		wc.lpszClassName = L"Default";
+
+		RegisterClassEx(&wc);
+		windowClassMap[WindowType::Default] =  L"Default";
+	}
+
+	WindowClassRegister::~WindowClassRegister()
+	{
+		for (auto& pair : windowClassMap)
+			UnregisterClass(pair.second.c_str(), hInstance);
 	}
 
 	LRESULT WindowClassRegister::WindowProcSetup(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
@@ -47,7 +65,7 @@ namespace IGGSZLab
 		return pWnd->WindowProc(hwnd, msg, wParam, lParam);
 	}
 
-	const WindowClassRegister* WindowClassRegister::GetInstance()
+	WindowClassRegister* const WindowClassRegister::GetInstance()
 	{
 		std::lock_guard<std::mutex> lock(mutex);
 		if (instance == nullptr)
@@ -55,9 +73,36 @@ namespace IGGSZLab
 		return instance;
 	}
 
-	Window::Window(HINSTANCE hInstance, float width, float height, WindowType type)
+	Window::Window(int width, int height, const wchar_t* title = L"IGGSZ Lab", WindowType type = WindowType::Default)
+		: width(width), height(height), hwnd(nullptr)
 	{
+		// 获取窗口类名称
+		WindowClassRegister* const windowRegister = WindowClassRegister::GetInstance();
+		std::wstring wndClassName = windowRegister->windowClassMap[type];
 
+		// 根据客户区域宽和高计算整个窗口的宽和高
+		RECT rect;
+		rect.left = 0;
+		rect.right = rect.left + width;
+		rect.top = 0;
+		rect.bottom = rect.top + height;
+
+		switch (type)
+		{
+		case WindowType::Default:
+			AdjustWindowRect(&rect, WS_OVERLAPPEDWINDOW, false);
+			hwnd = CreateWindow(wndClassName.c_str(), title, WS_OVERLAPPEDWINDOW,
+				CW_USEDEFAULT, CW_USEDEFAULT, rect.right - rect.left, rect.bottom - rect.top, 
+				nullptr, nullptr, windowRegister->hInstance, this);
+			break;
+		}
+
+		ShowWindow(hwnd, SW_SHOWDEFAULT);
+	}
+
+	Window::~Window()
+	{
+		DestroyWindow(hwnd);
 	}
 
 	LRESULT Window::WindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)

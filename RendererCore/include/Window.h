@@ -13,6 +13,7 @@
 #pragma once
 
 #include "pch.h"
+#include "resource.h"
 
 namespace IGGSZLab
 {
@@ -26,17 +27,21 @@ namespace IGGSZLab
 	class WindowClassRegister
 	{
 	public:
-		static const WindowClassRegister* GetInstance();
+		static WindowClassRegister* const GetInstance();
 
 	private:
-		WindowClassRegister();
+		WindowClassRegister() noexcept;
+		~WindowClassRegister();
 		WindowClassRegister(WindowClassRegister&) = delete;
 		void operator=(const WindowClassRegister&) = delete;
 
 		static LRESULT CALLBACK WindowProcSetup(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 		static LRESULT CALLBACK WindowProcThunk(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
+
 	public:
-		std::unordered_map<WindowType, std::string> windowClassMap;
+		std::unordered_map<WindowType, std::wstring> windowClassMap;
+		// ÊµÀý¾ä±ú
+		HINSTANCE hInstance;
 
 	private:
 		// ´°¿Ú×¢²áÆ÷µ¥Àý
@@ -48,12 +53,13 @@ namespace IGGSZLab
 	class Window
 	{
 	public:
-		Window(HINSTANCE hInstance, float width, float height, WindowType type = WindowType::Default);
+		Window(int width, int height, const wchar_t* title, WindowType type = WindowType::Default);
 		~Window();
 
 		virtual LRESULT CALLBACK WindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
+
 	public:
 		HWND hwnd;
-		HINSTANCE hInstance;
+		int width, height;
 	};
 }

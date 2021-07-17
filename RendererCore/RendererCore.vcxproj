@@ -145,6 +145,8 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="include\d3dx12.h" />
+    <ClInclude Include="include\Debug.h" />
+    <ClInclude Include="include\resource.h" />
     <ClInclude Include="include\Window.h" />
     <ClInclude Include="include\GameTimer.h" />
     <ClInclude Include="include\GPUBuffer.h" />
@@ -160,7 +162,10 @@
     <ClCompile Include="src\Window.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="cpp.hint" />
+    <ResourceCompile Include="RendererCore.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="leaf.ico" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
