@@ -10,9 +10,7 @@
 * Author: LiaoChenhan											*
 *****************************************************************/
 
-#include "Utility.h"
-#include "Debug.h"
-#include <locale>
+#include "pch.h"
 
 namespace IGGSZLab
 {

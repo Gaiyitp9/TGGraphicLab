@@ -30,7 +30,7 @@ namespace IGGSZLab
 		static WindowClassRegister* const GetInstance();
 
 	private:
-		WindowClassRegister() noexcept;
+		WindowClassRegister();
 		~WindowClassRegister();
 		WindowClassRegister(const WindowClassRegister&) = delete;
 		void operator=(const WindowClassRegister&) = delete;
@@ -39,6 +39,7 @@ namespace IGGSZLab
 		static LRESULT CALLBACK WindowProcThunk(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 	public:
+		// 记录不同类型窗口的名称
 		std::unordered_map<WindowType, std::wstring> windowClassMap;
 		// 实例句柄
 		HINSTANCE hInstance;
@@ -54,15 +55,14 @@ namespace IGGSZLab
 	class Window
 	{
 	public:
-		Window(int width, int height, const wchar_t* title, WindowType type = WindowType::Default);
+		Window(int width, int height, const wchar_t* title = L"IGGSZ Lab", WindowType type = WindowType::Default);
 		Window(const Window&) = delete;
 		void operator=(const Window&) = delete;
 		~Window();
 
 		virtual LRESULT CALLBACK WindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
-		void Run();
 
-	public:
+	private:
 		HWND hwnd;
 		int width, height;
 	};

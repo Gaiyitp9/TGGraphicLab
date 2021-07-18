@@ -10,6 +10,7 @@
 * Author: LiaoChenhan											*
 *****************************************************************/
 
+#include "pch.h"
 #include "Window.h"
 
 namespace IGGSZLab
@@ -82,7 +83,7 @@ namespace IGGSZLab
 		return instance;
 	}
 
-	Window::Window(int width, int height, const wchar_t* title = L"IGGSZ Lab", WindowType type = WindowType::Default)
+	Window::Window(int width, int height, const wchar_t* title, WindowType type)
 		: width(width), height(height), hwnd(nullptr)
 	{
 		// 获取窗口类名称
@@ -108,11 +109,21 @@ namespace IGGSZLab
 
 	Window::~Window()
 	{
-		DestroyWindow(hwnd);
 	}
 
 	LRESULT Window::WindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	{
+		switch (msg)
+		{
+		case WM_MOUSEMOVE:
+			OutputDebugString(L"Mouse move\n");
+			break;
+
+		case WM_DESTROY:
+			// 基础窗口一般作为主窗口，销毁后要退出线程
+			PostQuitMessage(0);
+			return 0;
+		}
 		return DefWindowProc(hwnd, msg, wParam, lParam);
 	}
 }
