@@ -51,7 +51,7 @@ namespace IGGSZLab
 		static std::mutex mutex;
 	};
 
-	// 基础窗口类
+	// 窗口类
 	class Window
 	{
 	public:
@@ -65,5 +65,6 @@ namespace IGGSZLab
 	private:
 		HWND hwnd;
 		int width, height;
+		WindowType type;
 	};
 }

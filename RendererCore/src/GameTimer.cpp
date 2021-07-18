@@ -10,30 +10,10 @@
 * Author: LiaoChenhan											*
 *****************************************************************/
 
-#pragma once
-
 #include "pch.h"
-#include <chrono>
+#include "GameTimer.h"
 
 namespace IGGSZLab
 {
-	class Timer
-	{
-	public:
-		Timer();
-		~Timer();
 
-		float DeltaTime() const;
-		float TotalTime() const;
-
-		void Reset();
-		void Pause();
-		void Start();
-		void Tick();
-
-	private:
-		float totalTime;
-		float deltaTime;
-		std::chrono::steady_clock::time_point last;
-	};
 }

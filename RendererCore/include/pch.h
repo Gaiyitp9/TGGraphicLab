@@ -47,12 +47,6 @@
 #include <string>
 #include <unordered_map>
 #include <mutex>
-#include <chrono>
-#include <locale>
-//#include <cstdarg>
-//#include <vector>
-//#include <memory>
-//#include <cwctype>
 #include <exception>
 
 //#include <ppltasks.h>

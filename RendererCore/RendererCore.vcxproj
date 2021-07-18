@@ -157,6 +157,7 @@
     <ClInclude Include="include\Utility.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\GameTimer.cpp" />
     <ClCompile Include="src\pch.cpp" />
     <ClCompile Include="src\Utility.cpp" />
     <ClCompile Include="src\Window.cpp" />

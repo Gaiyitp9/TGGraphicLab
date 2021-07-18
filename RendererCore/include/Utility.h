@@ -12,6 +12,7 @@
 #pragma once
 
 #include "pch.h"
+#include <locale>
 
 namespace IGGSZLab
 {
