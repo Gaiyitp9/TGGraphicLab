@@ -42,7 +42,7 @@ namespace IGGSZLab
 #endif
 
 #ifdef NDEBUG
-#define ASSERT(isTrue) isTrue
+#define ASSERT(isTrue, checkHrError) isTrue
 #define ASSERT_SUCCEEDED(hr) hr
 #else
 #define STRINGIFY(x) #x

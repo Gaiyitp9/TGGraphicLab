@@ -50,6 +50,7 @@ namespace IGGSZLab
 		static std::mutex mutex;
 	};
 
+	// »ù´¡´°¿ÚÀà
 	class Window
 	{
 	public:
