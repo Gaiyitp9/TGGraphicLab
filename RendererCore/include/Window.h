@@ -32,7 +32,7 @@ namespace IGGSZLab
 	private:
 		WindowClassRegister() noexcept;
 		~WindowClassRegister();
-		WindowClassRegister(WindowClassRegister&) = delete;
+		WindowClassRegister(const WindowClassRegister&) = delete;
 		void operator=(const WindowClassRegister&) = delete;
 
 		static LRESULT CALLBACK WindowProcSetup(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
@@ -55,9 +55,12 @@ namespace IGGSZLab
 	{
 	public:
 		Window(int width, int height, const wchar_t* title, WindowType type = WindowType::Default);
+		Window(const Window&) = delete;
+		void operator=(const Window&) = delete;
 		~Window();
 
 		virtual LRESULT CALLBACK WindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
+		void Run();
 
 	public:
 		HWND hwnd;

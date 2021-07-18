@@ -88,7 +88,7 @@ namespace IGGSZLab
 		// 获取窗口类名称
 		WindowClassRegister* const windowRegister = WindowClassRegister::GetInstance();
 		std::wstring wndClassName = windowRegister->windowClassMap[type];
-
+		// 客户端区域大小
 		RECT rect = {0, 0, rect.left + width, rect.top + height};
 
 		switch (type)
@@ -103,7 +103,7 @@ namespace IGGSZLab
 			break;
 		}
 
-		ShowWindow(hwnd, SW_SHOWDEFAULT);
+		ShowWindow(hwnd, SW_SHOW);
 	}
 
 	Window::~Window()

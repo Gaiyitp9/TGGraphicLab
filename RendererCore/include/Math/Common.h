@@ -15,12 +15,15 @@
 #include <DirectXMath.h>
 #include <intrin.h>
 
-#define INLINE __forceinline
-
-namespace Math
+namespace IGGSZLab
 {
-	template <typename T> __forceinline bool IsAligned(T value, size_t alignment)
+	class Math
 	{
-		return 0 == ((size_t)value & (alignment - 1));
-	}
+	public:
+		template <typename T> 
+		inline static bool IsAligned(T value, size_t alignment)
+		{
+			return 0 == ((size_t)value & (alignment - 1));
+		}
+	};
 }

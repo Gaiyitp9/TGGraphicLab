@@ -34,5 +34,4 @@ namespace IGGSZLab
 		static void SIMDMemCopy(void* __restrict dest, const void* __restrict source, size_t numQuadwords);
 		static void SIMDMemFill(void* __restrict dest, __m128 fillVector, size_t numQuadwords);
 	};
-
 }
