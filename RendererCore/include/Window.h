@@ -55,7 +55,7 @@ namespace IGGSZLab
 	class Window
 	{
 	public:
-		Window(int width, int height, const wchar_t* title = L"IGGSZ Lab", WindowType type = WindowType::Default);
+		Window(int width, int height, const wchar_t* title = L"IGGSZ Lab");
 		Window(const Window&) = delete;
 		void operator=(const Window&) = delete;
 		~Window();
@@ -65,6 +65,5 @@ namespace IGGSZLab
 	private:
 		HWND hwnd;
 		int width, height;
-		WindowType type;
 	};
 }
