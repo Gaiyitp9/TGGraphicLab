@@ -48,6 +48,8 @@
 #include <unordered_map>
 #include <mutex>
 #include <exception>
+#include <optional>
+#include <chrono>
 
 //#include <ppltasks.h>
 //#include <functional>

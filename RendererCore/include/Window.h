@@ -61,6 +61,10 @@ namespace IGGSZLab
 		~Window();
 
 		virtual LRESULT CALLBACK WindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
+		static std::optional<int> ProcessMessage();
+
+	protected:
+		virtual void Initialize(int width, int height, const wchar_t* title);
 
 	private:
 		HWND hwnd;

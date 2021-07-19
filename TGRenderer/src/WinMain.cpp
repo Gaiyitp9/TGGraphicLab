@@ -11,6 +11,7 @@
 *****************************************************************/
 #include "pch.h"
 #include "Window.h"
+#include <iostream>
 
 int WinMain(HINSTANCE hInstance,
 	HINSTANCE hPrevInstance,
@@ -18,15 +19,16 @@ int WinMain(HINSTANCE hInstance,
 	int       nShowCmd)
 {
 	IGGSZLab::Window wnd1(800, 600);
+	std::chrono::system_clock c;
+	std::wstringstream str;
+	const std::chrono::time_zone* z = std::chrono::current_zone();
+	z->to_local(c.now());
+	str << z->to_local(c.now());
+	OutputDebugString(str.str().c_str());
+
 	while (true)
 	{
-		MSG msg = { 0 };
-		while (PeekMessage(&msg, 0, 0, 0, PM_REMOVE))
-		{
-			if (msg.message == WM_QUIT)
-				return (int)msg.wParam;
-			TranslateMessage(&msg);
-			DispatchMessage(&msg);
-		}
+		if (const auto code = IGGSZLab::Window::ProcessMessage())
+			return *code;
 	}
 }
