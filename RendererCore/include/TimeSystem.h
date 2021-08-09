@@ -10,10 +10,35 @@
 * Author: LiaoChenhan											*
 *****************************************************************/
 
+#pragma once
+
 #include "pch.h"
-#include "GameTimer.h"
+#include <chrono>
 
 namespace IGGSZLab
 {
+	class TimeSystem
+	{
+	public:
+		TimeSystem();
+		~TimeSystem();
 
+		inline float DeltaTime() const { return deltaTime; }
+		inline float TotalTime() const { return totalTime; }
+		std::wstring Time() const;
+
+		void Reset();
+		void Pause();
+		void Start();
+		void Tick();
+
+	private:
+		float totalTime;
+		float deltaTime;
+
+		std::chrono::system_clock wallClock;
+
+		std::chrono::steady_clock timer;
+		std::chrono::steady_clock::time_point last;
+	};
 }

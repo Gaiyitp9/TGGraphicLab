@@ -27,13 +27,13 @@
     <ClInclude Include="include\Utility.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="include\Math\Common.h">
+    <ClInclude Include="include\Math\Math.h">
       <Filter>头文件\Math</Filter>
     </ClInclude>
     <ClInclude Include="include\Window.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="include\GameTimer.h">
+    <ClInclude Include="include\TimeSystem.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="include\Debug.h">
@@ -50,7 +50,7 @@
     <ClCompile Include="src\Window.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="src\GameTimer.cpp">
+    <ClCompile Include="src\TimeSystem.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

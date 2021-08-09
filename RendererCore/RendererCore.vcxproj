@@ -151,13 +151,13 @@
     <ClInclude Include="include\d3dx12.h" />
     <ClInclude Include="include\Debug.h" />
     <ClInclude Include="include\Window.h" />
-    <ClInclude Include="include\GameTimer.h" />
-    <ClInclude Include="include\Math\Common.h" />
+    <ClInclude Include="include\TimeSystem.h" />
+    <ClInclude Include="include\Math\Math.h" />
     <ClInclude Include="include\pch.h" />
     <ClInclude Include="include\Utility.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\GameTimer.cpp" />
+    <ClCompile Include="src\TimeSystem.cpp" />
     <ClCompile Include="src\pch.cpp" />
     <ClCompile Include="src\Utility.cpp" />
     <ClCompile Include="src\Window.cpp" />
