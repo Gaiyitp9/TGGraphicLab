@@ -11,6 +11,7 @@
 *****************************************************************/
 #include "pch.h"
 #include "Window.h"
+#include "TimeSystem.h"
 #include <iostream>
 
 int WinMain(HINSTANCE hInstance,
@@ -18,13 +19,13 @@ int WinMain(HINSTANCE hInstance,
 	LPSTR     lpCmdLine,
 	int       nShowCmd)
 {
-	LCH::Window wnd1(800, 600);
-	LCH::Time timer;
-	OutputDebugString(timer.Now().c_str());
+	IGGSZLab::Window wnd1(800, 600);
+	IGGSZLab::TimeSystem timer;
+	OutputDebugString(timer.Time().c_str());
 
 	while (true)
 	{
-		if (const auto code = LCH::Window::ProcessMessage())
+		if (const auto code = IGGSZLab::Window::ProcessMessage())
 			return *code;
 	}
 }

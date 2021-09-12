@@ -14,7 +14,7 @@
 #include "pch.h"
 #include <comdef.h>
 
-namespace LCH
+namespace IGGSZLab
 {
 	class Debug
 	{

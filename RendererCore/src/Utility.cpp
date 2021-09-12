@@ -12,8 +12,121 @@
 
 #include "pch.h"
 
-namespace LCH
+namespace IGGSZLab
 {
+	// A faster version of memcopy that uses SSE instructions. 
+	void Utility::SIMDMemCopy(void* __restrict dest, const void* __restrict source, size_t numQuadwords)
+	{
+		ASSERT(Math::IsAligned(dest, 16), false);
+		ASSERT(Math::IsAligned(source, 16), false);
+
+		__m128i* __restrict _dest = (__m128i * __restrict)dest;
+		const __m128i* __restrict _source = (const __m128i * __restrict)source;
+		// Cache line size is 64 bytes
+		size_t initialQuadwordCount = (4 - ((size_t)_source >> 4) & 3) & 3;
+		if (initialQuadwordCount > numQuadwords)
+			initialQuadwordCount = numQuadwords;
+
+		switch (initialQuadwordCount)
+		{
+		case 3: _mm_stream_si128(_dest + 2, _mm_load_si128(_source + 2));
+		case 2: _mm_stream_si128(_dest + 1, _mm_load_si128(_source + 1));
+		case 1: _mm_stream_si128(_dest, _mm_load_si128(_source));
+		default:
+			break;
+		}
+
+		if (numQuadwords == initialQuadwordCount)
+			return;
+
+		_dest += initialQuadwordCount;
+		_source += initialQuadwordCount;
+		numQuadwords -= initialQuadwordCount;
+
+		size_t cacheLines = numQuadwords >> 2;
+
+		switch (cacheLines)
+		{
+		default:
+		case 10: _mm_prefetch((char*)(_source + 36), _MM_HINT_NTA);
+		case 9:  _mm_prefetch((char*)(_source + 32), _MM_HINT_NTA);
+		case 8:  _mm_prefetch((char*)(_source + 28), _MM_HINT_NTA);
+		case 7:  _mm_prefetch((char*)(_source + 24), _MM_HINT_NTA);
+		case 6:  _mm_prefetch((char*)(_source + 20), _MM_HINT_NTA);
+		case 5:  _mm_prefetch((char*)(_source + 16), _MM_HINT_NTA);
+		case 4:  _mm_prefetch((char*)(_source + 12), _MM_HINT_NTA);
+		case 3:  _mm_prefetch((char*)(_source + 8), _MM_HINT_NTA);
+		case 2:  _mm_prefetch((char*)(_source + 4), _MM_HINT_NTA);
+		case 1:  _mm_prefetch((char*)(_source), _MM_HINT_NTA);
+
+			for (size_t i = cacheLines; i > 0; --i)
+			{
+				if (i >= 10)
+					_mm_prefetch((char*)(_source + 40), _MM_HINT_NTA);
+
+				_mm_stream_si128(_dest, _mm_load_si128(_source));
+				_mm_stream_si128(_dest + 1, _mm_load_si128(_source + 1));
+				_mm_stream_si128(_dest + 2, _mm_load_si128(_source + 2));
+				_mm_stream_si128(_dest + 3, _mm_load_si128(_source + 3));
+
+				_dest += 4;
+				_source += 4;
+			}
+		case 0:
+			break;
+		}
+
+		switch (numQuadwords & 3)
+		{
+		case 3: _mm_stream_si128(_dest + 2, _mm_load_si128(_source + 2));
+		case 2: _mm_stream_si128(_dest + 1, _mm_load_si128(_source + 1));
+		case 1: _mm_stream_si128(_dest, _mm_load_si128(_source));
+		default:
+			break;
+		}
+
+		_mm_sfence();
+	}
+
+	void Utility::SIMDMemFill(void* __restrict dest, __m128 fillVector, size_t numQuadwords)
+	{
+		ASSERT(Math::IsAligned(dest, 16), false);
+
+		register const __m128i source = _mm_castps_si128(fillVector);
+		__m128i* __restrict _dest = (__m128i * __restrict)dest;
+
+		switch (((size_t)_dest >> 4) & 3)
+		{
+		case 1: _mm_stream_si128(_dest++, source); --numQuadwords;
+		case 2: _mm_stream_si128(_dest++, source); --numQuadwords;
+		case 3: _mm_stream_si128(_dest++, source); --numQuadwords;
+		default:
+			break;
+		}
+
+		size_t wholeCacheLines = numQuadwords >> 2;
+		// Do four quadwords per loop to minimize stalls.
+		while (wholeCacheLines--)
+		{
+			_mm_stream_si128(_dest++, source);
+			_mm_stream_si128(_dest++, source);
+			_mm_stream_si128(_dest++, source);
+			_mm_stream_si128(_dest++, source);
+		}
+
+		// Copy the remaining quadwords
+		switch (numQuadwords & 3)
+		{
+		case 3: _mm_stream_si128(_dest++, source);
+		case 2: _mm_stream_si128(_dest++, source);
+		case 1: _mm_stream_si128(_dest++, source);
+		default:
+			break;
+		}
+
+		_mm_sfence();
+	}
+
 	std::wstring Utility::AnsiToWideString(const std::string& str)
 	{
 		wchar_t wstr[MAX_PATH];

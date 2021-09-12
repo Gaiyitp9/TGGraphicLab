@@ -11,8 +11,9 @@
 *****************************************************************/
 
 #include "pch.h"
+#include "Window.h"
 
-namespace LCH
+namespace IGGSZLab
 {
 	WindowClassRegister* WindowClassRegister::instance = nullptr;
 	std::mutex WindowClassRegister::mutex;

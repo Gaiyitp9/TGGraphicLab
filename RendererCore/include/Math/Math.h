@@ -15,7 +15,7 @@
 #include <DirectXMath.h>
 #include <intrin.h>
 
-namespace LCH
+namespace IGGSZLab
 {
 	class Math
 	{
