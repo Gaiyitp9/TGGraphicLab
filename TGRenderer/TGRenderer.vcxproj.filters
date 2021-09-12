@@ -25,7 +25,7 @@
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
-    <Image Include="leaf.ico">
+    <Image Include="maple-leaf.ico">
       <Filter>资源文件</Filter>
     </Image>
   </ItemGroup>

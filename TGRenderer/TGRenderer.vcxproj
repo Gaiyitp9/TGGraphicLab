@@ -156,7 +156,7 @@
     <ResourceCompile Include="TGRenderer.rc" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="leaf.ico" />
+    <Image Include="maple-leaf.ico" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\resource.h" />

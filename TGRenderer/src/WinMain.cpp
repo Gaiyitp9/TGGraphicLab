@@ -19,13 +19,13 @@ int WinMain(HINSTANCE hInstance,
 	LPSTR     lpCmdLine,
 	int       nShowCmd)
 {
-	IGGSZLab::Window wnd1(800, 600);
-	IGGSZLab::TimeSystem timer;
+	LCH::Window wnd1(800, 600);
+	LCH::TimeSystem timer;
 	OutputDebugString(timer.Time().c_str());
 
 	while (true)
 	{
-		if (const auto code = IGGSZLab::Window::ProcessMessage())
+		if (const auto code = LCH::Window::ProcessMessage())
 			return *code;
 	}
 }

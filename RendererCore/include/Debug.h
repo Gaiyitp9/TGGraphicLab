@@ -14,7 +14,7 @@
 #include "pch.h"
 #include <comdef.h>
 
-namespace IGGSZLab
+namespace LCH
 {
 	class Debug
 	{
@@ -61,7 +61,8 @@ namespace IGGSZLab
 #define ASSERT(isTrue, checkHrError)\
 		if (!(isTrue))\
 		{\
-			Debug::Log("\nAssertion failed in " STRINGIFY(__FILE__) " @ " STRINGIFY(__LINE__) "\n");\
+			\
+			Debug::Log("\nAssertion failed in " __FILE__ " @ " STRINGIFY(__LINE__) "\n");\
 			Debug::Log("\'" #isTrue "\' is false.\n");\
 			if (checkHrError)\
 			{\

@@ -15,7 +15,7 @@
 #include "pch.h"
 #include "resource.h"
 
-namespace IGGSZLab
+namespace LCH
 {
 	// ¥∞ø⁄÷÷¿‡
 	enum class WindowType

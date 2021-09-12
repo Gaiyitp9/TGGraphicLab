@@ -15,7 +15,7 @@
 #include "pch.h"
 #include <chrono>
 
-namespace IGGSZLab
+namespace LCH
 {
 	class TimeSystem
 	{
