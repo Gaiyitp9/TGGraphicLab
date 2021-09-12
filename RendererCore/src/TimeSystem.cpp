@@ -1,5 +1,5 @@
 /****************************************************************
-* Copyright (c) IGOTGAMES(IGG ShenZhen). All rights reserved.	*
+* Copyright (c) LiaoChenhan. All rights reserved.				*
 *																*
 * This code is licensed under the MIT License (MIT).			*
 * THIS CODE IS PROVIDED *AS IS* WITHOUT WARRANTY OF				*
