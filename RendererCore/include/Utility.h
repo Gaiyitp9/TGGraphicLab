@@ -12,9 +12,8 @@
 #pragma once
 
 #include "pch.h"
-#include <locale>
 
-namespace IGGSZLab
+namespace LCH
 {
 	class Utility
 	{
@@ -31,8 +30,5 @@ namespace IGGSZLab
 		static std::wstring GetFileExtension(const std::wstring& wstr);
 		static std::string RemoveExtension(const std::string& str);
 		static std::wstring RemoveExtension(const std::wstring& wstr);
-
-		static void SIMDMemCopy(void* __restrict dest, const void* __restrict source, size_t numQuadwords);
-		static void SIMDMemFill(void* __restrict dest, __m128 fillVector, size_t numQuadwords);
 	};
 }

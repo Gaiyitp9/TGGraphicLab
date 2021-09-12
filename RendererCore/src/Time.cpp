@@ -11,22 +11,22 @@
 *****************************************************************/
 
 #include "pch.h"
-#include "TimeSystem.h"
+#include "Time.h"
 
-namespace IGGSZLab
+namespace LCH
 {
-	TimeSystem::TimeSystem()
+	Time::Time()
 		: totalTime(0.0f), deltaTime(0.0f)
 	{
 
 	}
 
-	TimeSystem::~TimeSystem()
+	Time::~Time()
 	{
 
 	}
 
-	std::wstring TimeSystem::Time() const
+	std::wstring Time::Now() const
 	{
 		std::chrono::system_clock::time_point t = wallClock.now();
 		auto const localT = std::chrono::current_zone()->to_local(t);
@@ -35,7 +35,7 @@ namespace IGGSZLab
 		return std::format(L"{}", std::chrono::hh_mm_ss(hhmmss));
 	}
 
-	void TimeSystem::Tick()
+	void Time::Tick()
 	{
 		std::chrono::steady_clock::time_point t = timer.now();
 	}

@@ -49,10 +49,9 @@
 #include <mutex>
 #include <exception>
 #include <optional>
-
-//#include <ppltasks.h>
-//#include <functional>
+#include <locale>
 
 #include "Utility.h"
 #include "Math/Math.h"
 #include "Debug.h"
+#include "Window.h"

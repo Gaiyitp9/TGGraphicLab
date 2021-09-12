@@ -15,17 +15,19 @@
 #include "pch.h"
 #include <chrono>
 
-namespace IGGSZLab
+namespace LCH
 {
-	class TimeSystem
+	class Time
 	{
 	public:
-		TimeSystem();
-		~TimeSystem();
+		Time();
+		Time(const Time&) = delete;
+		Time& operator=(const Time&) = delete;
+		~Time();
 
 		inline float DeltaTime() const { return deltaTime; }
 		inline float TotalTime() const { return totalTime; }
-		std::wstring Time() const;
+		std::wstring Now() const;
 
 		void Reset();
 		void Pause();
