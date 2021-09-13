@@ -11,7 +11,6 @@
 *****************************************************************/
 #pragma once
 
-#include "pch.h"
 #include <comdef.h>
 
 namespace LCH
@@ -61,9 +60,10 @@ namespace LCH
 #define ASSERT(isTrue, checkHrError)\
 		if (!(isTrue))\
 		{\
-			\
-			Debug::Log("\nAssertion failed in " __FILE__ " @ " STRINGIFY(__LINE__) "\n");\
-			Debug::Log("\'" #isTrue "\' is false.\n");\
+			std::string errInfo = "\nAssertion failed in " __FILE__ ": ";\
+			errInfo += std::to_string(__LINE__);\
+			errInfo += "\n\'" #isTrue "\' is false.\n";\
+			Debug::Log(errInfo.c_str());\
 			if (checkHrError)\
 			{\
 				_com_error err(GetLastError());\
@@ -75,8 +75,10 @@ namespace LCH
 #define ASSERT_SUCCEEDED(hr)\
 		if (FAILED(hr))\
 		{\
-			Debug::Log("\nHRESULT failed in " STRINGIFY(__FILE__) " @ " STRINGIFY(__LINE__) "\n");\
-			Debug::LogFormat("hr = 0x%08X\n", hr);\
+			std::string errInfo = "\nHRESULT failed in " __FILE__ ": ";\
+			errInfo += std::to_string(__LINE__);\
+			Debug::Log(errInfo.c_str());\
+			Debug::LogFormat("\nhr = 0x%08X\n", hr);\
 			_com_error err(hr);\
 			Debug::Log(err.ErrorMessage());\
 			__debugbreak();\

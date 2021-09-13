@@ -11,14 +11,13 @@
 *****************************************************************/
 
 #include "pch.h"
-#include "TimeSystem.h"
 
 namespace LCH
 {
 	TimeSystem::TimeSystem()
 		: totalTime(0.0f), deltaTime(0.0f)
 	{
-
+		last = timer.now();
 	}
 
 	TimeSystem::~TimeSystem()
@@ -32,11 +31,15 @@ namespace LCH
 		auto const localT = std::chrono::current_zone()->to_local(t);
 		auto const days = std::chrono::floor<std::chrono::days>(localT);
 		auto const hhmmss = std::chrono::duration_cast<std::chrono::seconds>(localT - days);
-		return std::format(L"{}", std::chrono::hh_mm_ss(hhmmss));
+		return std::format(L"{:%T}", std::chrono::hh_mm_ss(hhmmss));
 	}
 
 	void TimeSystem::Tick()
 	{
 		std::chrono::steady_clock::time_point t = timer.now();
+		std::chrono::duration delta = t - last;
+		deltaTime = delta.count() * 1e-6f;
+		totalTime += deltaTime;
+		last = t;
 	}
 }

@@ -12,7 +12,6 @@
 
 #pragma once
 
-#include "pch.h"
 #include <chrono>
 
 namespace LCH
@@ -33,7 +32,7 @@ namespace LCH
 		void Tick();
 
 	private:
-		float totalTime;
+		float totalTime;	// µ•Œª∫¡√Î(ms)
 		float deltaTime;
 
 		std::chrono::system_clock wallClock;

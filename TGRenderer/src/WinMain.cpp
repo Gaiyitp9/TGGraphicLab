@@ -22,10 +22,18 @@ int WinMain(HINSTANCE hInstance,
 	LCH::Window wnd1(800, 600);
 	LCH::TimeSystem timer;
 	OutputDebugString(timer.Time().c_str());
+	timer.Tick();
+	int i = 100000;
+	while (i-- > 0);
+	timer.Tick();
+	OutputDebugString(L"\n");
+	OutputDebugString(std::to_wstring(timer.DeltaTime()).c_str());
 
 	while (true)
 	{
 		if (const auto code = LCH::Window::ProcessMessage())
+		{
 			return *code;
+		}
 	}
 }

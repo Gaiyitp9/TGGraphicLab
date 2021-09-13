@@ -21,6 +21,7 @@ namespace LCH
 	WindowClassRegister::WindowClassRegister()
 	{
 		hInstance = GetModuleHandle(nullptr);
+		ASSERT(hInstance, true);
 
 		WNDCLASSEX wc = {};
 		wc.cbSize = sizeof(WNDCLASSEX);

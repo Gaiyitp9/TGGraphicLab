@@ -55,7 +55,7 @@ namespace LCH
 	class Window
 	{
 	public:
-		Window(int width, int height, const wchar_t* title = L"IGGSZ Lab");
+		Window(int width, int height, const wchar_t* title = L"IGGSZ TA Group");
 		Window(const Window&) = delete;
 		void operator=(const Window&) = delete;
 		~Window();
