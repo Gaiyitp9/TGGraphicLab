@@ -12,8 +12,6 @@
 
 #pragma once
 
-#include "resource.h"
-
 namespace LCH
 {
 	// 窗口种类
@@ -54,7 +52,7 @@ namespace LCH
 	class Window
 	{
 	public:
-		Window(int width, int height, const wchar_t* title = L"IGGSZ TA Group");
+		Window(int width, int height, int icon = 0, const wchar_t* title = L"IGGSZ TA Group");
 		Window(const Window&) = delete;
 		Window& operator=(const Window&) = delete;
 		~Window();
@@ -62,11 +60,15 @@ namespace LCH
 		virtual LRESULT CALLBACK WindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 		static std::optional<int> ProcessMessage();
 
+	public:
+		int GetIcon() const;
+
 	protected:
 		virtual void Initialize(int width, int height, const wchar_t* title);
 
 	private:
 		HWND hwnd;
 		int width, height;
+		int icon;			// 窗口icon索引，在resource.h文件中定义
 	};
 }

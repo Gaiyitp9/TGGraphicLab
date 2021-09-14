@@ -10,6 +10,7 @@
 * Author: LiaoChenhan											*
 *****************************************************************/
 #include "pch.h"
+#include "../resource.h"
 #include <iostream>
 
 int WinMain(HINSTANCE hInstance,
@@ -17,7 +18,8 @@ int WinMain(HINSTANCE hInstance,
 	LPSTR     lpCmdLine,
 	int       nShowCmd)
 {
-	LCH::Window wnd1(800, 600);
+	LCH::Window wnd1(800, 600, IDI_ICON1);
+	//LCH::Window wnd1(800, 600);
 	LCH::TimeSystem timer;
 	OutputDebugString(timer.Time().c_str());
 	timer.Tick();

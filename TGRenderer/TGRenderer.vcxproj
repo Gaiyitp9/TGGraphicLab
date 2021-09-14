@@ -78,7 +78,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>include;..\RendererCore\include;$(IncludePath)</IncludePath>
+    <IncludePath>include;..\RendererCore\include</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
@@ -157,9 +157,10 @@
   </ItemGroup>
   <ItemGroup>
     <Image Include="maple-leaf.ico" />
+    <Image Include="maple-leaf2.ico" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\resource.h" />
+    <ClInclude Include="resource.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

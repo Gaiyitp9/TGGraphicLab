@@ -29,8 +29,7 @@ namespace LCH
 		wc.cbClsExtra = 0;
 		wc.cbWndExtra = 0;
 		wc.hInstance = hInstance;
-		wc.hIcon = static_cast<HICON>(LoadImage(hInstance, MAKEINTRESOURCE(IDI_ICON1), 
-			IMAGE_ICON, 32, 32, 0));
+		wc.hIcon = nullptr;
 		wc.hCursor = nullptr;
 		wc.hbrBackground = nullptr;
 		wc.hIconSm = nullptr;
@@ -56,14 +55,25 @@ namespace LCH
 #ifdef _DEBUG
 			SetLastError(0);
 #endif
-			SetWindowLongPtr(hwnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(pWnd));
+			auto offset = SetWindowLongPtr(hwnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(pWnd));
 #ifdef _DEBUG
-			ASSERT_SUCCEEDED(GetLastError());
+			ASSERT(offset || !GetLastError(), true);
 #endif
-			SetWindowLongPtr(hwnd, GWLP_WNDPROC, reinterpret_cast<LONG_PTR>(WindowProcThunk));
+			offset = SetWindowLongPtr(hwnd, GWLP_WNDPROC, reinterpret_cast<LONG_PTR>(WindowProcThunk));
 #ifdef _DEBUG
-			ASSERT_SUCCEEDED(GetLastError());
+			ASSERT(offset || !GetLastError(), true);
 #endif
+			// 如果icon索引不为0，则更换icon图标
+			if (int icon = pWnd->GetIcon())
+			{
+				offset = SetClassLongPtr(
+					hwnd, GCLP_HICON,
+					reinterpret_cast<LONG_PTR>(LoadIcon(pCreate->hInstance, MAKEINTRESOURCE(icon)))
+				);
+#ifdef _DEBUG
+				ASSERT(offset || !GetLastError(), true);
+#endif
+			}
 			return pWnd->WindowProc(hwnd, msg, wParam, lParam);
 		}
 		return DefWindowProc(hwnd, msg, wParam, lParam);
@@ -83,8 +93,8 @@ namespace LCH
 		return instance;
 	}
 
-	Window::Window(int width, int height, const wchar_t* title)
-		: width(width), height(height), hwnd(nullptr)
+	Window::Window(int width, int height, int icon, const wchar_t* title)
+		: width(width), height(height), icon(icon), hwnd(nullptr)
 	{
 		// 初始化窗口，使用虚函数，不同类型的窗口可以使用自己的初始化窗口函数
 		Initialize(width, height, title);
@@ -119,6 +129,11 @@ namespace LCH
 		}
 
 		return std::nullopt;
+	}
+
+	inline int Window::GetIcon() const
+	{
+		return icon;
 	}
 
 	void Window::Initialize(int width, int height, const wchar_t* title)
