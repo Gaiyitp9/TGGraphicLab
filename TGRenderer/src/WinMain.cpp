@@ -10,8 +10,6 @@
 * Author: LiaoChenhan											*
 *****************************************************************/
 #include "pch.h"
-#include "Window.h"
-#include "TimeSystem.h"
 #include <iostream>
 
 int WinMain(HINSTANCE hInstance,

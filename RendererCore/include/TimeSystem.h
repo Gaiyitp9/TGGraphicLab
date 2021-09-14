@@ -20,6 +20,8 @@ namespace LCH
 	{
 	public:
 		TimeSystem();
+		TimeSystem(const TimeSystem&) = delete;
+		TimeSystem& operator=(const TimeSystem&) = delete;
 		~TimeSystem();
 
 		inline float DeltaTime() const { return deltaTime; }

@@ -12,7 +12,6 @@
 
 #pragma once
 
-#include "pch.h"
 #include "resource.h"
 
 namespace LCH
@@ -33,7 +32,7 @@ namespace LCH
 		WindowClassRegister();
 		~WindowClassRegister();
 		WindowClassRegister(const WindowClassRegister&) = delete;
-		void operator=(const WindowClassRegister&) = delete;
+		WindowClassRegister& operator=(const WindowClassRegister&) = delete;
 
 		static LRESULT CALLBACK WindowProcSetup(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 		static LRESULT CALLBACK WindowProcThunk(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
@@ -57,7 +56,7 @@ namespace LCH
 	public:
 		Window(int width, int height, const wchar_t* title = L"IGGSZ TA Group");
 		Window(const Window&) = delete;
-		void operator=(const Window&) = delete;
+		Window& operator=(const Window&) = delete;
 		~Window();
 
 		virtual LRESULT CALLBACK WindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);

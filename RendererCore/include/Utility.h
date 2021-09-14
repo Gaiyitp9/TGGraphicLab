@@ -18,6 +18,9 @@ namespace LCH
 {
 	class Utility
 	{
+	private:
+		Utility();
+
 	public:
 		static std::wstring AnsiToWideString(const std::string& str);
 		static std::string WideStringToAnsi(const std::wstring& wstr);
