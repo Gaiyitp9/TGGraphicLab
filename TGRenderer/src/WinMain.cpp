@@ -20,9 +20,11 @@ int WinMain(HINSTANCE hInstance,
 {
 	LCH::Window wnd1(800, 600, IDI_ICON1);
 	LCH::TimeSystem timer;
+
 	OutputDebugString(timer.Time().c_str());
+
 	timer.Tick();
-	int i = 100000;
+	int i = 1000000;
 	while (i-- > 0);
 	timer.Tick();
 	OutputDebugString(L"\n");

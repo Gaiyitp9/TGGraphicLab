@@ -17,6 +17,7 @@ namespace LCH
 	TimeSystem::TimeSystem()
 		: totalTime(0.0f), deltaTime(0.0f)
 	{
+		base = timer.now();
 		last = timer.now();
 	}
 
@@ -37,9 +38,8 @@ namespace LCH
 	void TimeSystem::Tick()
 	{
 		std::chrono::steady_clock::time_point t = timer.now();
-		std::chrono::duration<float, std::milli> delta = t - last;
+		std::chrono::duration<double, std::milli> delta = t - last;
 		deltaTime = delta.count();
-		totalTime += deltaTime;
 		last = t;
 	}
 }

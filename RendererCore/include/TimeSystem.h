@@ -24,8 +24,8 @@ namespace LCH
 		TimeSystem& operator=(const TimeSystem&) = delete;
 		~TimeSystem();
 
-		inline float DeltaTime() const { return deltaTime; }
-		inline float TotalTime() const { return totalTime; }
+		float DeltaTime() const { return static_cast<float>(deltaTime); }
+		float TotalTime() const { return totalTime; }
 		std::wstring Time() const;
 
 		void Reset();
@@ -34,12 +34,15 @@ namespace LCH
 		void Tick();
 
 	private:
-		float totalTime;	// 单位毫秒(ms)
-		float deltaTime;
+		float totalTime;	
+		double deltaTime;		// 单位毫秒(ms)
 
 		std::chrono::system_clock wallClock;
 
 		std::chrono::steady_clock timer;
+		std::chrono::steady_clock::time_point base;
 		std::chrono::steady_clock::time_point last;
+		std::chrono::steady_clock::time_point stop;
+		std::chrono::duration<double, std::milli> paused;
 	};
 }
