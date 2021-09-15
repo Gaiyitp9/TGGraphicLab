@@ -25,7 +25,7 @@ namespace LCH
 		~TimeSystem();
 
 		float DeltaTime() const { return static_cast<float>(deltaTime); }
-		float TotalTime() const { return totalTime; }
+		float TotalTime() const;
 		std::wstring Time() const;
 
 		void Reset();
@@ -34,7 +34,6 @@ namespace LCH
 		void Tick();
 
 	private:
-		float totalTime;	
 		double deltaTime;		// µ•Œª∫¡√Î(ms)
 
 		std::chrono::system_clock wallClock;
