@@ -15,15 +15,36 @@
 namespace LCH
 {
 	TimeSystem::TimeSystem()
-		: totalTime(0.0f), deltaTime(0.0f)
 	{
 		base = timer.now();
 		last = timer.now();
+		paused = std::chrono::duration<double, std::milli>(0.0);
 	}
 
 	TimeSystem::~TimeSystem()
 	{
 
+	}
+
+	float TimeSystem::DeltaTime() const
+	{
+		return static_cast<float>(deltaTime);
+	}
+
+	float TimeSystem::TotalTime() const
+	{
+		std::chrono::duration<double, std::milli> total;
+		if (stopped)
+		{
+			total = stop - base;
+		}
+		else
+		{
+			std::chrono::steady_clock::time_point t = timer.now();
+			total = t - base;
+		}
+		total -= paused;
+		return static_cast<float>(total.count());
 	}
 
 	std::wstring TimeSystem::Time() const
@@ -33,6 +54,34 @@ namespace LCH
 		auto const days = std::chrono::floor<std::chrono::days>(localT);
 		auto const hhmmss = std::chrono::duration_cast<std::chrono::seconds>(localT - days);
 		return std::format(L"{:%T}", std::chrono::hh_mm_ss(hhmmss));
+	}
+
+	void TimeSystem::Reset()
+	{
+		base = timer.now();
+		last = timer.now();
+		paused = std::chrono::duration<double, std::milli>(0.0);
+		deltaTime = 0;
+		stopped = false;
+	}
+
+	void TimeSystem::Pause()
+	{
+		if (!stopped)
+		{
+			stop = timer.now();
+			stopped = true;
+		}
+	}
+
+	void TimeSystem::Start()
+	{
+		if (stopped)
+		{
+			stopped = false;
+			std::chrono::steady_clock::time_point t = timer.now();
+			paused += t - stop;
+		}
 	}
 
 	void TimeSystem::Tick()

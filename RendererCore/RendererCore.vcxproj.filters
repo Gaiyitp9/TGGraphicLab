@@ -39,6 +39,9 @@
     <ClInclude Include="include\Debug.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="include\Keyboard.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\pch.cpp">

@@ -112,6 +112,18 @@ namespace LCH
 			// 基础窗口一般作为主窗口，销毁后要退出线程
 			PostQuitMessage(0);
 			return 0;
+
+			// 按下按键
+		case WM_KEYDOWN:
+		case WM_SYSKEYDOWN:
+
+			break;
+
+			// 松开按键
+		case WM_KEYUP:
+		case WM_SYSKEYUP:
+
+			break;
 		}
 		return DefWindowProc(hwnd, msg, wParam, lParam);
 	}
@@ -131,7 +143,7 @@ namespace LCH
 		return std::nullopt;
 	}
 
-	inline int Window::GetIcon() const
+	int Window::GetIcon() const
 	{
 		return icon;
 	}

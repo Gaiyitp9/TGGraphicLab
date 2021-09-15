@@ -150,6 +150,7 @@
   <ItemGroup>
     <ClInclude Include="include\d3dx12.h" />
     <ClInclude Include="include\Debug.h" />
+    <ClInclude Include="include\Keyboard.h" />
     <ClInclude Include="include\Window.h" />
     <ClInclude Include="include\TimeSystem.h" />
     <ClInclude Include="include\Math\Math.h" />
