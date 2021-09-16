@@ -12,6 +12,8 @@
 
 #pragma once
 
+#include "Keyboard.h"
+
 namespace LCH
 {
 	// ´°¿ÚÖÖÀà
