@@ -39,10 +39,10 @@ namespace LCH
 
 		std::chrono::system_clock wallClock;
 
-		std::chrono::steady_clock timer;
-		std::chrono::steady_clock::time_point base;
-		std::chrono::steady_clock::time_point last;
-		std::chrono::steady_clock::time_point stop;
-		std::chrono::duration<double, std::milli> paused;
+		std::chrono::steady_clock timer;		
+		std::chrono::steady_clock::time_point base;			// 开始运行的时间点
+		std::chrono::steady_clock::time_point last;			// 上一帧的时间点
+		std::chrono::steady_clock::time_point stop;			// 暂停的时间点
+		std::chrono::duration<double, std::milli> paused;	// 已暂停的时间
 	};
 }

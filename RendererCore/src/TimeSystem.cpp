@@ -81,11 +81,18 @@ namespace LCH
 			stopped = false;
 			std::chrono::steady_clock::time_point t = timer.now();
 			paused += t - stop;
+			last = t;
 		}
 	}
 
 	void TimeSystem::Tick()
 	{
+		if (stopped)
+		{
+			deltaTime = 0;
+			return;
+		}
+
 		std::chrono::steady_clock::time_point t = timer.now();
 		std::chrono::duration<double, std::milli> delta = t - last;
 		deltaTime = delta.count();

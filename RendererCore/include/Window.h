@@ -13,6 +13,7 @@
 #pragma once
 
 #include "Keyboard.h"
+#include "Mouse.h"
 
 namespace LCH
 {
@@ -38,16 +39,12 @@ namespace LCH
 		static LRESULT CALLBACK WindowProcThunk(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 	public:
-		// 记录不同类型窗口的名称
-		std::unordered_map<WindowType, std::wstring> windowClassMap;
-		// 实例句柄
-		HINSTANCE hInstance;
+		std::unordered_map<WindowType, std::wstring> windowClassMap;	// 记录不同类型窗口的名称
+		HINSTANCE hInstance;											// 实例句柄
 
 	private:
-		// 窗口注册器单例
-		static WindowClassRegister* instance;
-		// 互斥锁，用于多线程访问窗口注册器单例
-		static std::mutex mutex;
+		static WindowClassRegister* instance;	// 窗口注册器单例
+		static std::mutex mutex;				// 互斥锁，用于多线程访问窗口注册器单例
 	};
 
 	// 窗口类
@@ -72,5 +69,8 @@ namespace LCH
 		HWND hwnd;
 		int width, height;
 		int icon;			// 窗口icon索引，在resource.h文件中定义
+
+		Keyboard keyboard;
+		Mouse mouse;
 	};
 }
