@@ -36,16 +36,15 @@ namespace LCH
 		Keyboard& operator=(const Keyboard&) = delete;
 		~Keyboard();
 
-		void OnKeyDown(unsigned char key);
-		void OnKeyHoldDown(unsigned char key);
-		void OnKeyUp(unsigned char key);
+		void OnKeyPressed(unsigned char key);
+		void OnKeyReleased(unsigned char key);
 
-		bool GetKeyDown(KeyCode key);
-		bool GetKeyHoldDown(KeyCode key);
+		bool AutoRepeatEnable() const noexcept;
 
 	private:
 		static constexpr unsigned int nKeys = 256u;
-		std::bitset<nKeys> keyDown;
-		std::bitset<nKeys> keyHoldDown;
+		std::bitset<nKeys> keyStates;
+
+		bool autoRepeatEnable = true;
 	};
 }

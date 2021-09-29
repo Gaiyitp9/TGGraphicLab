@@ -23,33 +23,18 @@ namespace LCH
 
 	}
 
-	void Keyboard::OnKeyDown(unsigned char key)
+	void Keyboard::OnKeyPressed(unsigned char key)
 	{
-		keyDown.set(key, true);
-		keyHoldDown.set(key, false);
+		keyStates.set(key, true);
 	}
 
-	void Keyboard::OnKeyHoldDown(unsigned char key)
+	void Keyboard::OnKeyReleased(unsigned char key)
 	{
-		keyDown.set(key, true);
-		keyHoldDown.set(key, true);
+		keyStates.set(key, false);
 	}
 
-	void Keyboard::OnKeyUp(unsigned char key)
+	bool Keyboard::AutoRepeatEnable() const noexcept
 	{
-		keyDown.set(key, false);
-		keyHoldDown.set(key, false);
-	}
-
-	bool Keyboard::GetKeyDown(KeyCode key)
-	{
-		std::size_t index = static_cast<std::size_t>(key);
-		return keyDown[index];
-	}
-
-	bool Keyboard::GetKeyHoldDown(KeyCode key)
-	{
-		std::size_t index = static_cast<std::size_t>(key);
-		return keyHoldDown[index];
+		return autoRepeatEnable;
 	}
 }

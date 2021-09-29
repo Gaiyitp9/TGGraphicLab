@@ -116,20 +116,16 @@ namespace LCH
 			// 按下按键
 		case WM_KEYDOWN:
 		case WM_SYSKEYDOWN:
-			if (lParam & 0x4000000)
+			if (!(lParam & 0x4000000) || keyboard.AutoRepeatEnable())
 			{
-				keyboard.OnKeyHoldDown(static_cast<unsigned char>(wParam));
-			}
-			else
-			{
-				keyboard.OnKeyDown(static_cast<unsigned char>(wParam));
+				keyboard.OnKeyPressed(static_cast<unsigned char>(wParam));
 			}
 			break;
 
 			// 松开按键
 		case WM_KEYUP:
 		case WM_SYSKEYUP:
-			keyboard.OnKeyUp(static_cast<unsigned char>(wParam));
+			keyboard.OnKeyReleased(static_cast<unsigned char>(wParam));
 			break;
 		}
 		return DefWindowProc(hwnd, msg, wParam, lParam);

@@ -46,6 +46,7 @@
 #include <cstdio>
 #include <string>
 #include <unordered_map>
+#include <queue>
 #include <mutex>
 #include <exception>
 #include <optional>
