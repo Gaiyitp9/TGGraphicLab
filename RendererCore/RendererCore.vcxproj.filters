@@ -45,7 +45,10 @@
     <ClInclude Include="include\Mouse.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="include\EventSystem.h">
+    <ClInclude Include="include\InputSystem.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\KeyCode.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
@@ -68,7 +71,7 @@
     <ClCompile Include="src\Mouse.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="src\EventSystem.cpp">
+    <ClCompile Include="src\InputSystem.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
