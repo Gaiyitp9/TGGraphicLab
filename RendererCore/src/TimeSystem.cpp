@@ -9,8 +9,8 @@
 *																*
 * Author: LiaoChenhan											*
 *****************************************************************/
-
 #include "pch.h"
+#include "TimeSystem.h"
 
 namespace LCH
 {

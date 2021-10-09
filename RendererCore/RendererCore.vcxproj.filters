@@ -45,6 +45,9 @@
     <ClInclude Include="include\Mouse.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="include\EventSystem.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\pch.cpp">
@@ -63,6 +66,9 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="src\Mouse.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="src\EventSystem.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

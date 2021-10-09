@@ -15,13 +15,13 @@
 
 namespace LCH
 {
-	class Keyboard
+	class InputSystem
 	{
 	public:
-		Keyboard();
-		Keyboard(const Keyboard&) = delete;
-		Keyboard& operator=(const Keyboard&) = delete;
-		~Keyboard();
+		InputSystem();
+		InputSystem(const InputSystem&) = delete;
+		InputSystem& operator=(const InputSystem&) = delete;
+		~InputSystem();
 
 		void OnKeyPressed(unsigned char key);
 		void OnKeyReleased(unsigned char key);

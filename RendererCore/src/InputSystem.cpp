@@ -10,33 +10,17 @@
 * Author: LiaoChenhan											*
 *****************************************************************/
 #include "pch.h"
-#include "Window.h"
-#include "TimeSystem.h"
-#include "../resource.h"
-#include <iostream>
+#include "InputSystem.h"
 
-int WinMain(HINSTANCE hInstance,
-	HINSTANCE hPrevInstance,
-	LPSTR     lpCmdLine,
-	int       nShowCmd)
+namespace LCH
 {
-	LCH::Window wnd1(800, 600, IDI_ICON1);
-	LCH::TimeSystem timer;
-
-	OutputDebugString(timer.Time().c_str());
-
-	timer.Tick();
-	int i = 1000000;
-	while (i-- > 0);
-	timer.Tick();
-	OutputDebugString(L"\n");
-	OutputDebugString(std::to_wstring(timer.DeltaTime()).c_str());
-
-	while (true)
+	InputSystem::InputSystem()
 	{
-		if (const auto code = LCH::Window::ProcessMessage())
-		{
-			return *code;
-		}
+
+	}
+
+	InputSystem::~InputSystem()
+	{
+
 	}
 }

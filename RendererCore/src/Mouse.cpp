@@ -10,6 +10,7 @@
 * Author: LiaoChenhan											*
 *****************************************************************/
 #include "pch.h"
+#include "Mouse.h"
 
 namespace LCH
 {
