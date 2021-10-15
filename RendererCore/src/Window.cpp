@@ -117,16 +117,17 @@ namespace LCH
 			// 按下按键
 		case WM_KEYDOWN:
 		case WM_SYSKEYDOWN:
-			if (!(lParam & 0x4000000) || keyboard.AutoRepeatEnable())
+			if (input && !(lParam & 0x4000000))
 			{
-				keyboard.OnKeyPressed(static_cast<unsigned char>(wParam));
+				input->OnKeyPressed(static_cast<size_t>(wParam));
 			}
 			break;
 
 			// 松开按键
 		case WM_KEYUP:
 		case WM_SYSKEYUP:
-			keyboard.OnKeyReleased(static_cast<unsigned char>(wParam));
+			if (input)
+				input->OnKeyReleased(static_cast<size_t>(wParam));
 			break;
 		}
 		return DefWindowProc(hwnd, msg, wParam, lParam);
@@ -150,6 +151,11 @@ namespace LCH
 	int Window::GetIcon() const
 	{
 		return icon;
+	}
+
+	void Window::ConnectInputSystem(InputSystem* input)
+	{
+		this->input = input;
 	}
 
 	void Window::Initialize(int width, int height, const wchar_t* title)

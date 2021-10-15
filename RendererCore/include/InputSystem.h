@@ -12,26 +12,35 @@
 #pragma once
 
 #include <bitset>
+#include <queue>
+#include "KeyCode.h"
+#include "InputEvent.h"
 
 namespace LCH
 {
 	class InputSystem
 	{
+		friend class Window;
 	public:
 		InputSystem();
 		InputSystem(const InputSystem&) = delete;
 		InputSystem& operator=(const InputSystem&) = delete;
 		~InputSystem();
 
-		void OnKeyPressed(unsigned char key);
-		void OnKeyReleased(unsigned char key);
+		void Update();
 
-		bool AutoRepeatEnable() const noexcept;
+		bool GetKey(KeyCode key) const noexcept;
+		bool GetKeyDown(KeyCode key) const noexcept;
+		bool GetKeyUp(KeyCode key) const noexcept;
+
+	private:
+		void OnKeyPressed(size_t key);
+		void OnKeyReleased(size_t key);
 
 	private:
 		static constexpr unsigned int nKeys = 256u;
-		std::bitset<nKeys> keyStates;
-
-		bool autoRepeatEnable = true;
+		std::bitset<nKeys> keyStates;		// 按键状态
+		std::queue<InputEvent> events;		// 输入事件队列
+		std::queue<char> chars;				// 输入字符队列
 	};
 }

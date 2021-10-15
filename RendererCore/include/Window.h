@@ -12,8 +12,7 @@
 
 #pragma once
 
-#include "Keyboard.h"
-#include "Mouse.h"
+#include "InputSystem.h"
 
 namespace LCH
 {
@@ -61,6 +60,7 @@ namespace LCH
 
 	public:
 		int GetIcon() const;
+		void ConnectInputSystem(InputSystem* input);
 
 	protected:
 		virtual void Initialize(int width, int height, const wchar_t* title);
@@ -70,7 +70,6 @@ namespace LCH
 		int width, height;
 		int icon;			// 窗口icon索引，在resource.h文件中定义
 
-		Keyboard keyboard;
-		Mouse mouse;
+		InputSystem* input;	// 输入系统
 	};
 }

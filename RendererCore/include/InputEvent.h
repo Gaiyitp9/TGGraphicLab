@@ -11,27 +11,25 @@
 *****************************************************************/
 #pragma once
 
-#include <bitset>
+#include "KeyCode.h"
 
 namespace LCH
 {
-	class Keyboard
+	struct InputEvent
 	{
 	public:
-		Keyboard();
-		Keyboard(const Keyboard&) = delete;
-		Keyboard& operator=(const Keyboard&) = delete;
-		~Keyboard();
+		enum class EventType
+		{
+			Pressed,
+			Released,
+		};
 
-		void OnKeyPressed(unsigned char key);
-		void OnKeyReleased(unsigned char key);
+	public:
+		InputEvent(KeyCode key, EventType type);
+		~InputEvent();
 
-		bool AutoRepeatEnable() const noexcept;
-
-	private:
-		static constexpr unsigned int nKeys = 256u;
-		std::bitset<nKeys> keyStates;
-
-		bool autoRepeatEnable = true;
+	public:
+		KeyCode key;
+		EventType type;
 	};
 }

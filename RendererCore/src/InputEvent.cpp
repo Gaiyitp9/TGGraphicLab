@@ -9,13 +9,20 @@
 *																*
 * Author: LiaoChenhan											*
 *****************************************************************/
-#pragma once
+
+#include "pch.h"
+#include "InputEvent.h"
 
 namespace LCH
 {
-	class Mouse
+	InputEvent::InputEvent(KeyCode key, EventType type)
+		: key(key), type(type)
 	{
-	public:
-		Mouse();
-	};
+	
+	}
+
+	InputEvent::~InputEvent()
+	{
+	
+	}
 }

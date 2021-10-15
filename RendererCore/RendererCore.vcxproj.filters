@@ -39,16 +39,13 @@
     <ClInclude Include="include\Debug.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="include\Keyboard.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Mouse.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="include\InputSystem.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="include\KeyCode.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\InputEvent.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
@@ -65,13 +62,10 @@
     <ClCompile Include="src\TimeSystem.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="src\Keyboard.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Mouse.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="src\InputSystem.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="src\InputEvent.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
