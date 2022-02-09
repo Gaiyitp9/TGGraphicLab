@@ -3,6 +3,7 @@
 * Copyright (c) Gaiyitp9. All rights reserved.					*
 * This code is licensed under the MIT License (MIT).			*
 *****************************************************************/
+
 #pragma once
 
 #include <winsdkver.h>
@@ -21,6 +22,7 @@
 
 #include <Windows.h>
 #include <wrl.h>
+#include <tchar.h>
 
 #include <d3d12.h>
 #include <d3dcompiler.h>
@@ -33,6 +35,7 @@
 
 #ifdef _DEBUG
 #include <dxgidebug.h>
+#include <iostream>
 #endif
 
 #include <cstdint>
