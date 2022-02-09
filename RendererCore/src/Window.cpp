@@ -159,7 +159,7 @@ namespace LCH
 		std::wstring wndClassName = windowRegister->windowClassMap[WindowType::Default];
 
 		// 客户端区域大小
-		RECT rect = { 0, 0, rect.left + width, rect.top + height };
+		RECT rect = { 0, 0, width, height };
 
 		// 根据客户区域宽和高计算整个窗口的宽和高
 		ASSERT(AdjustWindowRect(&rect, WS_OVERLAPPEDWINDOW, false), true);
