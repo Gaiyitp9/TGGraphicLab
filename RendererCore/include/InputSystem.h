@@ -1,14 +1,9 @@
 /****************************************************************
-* Copyright (c) LiaoChenhan. All rights reserved.				*
-*																*
+* TianGong RenderLab											*
+* Copyright (c) Gaiyitp9. All rights reserved.					*
 * This code is licensed under the MIT License (MIT).			*
-* THIS CODE IS PROVIDED *AS IS* WITHOUT WARRANTY OF				*
-* ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING ANY			*
-* IMPLIED WARRANTIES OF FITNESS FOR A PARTICULAR				*
-* PURPOSE, MERCHANTABILITY, OR NON-INFRINGEMENT.				*
-*																*
-* Author: LiaoChenhan											*
 *****************************************************************/
+
 #pragma once
 
 #include <bitset>
@@ -29,9 +24,9 @@ namespace LCH
 
 		void Update();
 
-		bool GetKey(KeyCode key) const noexcept;
-		bool GetKeyDown(KeyCode key) const noexcept;
-		bool GetKeyUp(KeyCode key) const noexcept;
+		bool GetKey(KeyCode key) const;
+		bool GetKeyDown(KeyCode key) const;
+		bool GetKeyUp(KeyCode key) const;
 
 	private:
 		void OnKeyPressed(size_t key);

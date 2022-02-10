@@ -23,7 +23,7 @@ namespace LCH
 		static WindowRegister* const GetInstance();
 		HINSTANCE GetHInstance() const noexcept;
 		std::wstring GetWindowClassName(const WindowType&) const;
-		std::wstring GetWindowMesssageInfo(DWORD, LPARAM, WPARAM) const;
+		std::wstring GetWindowMesssageInfo(DWORD, WPARAM, LPARAM) const;
 
 	private:
 		WindowRegister();

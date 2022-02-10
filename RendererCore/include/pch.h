@@ -24,6 +24,10 @@
 #include <wrl.h>
 #include <tchar.h>
 
+#ifdef _DEBUG
+#include <iostream>
+#endif
+
 #include <cstdint>
 #include <cstdio>
 #include <string>

@@ -11,7 +11,7 @@
 namespace LCH
 {
 	Window::Window(int width, int height, int icon, const wchar_t* title)
-		: width(width), height(height), icon(icon), hwnd(nullptr)
+		: width(width), height(height), icon(icon), hwnd(nullptr), input(nullptr)
 	{
 		// 初始化窗口，使用虚函数，不同类型的窗口可以使用自己的初始化窗口函数
 		Initialize(width, height, title);
@@ -23,6 +23,8 @@ namespace LCH
 
 	LRESULT Window::WindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	{
+		std::wcout << WindowRegister::GetInstance()->GetWindowMesssageInfo(msg, wParam, lParam);
+
 		switch (msg)
 		{
 		case WM_DESTROY:

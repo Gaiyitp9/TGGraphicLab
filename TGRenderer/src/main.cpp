@@ -8,7 +8,6 @@
 #include "Window.h"
 #include "TimeSystem.h"
 #include "../resource.h"
-#include <iostream>
 #include <format>
 
 int CALLBACK _tWinMain(_In_ HINSTANCE hInstance,
@@ -19,7 +18,7 @@ int CALLBACK _tWinMain(_In_ HINSTANCE hInstance,
 	LCH::Window wnd1(800, 600, IDI_ICON1);
 	LCH::TimeSystem timer;
 
-	std::wcout << std::format(L"test{:#x}\n", 120);
+	std::wcout << std::format(L"{:#x}\n", 120);
 
 	std::wcout << timer.Time() << std::endl;
 

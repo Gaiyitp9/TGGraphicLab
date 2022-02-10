@@ -274,7 +274,7 @@ namespace LCH
 		return windowClassName.at(type);
 	}
 
-	std::wstring WindowRegister::GetWindowMesssageInfo(DWORD msg, LPARAM lp, WPARAM wp) const
+	std::wstring WindowRegister::GetWindowMesssageInfo(DWORD msg, WPARAM wp, LPARAM lp) const
 	{
 		std::wstring msgInfo;
 		const auto it = windowMessage.find(msg);
@@ -286,7 +286,8 @@ namespace LCH
 		{
 			msgInfo += std::format(L"{:<25}", std::format(L"Unknown message: {:#x}", msg));
 		}
-		msgInfo += std::format(L"    LP: {:#08x}    WP: {:#08x}\n", lp, wp);
+		msgInfo += std::format(L"    LP: {:#012x}", lp);
+		msgInfo += std::format(L"    WP: {:#012x}\n", wp);
 		return msgInfo;
 	}
 }
