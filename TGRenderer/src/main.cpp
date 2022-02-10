@@ -8,14 +8,18 @@
 #include "Window.h"
 #include "TimeSystem.h"
 #include "../resource.h"
+#include <iostream>
+#include <format>
 
-int WINAPI _tWinMain(_In_ HINSTANCE hInstance,
+int CALLBACK _tWinMain(_In_ HINSTANCE hInstance,
 	_In_opt_ HINSTANCE hPrevInstance,
 	_In_ PTSTR     lpCmdLine,
 	_In_ int       nShowCmd)
 {
 	LCH::Window wnd1(800, 600, IDI_ICON1);
 	LCH::TimeSystem timer;
+
+	std::wcout << std::format(L"test{:#x}\n", 120);
 
 	std::wcout << timer.Time() << std::endl;
 

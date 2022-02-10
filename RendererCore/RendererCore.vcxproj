@@ -152,7 +152,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="include\d3dx12.h" />
     <ClInclude Include="include\Debug.h" />
     <ClInclude Include="include\InputEvent.h" />
     <ClInclude Include="include\InputSystem.h" />
@@ -162,6 +161,7 @@
     <ClInclude Include="include\Math\Math.h" />
     <ClInclude Include="include\pch.h" />
     <ClInclude Include="include\Utility.h" />
+    <ClInclude Include="include\WindowRegister.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\InputEvent.cpp" />
@@ -170,6 +170,7 @@
     <ClCompile Include="src\pch.cpp" />
     <ClCompile Include="src\Utility.cpp" />
     <ClCompile Include="src\Window.cpp" />
+    <ClCompile Include="src\WindowRegister.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
