@@ -7,6 +7,7 @@
 #include "pch.h"
 #include "WindowRegister.h"
 #include "Window.h"
+#include "Debug.h"
 #include <format>
 
 #define REGISTER_MESSAGE(msg) {msg,L#msg}

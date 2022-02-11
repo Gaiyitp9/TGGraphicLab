@@ -18,7 +18,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\pch.h">
+    <ClInclude Include="include\CustomWindows.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="include\Utility.h">

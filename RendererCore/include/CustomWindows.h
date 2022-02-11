@@ -21,21 +21,3 @@
 #define NOSERVICE
 
 #include <Windows.h>
-#include <wrl.h>
-#include <tchar.h>
-
-#ifdef _DEBUG
-#include <iostream>
-#endif
-
-#include <cstdint>
-#include <cstdio>
-#include <string>
-#include <unordered_map>
-#include <queue>
-#include <mutex>
-#include <exception>
-#include <optional>
-
-#include "Utility.h"
-#include "Debug.h"

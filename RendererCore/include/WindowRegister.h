@@ -7,6 +7,8 @@
 #pragma once
 
 #include "pch.h"
+#include <unordered_map>
+#include <mutex>
 
 namespace LCH
 {

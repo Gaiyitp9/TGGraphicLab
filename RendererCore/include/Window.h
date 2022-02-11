@@ -7,6 +7,7 @@
 #pragma once
 
 #include "InputSystem.h"
+#include <optional>
 
 namespace LCH
 {

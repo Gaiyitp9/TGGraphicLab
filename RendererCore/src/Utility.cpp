@@ -4,7 +4,7 @@
 * This code is licensed under the MIT License (MIT).			*
 *****************************************************************/
 
-#include "pch.h"
+#include "Utility.h"
 
 namespace LCH
 {

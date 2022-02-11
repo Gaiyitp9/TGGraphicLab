@@ -4,9 +4,13 @@
 * This code is licensed under the MIT License (MIT).			*
 *****************************************************************/
 
-#include "pch.h"
+#include "CustomWindows.h"
 #include "Window.h"
 #include "WindowRegister.h"
+#include "Debug.h"
+#ifdef _DEBUG
+#include <iostream>
+#endif
 
 namespace LCH
 {
