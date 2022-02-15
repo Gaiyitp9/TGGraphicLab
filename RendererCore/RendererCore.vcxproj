@@ -169,7 +169,6 @@
     <ClCompile Include="src\InputEvent.cpp" />
     <ClCompile Include="src\InputSystem.cpp" />
     <ClCompile Include="src\TimeSystem.cpp" />
-    <ClCompile Include="src\pch.cpp" />
     <ClCompile Include="src\Utility.cpp" />
     <ClCompile Include="src\Window.cpp" />
     <ClCompile Include="src\WindowRegister.cpp" />

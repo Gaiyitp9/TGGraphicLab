@@ -4,7 +4,6 @@
 * This code is licensed under the MIT License (MIT).			*
 *****************************************************************/
 
-#include "pch.h"
 #include "WindowRegister.h"
 #include "Window.h"
 #include "Debug.h"

@@ -10,7 +10,6 @@
 * Author: LiaoChenhan											*
 *****************************************************************/
 
-#include "pch.h"
 #include "InputEvent.h"
 
 namespace LCH
