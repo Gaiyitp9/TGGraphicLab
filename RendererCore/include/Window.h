@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include "CustomWindows.h"
+#include "SlimWindows.h"
 #include "InputSystem.h"
 #include <optional>
 
@@ -16,26 +16,23 @@ namespace LCH
 	class Window
 	{
 	public:
-		Window(int width, int height, int icon = 0, const wchar_t* title = L"TG RenderLab");
+		Window(int width, int height, std::optional<int> icon = std::nullopt, const wchar_t* title = L"TG RenderLab");
 		Window(const Window&) = delete;
 		Window& operator=(const Window&) = delete;
 		~Window();
-
-		virtual LRESULT CALLBACK WindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
-		static std::optional<int> ProcessMessage();
+		static std::optional<int> ProcessMessage();	// 处理窗口消息
 
 	public:
-		int GetIcon() const noexcept;
-		void ConnectInputSystem(InputSystem* input);
+		virtual LRESULT CALLBACK WindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);	// 消息处理函数，子类可以重写
+		std::optional<int> GetIcon() const noexcept;
 
 	protected:
+		// 初始化窗口，子类窗口可以重写初始化窗口函数
 		virtual void Initialize(int width, int height, const wchar_t* title);
 
 	private:
 		HWND hwnd;
 		int width, height;
-		int icon;			// 窗口icon索引，在resource.h文件中定义
-
-		InputSystem* input;	// 输入系统
+		std::optional<int> icon; // 窗口icon索引
 	};
 }

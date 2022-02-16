@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include "CustomWindows.h"
+#include "SlimWindows.h"
 #include <unordered_map>
 #include <mutex>
 
@@ -24,8 +24,8 @@ namespace LCH
 	public:
 		static WindowRegister* const GetInstance();
 		HINSTANCE GetHInstance() const noexcept;
-		std::wstring GetWindowClassName(const WindowType&) const;
-		std::wstring GetWindowMesssageInfo(DWORD, WPARAM, LPARAM) const;
+		const std::wstring& GetWindowClassName(const WindowType&) const;
+		const std::wstring& GetWindowMesssageInfo(DWORD, WPARAM, LPARAM);
 
 	private:
 		WindowRegister();
@@ -42,6 +42,9 @@ namespace LCH
 
 		HINSTANCE hInstance;											// 程序文件(.exe)句柄
 		std::unordered_map<WindowType, std::wstring> windowClassName;	// 记录不同类型窗口的名称
-		std::unordered_map<DWORD, std::wstring> windowMessage;			// 窗口消息名称
+
+		std::unordered_map<DWORD, std::wstring> windowMessage;			// 窗口消息
+		std::unordered_map<std::wstring, std::wstring> messageInfo;		// 消息包含的信息
+		std::wstring unknownMsgInfo;									// 未知消息的信息
 	};
 }

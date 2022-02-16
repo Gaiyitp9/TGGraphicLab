@@ -9,7 +9,15 @@
 #include "Debug.h"
 #include <format>
 
-#define REGISTER_MESSAGE(msg) {msg,L#msg}
+#ifdef _DEBUG
+#include <iostream>
+#endif
+
+#ifdef UNICODE
+#define REGISTER_MESSAGE(msg) {msg, L#msg}
+#elif
+#define REGISTER_MESSAGE(msg) {msg, #msg}
+#endif
 
 namespace LCH
 {
@@ -234,12 +242,12 @@ namespace LCH
 #ifdef _DEBUG
 			ASSERT(offset || !GetLastError(), true);
 #endif
-			// 如果icon索引不为0，则更换icon图标
-			if (int icon = pWnd->GetIcon())
+			// 如果icon索引不为空，则更换icon图标
+			if (auto icon = pWnd->GetIcon())
 			{
 				offset = SetClassLongPtr(
 					hwnd, GCLP_HICON,
-					reinterpret_cast<LONG_PTR>(LoadIcon(pCreate->hInstance, MAKEINTRESOURCE(icon)))
+					reinterpret_cast<LONG_PTR>(LoadIcon(pCreate->hInstance, MAKEINTRESOURCE(*icon)))
 				);
 #ifdef _DEBUG
 				ASSERT(offset || !GetLastError(), true);
@@ -247,12 +255,14 @@ namespace LCH
 			}
 			return pWnd->WindowProc(hwnd, msg, wParam, lParam);
 		}
+		// 处理WM_NCCREATE之前的消息
 		return DefWindowProc(hwnd, msg, wParam, lParam);
 	}
 
 	LRESULT WindowRegister::WindowProcThunk(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	{
 		Window* const pWnd = reinterpret_cast<Window*>(GetWindowLongPtr(hwnd, GWLP_USERDATA));
+		std::wcout << WindowRegister::GetInstance()->GetWindowMesssageInfo(msg, wParam, lParam);
 		return pWnd->WindowProc(hwnd, msg, wParam, lParam);
 	}
 
@@ -269,25 +279,30 @@ namespace LCH
 		return hInstance;
 	}
 
-	std::wstring WindowRegister::GetWindowClassName(const WindowType& type) const
+	const std::wstring& WindowRegister::GetWindowClassName(const WindowType& type) const
 	{
 		return windowClassName.at(type);
 	}
 
-	std::wstring WindowRegister::GetWindowMesssageInfo(DWORD msg, WPARAM wp, LPARAM lp) const
+	const std::wstring& WindowRegister::GetWindowMesssageInfo(DWORD msg, WPARAM wp, LPARAM lp)
 	{
-		std::wstring msgInfo;
 		const auto it = windowMessage.find(msg);
-		if (it != windowMessage.end())
+		if (it == windowMessage.end())
 		{
-			msgInfo += std::format(L"{:<25}", it->second);
+			unknownMsgInfo = std::move(std::format(L"Unknown message: {:#x}\n", msg));
+			return unknownMsgInfo;
 		}
 		else
 		{
-			msgInfo += std::format(L"{:<25}", std::format(L"Unknown message: {:#x}", msg));
+			if (!messageInfo.contains(it->second))
+			{
+				std::wstring msgInfo;
+				msgInfo += std::format(L"{:<25}", it->second);
+				msgInfo += std::format(L"    LP: {:#012x}", lp);
+				msgInfo += std::format(L"    WP: {:#012x}\n", wp);
+				messageInfo[it->second] = msgInfo;
+			}
+			return messageInfo.at(it->second);
 		}
-		msgInfo += std::format(L"    LP: {:#012x}", lp);
-		msgInfo += std::format(L"    WP: {:#012x}\n", wp);
-		return msgInfo;
 	}
 }

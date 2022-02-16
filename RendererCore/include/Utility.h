@@ -11,7 +11,7 @@
 *****************************************************************/
 #pragma once
 
-#include "CustomWindows.h"
+#include "SlimWindows.h"
 #include <locale>
 
 namespace LCH

@@ -19,8 +19,6 @@ int CALLBACK _tWinMain(_In_ HINSTANCE hInstance,
 	LCH::Window wnd1(800, 600, IDI_ICON1);
 	LCH::TimeSystem timer;
 
-	std::wcout << std::format(L"{:#x}\n", 120);
-
 	std::wcout << timer.Time() << std::endl;
 
 	timer.Tick();
