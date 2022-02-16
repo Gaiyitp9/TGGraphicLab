@@ -16,6 +16,7 @@ int CALLBACK _tWinMain(_In_ HINSTANCE hInstance,
 	_In_ PTSTR     lpCmdLine,
 	_In_ int       nShowCmd)
 {
+	LCH::Window wnd2(400, 300, IDI_ICON2);
 	LCH::Window wnd1(800, 600, IDI_ICON1);
 	LCH::TimeSystem timer;
 
