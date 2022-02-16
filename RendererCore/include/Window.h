@@ -9,6 +9,7 @@
 #include "SlimWindows.h"
 #include "InputSystem.h"
 #include <optional>
+#include <tchar.h>
 
 namespace LCH
 {
@@ -16,7 +17,7 @@ namespace LCH
 	class Window
 	{
 	public:
-		Window(int width, int height, std::optional<int> icon = std::nullopt, const wchar_t* title = L"TG RenderLab");
+		Window(int width, int height, PCTSTR title = L"TG RenderLab", HWND parent = nullptr);
 		Window(const Window&) = delete;
 		Window& operator=(const Window&) = delete;
 		~Window();
@@ -24,15 +25,17 @@ namespace LCH
 
 	public:
 		virtual LRESULT CALLBACK WindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);	// 消息处理函数，子类可以重写
-		std::optional<int> GetIcon() const noexcept;
+		const HWND GetHwnd() const noexcept;
+		const HWND GetParentHwnd() const noexcept;
+		const std::wstring& GetName() const noexcept;
 
 	protected:
 		// 初始化窗口，子类窗口可以重写初始化窗口函数
-		virtual void Initialize(int width, int height, const wchar_t* title);
+		virtual void Initialize();
 
 	private:
-		HWND hwnd;
+		HWND hwnd, parentHwnd;
 		int width, height;
-		std::optional<int> icon; // 窗口icon索引
+		std::wstring name;
 	};
 }

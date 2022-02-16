@@ -200,23 +200,6 @@ namespace LCH
 	{
 		hInstance = GetModuleHandle(nullptr);
 		ASSERT(hInstance, true);
-
-		WNDCLASSEX wc = {};
-		wc.cbSize = sizeof(WNDCLASSEX);
-		wc.style = CS_HREDRAW | CS_VREDRAW | CS_OWNDC;
-		wc.lpfnWndProc = WindowProcSetup;
-		wc.cbClsExtra = 0;
-		wc.cbWndExtra = 0;
-		wc.hInstance = hInstance;
-		wc.hIcon = nullptr;
-		wc.hCursor = nullptr;
-		wc.hbrBackground = nullptr;
-		wc.hIconSm = nullptr;
-		wc.lpszMenuName = nullptr;
-		wc.lpszClassName = L"Default";
-
-		ASSERT(RegisterClassEx(&wc), true);
-		windowClassName[WindowType::Default] = L"Default";
 	}
 
 	WindowRegister::~WindowRegister()
@@ -242,17 +225,6 @@ namespace LCH
 #ifdef _DEBUG
 			ASSERT(offset || !GetLastError(), true);
 #endif
-			// 如果icon索引不为空，则更换icon图标
-			if (auto icon = pWnd->GetIcon())
-			{
-				offset = SetClassLongPtr(
-					hwnd, GCLP_HICON,
-					reinterpret_cast<LONG_PTR>(LoadIcon(pCreate->hInstance, MAKEINTRESOURCE(*icon)))
-				);
-#ifdef _DEBUG
-				ASSERT(offset || !GetLastError(), true);
-#endif
-			}
 			return pWnd->WindowProc(hwnd, msg, wParam, lParam);
 		}
 		// 处理WM_NCCREATE之前的消息
@@ -262,7 +234,9 @@ namespace LCH
 	LRESULT WindowRegister::WindowProcThunk(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	{
 		Window* const pWnd = reinterpret_cast<Window*>(GetWindowLongPtr(hwnd, GWLP_USERDATA));
-		std::wcout << WindowRegister::GetInstance()->GetWindowMesssageInfo(msg, wParam, lParam);
+#ifdef _DEBUG
+		std::wcout << WindowRegister::GetInstance()->GetWindowMesssageInfo(pWnd->GetName(), msg, wParam, lParam);
+#endif
 		return pWnd->WindowProc(hwnd, msg, wParam, lParam);
 	}
 
@@ -279,18 +253,40 @@ namespace LCH
 		return hInstance;
 	}
 
+	void WindowRegister::Initialize(const std::vector<int>& icons)
+	{
+		int count = icons.size();
+
+		HICON icon = count > 0 ? LoadIcon(hInstance, MAKEINTRESOURCE(icons[0])) : nullptr;
+		WNDCLASSEX wc = {};
+		wc.cbSize = sizeof(WNDCLASSEX);
+		wc.style = CS_HREDRAW | CS_VREDRAW | CS_OWNDC;
+		wc.lpfnWndProc = WindowProcSetup;
+		wc.cbClsExtra = 0;
+		wc.cbWndExtra = 0;
+		wc.hInstance = hInstance;
+		wc.hIcon = icon;
+		wc.hCursor = nullptr;
+		wc.hbrBackground = nullptr;
+		wc.hIconSm = icon;
+		wc.lpszMenuName = nullptr;
+		wc.lpszClassName = L"Default";
+
+		ASSERT(RegisterClassEx(&wc), true);
+		windowClassName[WindowType::Default] = L"Default";
+	}
+
 	const std::wstring& WindowRegister::GetWindowClassName(const WindowType& type) const
 	{
 		return windowClassName.at(type);
 	}
 
-	const std::wstring& WindowRegister::GetWindowMesssageInfo(DWORD msg, WPARAM wp, LPARAM lp)
+	const std::wstring& WindowRegister::GetWindowMesssageInfo(const std::wstring& window, DWORD msg, WPARAM wp, LPARAM lp)
 	{
 		const auto it = windowMessage.find(msg);
 		if (it == windowMessage.end())
 		{
-			unknownMsgInfo = std::move(std::format(L"Unknown message: {:#x}\n", msg));
-			return unknownMsgInfo;
+			msgInfo = std::move(window + L"	" + std::format(L"Unknown message: {:#x}\n", msg));
 		}
 		else
 		{
@@ -302,7 +298,8 @@ namespace LCH
 				msgInfo += std::format(L"    WP: {:#012x}\n", wp);
 				messageInfo[it->second] = msgInfo;
 			}
-			return messageInfo.at(it->second);
+			msgInfo = std::move(window + L"	" + messageInfo.at(it->second));
 		}
+		return msgInfo;
 	}
 }

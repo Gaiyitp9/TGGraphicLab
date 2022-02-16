@@ -23,9 +23,10 @@ namespace LCH
 	{
 	public:
 		static WindowRegister* const GetInstance();
+		void Initialize(const std::vector<int>& icons);	// 初始化注册器，注册所有窗口类
 		HINSTANCE GetHInstance() const noexcept;
 		const std::wstring& GetWindowClassName(const WindowType&) const;
-		const std::wstring& GetWindowMesssageInfo(DWORD, WPARAM, LPARAM);
+		const std::wstring& GetWindowMesssageInfo(const std::wstring&, DWORD, WPARAM, LPARAM);
 
 	private:
 		WindowRegister();
@@ -45,6 +46,6 @@ namespace LCH
 
 		std::unordered_map<DWORD, std::wstring> windowMessage;			// 窗口消息
 		std::unordered_map<std::wstring, std::wstring> messageInfo;		// 消息包含的信息
-		std::wstring unknownMsgInfo;									// 未知消息的信息
+		std::wstring msgInfo;											// 消息信息
 	};
 }

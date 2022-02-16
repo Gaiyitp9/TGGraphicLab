@@ -13,10 +13,10 @@
 
 namespace LCH
 {
-	Window::Window(int width, int height, std::optional<int> icon, const wchar_t* title)
-		: width(width), height(height), icon(icon), hwnd(nullptr)
+	Window::Window(int width, int height, PCTSTR title, HWND parent)
+		: width(width), height(height), hwnd(nullptr), name(title), parentHwnd(parent)
 	{
-		Initialize(width, height, title);
+		Initialize();
 	}
 
 	Window::~Window()
@@ -61,16 +61,26 @@ namespace LCH
 		return std::nullopt;
 	}
 
-	std::optional<int> Window::GetIcon() const noexcept
+	const std::wstring& Window::GetName() const noexcept
 	{
-		return icon;
+		return name;
 	}
 
-	void Window::Initialize(int width, int height, const wchar_t* title)
+	const HWND Window::GetHwnd() const noexcept
+	{
+		return hwnd;
+	}
+
+	const HWND Window::GetParentHwnd() const noexcept
+	{
+		return parentHwnd;
+	}
+
+	void Window::Initialize()
 	{
 		// 获取窗口类名称
 		WindowRegister* const windowRegister = WindowRegister::GetInstance();
-		std::wstring wndClassName = windowRegister->GetWindowClassName(WindowType::Default);
+		const std::wstring& wndClassName = windowRegister->GetWindowClassName(WindowType::Default);
 
 		// 客户端区域大小
 		RECT rect = { 0, 0, width, height };
@@ -78,9 +88,9 @@ namespace LCH
 		// 根据客户区域宽和高计算整个窗口的宽和高
 		ASSERT(AdjustWindowRect(&rect, WS_OVERLAPPEDWINDOW, false), true);
 		// 创建窗口
-		ASSERT(hwnd = CreateWindow(wndClassName.c_str(), title, WS_OVERLAPPEDWINDOW,
+		ASSERT(hwnd = CreateWindow(wndClassName.c_str(), name.c_str(), WS_OVERLAPPEDWINDOW,
 			CW_USEDEFAULT, CW_USEDEFAULT, rect.right - rect.left, rect.bottom - rect.top,
-			nullptr, nullptr, windowRegister->GetHInstance(), this), true);
+			parentHwnd, nullptr, windowRegister->GetHInstance(), this), true);
 
 		ShowWindow(hwnd, SW_SHOW);
 	}
