@@ -8,6 +8,7 @@
 #include "Window.h"
 #include "WindowRegister.h"
 #include "TimeSystem.h"
+#include "Utility.h"
 #include "../resource.h"
 #include <iostream>
 #include <format>
@@ -31,6 +32,9 @@ namespace LCH
 		LCH::TimeSystem timer;
 
 		std::wcout << timer.Time() << std::endl;
+		std::string time = Utility::WideStringToAnsi(timer.Time());
+		std::cout << time << std::endl;
+
 
 		timer.Tick();
 		int i = 1000000;

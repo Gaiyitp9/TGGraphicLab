@@ -19,7 +19,7 @@ namespace LCH
 		Window(int width, int height, const wchar_t* title = L"TG RenderLab", HWND parent = nullptr);
 		Window(const Window&) = delete;
 		Window& operator=(const Window&) = delete;
-		~Window();
+		virtual ~Window();
 
 		static std::optional<int> ProcessMessage();							// 处理所有窗口的消息
 

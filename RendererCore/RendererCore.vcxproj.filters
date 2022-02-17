@@ -19,6 +19,9 @@
     <Filter Include="头文件\Diagnostics">
       <UniqueIdentifier>{0cbeb0cf-9f64-4dde-8730-ff66247353ad}</UniqueIdentifier>
     </Filter>
+    <Filter Include="源文件\Diagnostics">
+      <UniqueIdentifier>{97334a28-f99a-4278-876e-43920cddba7f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\SlimWindows.h">
@@ -51,6 +54,9 @@
     <ClInclude Include="include\Diagnostics\Debug.h">
       <Filter>头文件\Diagnostics</Filter>
     </ClInclude>
+    <ClInclude Include="include\Diagnostics\BaseException.h">
+      <Filter>头文件\Diagnostics</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Utility.cpp">
@@ -70,6 +76,9 @@
     </ClCompile>
     <ClCompile Include="src\WindowRegister.cpp">
       <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Diagnostics\BaseException.cpp">
+      <Filter>源文件\Diagnostics</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
