@@ -6,14 +6,14 @@
 
 #include "Window.h"
 #include "WindowRegister.h"
-#include "Debug.h"
+#include "Diagnostics/Debug.h"
 #ifdef _DEBUG
 #include <iostream>
 #endif
 
 namespace LCH
 {
-	Window::Window(int width, int height, PCTSTR title, HWND parent)
+	Window::Window(int width, int height, const wchar_t* title, HWND parent)
 		: width(width), height(height), hwnd(nullptr), name(title), parentHwnd(parent)
 	{
 		Initialize();

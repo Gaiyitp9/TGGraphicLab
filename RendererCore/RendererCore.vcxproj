@@ -154,7 +154,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="include\Debug.h" />
+    <ClInclude Include="include\Diagnostics\Debug.h" />
     <ClInclude Include="include\InputEvent.h" />
     <ClInclude Include="include\InputSystem.h" />
     <ClInclude Include="include\KeyCode.h" />

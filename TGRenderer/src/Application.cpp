@@ -16,7 +16,7 @@ namespace LCH
 {
 	Application::Application()
 	{
-
+		WindowRegister::GetInstance()->Initialize({IDI_ICON1, IDI_ICON2});
 	}
 
 	Application::~Application()
@@ -26,9 +26,6 @@ namespace LCH
 
 	int Application::Run()
 	{
-		std::vector<int> icons = { IDI_ICON1 , IDI_ICON2 };
-		LCH::WindowRegister::GetInstance()->Initialize(icons);
-
 		LCH::Window wnd1(800, 600, L"TG Renderer");
 		LCH::Window wnd2(400, 300, L"child window", wnd1.GetHwnd());
 		LCH::TimeSystem timer;

@@ -6,18 +6,14 @@
 
 #include "WindowRegister.h"
 #include "Window.h"
-#include "Debug.h"
+#include "Diagnostics/Debug.h"
 #include <format>
 
 #ifdef _DEBUG
 #include <iostream>
 #endif
 
-#ifdef UNICODE
 #define REGISTER_MESSAGE(msg) {msg, L#msg}
-#elif
-#define REGISTER_MESSAGE(msg) {msg, #msg}
-#endif
 
 namespace LCH
 {
@@ -235,7 +231,7 @@ namespace LCH
 	{
 		Window* const pWnd = reinterpret_cast<Window*>(GetWindowLongPtr(hwnd, GWLP_USERDATA));
 #ifdef _DEBUG
-		std::wcout << WindowRegister::GetInstance()->GetWindowMesssageInfo(pWnd->GetName(), msg, wParam, lParam);
+		std::wcout << WindowRegister::GetInstance()->GetWindowMesssageInfo(pWnd->name, msg, wParam, lParam);
 #endif
 		return pWnd->WindowProc(hwnd, msg, wParam, lParam);
 	}
@@ -281,7 +277,7 @@ namespace LCH
 		return windowClassName.at(type);
 	}
 
-	const std::wstring& WindowRegister::GetWindowMesssageInfo(const std::wstring& window, DWORD msg, WPARAM wp, LPARAM lp)
+	const std::wstring& WindowRegister::GetWindowMesssageInfo(const std::wstring& window, UINT msg, WPARAM wp, LPARAM lp)
 	{
 		const auto it = windowMessage.find(msg);
 		if (it == windowMessage.end())

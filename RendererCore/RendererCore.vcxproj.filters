@@ -16,6 +16,9 @@
     <Filter Include="头文件\Math">
       <UniqueIdentifier>{7598275a-1fca-4bc6-ade6-100371401d0f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="头文件\Diagnostics">
+      <UniqueIdentifier>{0cbeb0cf-9f64-4dde-8730-ff66247353ad}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\SlimWindows.h">
@@ -33,9 +36,6 @@
     <ClInclude Include="include\TimeSystem.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="include\Debug.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="include\InputSystem.h">
       <Filter>头文件</Filter>
     </ClInclude>
@@ -47,6 +47,9 @@
     </ClInclude>
     <ClInclude Include="include\WindowRegister.h">
       <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Diagnostics\Debug.h">
+      <Filter>头文件\Diagnostics</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

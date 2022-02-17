@@ -5,16 +5,23 @@
 *****************************************************************/
 
 #include "SlimWindows.h"
-#include <tchar.h>
 #include "Application.h"
 #include <exception>
 #include <iostream>
 
-int CALLBACK _tWinMain(_In_ HINSTANCE hInstance,
+int CALLBACK wWinMain(_In_ HINSTANCE hInstance,
 	_In_opt_ HINSTANCE hPrevInstance,
-	_In_ PTSTR     lpCmdLine,
+	_In_ PWSTR     lpCmdLine,
 	_In_ int       nShowCmd)
 {
 	LCH::Application app;
-	return app.Run();
+	try
+	{
+		return app.Run();
+	}
+	catch (std::exception& e)
+	{
+		std::cout << e.what() << std::endl;
+		return -1;
+	}
 }

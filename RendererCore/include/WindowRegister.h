@@ -23,10 +23,10 @@ namespace LCH
 	{
 	public:
 		static WindowRegister* const GetInstance();
-		void Initialize(const std::vector<int>& icons);	// 初始化注册器，注册所有窗口类
+		void Initialize(const std::vector<int>& icons);					// 初始化注册器，注册所有窗口类
 		HINSTANCE GetHInstance() const noexcept;
-		const std::wstring& GetWindowClassName(const WindowType&) const;
-		const std::wstring& GetWindowMesssageInfo(const std::wstring&, DWORD, WPARAM, LPARAM);
+		const std::wstring& GetWindowClassName(const WindowType& type) const;
+		const std::wstring& GetWindowMesssageInfo(const std::wstring& window, UINT msg, WPARAM wp, LPARAM lp);
 
 	private:
 		WindowRegister();
@@ -34,8 +34,8 @@ namespace LCH
 		WindowRegister(const WindowRegister&) = delete;
 		WindowRegister& operator=(const WindowRegister&) = delete;
 
-		static LRESULT CALLBACK WindowProcSetup(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
-		static LRESULT CALLBACK WindowProcThunk(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
+		static LRESULT CALLBACK WindowProcSetup(HWND, UINT, WPARAM, LPARAM);
+		static LRESULT CALLBACK WindowProcThunk(HWND, UINT, WPARAM, LPARAM);
 
 	private:
 		static WindowRegister* instance;								// 窗口注册器单例
