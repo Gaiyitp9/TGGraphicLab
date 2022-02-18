@@ -16,7 +16,7 @@ namespace LCH
 	class Window
 	{
 	public:
-		Window(int width, int height, const wchar_t* title = L"TG RenderLab", HWND parent = nullptr);
+		Window(int width, int height, wchar_t const* title = L"TG RenderLab", HWND parent = nullptr);
 		Window(const Window&) = delete;
 		Window& operator=(const Window&) = delete;
 		virtual ~Window();

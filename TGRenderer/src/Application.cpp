@@ -9,6 +9,7 @@
 #include "WindowRegister.h"
 #include "TimeSystem.h"
 #include "Utility.h"
+#include "Diagnostics/BaseException.h"
 #include "../resource.h"
 #include <iostream>
 #include <format>
@@ -35,6 +36,7 @@ namespace LCH
 		std::string time = Utility::WideStringToAnsi(timer.Time());
 		std::cout << time << std::endl;
 
+		throw LCH::BaseException(38, L"application.cpp");
 
 		timer.Tick();
 		int i = 1000000;

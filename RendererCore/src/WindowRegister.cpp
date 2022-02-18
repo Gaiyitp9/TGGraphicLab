@@ -277,25 +277,20 @@ namespace LCH
 		return windowClassName.at(type);
 	}
 
-	const std::wstring& WindowRegister::GetWindowMesssageInfo(const std::wstring& window, UINT msg, WPARAM wp, LPARAM lp)
+	std::wstring WindowRegister::GetWindowMesssageInfo(const std::wstring& window, UINT msg, WPARAM wp, LPARAM lp) const
 	{
+		std::wstring msgInfo(window);
 		const auto it = windowMessage.find(msg);
 		if (it == windowMessage.end())
 		{
-			msgInfo = std::move(window + L"	" + std::format(L"Unknown message: {:#x}\n", msg));
+			msgInfo += std::format(L"	{:<25}", std::format(L"Unknown message: {:#x}", msg));
 		}
 		else
 		{
-			if (!messageInfo.contains(it->second))
-			{
-				std::wstring msgInfo;
-				msgInfo += std::format(L"{:<25}", it->second);
-				msgInfo += std::format(L"    LP: {:#012x}", lp);
-				msgInfo += std::format(L"    WP: {:#012x}\n", wp);
-				messageInfo[it->second] = msgInfo;
-			}
-			msgInfo = std::move(window + L"	" + messageInfo.at(it->second));
+			msgInfo += std::format(L"	{:<25}", it->second);
 		}
-		return msgInfo;
+		msgInfo += std::format(L"    LP: {:#012x}", lp);
+		msgInfo += std::format(L"    WP: {:#012x}\n", wp);
+		return std::move(msgInfo);
 	}
 }

@@ -10,18 +10,22 @@ namespace LCH
 {
 	std::wstring Utility::AnsiToWideString(const std::string& str)
 	{
-		wchar_t wstr[MAX_PATH];
-		if (!MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED, str.c_str(), -1, wstr, MAX_PATH))
-			wstr[0] = L'\0';
-		return wstr;
+		int length = MultiByteToWideChar(CP_UTF8, 0, str.c_str(), -1, nullptr, 0);
+		wchar_t* wide = new wchar_t[length];
+		MultiByteToWideChar(CP_UTF8, 0, str.c_str(), -1, wide, length);
+		std::wstring wstr(wide);
+		delete[] wide;
+		return std::move(wstr);
 	}
 
 	std::string Utility::WideStringToAnsi(const std::wstring& wstr)
 	{
-		char str[MAX_PATH];
-		if (!WideCharToMultiByte(CP_ACP, MB_PRECOMPOSED, wstr.c_str(), -1, str, MAX_PATH, nullptr, nullptr))
-			str[0] = '\0';
-		return str;
+		int length = WideCharToMultiByte(CP_UTF8, 0, wstr.c_str(), -1, nullptr, 0, nullptr, nullptr);
+		char* ansi = new char[length];
+		WideCharToMultiByte(CP_UTF8, 0, wstr.c_str(), -1, ansi, length, nullptr, nullptr);
+		std::string str(ansi);
+		delete[] ansi;
+		return std::move(str);
 	}
 
 	std::string Utility::ToLower(const std::string& str)

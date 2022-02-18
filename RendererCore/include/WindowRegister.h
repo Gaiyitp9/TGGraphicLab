@@ -26,7 +26,7 @@ namespace LCH
 		void Initialize(const std::vector<int>& icons);					// 初始化注册器，注册所有窗口类
 		HINSTANCE GetHInstance() const noexcept;
 		const std::wstring& GetWindowClassName(const WindowType& type) const;
-		const std::wstring& GetWindowMesssageInfo(const std::wstring& window, UINT msg, WPARAM wp, LPARAM lp);
+		std::wstring GetWindowMesssageInfo(const std::wstring& window, UINT msg, WPARAM wp, LPARAM lp) const;
 
 	private:
 		WindowRegister();
@@ -45,7 +45,5 @@ namespace LCH
 		std::unordered_map<WindowType, std::wstring> windowClassName;	// 记录不同类型窗口的名称
 
 		std::unordered_map<DWORD, std::wstring> windowMessage;			// 窗口消息
-		std::unordered_map<std::wstring, std::wstring> messageInfo;		// 消息包含的信息
-		std::wstring msgInfo;											// 消息信息
 	};
 }

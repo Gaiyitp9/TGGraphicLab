@@ -8,10 +8,11 @@
 #include "Application.h"
 #include <exception>
 #include <iostream>
+#include <tchar.h>
 
-int CALLBACK wWinMain(_In_ HINSTANCE hInstance,
+int CALLBACK _tWinMain(_In_ HINSTANCE hInstance,
 	_In_opt_ HINSTANCE hPrevInstance,
-	_In_ PWSTR     lpCmdLine,
+	_In_ LPTSTR     lpCmdLine,
 	_In_ int       nShowCmd)
 {
 	LCH::Application app;

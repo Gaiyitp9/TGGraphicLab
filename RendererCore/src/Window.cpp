@@ -13,7 +13,7 @@
 
 namespace LCH
 {
-	Window::Window(int width, int height, const wchar_t* title, HWND parent)
+	Window::Window(int width, int height, wchar_t const* title, HWND parent)
 		: width(width), height(height), hwnd(nullptr), name(title), parentHwnd(parent)
 	{
 		Initialize();
@@ -79,7 +79,7 @@ namespace LCH
 	void Window::Initialize()
 	{
 		// 获取窗口类名称
-		WindowRegister* const windowRegister = WindowRegister::GetInstance();
+		WindowRegister const* const windowRegister = WindowRegister::GetInstance();
 		const std::wstring& wndClassName = windowRegister->GetWindowClassName(WindowType::Default);
 
 		// 客户端区域大小
