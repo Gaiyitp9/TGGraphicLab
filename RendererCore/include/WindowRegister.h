@@ -32,7 +32,7 @@ namespace LCH
 		WindowRegister();
 		~WindowRegister();
 		WindowRegister(const WindowRegister&) = delete;
-		WindowRegister& operator=(const WindowRegister&) = delete;
+		const WindowRegister& operator=(const WindowRegister&) = delete;
 
 		static LRESULT CALLBACK WindowProcSetup(HWND, UINT, WPARAM, LPARAM);
 		static LRESULT CALLBACK WindowProcThunk(HWND, UINT, WPARAM, LPARAM);

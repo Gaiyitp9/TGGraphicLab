@@ -5,22 +5,27 @@
 *****************************************************************/
 
 #include "Diagnostics/BaseException.h"
-#include "Utility.h"
 #include <format>
 #include <DbgHelp.h>
 
 namespace LCH
 {
-	BaseException::BaseException(int lineNum, std::wstring filePath)
-		: lineNum(lineNum), filePath(filePath)
+	BaseException::BaseException(std::string description)
 	{
 		// 初始化符号处理器，用于堆栈信息追踪
 		hProcess = GetCurrentProcess();
-		SymInitializeW(hProcess, nullptr, true);
-		hThread = GetCurrentThread();
-
-		std::wstring wstr = GetType() + std::format(L"\n[File] {}\n[Line] {}\n", filePath, lineNum);
-		whatBuffer += Utility::WideStringToAnsi(wstr);
+		SymInitialize(hProcess, nullptr, true);
+		// 记录栈帧信息
+		StackTrace();
+		// 记录异常信息
+		whatBuffer = std::format("{}: {}\n", GetType(), description);
+		whatBuffer += "-----------------------------------------------\n";
+		for(const auto& info : stackFrameInfo)
+		{
+			whatBuffer += std::format("Frame: {}\nFile: {}\nFunction: {}\nLine: {}\n", 
+				info.index, info.file, info.function, info.line);
+			whatBuffer += "-----------------------------------------------\n";
+		}
 	}
 	
 	BaseException::~BaseException()
@@ -34,19 +39,9 @@ namespace LCH
 		return whatBuffer.c_str();
 	}
 
-	wchar_t const* BaseException::GetType() const noexcept
+	char const* BaseException::GetType() const noexcept
 	{
-		return L"Base Exception";
-	}
-
-	int BaseException::GetLineNum() const noexcept
-	{
-		return lineNum;
-	}
-
-	const std::wstring& BaseException::GetFilePath() const noexcept
-	{
-		return filePath;
+		return "Base Exception";
 	}
 
 	void BaseException::StackTrace()
@@ -54,17 +49,23 @@ namespace LCH
 		void* stackFrames[FramesToCapture];
 		USHORT frameCount = CaptureStackBackTrace(0, FramesToCapture, stackFrames, nullptr);
 
-		SYMBOL_INFOW* symbol = reinterpret_cast<SYMBOL_INFOW*>(malloc(sizeof(SYMBOL_INFOW) + MaxNameLen * sizeof(WCHAR)));
-		symbol->SizeOfStruct = sizeof(SYMBOL_INFOW);
+		SYMBOL_INFO* symbol = reinterpret_cast<SYMBOL_INFO*>(malloc(sizeof(SYMBOL_INFO) + MaxNameLen * sizeof(CHAR)));
+		symbol->SizeOfStruct = sizeof(SYMBOL_INFO);
 		symbol->MaxNameLen = MaxNameLen;
 
-		IMAGEHLP_LINEW64 imageLine = { 0 };
-		imageLine.SizeOfStruct = sizeof(IMAGEHLP_LINEW64);
+		IMAGEHLP_LINE imageLine = { 0 };
+		imageLine.SizeOfStruct = sizeof(IMAGEHLP_LINE);
 
+		DWORD displacement;
 		for (USHORT i = 0; i < frameCount; ++i)
 		{
-			SymFromAddrW(hProcess, (DWORD64)stackFrames[i], 0, symbol);
-			SymGetLineFromAddrW(hProcess, (DWORD64)stackFrames[i], 0, &imageLine);
+			SymFromAddr(hProcess, (DWORD64)stackFrames[i], nullptr, symbol);
+			SymGetLineFromAddr(hProcess, (DWORD64)stackFrames[i], &displacement, &imageLine);
+			StackFrame frame{ static_cast<unsigned int>(frameCount - i - 1), imageLine.FileName,
+				symbol->Name, static_cast<unsigned int>(imageLine.LineNumber) };
+			stackFrameInfo.push_back(frame);
 		}
+
+		free(symbol);
 	}
 }

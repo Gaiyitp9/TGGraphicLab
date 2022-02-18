@@ -8,32 +8,36 @@
 #include "../SlimWindows.h"
 #include <exception>
 #include <string>
+#include <vector>
 
 namespace LCH
 {
+
 	class BaseException : public std::exception
 	{
+		struct StackFrame
+		{
+			unsigned int index;
+			std::string file;
+			std::string function;
+			unsigned int line;
+		};
+
 	public:
-		BaseException(int lineNum, std::wstring filePath);
+		BaseException(std::string description);
 		~BaseException();
 
 		virtual char const* what() const override;
-		virtual wchar_t const* GetType() const noexcept;
-
-		int GetLineNum() const noexcept;
-		const std::wstring& GetFilePath() const noexcept;
-
-	private:
-		void StackTrace();		// 追踪栈帧信息
+		virtual char const* GetType() const noexcept;
 
 	protected:
-		int lineNum;
-		std::wstring filePath;
-		std::string whatBuffer;
+		std::string whatBuffer;							// 异常信息
+		std::vector<StackFrame> stackFrameInfo;			// 栈帧信息
 
 	private:
-		HANDLE hProcess;		// 当前进程句柄
-		HANDLE hThread;			// 当前线程句柄
+		void StackTrace();								// 追踪栈帧信息
+
+		HANDLE hProcess;								// 当前进程句柄
 		constexpr static USHORT FramesToCapture = 100;	// 最大追踪栈帧数
 		constexpr static UINT MaxNameLen = 255;			// 函数名称最大长度
 	};

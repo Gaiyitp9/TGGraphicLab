@@ -79,7 +79,7 @@ namespace LCH
 	void Window::Initialize()
 	{
 		// 获取窗口类名称
-		WindowRegister const* const windowRegister = WindowRegister::GetInstance();
+		WindowRegister* const windowRegister = WindowRegister::GetInstance();
 		const std::wstring& wndClassName = windowRegister->GetWindowClassName(WindowType::Default);
 
 		// 客户端区域大小

@@ -251,7 +251,7 @@ namespace LCH
 
 	void WindowRegister::Initialize(const std::vector<int>& icons)
 	{
-		int count = icons.size();
+		size_t count = icons.size();
 
 		HICON icon = count > 0 ? LoadIcon(hInstance, MAKEINTRESOURCE(icons[0])) : nullptr;
 		WNDCLASSEX wc = {};
@@ -279,7 +279,8 @@ namespace LCH
 
 	std::wstring WindowRegister::GetWindowMesssageInfo(const std::wstring& window, UINT msg, WPARAM wp, LPARAM lp) const
 	{
-		std::wstring msgInfo(window);
+		std::wstring msgInfo;
+		msgInfo += std::format(L"{:<10}", window);
 		const auto it = windowMessage.find(msg);
 		if (it == windowMessage.end())
 		{
@@ -289,8 +290,8 @@ namespace LCH
 		{
 			msgInfo += std::format(L"	{:<25}", it->second);
 		}
-		msgInfo += std::format(L"    LP: {:#012x}", lp);
-		msgInfo += std::format(L"    WP: {:#012x}\n", wp);
+		msgInfo += std::format(L"    LP: {:#018x}", lp);
+		msgInfo += std::format(L"    WP: {:#018x}\n", wp);
 		return std::move(msgInfo);
 	}
 }
