@@ -50,12 +50,12 @@ namespace LCH
 	{
 		MSG msg = { 0 };
 
-		while (PeekMessage(&msg, 0, 0, 0, PM_REMOVE))
+		while (PeekMessageW(&msg, 0, 0, 0, PM_REMOVE))
 		{
 			if (msg.message == WM_QUIT)
 				return (int)msg.wParam;
 			TranslateMessage(&msg);
-			DispatchMessage(&msg);
+			DispatchMessageW(&msg);
 		}
 
 		return std::nullopt;
@@ -88,7 +88,7 @@ namespace LCH
 		// 根据客户区域宽和高计算整个窗口的宽和高
 		ASSERT(AdjustWindowRect(&rect, WS_OVERLAPPEDWINDOW, false), true);
 		// 创建窗口
-		ASSERT(hwnd = CreateWindow(wndClassName.c_str(), name.c_str(), WS_OVERLAPPEDWINDOW,
+		ASSERT(hwnd = CreateWindowW(wndClassName.c_str(), name.c_str(), WS_OVERLAPPEDWINDOW,
 			CW_USEDEFAULT, CW_USEDEFAULT, rect.right - rect.left, rect.bottom - rect.top,
 			parentHwnd, nullptr, windowRegister->GetHInstance(), this), true);
 

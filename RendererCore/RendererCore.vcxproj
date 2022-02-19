@@ -156,6 +156,7 @@
   <ItemGroup>
     <ClInclude Include="include\Diagnostics\BaseException.h" />
     <ClInclude Include="include\Diagnostics\Debug.h" />
+    <ClInclude Include="include\Diagnostics\WinAPIException.h" />
     <ClInclude Include="include\InputEvent.h" />
     <ClInclude Include="include\InputSystem.h" />
     <ClInclude Include="include\KeyCode.h" />
@@ -168,6 +169,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Diagnostics\BaseException.cpp" />
+    <ClCompile Include="src\Diagnostics\WinAPIException.cpp" />
     <ClCompile Include="src\InputEvent.cpp" />
     <ClCompile Include="src\InputSystem.cpp" />
     <ClCompile Include="src\TimeSystem.cpp" />

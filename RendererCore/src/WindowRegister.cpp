@@ -194,14 +194,14 @@ namespace LCH
 			REGISTER_MESSAGE(WM_ENTERSIZEMOVE),
 			})
 	{
-		hInstance = GetModuleHandle(nullptr);
+		hInstance = GetModuleHandleW(nullptr);
 		ASSERT(hInstance, true);
 	}
 
 	WindowRegister::~WindowRegister()
 	{
 		for (auto& pair : windowClassName)
-			UnregisterClass(pair.second.c_str(), hInstance);
+			UnregisterClassW(pair.second.c_str(), hInstance);
 	}
 
 	LRESULT WindowRegister::WindowProcSetup(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
@@ -213,23 +213,23 @@ namespace LCH
 #ifdef _DEBUG
 			SetLastError(0);
 #endif
-			auto offset = SetWindowLongPtr(hwnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(pWnd));
+			auto offset = SetWindowLongPtrW(hwnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(pWnd));
 #ifdef _DEBUG
 			ASSERT(offset || !GetLastError(), true);
 #endif
-			offset = SetWindowLongPtr(hwnd, GWLP_WNDPROC, reinterpret_cast<LONG_PTR>(WindowProcThunk));
+			offset = SetWindowLongPtrW(hwnd, GWLP_WNDPROC, reinterpret_cast<LONG_PTR>(WindowProcThunk));
 #ifdef _DEBUG
 			ASSERT(offset || !GetLastError(), true);
 #endif
 			return pWnd->WindowProc(hwnd, msg, wParam, lParam);
 		}
 		// 处理WM_NCCREATE之前的消息
-		return DefWindowProc(hwnd, msg, wParam, lParam);
+		return DefWindowProcW(hwnd, msg, wParam, lParam);
 	}
 
 	LRESULT WindowRegister::WindowProcThunk(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	{
-		Window* const pWnd = reinterpret_cast<Window*>(GetWindowLongPtr(hwnd, GWLP_USERDATA));
+		Window* const pWnd = reinterpret_cast<Window*>(GetWindowLongPtrW(hwnd, GWLP_USERDATA));
 #ifdef _DEBUG
 		std::wcout << WindowRegister::GetInstance()->GetWindowMesssageInfo(pWnd->name, msg, wParam, lParam);
 #endif
@@ -268,7 +268,7 @@ namespace LCH
 		wc.lpszMenuName = nullptr;
 		wc.lpszClassName = L"Default";
 
-		ASSERT(RegisterClassEx(&wc), true);
+		ASSERT(RegisterClassExW(&wc), true);
 		windowClassName[WindowType::Default] = L"Default";
 	}
 

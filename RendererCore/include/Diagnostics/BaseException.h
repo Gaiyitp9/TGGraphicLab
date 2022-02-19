@@ -18,27 +18,30 @@ namespace LCH
 		struct StackFrame
 		{
 			unsigned int index;
-			std::string file;
-			std::string function;
+			std::wstring file;
+			std::wstring function;
 			unsigned int line;
 		};
 
 	public:
-		BaseException(std::string description);
+		BaseException(const std::wstring& description = L"No Description");
 		~BaseException();
 
 		virtual char const* what() const override;
-		virtual char const* GetType() const noexcept;
+		virtual wchar_t const* GetType() const noexcept;
+		const std::wstring& GetExceptionInfo() const noexcept;
 
 	protected:
-		std::string whatBuffer;							// 异常信息
+		std::wstring wWhatBuffer;						// 异常信息(宽字符，Unicode)
+		std::string whatBuffer;							// 异常信息(窄字符，GB2312)
 		std::vector<StackFrame> stackFrameInfo;			// 栈帧信息
 
 	private:
 		void StackTrace();								// 追踪栈帧信息
 
 		HANDLE hProcess;								// 当前进程句柄
-		constexpr static USHORT FramesToCapture = 100;	// 最大追踪栈帧数
-		constexpr static UINT MaxNameLen = 255;			// 函数名称最大长度
+		constexpr static USHORT FRAMESTOCAPTURE = 100;	// 最大追踪栈帧数
+		constexpr static UINT MAXNAMELEN = 255;			// 函数名称最大长度
+		const wchar_t* SEPARATOR = L"\n-----------------------------------------------\n";	// 分隔符
 	};
 }

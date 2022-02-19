@@ -10,9 +10,9 @@ namespace LCH
 {
 	std::wstring Utility::AnsiToWideString(const std::string& str)
 	{
-		int length = MultiByteToWideChar(CP_UTF8, 0, str.c_str(), -1, nullptr, 0);
+		int length = MultiByteToWideChar(CP_ACP, 0, str.c_str(), -1, nullptr, 0);
 		wchar_t* wide = new wchar_t[length];
-		MultiByteToWideChar(CP_UTF8, 0, str.c_str(), -1, wide, length);
+		MultiByteToWideChar(CP_ACP, 0, str.c_str(), -1, wide, length);
 		std::wstring wstr(wide);
 		delete[] wide;
 		return std::move(wstr);
@@ -20,9 +20,9 @@ namespace LCH
 
 	std::string Utility::WideStringToAnsi(const std::wstring& wstr)
 	{
-		int length = WideCharToMultiByte(CP_UTF8, 0, wstr.c_str(), -1, nullptr, 0, nullptr, nullptr);
+		int length = WideCharToMultiByte(CP_ACP, 0, wstr.c_str(), -1, nullptr, 0, nullptr, nullptr);
 		char* ansi = new char[length];
-		WideCharToMultiByte(CP_UTF8, 0, wstr.c_str(), -1, ansi, length, nullptr, nullptr);
+		WideCharToMultiByte(CP_ACP, 0, wstr.c_str(), -1, ansi, length, nullptr, nullptr);
 		std::string str(ansi);
 		delete[] ansi;
 		return std::move(str);

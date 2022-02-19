@@ -6,6 +6,11 @@
 
 #pragma once
 
+#include "TimeSystem.h"
+#include "InputSystem.h"
+#include <locale>
+#include <iostream>
+
 namespace LCH
 {
 	class Application
@@ -14,8 +19,13 @@ namespace LCH
 		Application();
 		~Application();
 		Application(const Application&) = delete;
-		Application& operator=(const Application&) = delete;
+		const Application& operator=(const Application&) = delete;
 
 		int Run();
+
+	private:
+		std::locale locale;		// 语言区域
+		TimeSystem timer;		// 时间系统
+		InputSystem input;		// 输入系统
 	};
 }

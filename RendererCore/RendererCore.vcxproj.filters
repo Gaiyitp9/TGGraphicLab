@@ -57,6 +57,9 @@
     <ClInclude Include="include\Diagnostics\BaseException.h">
       <Filter>头文件\Diagnostics</Filter>
     </ClInclude>
+    <ClInclude Include="include\Diagnostics\WinAPIException.h">
+      <Filter>头文件\Diagnostics</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Utility.cpp">
@@ -78,6 +81,9 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="src\Diagnostics\BaseException.cpp">
+      <Filter>源文件\Diagnostics</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Diagnostics\WinAPIException.cpp">
       <Filter>源文件\Diagnostics</Filter>
     </ClCompile>
   </ItemGroup>

@@ -5,18 +5,21 @@
 *****************************************************************/
 #pragma once
 
-#include <DirectXMath.h>
-#include <intrin.h>
+#include "BaseException.h"
 
 namespace LCH
 {
-	class Math
+	class WinAPIException : public BaseException
 	{
 	public:
-		template <typename T> 
-		inline static bool IsAligned(T value, size_t alignment)
-		{
-			return 0 == ((size_t)value & (alignment - 1));
-		}
+		WinAPIException(const std::wstring& description);
+		~WinAPIException();
+
+		virtual char const* what() const override;
+		virtual wchar_t const* GetType() const noexcept override;
+
+	protected:
+		HRESULT errorCode;
+		std::wstring errorInfo;
 	};
 }
