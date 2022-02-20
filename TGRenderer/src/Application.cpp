@@ -24,7 +24,7 @@ namespace LCH
 		locale = std::locale("zh_CN.utf8");
 		std::wcout.imbue(locale);
 
-		// 为了能在控制台查看日志，需要把控制台的代码页(code page)设置为UTF8
+		// 为了能在控制台查看日志，需要把控制台的代码页(code page)设置为UTF-8
 		SetConsoleCP(65001);
 		SetConsoleOutputCP(65001);
 	}
@@ -41,12 +41,14 @@ namespace LCH
 		LCH::TimeSystem timer;
 
 		const wchar_t* testStr = L"天工渲染器";
-		std::wcout << testStr[0] << std::endl;
+		std::wcout << sizeof(wchar_t) << testStr[0] << std::endl;
+		const wchar_t* testStr2 = L"TianGong";
+		std::wcout << testStr2 << sizeof(testStr2) << std::endl;
 		std::wcout << L"你好TG" << std::endl;
 		std::string str1 = Utility::WideStringToAnsi(L"你好");
 		std::wstring wstr1 = Utility::AnsiToWideString("你好");
-		std::cout << str1 << std::endl;
-		std::wcout << wstr1 << std::endl;
+		std::cout << str1 << str1.size() << std::endl;
+		std::wcout << wstr1 << wstr1.size() << std::endl;
 
 		//throw LCH::BaseException();
 

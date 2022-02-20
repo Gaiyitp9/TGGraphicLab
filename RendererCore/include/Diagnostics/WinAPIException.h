@@ -12,7 +12,7 @@ namespace LCH
 	class WinAPIException : public BaseException
 	{
 	public:
-		WinAPIException(const std::wstring& description);
+		WinAPIException(HRESULT hr, const std::wstring& description = L"No Description");
 		~WinAPIException();
 
 		virtual char const* what() const override;
@@ -21,5 +21,8 @@ namespace LCH
 	protected:
 		HRESULT errorCode;
 		std::wstring errorInfo;
+
+	private:
+		void TranslateHrErrorCode();
 	};
 }

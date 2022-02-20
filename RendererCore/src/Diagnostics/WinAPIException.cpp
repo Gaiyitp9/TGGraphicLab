@@ -8,5 +8,14 @@
 
 namespace LCH
 {
+	WinAPIException::WinAPIException(HRESULT hr, const std::wstring& description)
+		: BaseException(L"#"), errorCode(hr)
+	{
 
+	}
+
+	void WinAPIException::TranslateHrErrorCode()
+	{
+
+	}
 }
