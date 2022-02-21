@@ -19,10 +19,10 @@ namespace LCH
 		virtual wchar_t const* GetType() const noexcept override;
 
 	protected:
-		HRESULT errorCode;
-		std::wstring errorInfo;
+		DWORD errorCode;
+		std::wstring errorMsg;
 
 	private:
-		void TranslateHrErrorCode();
+		void TranslateHrErrorCode();		// 根据错误码生成相应错误信息
 	};
 }

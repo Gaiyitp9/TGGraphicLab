@@ -29,12 +29,13 @@ namespace LCH
 
 		virtual char const* what() const override;
 		virtual wchar_t const* GetType() const noexcept;
-		const std::wstring& GetExceptionInfo() const noexcept;
 
 	protected:
-		std::wstring wWhatBuffer;						// 异常信息(宽字符)
-		std::string whatBuffer;							// 异常信息(窄字符)
+		mutable std::string whatBuffer;					// 异常信息
+		std::wstring description;						// 异常描述
 		std::vector<StackFrame> stackFrameInfo;			// 栈帧信息
+		const wchar_t* SEPARATOR = L"\n-------------"	// 分隔符
+			"----------------------------------\n";	
 
 	private:
 		void StackTrace();								// 追踪栈帧信息
@@ -42,7 +43,5 @@ namespace LCH
 		HANDLE hProcess;								// 当前进程句柄
 		constexpr static USHORT FRAMESTOCAPTURE = 100;	// 最大追踪栈帧数
 		constexpr static UINT MAXNAMELEN = 255;			// 函数名称最大长度
-		const wchar_t* SEPARATOR = L"\n-------------"	// 分隔符
-			"----------------------------------\n";	
 	};
 }

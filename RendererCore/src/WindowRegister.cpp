@@ -194,8 +194,8 @@ namespace LCH
 			REGISTER_MESSAGE(WM_ENTERSIZEMOVE),
 			})
 	{
-		hInstance = GetModuleHandleW(nullptr);
-		ASSERT(hInstance, true);
+		if (hInstance = GetModuleHandleW(nullptr))
+			ThrowLastError();
 	}
 
 	WindowRegister::~WindowRegister()
@@ -210,17 +210,14 @@ namespace LCH
 		{
 			const CREATESTRUCT* const pCreate = reinterpret_cast<CREATESTRUCT*>(lParam);
 			Window* const pWnd = static_cast<Window*>(pCreate->lpCreateParams);
-#ifdef _DEBUG
+
 			SetLastError(0);
-#endif
-			auto offset = SetWindowLongPtrW(hwnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(pWnd));
-#ifdef _DEBUG
-			ASSERT(offset || !GetLastError(), true);
-#endif
-			offset = SetWindowLongPtrW(hwnd, GWLP_WNDPROC, reinterpret_cast<LONG_PTR>(WindowProcThunk));
-#ifdef _DEBUG
-			ASSERT(offset || !GetLastError(), true);
-#endif
+			SetWindowLongPtrW(hwnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(pWnd));
+			ThrowLastError();
+
+			SetLastError(0);
+			SetWindowLongPtrW(hwnd, GWLP_WNDPROC, reinterpret_cast<LONG_PTR>(WindowProcThunk));
+			ThrowLastError();
 			return pWnd->WindowProc(hwnd, msg, wParam, lParam);
 		}
 		// 处理WM_NCCREATE之前的消息
@@ -268,7 +265,9 @@ namespace LCH
 		wc.lpszMenuName = nullptr;
 		wc.lpszClassName = L"Default";
 
-		ASSERT(RegisterClassExW(&wc), true);
+		if(RegisterClassExW(&wc))
+			ThrowLastError();
+
 		windowClassName[WindowType::Default] = L"Default";
 	}
 

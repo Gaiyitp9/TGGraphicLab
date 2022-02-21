@@ -7,9 +7,7 @@
 #include "Window.h"
 #include "WindowRegister.h"
 #include "Diagnostics/Debug.h"
-#ifdef _DEBUG
 #include <iostream>
-#endif
 
 namespace LCH
 {
@@ -86,11 +84,16 @@ namespace LCH
 		RECT rect = { 0, 0, width, height };
 
 		// 根据客户区域宽和高计算整个窗口的宽和高
-		ASSERT(AdjustWindowRect(&rect, WS_OVERLAPPEDWINDOW, false), true);
+		if (!AdjustWindowRect(&rect, WS_OVERLAPPEDWINDOW, false))
+			ThrowLastError();
+
 		// 创建窗口
-		ASSERT(hwnd = CreateWindowW(wndClassName.c_str(), name.c_str(), WS_OVERLAPPEDWINDOW,
+		hwnd = CreateWindowW(wndClassName.c_str(), name.c_str(), WS_OVERLAPPEDWINDOW,
 			CW_USEDEFAULT, CW_USEDEFAULT, rect.right - rect.left, rect.bottom - rect.top,
-			parentHwnd, nullptr, windowRegister->GetHInstance(), this), true);
+			parentHwnd, nullptr, windowRegister->GetHInstance(), this);
+
+		if (hwnd == nullptr)
+			ThrowLastError();
 
 		ShowWindow(hwnd, SW_SHOW);
 	}

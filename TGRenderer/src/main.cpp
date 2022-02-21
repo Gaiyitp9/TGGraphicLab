@@ -6,6 +6,7 @@
 
 #include "SlimWindows.h"
 #include "Application.h"
+#include "Diagnostics/BaseException.h"
 #include <exception>
 #include <iostream>
 #include <tchar.h>
@@ -20,9 +21,17 @@ int CALLBACK _tWinMain(_In_ HINSTANCE hInstance,
 	{
 		return app.Run();
 	}
-	catch (std::exception& e)
+	catch (const LCH::BaseException& e)
 	{
 		std::cout << e.what() << std::endl;
-		return -1;
 	}
+	catch (const std::exception& e)
+	{
+		std::cout << "Standard exception:\n" << e.what() << std::endl;
+	}
+	catch (...)
+	{
+		std::wcout << L"Unknown Exception" << std::endl;
+	}
+	return -1;
 }

@@ -10,6 +10,7 @@
 #include "TimeSystem.h"
 #include "Utility.h"
 #include "Diagnostics/BaseException.h"
+#include "Diagnostics/WinAPIException.h"
 #include "../resource.h"
 #include <iostream>
 #include <format>
@@ -20,13 +21,13 @@ namespace LCH
 	{
 		WindowRegister::GetInstance()->Initialize({IDI_ICON1, IDI_ICON2});
 
-		// 区域设置为简体中文，编码为UTF-8
-		locale = std::locale("zh_CN.utf8");
-		std::wcout.imbue(locale);
-
 		// 为了能在控制台查看日志，需要把控制台的代码页(code page)设置为UTF-8
 		SetConsoleCP(65001);
 		SetConsoleOutputCP(65001);
+
+		// 编码设置为UTF-8
+		locale = std::locale(".utf8");
+		std::wcout.imbue(locale);
 	}
 
 	Application::~Application()
@@ -50,7 +51,7 @@ namespace LCH
 		std::cout << str1 << str1.size() << std::endl;
 		std::wcout << wstr1 << wstr1.size() << std::endl;
 
-		//throw LCH::BaseException();
+		throw LCH::WinAPIException(E_OUTOFMEMORY);
 
 		timer.Tick();
 		int i = 1000000;

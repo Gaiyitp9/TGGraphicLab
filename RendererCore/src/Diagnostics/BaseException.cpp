@@ -12,6 +12,7 @@
 namespace LCH
 {
 	BaseException::BaseException(const std::wstring& description)
+		: description(description)
 	{
 		// 初始化符号处理器，用于堆栈信息追踪
 		hProcess = GetCurrentProcess();
@@ -19,18 +20,6 @@ namespace LCH
 
 		// 记录栈帧信息
 		StackTrace();
-
-		// 记录异常信息
-		wWhatBuffer = std::format(L"Exception type: {}\n", GetType());
-		wWhatBuffer += description;
-		wWhatBuffer += SEPARATOR;
-		for(const auto& info : stackFrameInfo)
-		{
-			wWhatBuffer += std::format(L"Frame: {}\nFile: {}\nFunction: {}\nLine: {}", 
-				info.index, info.file, info.function, info.line);
-			wWhatBuffer += L"\n-----------------------------------------------\n";
-		}
-		whatBuffer = Utility::WideStringToAnsi(wWhatBuffer);
 	}
 	
 	BaseException::~BaseException()
@@ -41,17 +30,23 @@ namespace LCH
 
 	char const* BaseException::what() const
 	{
+		// 记录异常信息
+		 std::wstring wWhatBuffer = std::format(L"Exception type: {}\n", GetType());
+		wWhatBuffer += description;
+		wWhatBuffer += SEPARATOR;
+		for (const auto& info : stackFrameInfo)
+		{
+			wWhatBuffer += std::format(L"Frame: {}\nFile: {}\nFunction: {}\nLine: {}",
+				info.index, info.file, info.function, info.line);
+			wWhatBuffer += SEPARATOR;
+		}
+		whatBuffer = Utility::WideStringToAnsi(wWhatBuffer);
 		return whatBuffer.c_str();
 	}
 
 	wchar_t const* BaseException::GetType() const noexcept
 	{
 		return L"Base Exception";
-	}
-
-	const std::wstring& BaseException::GetExceptionInfo() const noexcept
-	{
-		return wWhatBuffer;
 	}
 
 	void BaseException::StackTrace()
