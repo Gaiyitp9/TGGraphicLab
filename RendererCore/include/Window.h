@@ -7,6 +7,7 @@
 
 #include "SlimWindows.h"
 #include "InputSystem.h"
+#include "Diagnostics/Debug.h"
 #include <optional>
 
 namespace LCH
@@ -26,6 +27,9 @@ namespace LCH
 		const HWND GetParentHwnd() const noexcept;
 		const std::wstring& GetName() const noexcept;
 
+	public:
+		bool spyMessage = false;
+
 	private:
 		virtual void Initialize();											// 初始化窗口，子类窗口可以重写初始化窗口函数
 		virtual LRESULT CALLBACK WindowProc(HWND, UINT, WPARAM, LPARAM);	// 消息处理函数，子类可以重写
@@ -34,6 +38,8 @@ namespace LCH
 		HWND hwnd, parentHwnd;
 		int width, height;
 		std::wstring name;
+
+		static BaseException const* windowProcException;					// 用于记录窗口处理函数异常(因为异常不能从窗口处理函数向上传播)
 
 		friend class WindowRegister;
 	};

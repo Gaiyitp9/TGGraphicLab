@@ -65,7 +65,7 @@ namespace LCH
 		for (USHORT i = 0; i < frameCount; ++i)
 		{
 			SymFromAddrW(hProcess, (DWORD64)stackFrames[i], nullptr, symbol);
-			SymGetLineFromAddrW(hProcess, (DWORD64)stackFrames[i], &displacement, &imageLine);
+			SymGetLineFromAddrW64(hProcess, (DWORD64)stackFrames[i], &displacement, &imageLine);
 			StackFrame frame{ static_cast<unsigned int>(frameCount - i - 1), imageLine.FileName,
 				symbol->Name, static_cast<unsigned int>(imageLine.LineNumber) };
 			stackFrameInfo.push_back(frame);

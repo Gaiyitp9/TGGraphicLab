@@ -6,11 +6,11 @@
 
 #include "Window.h"
 #include "WindowRegister.h"
-#include "Diagnostics/Debug.h"
-#include <iostream>
 
 namespace LCH
 {
+	BaseException const* Window::windowProcException = nullptr;
+
 	Window::Window(int width, int height, wchar_t const* title, HWND parent)
 		: width(width), height(height), hwnd(nullptr), name(title), parentHwnd(parent)
 	{
@@ -52,8 +52,12 @@ namespace LCH
 		{
 			if (msg.message == WM_QUIT)
 				return (int)msg.wParam;
+
 			TranslateMessage(&msg);
 			DispatchMessageW(&msg);
+
+			if (windowProcException)
+				throw windowProcException;
 		}
 
 		return std::nullopt;

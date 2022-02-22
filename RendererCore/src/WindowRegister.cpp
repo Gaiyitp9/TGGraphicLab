@@ -9,10 +9,6 @@
 #include "Diagnostics/Debug.h"
 #include <format>
 
-#ifdef _DEBUG
-#include <iostream>
-#endif
-
 #define REGISTER_MESSAGE(msg) {msg, L#msg}
 
 namespace LCH
@@ -206,19 +202,34 @@ namespace LCH
 
 	LRESULT WindowRegister::WindowProcSetup(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	{
+		// 窗口处理函数不能向上传递异常，所以在这里面处理异常
 		if (msg == WM_NCCREATE)
 		{
 			const CREATESTRUCT* const pCreate = reinterpret_cast<CREATESTRUCT*>(lParam);
 			Window* const pWnd = static_cast<Window*>(pCreate->lpCreateParams);
+			try
+			{
+				if (pWnd == nullptr)
+					ThrowBaseExcept(L"Window pointer cannot be null! Please pass window pointer to CreateWindow Function");
 
-			SetLastError(0);
-			SetWindowLongPtrW(hwnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(pWnd));
-			ThrowLastError();
+				SetLastError(0);
+				SetWindowLongPtrW(hwnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(pWnd));
+				ThrowLastError();
 
-			SetLastError(0);
-			SetWindowLongPtrW(hwnd, GWLP_WNDPROC, reinterpret_cast<LONG_PTR>(WindowProcThunk));
-			ThrowLastError();
-			return pWnd->WindowProc(hwnd, msg, wParam, lParam);
+				SetLastError(0);
+				SetWindowLongPtrW(hwnd, GWLP_WNDPROC, reinterpret_cast<LONG_PTR>(WindowProcThunk));
+				ThrowLastError();
+				return pWnd->WindowProc(hwnd, msg, wParam, lParam);
+			}
+			catch (const BaseException* e)
+			{
+				Window::windowProcException = e;
+			}
+			catch (...)
+			{
+				Debug::Log(L"Unknow exception in WindowProc");
+				DestroyWindow(pWnd->hwnd);
+			}
 		}
 		// 处理WM_NCCREATE之前的消息
 		return DefWindowProcW(hwnd, msg, wParam, lParam);
@@ -227,9 +238,11 @@ namespace LCH
 	LRESULT WindowRegister::WindowProcThunk(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	{
 		Window* const pWnd = reinterpret_cast<Window*>(GetWindowLongPtrW(hwnd, GWLP_USERDATA));
-#ifdef _DEBUG
-		std::wcout << WindowRegister::GetInstance()->GetWindowMesssageInfo(pWnd->name, msg, wParam, lParam);
-#endif
+
+		// 是否监控窗口消息
+		if (pWnd->spyMessage)
+			Debug::Log(WindowRegister::GetInstance()->GetWindowMesssageInfo(pWnd->name, msg, wParam, lParam));
+
 		return pWnd->WindowProc(hwnd, msg, wParam, lParam);
 	}
 

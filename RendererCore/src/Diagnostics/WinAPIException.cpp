@@ -47,11 +47,11 @@ namespace LCH
 	void WinAPIException::TranslateHrErrorCode()
 	{
 		wchar_t* msgBuf = nullptr;
-		FormatMessageW(FORMAT_MESSAGE_FROM_SYSTEM |
+		DWORD msgLen = FormatMessageW(FORMAT_MESSAGE_FROM_SYSTEM |
 			FORMAT_MESSAGE_ALLOCATE_BUFFER |
 			FORMAT_MESSAGE_IGNORE_INSERTS,
-			nullptr, errorCode, LANG_SYSTEM_DEFAULT, (wchar_t*)&msgBuf, 0, nullptr);
-		errorMsg = msgBuf;
+			nullptr, errorCode, LANG_SYSTEM_DEFAULT, reinterpret_cast<LPWSTR>(&msgBuf), 0, nullptr);
+		errorMsg = msgLen > 0 ? msgBuf : L"Unidentified error code";
 		LocalFree(msgBuf);
 
 		/*

@@ -38,7 +38,9 @@ namespace LCH
 	int Application::Run()
 	{
 		LCH::Window wnd1(800, 600, L"天工渲染器");
+		wnd1.spyMessage = true;
 		LCH::Window wnd2(400, 300, L"辅助窗口", wnd1.GetHwnd());
+		wnd2.spyMessage = true;
 		LCH::TimeSystem timer;
 
 		const wchar_t* testStr = L"天工渲染器";
@@ -51,7 +53,7 @@ namespace LCH
 		std::cout << str1 << str1.size() << std::endl;
 		std::wcout << wstr1 << wstr1.size() << std::endl;
 
-		throw LCH::WinAPIException(E_OUTOFMEMORY);
+		//throw new LCH::WinAPIException(E_OUTOFMEMORY);
 
 		timer.Tick();
 		int i = 1000000;

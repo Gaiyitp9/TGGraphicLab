@@ -6,6 +6,7 @@
 #pragma once
 
 #include "WinAPIException.h"
+#include <iostream>
 
 #ifdef ThrowIfFailed
 #undef ThrowIfFailed
@@ -23,11 +24,16 @@
 #undef ThrowLastErrorWithDesc
 #endif
 
+#define ThrowBaseExcept(description)\
+		{\
+			throw new LCH::BaseException(description);\
+		}
+
 #define ThrowIfFailed(hr)\
 		{\
 			if (FAILED(hr))\
 			{\
-				throw LCH::WinAPIException(hr);\
+				throw new LCH::WinAPIException(hr);\
 			}\
 		}
 
@@ -35,7 +41,7 @@
 		{\
 			if (FAILED(hr))\
 			{\
-				throw LCH::WinAPIException(hr, description);\
+				throw new LCH::WinAPIException(hr, description);\
 			}\
 		}
 
@@ -44,7 +50,7 @@
 			HRESULT hr = GetLastError();\
 			if (FAILED(hr))\
 			{\
-				throw LCH::WinAPIException(hr);\
+				throw new LCH::WinAPIException(hr);\
 			}\
 		}
 
@@ -53,6 +59,49 @@
 			HRESULT hr = GetLastError();\
 			if (FAILED(hr))\
 			{\
-				throw LCH::WinAPIException(hr, description);\
+				throw new LCH::WinAPIException(hr, description);\
 			}\
 		}
+
+namespace LCH
+{
+	class Debug
+	{
+	public:
+		template <typename charT>
+		static void Log(const std::basic_string<charT>& log)
+		{
+			if constexpr (std::is_same_v<charT, char>)
+				std::cout << log;
+			else
+				std::wcout << log;
+		}
+
+		template <typename charT>
+		static void LogLine(const std::basic_string<charT>& log)
+		{
+			if constexpr (std::is_same_v<charT, char>)
+				std::cout << log << std::endl;
+			else
+				std::wcout << log << std::endl;
+		}
+
+		template <typename charT>
+		static void Log(charT const* log)
+		{
+			if constexpr (std::is_same_v<charT, char>)
+				std::cout << log;
+			else
+				std::wcout << log;
+		}
+
+		template <typename charT>
+		static void LogLine(charT const* log)
+		{
+			if constexpr (std::is_same_v<charT, char>)
+				std::cout << log << std::endl;
+			else
+				std::wcout << log << std::endl;
+		}
+	};
+}
