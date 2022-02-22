@@ -78,6 +78,11 @@ namespace LCH
 		return parentHwnd;
 	}
 
+	const InputSystem& Window::Input() const noexcept
+	{
+		return input;
+	}
+
 	void Window::Initialize()
 	{
 		// 获取窗口类名称

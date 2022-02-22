@@ -9,11 +9,8 @@
 #include "WindowRegister.h"
 #include "TimeSystem.h"
 #include "Utility.h"
-#include "Diagnostics/BaseException.h"
 #include "Diagnostics/WinAPIException.h"
 #include "../resource.h"
-#include <iostream>
-#include <format>
 
 namespace LCH
 {

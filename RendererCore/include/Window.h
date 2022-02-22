@@ -6,7 +6,7 @@
 #pragma once
 
 #include "SlimWindows.h"
-#include "InputSystem.h"
+#include "Input/InputSystem.h"
 #include "Diagnostics/Debug.h"
 #include <optional>
 
@@ -18,7 +18,7 @@ namespace LCH
 	public:
 		Window(int width, int height, wchar_t const* title = L"TG RenderLab", HWND parent = nullptr);
 		Window(const Window&) = delete;
-		const Window& operator=(const Window&) = delete;
+		Window& operator=(const Window&) = delete;
 		virtual ~Window();
 
 		static std::optional<int> ProcessMessage();							// 处理所有窗口的消息
@@ -27,8 +27,10 @@ namespace LCH
 		const HWND GetParentHwnd() const noexcept;
 		const std::wstring& GetName() const noexcept;
 
+		const InputSystem& Input() const noexcept;
+
 	public:
-		bool spyMessage = false;
+		bool spyMessage = false;											// 是否监控窗口消息
 
 	private:
 		virtual void Initialize();											// 初始化窗口，子类窗口可以重写初始化窗口函数
@@ -40,6 +42,8 @@ namespace LCH
 		std::wstring name;
 
 		static BaseException const* windowProcException;					// 用于记录窗口处理函数异常(因为异常不能从窗口处理函数向上传播)
+
+		InputSystem input;													// 输入系统，用于记录输入信息，比如键盘和鼠标
 
 		friend class WindowRegister;
 	};

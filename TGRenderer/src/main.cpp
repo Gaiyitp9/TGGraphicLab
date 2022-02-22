@@ -25,7 +25,7 @@ int CALLBACK _tWinMain(_In_ HINSTANCE hInstance,
 	}
 	catch (const std::exception* e)
 	{
-		LCH::Debug::Log("Standard exception:\n");
+		LCH::Debug::LogLine("Standard exception: ");
 		LCH::Debug::Log(e->what());
 	}
 	catch (...)

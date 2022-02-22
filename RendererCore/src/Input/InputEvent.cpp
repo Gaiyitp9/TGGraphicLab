@@ -10,7 +10,7 @@
 * Author: LiaoChenhan											*
 *****************************************************************/
 
-#include "InputEvent.h"
+#include "Input/InputEvent.h"
 
 namespace LCH
 {

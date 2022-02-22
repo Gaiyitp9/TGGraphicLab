@@ -213,12 +213,11 @@ namespace LCH
 					ThrowBaseExcept(L"Window pointer cannot be null! Please pass window pointer to CreateWindow Function");
 
 				SetLastError(0);
-				SetWindowLongPtrW(hwnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(pWnd));
-				ThrowLastError();
+				if (SetWindowLongPtrW(hwnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(pWnd)) == 0)
+					ThrowLastError();
 
-				SetLastError(0);
-				SetWindowLongPtrW(hwnd, GWLP_WNDPROC, reinterpret_cast<LONG_PTR>(WindowProcThunk));
-				ThrowLastError();
+				if (SetWindowLongPtrW(hwnd, GWLP_WNDPROC, reinterpret_cast<LONG_PTR>(WindowProcThunk)) == 0)
+					ThrowLastError();
 				return pWnd->WindowProc(hwnd, msg, wParam, lParam);
 			}
 			catch (const BaseException* e)
@@ -263,7 +262,7 @@ namespace LCH
 	{
 		size_t count = icons.size();
 
-		HICON icon = count > 0 ? LoadIcon(hInstance, MAKEINTRESOURCE(icons[0])) : nullptr;
+		HICON icon = count > 0 ? LoadIconW(hInstance, MAKEINTRESOURCEW(icons[0])) : nullptr;
 		WNDCLASSEX wc = {};
 		wc.cbSize = sizeof(WNDCLASSEX);
 		wc.style = CS_HREDRAW | CS_VREDRAW | CS_OWNDC;

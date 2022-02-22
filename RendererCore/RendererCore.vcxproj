@@ -161,9 +161,11 @@
     <ClInclude Include="include\Diagnostics\BaseException.h" />
     <ClInclude Include="include\Diagnostics\Debug.h" />
     <ClInclude Include="include\Diagnostics\WinAPIException.h" />
-    <ClInclude Include="include\InputEvent.h" />
-    <ClInclude Include="include\InputSystem.h" />
-    <ClInclude Include="include\KeyCode.h" />
+    <ClInclude Include="include\Input\InputEvent.h" />
+    <ClInclude Include="include\Input\InputSystem.h" />
+    <ClInclude Include="include\Input\Keyboard.h" />
+    <ClInclude Include="include\Input\KeyCode.h" />
+    <ClInclude Include="include\Input\Mouse.h" />
     <ClInclude Include="include\Window.h" />
     <ClInclude Include="include\TimeSystem.h" />
     <ClInclude Include="include\Math\Math.h" />
@@ -174,8 +176,10 @@
   <ItemGroup>
     <ClCompile Include="src\Diagnostics\BaseException.cpp" />
     <ClCompile Include="src\Diagnostics\WinAPIException.cpp" />
-    <ClCompile Include="src\InputEvent.cpp" />
-    <ClCompile Include="src\InputSystem.cpp" />
+    <ClCompile Include="src\Input\InputEvent.cpp" />
+    <ClCompile Include="src\Input\InputSystem.cpp" />
+    <ClCompile Include="src\Input\Keyboard.cpp" />
+    <ClCompile Include="src\Input\Mouse.cpp" />
     <ClCompile Include="src\TimeSystem.cpp" />
     <ClCompile Include="src\Utility.cpp" />
     <ClCompile Include="src\Window.cpp" />

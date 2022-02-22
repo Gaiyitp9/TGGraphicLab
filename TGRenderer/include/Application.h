@@ -7,7 +7,7 @@
 #pragma once
 
 #include "TimeSystem.h"
-#include "InputSystem.h"
+#include "Input/InputSystem.h"
 #include <locale>
 #include <iostream>
 
@@ -26,6 +26,5 @@ namespace LCH
 	private:
 		std::locale locale;		// 语言区域
 		TimeSystem timer;		// 时间系统
-		InputSystem input;		// 输入系统
 	};
 }

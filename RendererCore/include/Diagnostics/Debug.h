@@ -47,8 +47,8 @@
 
 #define ThrowLastError()\
 		{\
-			HRESULT hr = GetLastError();\
-			if (FAILED(hr))\
+			DWORD hr = GetLastError();\
+			if (hr > 0)\
 			{\
 				throw new LCH::WinAPIException(hr);\
 			}\
@@ -56,8 +56,8 @@
 
 #define ThrowLastErrorWithDesc(description)\
 		{\
-			HRESULT hr = GetLastError();\
-			if (FAILED(hr))\
+			DWORD hr = GetLastError();\
+			if (hr > 0)\
 			{\
 				throw new LCH::WinAPIException(hr, description);\
 			}\
@@ -67,6 +67,11 @@ namespace LCH
 {
 	class Debug
 	{
+	public:
+		Debug() = delete;
+		Debug(const Debug&) = delete;
+		Debug& operator=(const Debug&) = delete;
+
 	public:
 		template <typename charT>
 		static void Log(const std::basic_string<charT>& log)

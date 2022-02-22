@@ -22,6 +22,12 @@
     <Filter Include="源文件\Diagnostics">
       <UniqueIdentifier>{97334a28-f99a-4278-876e-43920cddba7f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="头文件\Input">
+      <UniqueIdentifier>{bf21273f-e26b-4387-98a5-a849c5f39398}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\Input">
+      <UniqueIdentifier>{41c8a9fc-f68f-4359-9423-a571b428e1b4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\SlimWindows.h">
@@ -39,15 +45,6 @@
     <ClInclude Include="include\TimeSystem.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="include\InputSystem.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="include\KeyCode.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="include\InputEvent.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="include\WindowRegister.h">
       <Filter>头文件</Filter>
     </ClInclude>
@@ -60,6 +57,21 @@
     <ClInclude Include="include\Diagnostics\WinAPIException.h">
       <Filter>头文件\Diagnostics</Filter>
     </ClInclude>
+    <ClInclude Include="include\Input\InputEvent.h">
+      <Filter>头文件\Input</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Input\InputSystem.h">
+      <Filter>头文件\Input</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Input\KeyCode.h">
+      <Filter>头文件\Input</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Input\Keyboard.h">
+      <Filter>头文件\Input</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Input\Mouse.h">
+      <Filter>头文件\Input</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Utility.cpp">
@@ -71,12 +83,6 @@
     <ClCompile Include="src\TimeSystem.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="src\InputSystem.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="src\InputEvent.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="src\WindowRegister.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
@@ -85,6 +91,18 @@
     </ClCompile>
     <ClCompile Include="src\Diagnostics\WinAPIException.cpp">
       <Filter>源文件\Diagnostics</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Input\InputEvent.cpp">
+      <Filter>源文件\Input</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Input\InputSystem.cpp">
+      <Filter>源文件\Input</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Input\Keyboard.cpp">
+      <Filter>源文件\Input</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Input\Mouse.cpp">
+      <Filter>源文件\Input</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
