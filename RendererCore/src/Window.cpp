@@ -34,12 +34,30 @@ namespace LCH
 			// 按下按键
 		case WM_KEYDOWN:
 		case WM_SYSKEYDOWN:
-			break;
+			// 是否记录重复按键
+			if (!(lParam & 0x40000000) || input.keyboard.autoRepeat)
+			{
+				WPARAM keyCode = input.keyboard.MapLeftRightKey(wParam, lParam);
+				input.keyboard.OnKeyPressed(static_cast<unsigned char>(keyCode));
+			}
+			return 0;
 
 			// 松开按键
 		case WM_KEYUP:
 		case WM_SYSKEYUP:
-			break;
+			{
+				WPARAM keyCode = input.keyboard.MapLeftRightKey(wParam, lParam);
+				input.keyboard.OnKeyReleased(static_cast<unsigned char>(keyCode));
+				return 0;
+			}
+
+			// 按键字符
+		case WM_CHAR:
+			if (!(lParam & 0x40000000) || input.keyboard.autoRepeat)
+			{
+				input.keyboard.OnChar(static_cast<char>(wParam));
+			}
+			return 0;
 		}
 		return DefWindowProc(hwnd, msg, wParam, lParam);
 	}

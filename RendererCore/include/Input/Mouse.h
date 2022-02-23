@@ -5,6 +5,10 @@
 *****************************************************************/
 #pragma once
 
+#include "KeyCode.h"
+#include <queue>
+#include "InputEvent.h"
+
 namespace LCH
 {
 	class Mouse
@@ -12,5 +16,11 @@ namespace LCH
 	public:
 		Mouse();
 		~Mouse();
+
+		void OnMouseMove(int x, int y);
+		void OnMouseEnter();
+
+	private:
+		std::queue<InputEvent> events;
 	};
 }

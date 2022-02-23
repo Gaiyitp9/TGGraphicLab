@@ -22,12 +22,7 @@ namespace LCH
 		bool GetKeyDown(KeyCode key) const;
 		bool GetKeyUp(KeyCode key) const;
 
-		void OnKeyPressed(size_t key);
-		void OnKeyReleased(size_t key);
-
-		void OnMouseMove(int x, int y);
-		
-	private:
+	public:
 		Keyboard keyboard;
 		Mouse mouse;
 	};

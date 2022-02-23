@@ -18,18 +18,13 @@ namespace LCH
 
 	}
 
-	void InputSystem::OnKeyPressed(size_t key)
-	{
-
-	}
-
-	void InputSystem::OnKeyReleased(size_t key)
-	{
-
-	}
-
 	bool InputSystem::GetKey(KeyCode key) const
 	{
 		return false;
+	}
+
+	bool InputSystem::GetKeyDown(KeyCode key) const
+	{
+		return keyboard.keyStates.test(static_cast<size_t>(key));
 	}
 }

@@ -41,10 +41,9 @@ namespace LCH
 		int width, height;
 		std::wstring name;
 
-		static BaseException const* windowProcException;					// 用于记录窗口处理函数异常(因为异常不能从窗口处理函数向上传播)
-
 		InputSystem input;													// 输入系统，用于记录输入信息，比如键盘和鼠标
 
+		static BaseException const* windowProcException;					// 用于记录窗口处理函数异常(因为异常不能从窗口处理函数向上传播)
 		friend class WindowRegister;
 	};
 }

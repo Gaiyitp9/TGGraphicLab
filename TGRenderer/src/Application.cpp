@@ -40,6 +40,8 @@ namespace LCH
 		wnd2.spyMessage = true;
 		LCH::TimeSystem timer;
 
+		const wchar_t* unicodeStr = L"\u303E";
+		std::wcout << unicodeStr << std::endl;
 		const wchar_t* testStr = L"天工渲染器";
 		std::wcout << sizeof(wchar_t) << testStr[0] << std::endl;
 		const wchar_t* testStr2 = L"TianGong";
@@ -65,6 +67,8 @@ namespace LCH
 			{
 				return *code;
 			}
+			if (wnd1.Input().GetKeyDown(LCH::KeyCode::S))
+				Debug::LogLine("Press S");
 		}
 	}
 }

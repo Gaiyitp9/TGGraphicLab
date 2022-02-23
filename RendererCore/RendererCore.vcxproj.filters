@@ -92,9 +92,6 @@
     <ClCompile Include="src\Diagnostics\WinAPIException.cpp">
       <Filter>源文件\Diagnostics</Filter>
     </ClCompile>
-    <ClCompile Include="src\Input\InputEvent.cpp">
-      <Filter>源文件\Input</Filter>
-    </ClCompile>
     <ClCompile Include="src\Input\InputSystem.cpp">
       <Filter>源文件\Input</Filter>
     </ClCompile>

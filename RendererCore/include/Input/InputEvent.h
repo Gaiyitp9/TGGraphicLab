@@ -11,19 +11,23 @@ namespace LCH
 {
 	struct InputEvent
 	{
-	public:
-		enum class EventType
+		enum class Type
 		{
 			Pressed,
 			Released,
+
+			LPress,
+			LRelease,
+			RPress,
+			RRelease,
+			WheelUp,
+			WheelDown,
+			Move,
+			Enter,
+			Leave
 		};
 
-	public:
-		InputEvent(KeyCode key, EventType type);
-		~InputEvent();
-
-	public:
 		KeyCode key;
-		EventType type;
+		Type type;
 	};
 }

@@ -13,6 +13,13 @@
 
 namespace LCH
 {
+	enum class TestEnum : unsigned char
+	{
+		TEST1 = 1,
+		TEST2 = 3,
+		TEST3 = 5
+	};
+
 	class Application
 	{
 	public:
