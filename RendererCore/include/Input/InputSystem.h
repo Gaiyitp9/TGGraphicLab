@@ -18,6 +18,8 @@ namespace LCH
 		InputSystem& operator=(const InputSystem&) = delete;
 		~InputSystem();
 
+		void Update();
+
 		bool GetKey(KeyCode key) const;
 		bool GetKeyDown(KeyCode key) const;
 		bool GetKeyUp(KeyCode key) const;

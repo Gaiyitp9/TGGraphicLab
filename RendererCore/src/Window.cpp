@@ -22,6 +22,11 @@ namespace LCH
 		DestroyWindow(hwnd);
 	}
 
+	void Window::Update()
+	{
+		input.Update();
+	}
+
 	LRESULT Window::WindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	{
 		switch (msg)

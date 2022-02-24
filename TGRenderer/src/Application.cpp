@@ -67,8 +67,14 @@ namespace LCH
 			{
 				return *code;
 			}
+			wnd1.Update();
+
 			if (wnd1.Input().GetKeyDown(LCH::KeyCode::S))
+				Debug::LogLine("Press down S");
+			if (wnd1.Input().GetKey(LCH::KeyCode::S))
 				Debug::LogLine("Press S");
+			if (wnd1.Input().GetKeyUp(LCH::KeyCode::S))
+				Debug::LogLine("Press up S");
 		}
 	}
 }

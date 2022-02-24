@@ -23,10 +23,11 @@ namespace LCH
 
 		static std::optional<int> ProcessMessage();							// 处理所有窗口的消息
 
+		void Update();														// 更新窗口
+
 		const HWND GetHwnd() const noexcept;
 		const HWND GetParentHwnd() const noexcept;
 		const std::wstring& GetName() const noexcept;
-
 		const InputSystem& Input() const noexcept;
 
 	public:

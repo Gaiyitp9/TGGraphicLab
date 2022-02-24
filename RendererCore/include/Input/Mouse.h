@@ -17,6 +17,8 @@ namespace LCH
 		Mouse();
 		~Mouse();
 
+		void Update();
+
 		void OnMouseMove(int x, int y);
 		void OnMouseEnter();
 

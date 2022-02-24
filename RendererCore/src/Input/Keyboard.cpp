@@ -19,9 +19,36 @@ namespace LCH
 
 	}
 
+	void Keyboard::Update()
+	{
+		keyDown.reset();
+		keyUp.reset();
+		while (!eventBuffer.empty())
+		{
+			InputEvent e = eventBuffer.front();
+			size_t key = static_cast<size_t>(e.key);
+			switch (e.type)
+			{
+			case InputEvent::Type::Pressed:
+				// 第一次按下，key down为true
+				if (!keyStates.test(key))
+					keyDown[key] = true;
+				keyStates[key] = true;
+				break;
+
+			case InputEvent::Type::Released:
+				// 放开按键，key up为true(不存在第一次放开，每一次WM_KEYUP都是第一次放开)
+				keyUp[key] = true;
+				keyStates[key] = false;
+				break;
+			}
+			eventBuffer.pop();
+		}
+	}
+
 	void Keyboard::OnKeyPressed(unsigned char keyCode)
 	{
-		keyStates[keyCode] = true;
+		// 按键记录到队列中
 		eventBuffer.push(InputEvent{ static_cast<KeyCode>(keyCode), InputEvent::Type::Pressed });
 		// 移除旧的按键事件
 		while (eventBuffer.size() > BUFSIZE)
@@ -32,7 +59,7 @@ namespace LCH
 
 	void Keyboard::OnKeyReleased(unsigned char keyCode)
 	{
-		keyStates[keyCode] = false;
+		// 按键记录到队列中
 		eventBuffer.push(InputEvent{ static_cast<KeyCode>(keyCode), InputEvent::Type::Released });
 		// 移除旧的按键事件
 		while (eventBuffer.size() > BUFSIZE)

@@ -17,4 +17,19 @@ namespace LCH
 	{
 
 	}
+
+	void Mouse::Update()
+	{
+
+	}
+
+	void Mouse::OnMouseMove(int x, int y)
+	{
+
+	}
+
+	void Mouse::OnMouseEnter()
+	{
+
+	}
 }

@@ -19,6 +19,8 @@ namespace LCH
 		Keyboard();
 		~Keyboard();
 
+		void Update();									// 分析事件队列，设置各种状态
+
 		void OnKeyPressed(unsigned char keyCode);
 		void OnKeyReleased(unsigned char keyCode);
 		void OnChar(char ch);
@@ -30,7 +32,10 @@ namespace LCH
 		static constexpr unsigned int BUFSIZE = 16u;	// 队列最大长度
 
 	public:
-		std::bitset<NUMKEYS> keyStates;					// 按键状态
+		std::bitset<NUMKEYS> keyStates;					// 按键状态(是否被按下)
+		std::bitset<NUMKEYS> keyDown;					// 按键是否刚刚按下
+		std::bitset<NUMKEYS> keyUp;						// 按键是否刚刚松开
+
 		std::queue<InputEvent> eventBuffer;				// 输入事件队列
 		std::queue<char> charBuffer;					// 输入字符队列
 
