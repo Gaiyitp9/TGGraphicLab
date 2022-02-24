@@ -23,6 +23,7 @@ namespace LCH
 		void OnMouseEnter();
 
 	private:
+
 		std::queue<InputEvent> events;
 	};
 }

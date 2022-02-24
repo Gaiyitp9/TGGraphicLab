@@ -14,7 +14,6 @@ namespace LCH
 		MidMouseButton		= 0x04,
 		Backspace	= 0x08,
 		Tab			= 0x09,
-		Alt			= 0x12,
 		Esc			= 0x1B,
 		Space		= 0x20,
 		PageUp		= 0x21,
