@@ -101,8 +101,5 @@
     <ClCompile Include="src\Input\Mouse.cpp">
       <Filter>源文件\Input</Filter>
     </ClCompile>
-    <ClCompile Include="src\Input\InputEvent.cpp">
-      <Filter>源文件\Input</Filter>
-    </ClCompile>
   </ItemGroup>
 </Project>

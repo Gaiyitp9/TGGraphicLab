@@ -10,6 +10,7 @@
 #include "Input/InputSystem.h"
 #include <locale>
 #include <iostream>
+#include <format>
 
 namespace LCH
 {

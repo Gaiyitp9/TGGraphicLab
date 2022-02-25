@@ -34,6 +34,8 @@ namespace LCH
 
 	int Application::Run()
 	{
+		InputEvent ie{ KeyCode::BackSlash, InputEvent::Type::Pressed };
+		std::cout << std::format("{}", ie) << std::endl;
 		LCH::Window wnd1(800, 600, L"天工渲染器");
 		wnd1.spyMessage = true;
 		LCH::Window wnd2(400, 300, L"辅助窗口", wnd1.GetHwnd());
