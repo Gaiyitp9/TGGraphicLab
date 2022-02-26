@@ -28,23 +28,24 @@ namespace LCH
 		const HWND GetHwnd() const noexcept;
 		const HWND GetParentHwnd() const noexcept;
 		const std::wstring& GetName() const noexcept;
+		bool Exist() const noexcept;
 		const InputSystem& Input() const noexcept;
-
-	public:
-		bool spyMessage = false;											// 是否监控窗口消息
 
 	private:
 		virtual void Initialize();											// 初始化窗口，子类窗口可以重写初始化窗口函数
 		virtual LRESULT CALLBACK WindowProc(HWND, UINT, WPARAM, LPARAM);	// 消息处理函数，子类可以重写
+
+	public:
+		bool spyMessage = false;		// 是否监控窗口消息
 
 	private:
 		HWND hwnd, parentHwnd;
 		int width, height;
 		std::wstring name;
 
-		InputSystem input;													// 输入系统，用于记录输入信息，比如键盘和鼠标
+		bool exist = true;				// 窗口是否存在
+		InputSystem input;				// 输入系统，用于记录输入信息，比如键盘和鼠标
 
-		static BaseException const* windowProcException;					// 用于记录窗口处理函数异常(因为异常不能从窗口处理函数向上传播)
 		friend class WindowRegister;
 	};
 }

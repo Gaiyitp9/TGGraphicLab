@@ -16,6 +16,7 @@ namespace LCH
 {
 	Application::Application()
 	{
+		// 设置应用的icon
 		WindowRegister::GetInstance()->Initialize({IDI_ICON1, IDI_ICON2});
 
 		// 为了能在控制台查看日志，需要把控制台的代码页(code page)设置为UTF-8
@@ -35,12 +36,12 @@ namespace LCH
 	int Application::Run()
 	{
 		InputEvent ie{ KeyCode::BackSlash, InputEvent::Type::Pressed };
-		std::cout << std::format("{}", ie) << std::endl;
-		LCH::Window wnd1(800, 600, L"天工渲染器");
-		wnd1.spyMessage = true;
-		LCH::Window wnd2(400, 300, L"辅助窗口", wnd1.GetHwnd());
-		wnd2.spyMessage = true;
-		LCH::TimeSystem timer;
+		std::wcout << std::format(L"{}", ie) << std::endl;
+
+		windows[L"天工渲染器"] = std::make_unique<Window>(800, 600, L"天工渲染器");
+		windows[L"天工渲染器"]->spyMessage = true;
+		windows[L"辅助窗口"] = std::make_unique<Window>(400, 300, L"辅助窗口", windows[L"天工渲染器"]->GetHwnd());
+		windows[L"辅助窗口"]->spyMessage = true;
 
 		const wchar_t* unicodeStr = L"\u303E";
 		std::wcout << unicodeStr << std::endl;
@@ -54,8 +55,9 @@ namespace LCH
 		std::cout << str1 << str1.size() << std::endl;
 		std::wcout << wstr1 << wstr1.size() << std::endl;
 
-		//throw new LCH::WinAPIException(E_OUTOFMEMORY);
+		//throw LCH::WinAPIException(E_OUTOFMEMORY);
 
+		LCH::TimeSystem timer;
 		timer.Tick();
 		int i = 1000000;
 		while (i-- > 0);
@@ -69,14 +71,15 @@ namespace LCH
 			{
 				return *code;
 			}
-			wnd1.Update();
 
-			if (wnd1.Input().GetKeyDown(LCH::KeyCode::S))
-				Debug::LogLine("Press down S");
-			if (wnd1.Input().GetKey(LCH::KeyCode::S))
-				Debug::LogLine("Press S");
-			if (wnd1.Input().GetKeyUp(LCH::KeyCode::S))
-				Debug::LogLine("Press up S");
+			for (auto it = windows.begin(); it != windows.end(); ++it)
+			{
+				// 如果Windows窗口被销毁，则移除对应的窗口
+				while (!it->second->Exist())
+					it = windows.erase(it);
+
+				it->second->Update();
+			}
 		}
 	}
 }

@@ -9,8 +9,6 @@
 
 namespace LCH
 {
-	BaseException const* Window::windowProcException = nullptr;
-
 	Window::Window(int width, int height, wchar_t const* title, HWND parent)
 		: width(width), height(height), hwnd(nullptr), name(title), parentHwnd(parent)
 	{
@@ -19,7 +17,6 @@ namespace LCH
 
 	Window::~Window()
 	{
-		DestroyWindow(hwnd);
 	}
 
 	void Window::Update()
@@ -63,6 +60,11 @@ namespace LCH
 				input.keyboard.OnChar(static_cast<char>(wParam));
 			}
 			return 0;
+
+			// 鼠标移动
+		case WM_MOUSEMOVE:
+			input.mouse.OnMouseMove(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+			return 0;
 		}
 		return DefWindowProc(hwnd, msg, wParam, lParam);
 	}
@@ -78,9 +80,6 @@ namespace LCH
 
 			TranslateMessage(&msg);
 			DispatchMessageW(&msg);
-
-			if (windowProcException)
-				throw windowProcException;
 		}
 
 		return std::nullopt;
@@ -99,6 +98,11 @@ namespace LCH
 	const HWND Window::GetParentHwnd() const noexcept
 	{
 		return parentHwnd;
+	}
+
+	bool Window::Exist() const noexcept
+	{
+		return exist;
 	}
 
 	const InputSystem& Window::Input() const noexcept

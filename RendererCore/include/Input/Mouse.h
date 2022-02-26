@@ -5,9 +5,9 @@
 *****************************************************************/
 #pragma once
 
-#include "KeyCode.h"
-#include <queue>
+#include "../SlimWindows.h"
 #include "InputEvent.h"
+#include <queue>
 
 namespace LCH
 {
@@ -23,7 +23,7 @@ namespace LCH
 		void OnMouseEnter();
 
 	private:
-
+		POINT position;
 		std::queue<InputEvent> events;
 	};
 }

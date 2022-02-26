@@ -19,14 +19,14 @@ int CALLBACK _tWinMain(_In_ HINSTANCE hInstance,
 	{
 		return app.Run();
 	}
-	catch (const LCH::BaseException* e)
+	catch (const LCH::BaseException& e)
 	{
-		LCH::Debug::Log(e->what());
+		LCH::Debug::Log(e.what());
 	}
-	catch (const std::exception* e)
+	catch (const std::exception& e)
 	{
 		LCH::Debug::LogLine("Standard exception: ");
-		LCH::Debug::Log(e->what());
+		LCH::Debug::Log(e.what());
 	}
 	catch (...)
 	{

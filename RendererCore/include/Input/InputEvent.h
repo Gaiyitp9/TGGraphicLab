@@ -50,7 +50,7 @@ namespace std
 		template<typename FormatContext>
 		auto format(const LCH::InputEvent& e, FormatContext& fc)
 		{
-			return std::format_to(fc.out(), L"Key: {}, Event: {}", keysName[e.key], types[e.type]);
+			return std::format_to(fc.out(), L"Key: {} Event: {}", keysName[e.key], types[e.type]);
 		}
 
 	private:

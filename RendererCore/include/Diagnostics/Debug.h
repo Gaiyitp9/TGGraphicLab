@@ -26,14 +26,14 @@
 
 #define ThrowBaseExcept(description)\
 		{\
-			throw new LCH::BaseException(description);\
+			throw LCH::BaseException(description);\
 		}
 
 #define ThrowIfFailed(hr)\
 		{\
 			if (FAILED(hr))\
 			{\
-				throw new LCH::WinAPIException(hr);\
+				throw LCH::WinAPIException(hr);\
 			}\
 		}
 
@@ -41,7 +41,7 @@
 		{\
 			if (FAILED(hr))\
 			{\
-				throw new LCH::WinAPIException(hr, description);\
+				throw LCH::WinAPIException(hr, description);\
 			}\
 		}
 
@@ -50,7 +50,7 @@
 			DWORD hr = GetLastError();\
 			if (hr > 0)\
 			{\
-				throw new LCH::WinAPIException(hr);\
+				throw LCH::WinAPIException(hr);\
 			}\
 		}
 
@@ -59,7 +59,7 @@
 			DWORD hr = GetLastError();\
 			if (hr > 0)\
 			{\
-				throw new LCH::WinAPIException(hr, description);\
+				throw LCH::WinAPIException(hr, description);\
 			}\
 		}
 

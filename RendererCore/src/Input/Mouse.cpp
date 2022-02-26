@@ -25,7 +25,8 @@ namespace LCH
 
 	void Mouse::OnMouseMove(int x, int y)
 	{
-
+		position.x = x;
+		position.y = y;
 	}
 
 	void Mouse::OnMouseEnter()
