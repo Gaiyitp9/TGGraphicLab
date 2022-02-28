@@ -204,7 +204,8 @@ namespace LCH
 
 	LRESULT WindowRegister::WindowProcSetup(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	{
-		// 注：窗口处理函数不能向上传递异常，还没有想到好的解决方案，所以在这里暂时不处理异常
+		// 注：窗口处理函数不能向上传递异常，还没有想到好的解决方案。这个项目里的异常主要是为了定位，
+		// 而且涉及的函数主要是一些简单的WIN32函数和c++的STL，基本上不会出错，所以在这里不处理异常
 		if (msg == WM_NCCREATE)
 		{
 			const CREATESTRUCT* const pCreate = reinterpret_cast<CREATESTRUCT*>(lParam);
@@ -221,7 +222,8 @@ namespace LCH
 
 	LRESULT WindowRegister::WindowProcThunk(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	{
-		// 注：窗口处理函数不能向上传递异常，还没有想到好的解决方案，所以在这里暂时不处理异常
+		// 注：窗口处理函数不能向上传递异常，还没有想到好的解决方案。这个项目里的异常主要是为了定位，
+		// 涉及的函数是一些简单的WIN32函数和c++的STL，基本上不会出错，所以在这里不处理异常
 		Window* const pWnd = reinterpret_cast<Window*>(GetWindowLongPtrW(hwnd, GWLP_USERDATA));
 
 		// 是否监控窗口消息
@@ -252,7 +254,13 @@ namespace LCH
 	{
 		size_t count = icons.size();
 
-		HICON icon = count > 0 ? LoadIconW(hInstance, MAKEINTRESOURCEW(icons[0])) : nullptr;
+		HICON icon = nullptr;
+		if (count > 0)
+		{
+			icon = LoadIconW(hInstance, MAKEINTRESOURCEW(icons[0]));
+			if (icon == nullptr)
+				ThrowLastError();
+		}
 		WNDCLASSEX wc = {};
 		wc.cbSize = sizeof(WNDCLASSEX);
 		wc.style = CS_HREDRAW | CS_VREDRAW | CS_OWNDC;
