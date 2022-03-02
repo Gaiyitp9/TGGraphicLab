@@ -17,7 +17,7 @@ namespace LCH
 	Application::Application()
 	{
 		// 设置应用的icon
-		WindowRegister::GetInstance()->Initialize({IDI_ICON1, IDI_ICON2});
+		WindowRegister::GetInstance().Initialize({IDI_ICON1, IDI_ICON2});
 
 		// 为了能在控制台查看日志，需要把控制台的代码页(code page)设置为UTF-8
 		SetConsoleCP(65001);

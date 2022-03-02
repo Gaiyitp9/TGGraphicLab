@@ -7,7 +7,6 @@
 
 #include "SlimWindows.h"
 #include <unordered_map>
-#include <mutex>
 
 namespace LCH
 {
@@ -21,7 +20,7 @@ namespace LCH
 	class WindowRegister
 	{
 	public:
-		static WindowRegister* const GetInstance();
+		static WindowRegister& GetInstance();
 		void Initialize(const std::vector<int>& icons);					// 初始化注册器，注册所有窗口类
 		HINSTANCE GetHInstance() const noexcept;
 		const std::wstring& GetWindowClassName(const WindowType& type) const;
@@ -37,9 +36,6 @@ namespace LCH
 		static LRESULT CALLBACK WindowProcThunk(HWND, UINT, WPARAM, LPARAM);
 
 	private:
-		static WindowRegister* instance;								// 窗口注册器单例
-		static std::mutex mutex;										// 互斥锁，用于多线程访问窗口注册器单例
-
 		HINSTANCE hInstance;											// 程序文件(.exe)句柄
 		std::unordered_map<WindowType, std::wstring> windowClassName;	// 记录不同类型窗口的名称
 

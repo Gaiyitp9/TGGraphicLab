@@ -113,8 +113,8 @@ namespace LCH
 	void Window::Initialize()
 	{
 		// 获取窗口类名称
-		WindowRegister* const windowRegister = WindowRegister::GetInstance();
-		const std::wstring& wndClassName = windowRegister->GetWindowClassName(WindowType::Default);
+		WindowRegister& windowRegister = WindowRegister::GetInstance();
+		const std::wstring& wndClassName = windowRegister.GetWindowClassName(WindowType::Default);
 
 		// 客户端区域大小
 		RECT rect = { 0, 0, width, height };
@@ -126,7 +126,7 @@ namespace LCH
 		// 创建窗口
 		hwnd = CreateWindowW(wndClassName.c_str(), name.c_str(), WS_OVERLAPPEDWINDOW,
 			CW_USEDEFAULT, CW_USEDEFAULT, rect.right - rect.left, rect.bottom - rect.top,
-			parentHwnd, nullptr, windowRegister->GetHInstance(), this);
+			parentHwnd, nullptr, windowRegister.GetHInstance(), this);
 
 		if (hwnd == nullptr)
 			ThrowLastError();

@@ -13,9 +13,6 @@
 
 namespace LCH
 {
-	WindowRegister* WindowRegister::instance = nullptr;
-	std::mutex WindowRegister::mutex;
-
 	WindowRegister::WindowRegister()
 		: windowMessage({
 			REGISTER_MESSAGE(WM_NULL),
@@ -228,7 +225,7 @@ namespace LCH
 
 		// 是否监控窗口消息
 		if (pWnd->spyMessage)
-			Debug::Log(WindowRegister::GetInstance()->GetWindowMesssageInfo(pWnd->name, msg, wParam, lParam));
+			Debug::Log(WindowRegister::GetInstance().GetWindowMesssageInfo(pWnd->name, msg, wParam, lParam));
 
 		// 窗口被销毁
 		if (msg == WM_DESTROY)
@@ -237,12 +234,10 @@ namespace LCH
 		return pWnd->WindowProc(hwnd, msg, wParam, lParam);
 	}
 
-	WindowRegister* const WindowRegister::GetInstance()
+	WindowRegister& WindowRegister::GetInstance()
 	{
-		std::lock_guard<std::mutex> lock(mutex);
-		if (instance == nullptr)
-			instance = new WindowRegister();
-		return instance;
+		static WindowRegister s;
+		return s;
 	}
 
 	HINSTANCE WindowRegister::GetHInstance() const noexcept
