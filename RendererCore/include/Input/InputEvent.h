@@ -16,18 +16,12 @@ namespace LCH
 	{
 		enum class Type
 		{
-			Pressed,
-			Released,
+			Press,
+			Release,
 
-			LPress,
-			LRelease,
-			RPress,
-			RRelease,
-			WheelUp,
-			WheelDown,
-			Move,
-			Enter,
-			Leave
+			MouseMove,
+			MouseEnter,
+			MouseLeave
 		};
 
 		KeyCode key;
@@ -56,6 +50,7 @@ namespace std
 	private:
 		std::unordered_map<LCH::KeyCode, wchar_t const*> keysName =
 		{
+			{LCH::KeyCode::None, L"None"},
 			{LCH::KeyCode::LeftMouseButton, L"LeftMouseButton"},
 			{LCH::KeyCode::RightMouseButton, L"RightMouseButton"},
 			{LCH::KeyCode::MidMouseButton, L"MidMouseButton"},
@@ -157,18 +152,11 @@ namespace std
 
 		std::unordered_map<LCH::InputEvent::Type, wchar_t const*> types =
 		{
-			{LCH::InputEvent::Type::Pressed, L"Pressed"},
-			{LCH::InputEvent::Type::Released, L"Released"},
-
-			{LCH::InputEvent::Type::LPress, L"LPress"},
-			{LCH::InputEvent::Type::LRelease, L"LRelease"},
-			{LCH::InputEvent::Type::RPress, L"RPress"},
-			{LCH::InputEvent::Type::RRelease, L"RRelease"},
-			{LCH::InputEvent::Type::WheelUp, L"WheelUp"},
-			{LCH::InputEvent::Type::WheelDown, L"WheelDown"},
-			{LCH::InputEvent::Type::Move, L"Move"},
-			{LCH::InputEvent::Type::Enter, L"Enter"},
-			{LCH::InputEvent::Type::Leave, L"Leave"},
+			{LCH::InputEvent::Type::Press, L"Press"},
+			{LCH::InputEvent::Type::Release, L"Release"},
+			{LCH::InputEvent::Type::MouseMove, L"MouseMove"},
+			{LCH::InputEvent::Type::MouseEnter, L"MouseEnter"},
+			{LCH::InputEvent::Type::MouseLeave, L"MouseLeave"},
 		};
 	};
 }

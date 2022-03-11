@@ -35,7 +35,7 @@ namespace LCH
 
 	int Application::Run()
 	{
-		InputEvent ie{ KeyCode::BackSlash, InputEvent::Type::Pressed };
+		InputEvent ie{ KeyCode::BackSlash, InputEvent::Type::Press };
 		std::wcout << std::format(L"{}", ie) << std::endl;
 
 		windows[L"天工渲染器"] = std::make_unique<Window>(800, 600, L"天工渲染器");
