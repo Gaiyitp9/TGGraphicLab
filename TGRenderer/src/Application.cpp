@@ -36,12 +36,12 @@ namespace LCH
 	int Application::Run()
 	{
 		InputEvent ie{ KeyCode::BackSlash, InputEvent::Type::Press };
-		std::wcout << std::format(L"{}", ie) << std::endl;
+		std::wcout << std::format(L"{:e}", ie) << std::endl;
 
 		windows[L"天工渲染器"] = std::make_unique<Window>(800, 600, L"天工渲染器");
-		windows[L"天工渲染器"]->spyMessage = true;
-		windows[L"辅助窗口"] = std::make_unique<Window>(400, 300, L"辅助窗口", windows[L"天工渲染器"]->GetHwnd());
-		windows[L"辅助窗口"]->spyMessage = true;
+		windows[L"天工渲染器"]->input.SpyInputEvent();
+		windows[L"辅助窗口"] = std::make_unique<Window>(400, 300, L"辅助窗口", windows[L"天工渲染器"]->Hwnd());
+		windows[L"辅助窗口"]->SpyMessage();
 
 		const wchar_t* unicodeStr = L"\u303E";
 		std::wcout << unicodeStr << std::endl;
@@ -68,17 +68,16 @@ namespace LCH
 		while (true)
 		{
 			if (const auto code = LCH::Window::ProcessMessage())
-			{
 				return *code;
-			}
 
 			for (auto it = windows.begin(); it != windows.end(); ++it)
 			{
+				auto& window = it->second;
 				// 如果Windows窗口被销毁，则移除对应的窗口
-				while (!it->second->Exist())
+				while (!window->Exist())
 					it = windows.erase(it);
-
-				it->second->Update();
+				// 更新窗口
+				window->Update();
 			}
 		}
 	}

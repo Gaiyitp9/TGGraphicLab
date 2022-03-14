@@ -38,7 +38,6 @@ namespace LCH
 	private:
 		HINSTANCE hInstance;											// 程序文件(.exe)句柄
 		std::unordered_map<WindowType, std::wstring> windowClassName;	// 记录不同类型窗口的名称
-
 		std::unordered_map<DWORD, std::wstring> windowMessage;			// 窗口消息
 	};
 }

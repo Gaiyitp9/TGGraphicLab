@@ -8,7 +8,6 @@
 #include "KeyCode.h"
 #include <format>
 #include <unordered_map>
-#include <string>
 
 namespace LCH
 {
@@ -18,10 +17,8 @@ namespace LCH
 		{
 			Press,
 			Release,
-
 			MouseMove,
-			MouseEnter,
-			MouseLeave
+			ButtonRoll,
 		};
 
 		KeyCode key;
@@ -38,14 +35,64 @@ namespace std
 		template<typename FormatParseContext>
 		auto parse(FormatParseContext& pc)
 		{
-			return pc.end();
+			auto iter{ pc.begin() };
+			const auto end{ pc.end() };
+			if (iter == end || *iter == '}')
+			{
+				outputType = OutputType::KeyAndEvent;
+				return iter;
+			}
+			switch (*iter)
+			{
+			case 'k':
+				outputType = OutputType::KeyOnly;
+				break;
+			case 'e':
+				outputType = OutputType::EventOnly;
+				break;
+			default:
+				throw format_error{ "Invalid KeyValue format specifier" };
+			}
+
+			++iter;
+			if (iter != end && *iter != '}')
+				throw format_error{ "Invalid KeyValue format specifier" };
+			return iter;
 		}
 
 		template<typename FormatContext>
 		auto format(const LCH::InputEvent& e, FormatContext& fc)
 		{
-			return std::format_to(fc.out(), L"Key: {} Event: {}", keysName[e.key], types[e.type]);
+			switch (outputType)
+			{
+			case OutputType::KeyOnly:
+				if (keysName.contains(e.key))
+					return std::format_to(fc.out(), L"Key: {}", keysName[e.key]);
+				else
+					return std::format_to(fc.out(), L"Invalid KeyCode");
+
+			case OutputType::EventOnly:
+				if (types.contains(e.type))
+					return std::format_to(fc.out(), L"Event: {}", types[e.type]);
+				else
+					return std::format_to(fc.out(), L"Invalid Event");
+
+			default:
+				if (keysName.contains(e.key) && types.contains(e.type))
+					return std::format_to(fc.out(), L"Key: {}\tEvent: {}", keysName[e.key], types[e.type]);
+				else
+					return std::format_to(fc.out(), L"Invalid Input Event");
+			}
 		}
+
+	private:
+		enum class OutputType
+		{
+			KeyOnly,
+			EventOnly,
+			KeyAndEvent,
+		};
+		OutputType outputType{ OutputType::KeyAndEvent };
 
 	private:
 		std::unordered_map<LCH::KeyCode, wchar_t const*> keysName =
@@ -56,6 +103,7 @@ namespace std
 			{LCH::KeyCode::MidMouseButton, L"MidMouseButton"},
 			{LCH::KeyCode::Backspace, L"Backspace"},
 			{LCH::KeyCode::Tab, L"Tab"},
+			{LCH::KeyCode::Enter, L"Enter"},
 			{LCH::KeyCode::Esc, L"Esc"},
 			{LCH::KeyCode::Space, L"Space"},
 			{LCH::KeyCode::PageUp, L"PageUp"},
@@ -154,9 +202,8 @@ namespace std
 		{
 			{LCH::InputEvent::Type::Press, L"Press"},
 			{LCH::InputEvent::Type::Release, L"Release"},
-			{LCH::InputEvent::Type::MouseMove, L"MouseMove"},
-			{LCH::InputEvent::Type::MouseEnter, L"MouseEnter"},
-			{LCH::InputEvent::Type::MouseLeave, L"MouseLeave"},
+			{LCH::InputEvent::Type::MouseMove, L"Mouse Move"},
+			{LCH::InputEvent::Type::ButtonRoll, L"Button Roll"},
 		};
 	};
 }

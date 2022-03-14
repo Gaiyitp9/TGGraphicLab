@@ -5,7 +5,7 @@
 *****************************************************************/
 
 #include "Input/Keyboard.h"
-#include <iostream>
+#include "Diagnostics/Debug.h"
 
 namespace LCH
 {
@@ -26,6 +26,12 @@ namespace LCH
 		while (!eventBuffer.empty())
 		{
 			InputEvent e = eventBuffer.front();
+			eventBuffer.pop();
+
+			// 监控键盘
+			if (spyKeyboard)
+				Debug::LogLine(std::format(L"{}", e));
+
 			size_t key = static_cast<size_t>(e.key);
 			switch (e.type)
 			{
@@ -42,30 +48,36 @@ namespace LCH
 				keyStates[key] = false;
 				break;
 			}
-			eventBuffer.pop();
+		}
+
+		if (spyKeyboard)
+		{
+			while (!charBuffer.empty())
+			{
+				std::string c;
+				c.append(1, charBuffer.front());
+				Debug::LogLine(c);
+				charBuffer.pop();
+			}
 		}
 	}
 
-	void Keyboard::OnKeyPressed(unsigned char keyCode)
+	void Keyboard::OnKeyPress(KeyCode keyCode)
 	{
 		// 按键记录到队列中
-		eventBuffer.push(InputEvent{ static_cast<KeyCode>(keyCode), InputEvent::Type::Press });
+		eventBuffer.push(InputEvent{ keyCode, InputEvent::Type::Press });
 		// 移除旧的按键事件
 		while (eventBuffer.size() > BUFSIZE)
-		{
 			eventBuffer.pop();
-		}
 	}
 
-	void Keyboard::OnKeyReleased(unsigned char keyCode)
+	void Keyboard::OnKeyRelease(KeyCode keyCode)
 	{
 		// 按键记录到队列中
-		eventBuffer.push(InputEvent{ static_cast<KeyCode>(keyCode), InputEvent::Type::Release });
+		eventBuffer.push(InputEvent{ keyCode, InputEvent::Type::Release });
 		// 移除旧的按键事件
 		while (eventBuffer.size() > BUFSIZE)
-		{
 			eventBuffer.pop();
-		}
 	}
 
 	void Keyboard::OnChar(char ch)
@@ -73,9 +85,7 @@ namespace LCH
 		charBuffer.push(ch);
 		// 移除旧的字符
 		while (charBuffer.size() > BUFSIZE)
-		{
 			charBuffer.pop();
-		}
 	}
 
 	WPARAM Keyboard::MapLeftRightKey(WPARAM wParam, LPARAM lParam)

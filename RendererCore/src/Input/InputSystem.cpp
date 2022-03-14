@@ -21,20 +21,36 @@ namespace LCH
 	void InputSystem::Update()
 	{
 		keyboard.Update();
+		mouse.Update();
 	}
 
 	bool InputSystem::GetKey(KeyCode key) const
 	{
-		return keyboard.keyStates.test(static_cast<size_t>(key));
+		size_t pos = static_cast<size_t>(key);
+		return keyboard.keyStates.test(pos) || mouse.mouseStates.test(pos);
 	}
 
 	bool InputSystem::GetKeyDown(KeyCode key) const
 	{
-		return keyboard.keyDown.test(static_cast<size_t>(key));
+		size_t pos = static_cast<size_t>(key);
+		return keyboard.keyDown.test(pos) || mouse.mouseDown.test(pos);
 	}
 
 	bool InputSystem::GetKeyUp(KeyCode key) const
 	{
-		return keyboard.keyUp.test(static_cast<size_t>(key));
+		size_t pos = static_cast<size_t>(key);
+		return keyboard.keyUp.test(pos) || mouse.mouseUp.test(pos);
+	}
+
+	void InputSystem::SpyInputEvent() noexcept
+	{
+		keyboard.spyKeyboard = true;
+		mouse.spyMouse = true;
+	}
+
+	void InputSystem::StopSpyInputEvent() noexcept
+	{
+		keyboard.spyKeyboard = false;
+		mouse.spyMouse = false;
 	}
 }

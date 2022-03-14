@@ -21,8 +21,8 @@ namespace LCH
 
 		void Update();									// 分析事件队列，设置各种状态
 
-		void OnKeyPressed(unsigned char keyCode);
-		void OnKeyReleased(unsigned char keyCode);
+		void OnKeyPress(KeyCode keyCode);
+		void OnKeyRelease(KeyCode keyCode);
 		void OnChar(char ch);
 
 		WPARAM MapLeftRightKey(WPARAM, LPARAM);			// 映射左右按键(shift, ctrl, alt)
@@ -36,9 +36,11 @@ namespace LCH
 		std::bitset<NUMKEYS> keyDown;					// 按键是否刚刚按下
 		std::bitset<NUMKEYS> keyUp;						// 按键是否刚刚松开
 
+		bool autoRepeat = true;							// 按住按键是否能重复输入字符
+		bool spyKeyboard = false;						// 是否监控键盘
+
+	private:
 		std::queue<InputEvent> eventBuffer;				// 输入事件队列
 		std::queue<char> charBuffer;					// 输入字符队列
-
-		bool autoRepeat = true;							// 是否记录重复按键
 	};
 }

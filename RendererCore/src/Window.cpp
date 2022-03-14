@@ -36,22 +36,21 @@ namespace LCH
 			// 按下按键
 		case WM_KEYDOWN:
 		case WM_SYSKEYDOWN:
+		{
 			// 是否记录重复按键
-			if (!(lParam & 0x40000000) || input.keyboard.autoRepeat)
-			{
-				WPARAM keyCode = input.keyboard.MapLeftRightKey(wParam, lParam);
-				input.keyboard.OnKeyPressed(static_cast<unsigned char>(keyCode));
-			}
+			WPARAM keyCode = input.keyboard.MapLeftRightKey(wParam, lParam);
+			input.keyboard.OnKeyPress(static_cast<KeyCode>(keyCode));
 			return 0;
+		}
 
 			// 松开按键
 		case WM_KEYUP:
 		case WM_SYSKEYUP:
-			{
-				WPARAM keyCode = input.keyboard.MapLeftRightKey(wParam, lParam);
-				input.keyboard.OnKeyReleased(static_cast<unsigned char>(keyCode));
-				return 0;
-			}
+		{
+			WPARAM keyCode = input.keyboard.MapLeftRightKey(wParam, lParam);
+			input.keyboard.OnKeyRelease(static_cast<KeyCode>(keyCode));
+			return 0;
+		}
 
 			// 按键字符
 		case WM_CHAR:
@@ -63,7 +62,37 @@ namespace LCH
 
 			// 鼠标移动
 		case WM_MOUSEMOVE:
-			input.mouse.OnMouseMove(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+			input.mouse.OnMouseMove(MAKEPOINTS(lParam));
+			return 0;
+
+			// 按下鼠标左键
+		case WM_LBUTTONDOWN:
+			input.mouse.OnButtonPress(KeyCode::LeftMouseButton);
+			return 0;
+
+			// 松开鼠标左键
+		case WM_LBUTTONUP:
+			input.mouse.OnButtonRelease(KeyCode::LeftMouseButton);
+			return 0;
+
+			// 按下鼠标右键
+		case WM_RBUTTONDOWN:
+			input.mouse.OnButtonPress(KeyCode::RightMouseButton);
+			return 0;
+
+			// 松开鼠标右键
+		case WM_RBUTTONUP:
+			input.mouse.OnButtonRelease(KeyCode::RightMouseButton);
+			return 0;
+
+			// 按下鼠标中键
+		case WM_MBUTTONDOWN:
+			input.mouse.OnButtonPress(KeyCode::MidMouseButton);
+			return 0;
+
+			// 松开鼠标中键
+		case WM_MBUTTONUP:
+			input.mouse.OnButtonRelease(KeyCode::MidMouseButton);
 			return 0;
 		}
 		return DefWindowProc(hwnd, msg, wParam, lParam);
@@ -85,17 +114,17 @@ namespace LCH
 		return std::nullopt;
 	}
 
-	const std::wstring& Window::GetName() const noexcept
+	const std::wstring& Window::Name() const noexcept
 	{
 		return name;
 	}
 
-	const HWND Window::GetHwnd() const noexcept
+	const HWND Window::Hwnd() const noexcept
 	{
 		return hwnd;
 	}
 
-	const HWND Window::GetParentHwnd() const noexcept
+	const HWND Window::ParentHwnd() const noexcept
 	{
 		return parentHwnd;
 	}
@@ -105,9 +134,14 @@ namespace LCH
 		return exist;
 	}
 
-	const InputSystem& Window::Input() const noexcept
+	void Window::SpyMessage() noexcept
 	{
-		return input;
+		spyMessage = true;
+	}
+
+	void Window::StopSpyMessage() noexcept
+	{
+		spyMessage = false;
 	}
 
 	void Window::Initialize()
