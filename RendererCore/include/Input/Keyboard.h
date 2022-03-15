@@ -28,8 +28,14 @@ namespace LCH
 		WPARAM MapLeftRightKey(WPARAM, LPARAM);			// 映射左右按键(shift, ctrl, alt)
 
 	private:
+		void TrimEventBuffer();
+		void TrimCharBuffer();
+
+	private:
 		static constexpr unsigned int NUMKEYS = 256u;	// 按键数量
 		static constexpr unsigned int BUFSIZE = 16u;	// 队列最大长度
+		std::queue<InputEvent> eventBuffer;				// 输入事件队列
+		std::queue<char> charBuffer;					// 输入字符队列
 
 	public:
 		std::bitset<NUMKEYS> keyStates;					// 按键状态(是否被按下)
@@ -38,9 +44,5 @@ namespace LCH
 
 		bool autoRepeat = true;							// 按住按键是否能重复输入字符
 		bool spyKeyboard = false;						// 是否监控键盘
-
-	private:
-		std::queue<InputEvent> eventBuffer;				// 输入事件队列
-		std::queue<char> charBuffer;					// 输入字符队列
 	};
 }

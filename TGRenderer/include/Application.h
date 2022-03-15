@@ -30,5 +30,7 @@ namespace LCH
 		TimeSystem timer;		// 时间系统
 
 		std::unordered_map<std::wstring, std::unique_ptr<Window>> windows;	// 所有窗口集合
+
+		long count = 0;
 	};
 }

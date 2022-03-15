@@ -94,6 +94,12 @@ namespace LCH
 		case WM_MBUTTONUP:
 			input.mouse.OnButtonRelease(KeyCode::MidMouseButton);
 			return 0;
+
+			// 滚动鼠标滚轮
+		case WM_MOUSEWHEEL:
+			// 每帧只会产生一个WM_MOUSEWHEEL
+			input.mouse.OnWheelRoll(KeyCode::MidMouseButton, GET_WHEEL_DELTA_WPARAM(wParam));
+			return 0;
 		}
 		return DefWindowProc(hwnd, msg, wParam, lParam);
 	}

@@ -18,7 +18,7 @@ namespace LCH
 			Press,
 			Release,
 			MouseMove,
-			ButtonRoll,
+			WheelRoll,
 		};
 
 		KeyCode key;
@@ -203,7 +203,7 @@ namespace std
 			{LCH::InputEvent::Type::Press, L"Press"},
 			{LCH::InputEvent::Type::Release, L"Release"},
 			{LCH::InputEvent::Type::MouseMove, L"Mouse Move"},
-			{LCH::InputEvent::Type::ButtonRoll, L"Button Roll"},
+			{LCH::InputEvent::Type::WheelRoll, L"Wheel Roll"},
 		};
 	};
 }

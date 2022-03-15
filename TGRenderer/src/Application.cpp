@@ -79,6 +79,12 @@ namespace LCH
 				// 更新窗口
 				window->Update();
 			}
+
+			/*unsigned int i = 0x7fffffff;
+			while (i-- > 1)
+			{
+				count++;
+			}*/
 		}
 	}
 }

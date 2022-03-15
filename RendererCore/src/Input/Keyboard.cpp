@@ -66,26 +66,20 @@ namespace LCH
 	{
 		// 按键记录到队列中
 		eventBuffer.push(InputEvent{ keyCode, InputEvent::Type::Press });
-		// 移除旧的按键事件
-		while (eventBuffer.size() > BUFSIZE)
-			eventBuffer.pop();
+		TrimEventBuffer();
 	}
 
 	void Keyboard::OnKeyRelease(KeyCode keyCode)
 	{
 		// 按键记录到队列中
 		eventBuffer.push(InputEvent{ keyCode, InputEvent::Type::Release });
-		// 移除旧的按键事件
-		while (eventBuffer.size() > BUFSIZE)
-			eventBuffer.pop();
+		TrimEventBuffer();
 	}
 
 	void Keyboard::OnChar(char ch)
 	{
 		charBuffer.push(ch);
-		// 移除旧的字符
-		while (charBuffer.size() > BUFSIZE)
-			charBuffer.pop();
+		TrimCharBuffer();
 	}
 
 	WPARAM Keyboard::MapLeftRightKey(WPARAM wParam, LPARAM lParam)
@@ -112,5 +106,19 @@ namespace LCH
 		}
 
 		return mappedVK;
+	}
+
+	inline void Keyboard::TrimEventBuffer()
+	{
+		// 移除旧的按键事件
+		while (eventBuffer.size() > BUFSIZE)
+			eventBuffer.pop();
+	}
+
+	inline void Keyboard::TrimCharBuffer()
+	{
+		// 移除旧的字符
+		while (charBuffer.size() > BUFSIZE)
+			charBuffer.pop();
 	}
 }

@@ -30,10 +30,7 @@ namespace LCH
 
 			// 监控键盘
 			if (spyMouse)
-				Debug::LogLine(std::format(L"{}", e));
-			// 跳过非按键消息
-			if (e.key == KeyCode::None)
-				continue;
+				SpyMouseEvent(e);
 
 			size_t key = static_cast<size_t>(e.key);
 			switch (e.type)
@@ -55,26 +52,53 @@ namespace LCH
 	{
 		this->position = position;
 		eventBuffer.push(InputEvent{ KeyCode::None, InputEvent::Type::MouseMove });
-		while (eventBuffer.size() > BUFSIZE)
-			eventBuffer.pop();
+		TrimEventBuffer();
 	}
 
 	void Mouse::OnButtonPress(KeyCode key)
 	{
 		eventBuffer.push(InputEvent{ key, InputEvent::Type::Press });
-		while (eventBuffer.size() > BUFSIZE)
-			eventBuffer.pop();
+		TrimEventBuffer();
 	}
 
 	void Mouse::OnButtonRelease(KeyCode key)
 	{
 		eventBuffer.push(InputEvent{ key, InputEvent::Type::Release });
-		while (eventBuffer.size() > BUFSIZE)
-			eventBuffer.pop();
+		TrimEventBuffer();
+	}
+
+	void Mouse::OnWheelRoll(KeyCode key, short delta)
+	{
+		eventBuffer.push(InputEvent{ key, InputEvent::Type::WheelRoll });
+		TrimEventBuffer();
+		wheelDelta = delta;
 	}
 
 	const POINTS& Mouse::Position() const noexcept
 	{
 		return position;
+	}
+
+	short Mouse::RawWheelDelta() const noexcept
+	{
+		return wheelDelta;
+	}
+
+	short Mouse::WheelDelta() const noexcept
+	{
+		return wheelDelta / WHEEL_DELTA;
+	}
+
+	inline void Mouse::TrimEventBuffer()
+	{
+		while (eventBuffer.size() > BUFSIZE)
+			eventBuffer.pop();
+	}
+
+	void Mouse::SpyMouseEvent(InputEvent e)
+	{
+		Debug::LogLine(std::format(L"{}", e));
+		if (e.type == InputEvent::Type::WheelRoll)
+			Debug::LogLine(std::format(L"Raw wheel delta: {}\tWheel Delta: {}", RawWheelDelta(), WheelDelta()));
 	}
 }
