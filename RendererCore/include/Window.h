@@ -28,7 +28,7 @@ namespace LCH
 		const HWND Hwnd() const noexcept;				// 窗口句柄
 		const HWND ParentHwnd() const noexcept;			// 父母窗口句柄
 		const std::wstring& Name() const noexcept;		// 窗口名称
-		bool Exist() const noexcept;					// Windows窗口是否存在
+		bool Destroy() const noexcept;					// 是否销毁Windows窗口
 
 		void SpyMessage() noexcept;						// 捕捉窗口消息
 		void StopSpyMessage() noexcept;					// 停止捕捉窗口消息
@@ -45,7 +45,7 @@ namespace LCH
 		int width, height;
 		std::wstring name;
 
-		bool exist = true;				// 窗口是否存在
+		bool destroy = false;			// 是否销毁窗口
 		bool spyMessage = false;		// 是否监控窗口消息
 
 		friend class WindowRegister;

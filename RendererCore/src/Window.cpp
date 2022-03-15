@@ -17,6 +17,7 @@ namespace LCH
 
 	Window::~Window()
 	{
+
 	}
 
 	void Window::Update()
@@ -125,6 +126,11 @@ namespace LCH
 		return name;
 	}
 
+	bool Window::Destroy() const noexcept
+	{
+		return destroy;
+	}
+
 	const HWND Window::Hwnd() const noexcept
 	{
 		return hwnd;
@@ -133,11 +139,6 @@ namespace LCH
 	const HWND Window::ParentHwnd() const noexcept
 	{
 		return parentHwnd;
-	}
-
-	bool Window::Exist() const noexcept
-	{
-		return exist;
 	}
 
 	void Window::SpyMessage() noexcept

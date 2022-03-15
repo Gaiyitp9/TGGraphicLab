@@ -70,14 +70,16 @@ namespace LCH
 			if (const auto code = LCH::Window::ProcessMessage())
 				return *code;
 
-			for (auto it = windows.begin(); it != windows.end(); ++it)
+			auto it = windows.begin();
+			while (it != windows.end())
 			{
-				auto& window = it->second;
-				// 如果Windows窗口被销毁，则移除对应的窗口
-				while (!window->Exist())
-					it = windows.erase(it);
 				// 更新窗口
-				window->Update();
+				it->second->Update();
+				// 如果Windows窗口被销毁，则移除对应的窗口
+				if (it->second->Destroy()) 
+					it = windows.erase(it);
+				else 
+					++it;
 			}
 
 			/*unsigned int i = 0x7fffffff;

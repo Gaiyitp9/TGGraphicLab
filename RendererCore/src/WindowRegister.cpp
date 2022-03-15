@@ -229,7 +229,7 @@ namespace LCH
 
 		// 窗口被销毁
 		if (msg == WM_DESTROY)
-			pWnd->exist = false;
+			pWnd->destroy = true;
 
 		return pWnd->WindowProc(hwnd, msg, wParam, lParam);
 	}
