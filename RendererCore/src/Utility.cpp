@@ -15,7 +15,7 @@ namespace LCH
 		MultiByteToWideChar(CP_UTF8, 0, str.c_str(), -1, wide, length);
 		std::wstring wstr(wide);
 		delete[] wide;
-		return std::move(wstr);
+		return wstr;
 	}
 
 	std::string Utility::WideStringToAnsi(const std::wstring& wstr)
@@ -25,7 +25,7 @@ namespace LCH
 		WideCharToMultiByte(CP_UTF8, 0, wstr.c_str(), -1, ansi, length, nullptr, nullptr);
 		std::string str(ansi);
 		delete[] ansi;
-		return std::move(str);
+		return str;
 	}
 
 	std::string Utility::ToLower(const std::string& str)

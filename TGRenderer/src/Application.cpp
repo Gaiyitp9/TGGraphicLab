@@ -73,13 +73,15 @@ namespace LCH
 			auto it = windows.begin();
 			while (it != windows.end())
 			{
-				// 更新窗口
-				it->second->Update();
 				// 如果Windows窗口被销毁，则移除对应的窗口
 				if (it->second->Destroy()) 
 					it = windows.erase(it);
-				else 
+				else
+				{
+					// 更新窗口
+					it->second->Update();
 					++it;
+				}
 			}
 
 			/*unsigned int i = 0x7fffffff;

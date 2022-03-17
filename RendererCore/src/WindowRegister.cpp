@@ -227,7 +227,7 @@ namespace LCH
 		if (pWnd->spyMessage)
 			Debug::Log(WindowRegister::GetInstance().GetWindowMesssageInfo(pWnd->name, msg, wParam, lParam));
 
-		// 窗口被销毁
+		// 窗口被销毁后，窗口类也需要被销毁
 		if (msg == WM_DESTROY)
 			pWnd->destroy = true;
 
@@ -296,6 +296,6 @@ namespace LCH
 		}
 		msgInfo += std::format(L"    LP: {:#018x}", lp);
 		msgInfo += std::format(L"    WP: {:#018x}\n", wp);
-		return std::move(msgInfo);
+		return msgInfo;
 	}
 }

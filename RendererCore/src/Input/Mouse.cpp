@@ -97,8 +97,12 @@ namespace LCH
 
 	void Mouse::SpyMouseEvent(InputEvent e)
 	{
-		Debug::LogLine(std::format(L"{}", e));
-		if (e.type == InputEvent::Type::WheelRoll)
+		if (e.type != InputEvent::Type::WheelRoll)
+			Debug::LogLine(std::format(L"{}", e));
+		else
+		{
+			Debug::Log(std::format(L"{}\t", e));
 			Debug::LogLine(std::format(L"Raw wheel delta: {}\tWheel Delta: {}", RawWheelDelta(), WheelDelta()));
+		}
 	}
 }
