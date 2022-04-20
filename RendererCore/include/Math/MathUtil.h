@@ -5,18 +5,23 @@
 *****************************************************************/
 #pragma once
 
-#include <DirectXMath.h>
-#include <intrin.h>
+#include <array>
+#include <concepts>
 
-namespace LCH
+namespace LCH::Math
 {
-	class Math
+	// 数学工具类
+	class MathUtil
 	{
 	public:
-		template <typename T> 
-		inline static bool IsAligned(T value, size_t alignment)
+		// 地址是否满足对齐条件
+		template <typename T>
+		inline static bool IsAligned(T const* value, size_t alignment)
 		{
 			return 0 == ((size_t)value & (alignment - 1));
 		}
 	};
+
+	template<typename T, size_t N, size_t Alignment = 16>
+	class alignas(Alignment) aligned_array : public std::array<T, N> {};
 }

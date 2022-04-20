@@ -130,6 +130,7 @@
       </PrecompiledHeaderFile>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
+      <EnableEnhancedInstructionSet>AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -149,6 +150,7 @@
       <PrecompiledHeaderFile>
       </PrecompiledHeaderFile>
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
+      <EnableEnhancedInstructionSet>AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -166,9 +168,11 @@
     <ClInclude Include="include\Input\Keyboard.h" />
     <ClInclude Include="include\Input\KeyCode.h" />
     <ClInclude Include="include\Input\Mouse.h" />
+    <ClInclude Include="include\Math\Simd.hpp" />
+    <ClInclude Include="include\Math\Vector.hpp" />
     <ClInclude Include="include\Window.h" />
     <ClInclude Include="include\TimeSystem.h" />
-    <ClInclude Include="include\Math\Math.h" />
+    <ClInclude Include="include\Math\MathUtil.h" />
     <ClInclude Include="include\SlimWindows.h" />
     <ClInclude Include="include\Utility.h" />
     <ClInclude Include="include\WindowRegister.h" />

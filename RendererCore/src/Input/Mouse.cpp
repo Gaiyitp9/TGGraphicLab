@@ -28,7 +28,7 @@ namespace LCH
 			InputEvent e = eventBuffer.front();
 			eventBuffer.pop();
 
-			// 监控键盘
+			// 监控鼠标
 			if (spyMouse)
 				SpyMouseEvent(e);
 
@@ -97,12 +97,20 @@ namespace LCH
 
 	void Mouse::SpyMouseEvent(InputEvent e)
 	{
-		if (e.type != InputEvent::Type::WheelRoll)
-			Debug::LogLine(std::format(L"{}", e));
-		else
+		switch (e.type)
 		{
+		case InputEvent::Type::MouseMove:
+			Debug::Log(std::format(L"{}\t", e));
+			Debug::LogLine(std::format(L"MouseX: {}\tMouseY: {}", position.x, position.y));
+			break;
+
+		case InputEvent::Type::WheelRoll:
 			Debug::Log(std::format(L"{}\t", e));
 			Debug::LogLine(std::format(L"Raw wheel delta: {}\tWheel Delta: {}", RawWheelDelta(), WheelDelta()));
+			break;
+
+		default:
+			Debug::LogLine(std::format(L"{}", e));
 		}
 	}
 }

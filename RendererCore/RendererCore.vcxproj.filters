@@ -36,7 +36,7 @@
     <ClInclude Include="include\Utility.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="include\Math\Math.h">
+    <ClInclude Include="include\Math\MathUtil.h">
       <Filter>头文件\Math</Filter>
     </ClInclude>
     <ClInclude Include="include\Window.h">
@@ -71,6 +71,12 @@
     </ClInclude>
     <ClInclude Include="include\Input\Mouse.h">
       <Filter>头文件\Input</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Math\Vector.hpp">
+      <Filter>头文件\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Math\Simd.hpp">
+      <Filter>头文件\Math</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

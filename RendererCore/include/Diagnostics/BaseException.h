@@ -12,7 +12,6 @@
 
 namespace LCH
 {
-
 	class BaseException : public std::exception
 	{
 		struct StackFrame

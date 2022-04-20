@@ -31,7 +31,7 @@ namespace LCH
 	char const* BaseException::what() const
 	{
 		// 记录异常信息
-		 std::wstring wWhatBuffer = std::format(L"Exception type: {}\n", GetType());
+		std::wstring wWhatBuffer = std::format(L"Exception type: {}\n", GetType());
 		wWhatBuffer += description;
 		wWhatBuffer += SEPARATOR;
 		for (const auto& info : stackFrameInfo)
