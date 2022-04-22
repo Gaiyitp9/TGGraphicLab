@@ -9,19 +9,27 @@
 
 namespace LCH::Math
 {
+	// 是否支持SIMD的trait
 	struct support_simd;
+
+	// 内存对齐数组
+	template<typename T, size_t Size, size_t Alignment = 16>
+	class alignas(Alignment) aligned_array : public std::array<T, Size> {};
+
+	// 向量和矩阵的元素类型和维度的concept
+	template<typename T, size_t Size>
+	concept type_and_size = (std::is_same_v<T, int> || std::is_same_v<T, float> ||
+		std::is_same_v<T, double>) && (Size > 1);
 }
 
 // 使用SIMD需要支持AVX2或AVX指令集
 #if defined(__AVX2__) || defined(__AVX__)
 #include <immintrin.h>
-struct LCH::Math::support_simd : std::true_type { };
-#else
-struct LCH::Math::support_simd : std::false_type { };
-#endif
 
 namespace LCH::Math
 {
+	struct support_simd : std::true_type { };
+
 	template<typename T>
 	struct simd_trait;
 
@@ -60,4 +68,12 @@ namespace LCH::Math
 	{
 		static constexpr size_t Alignment = 32;
 	};
+
+#else
+namespace LCH::Math
+{
+	struct support_simd : std::false_type { };
+#endif
+
+	constexpr bool support_simd_t = support_simd::value;
 }

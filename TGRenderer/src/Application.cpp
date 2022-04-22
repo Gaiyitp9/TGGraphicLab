@@ -11,6 +11,7 @@
 #include "Diagnostics/WinAPIException.h"
 #include <array>
 #include "Math/MathUtil.h"
+#include "Math/Vector.hpp"
 
 namespace LCH
 {
@@ -35,6 +36,7 @@ namespace LCH
 
 	int Application::Run()
 	{
+		Math::Vector<double, 2> v;
 		InputEvent ie{ KeyCode::BackSlash, InputEvent::Type::Press };
 		std::wcout << std::format(L"{:e}", ie) << std::endl;
 

@@ -7,6 +7,7 @@
 
 #include <array>
 #include <concepts>
+#include "Vector.hpp"
 
 namespace LCH::Math
 {
@@ -21,7 +22,4 @@ namespace LCH::Math
 			return 0 == ((size_t)value & (alignment - 1));
 		}
 	};
-
-	template<typename T, size_t N, size_t Alignment = 16>
-	class alignas(Alignment) aligned_array : public std::array<T, N> {};
 }
