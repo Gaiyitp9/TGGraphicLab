@@ -12,7 +12,7 @@ namespace LCH::Math
 	struct support_simd;
 }
 
-// Ê¹ÓÃSIMDĞèÒªÖ§³ÖAVX2»òAVXÖ¸Áî¼¯
+// ä½¿ç”¨SIMDéœ€è¦æ”¯æŒAVX2æˆ–AVXæŒ‡ä»¤é›†
 #if defined(__AVX2__) || defined(__AVX__)
 #include <immintrin.h>
 struct LCH::Math::support_simd : std::true_type { };
