@@ -13,9 +13,6 @@ namespace LCH
 {
 	Application::Application()
 	{
-		// 设置应用的icon
-		WindowRegister::GetInstance().Initialize({IDI_ICON1, IDI_ICON2});
-
 		// 为了能在控制台查看日志，需要把控制台的代码页(code page)设置为UTF-8
 		SetConsoleCP(65001);
 		SetConsoleOutputCP(65001);
@@ -36,6 +33,7 @@ namespace LCH
 		windows[L"天工渲染器"]->input.SpyInputEvent();
 		windows[L"辅助窗口"] = std::make_unique<Window>(400, 300, L"辅助窗口", windows[L"天工渲染器"]->Hwnd());
 		windows[L"辅助窗口"]->SpyMessage();
+		windows[L"天工渲染器"]->SetIcon(IDI_ICON1);
 
 		//throw LCH::WinAPIException(E_OUTOFMEMORY);
 		unitTest.FormatTest();

@@ -22,14 +22,15 @@ namespace LCH
 		virtual ~Window();
 
 		static std::optional<int> ProcessMessage();		// 处理所有窗口的消息
+		void SetIcon(int icon);							// 设置窗口的icon
 
 		void Update();									// 更新窗口
 
 		const HWND Hwnd() const noexcept;				// 窗口句柄
 		const HWND ParentHwnd() const noexcept;			// 父母窗口句柄
 		const std::wstring& Name() const noexcept;		// 窗口名称
-		bool Destroy() const noexcept;					// 是否销毁Windows窗口
 
+		bool Destroy() const noexcept;					// 是否销毁Windows窗口
 		void SpyMessage() noexcept;						// 捕捉窗口消息
 		void StopSpyMessage() noexcept;					// 停止捕捉窗口消息
 

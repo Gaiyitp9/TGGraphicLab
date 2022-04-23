@@ -21,7 +21,6 @@ namespace LCH
 	{
 	public:
 		static WindowRegister& GetInstance();
-		void Initialize(const std::vector<int>& icons);					// 初始化注册器，注册所有窗口类
 		HINSTANCE GetHInstance() const noexcept;
 		const std::wstring& GetWindowClassName(const WindowType& type) const;
 		std::wstring GetWindowMesssageInfo(const std::wstring& window, UINT msg, WPARAM wp, LPARAM lp) const;

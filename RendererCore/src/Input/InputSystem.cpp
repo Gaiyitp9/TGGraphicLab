@@ -27,19 +27,19 @@ namespace LCH
 	bool InputSystem::GetKey(KeyCode key) const
 	{
 		size_t pos = static_cast<size_t>(key);
-		return keyboard.keyStates.test(pos) || mouse.mouseStates.test(pos);
+		return keyboard.keyStates.test(pos);
 	}
 
 	bool InputSystem::GetKeyDown(KeyCode key) const
 	{
 		size_t pos = static_cast<size_t>(key);
-		return keyboard.keyDown.test(pos) || mouse.mouseDown.test(pos);
+		return keyboard.keyDown.test(pos);
 	}
 
 	bool InputSystem::GetKeyUp(KeyCode key) const
 	{
 		size_t pos = static_cast<size_t>(key);
-		return keyboard.keyUp.test(pos) || mouse.mouseUp.test(pos);
+		return keyboard.keyUp.test(pos);
 	}
 
 	void InputSystem::SpyInputEvent() noexcept

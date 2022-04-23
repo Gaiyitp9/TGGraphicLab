@@ -191,6 +191,25 @@ namespace LCH
 	{
 		if (hInstance = GetModuleHandleW(nullptr))
 			ThrowLastError();
+
+		WNDCLASSEX wc = {};
+		wc.cbSize = sizeof(WNDCLASSEX);
+		wc.style = CS_HREDRAW | CS_VREDRAW | CS_OWNDC;
+		wc.lpfnWndProc = WindowProcSetup;
+		wc.cbClsExtra = 0;
+		wc.cbWndExtra = 0;
+		wc.hInstance = hInstance;
+		wc.hIcon = nullptr;
+		wc.hCursor = nullptr;
+		wc.hbrBackground = nullptr;
+		wc.hIconSm = nullptr;
+		wc.lpszMenuName = nullptr;
+		wc.lpszClassName = L"Default";
+
+		if (RegisterClassExW(&wc))
+			ThrowLastError();
+
+		windowClassName[WindowType::Default] = L"Default";
 	}
 
 	WindowRegister::~WindowRegister()
@@ -243,37 +262,6 @@ namespace LCH
 	HINSTANCE WindowRegister::GetHInstance() const noexcept
 	{
 		return hInstance;
-	}
-
-	void WindowRegister::Initialize(const std::vector<int>& icons)
-	{
-		size_t count = icons.size();
-
-		HICON icon = nullptr;
-		if (count > 0)
-		{
-			icon = LoadIconW(hInstance, MAKEINTRESOURCEW(icons[0]));
-			if (icon == nullptr)
-				ThrowLastError();
-		}
-		WNDCLASSEX wc = {};
-		wc.cbSize = sizeof(WNDCLASSEX);
-		wc.style = CS_HREDRAW | CS_VREDRAW | CS_OWNDC;
-		wc.lpfnWndProc = WindowProcSetup;
-		wc.cbClsExtra = 0;
-		wc.cbWndExtra = 0;
-		wc.hInstance = hInstance;
-		wc.hIcon = icon;
-		wc.hCursor = nullptr;
-		wc.hbrBackground = nullptr;
-		wc.hIconSm = icon;
-		wc.lpszMenuName = nullptr;
-		wc.lpszClassName = L"Default";
-
-		if(RegisterClassExW(&wc))
-			ThrowLastError();
-
-		windowClassName[WindowType::Default] = L"Default";
 	}
 
 	const std::wstring& WindowRegister::GetWindowClassName(const WindowType& type) const
