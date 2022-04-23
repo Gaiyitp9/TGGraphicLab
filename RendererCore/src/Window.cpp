@@ -121,12 +121,22 @@ namespace LCH
 		return std::nullopt;
 	}
 
-	void Window::SetIcon(int iconSource)
+	void Window::SetIcon(int iconSource, int iconsmSource)
 	{
 		HICON icon = LoadIconW(GetModuleHandleW(nullptr), MAKEINTRESOURCEW(iconSource));
 		if (icon == nullptr)
 			ThrowLastErrorWithDesc(L"Invalid icon source");
+
+		HICON iconsm;
+		if (iconsmSource != iconSource)
+			iconsm = LoadIconW(GetModuleHandleW(nullptr), MAKEINTRESOURCEW(iconsmSource));
+		else
+			iconsm = icon;
+		if (iconsm == nullptr)
+			ThrowLastErrorWithDesc(L"Invalid iconsm source");
+
 		SetClassLongPtrW(hwnd, GCLP_HICON, reinterpret_cast<LONG_PTR>(icon));
+		SetClassLongPtrW(hwnd, GCLP_HICONSM, reinterpret_cast<LONG_PTR>(iconsm));
 	}
 
 	const std::wstring& Window::Name() const noexcept

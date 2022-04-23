@@ -22,7 +22,7 @@ namespace LCH
 		virtual ~Window();
 
 		static std::optional<int> ProcessMessage();		// 处理所有窗口的消息
-		void SetIcon(int icon);							// 设置窗口的icon
+		void SetIcon(int icon, int iconsmSource);		// 设置窗口的icon
 
 		void Update();									// 更新窗口
 

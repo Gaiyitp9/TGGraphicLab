@@ -33,7 +33,7 @@ namespace LCH
 		windows[L"天工渲染器"]->input.SpyInputEvent();
 		windows[L"辅助窗口"] = std::make_unique<Window>(400, 300, L"辅助窗口", windows[L"天工渲染器"]->Hwnd());
 		windows[L"辅助窗口"]->SpyMessage();
-		windows[L"天工渲染器"]->SetIcon(IDI_ICON1);
+		windows[L"天工渲染器"]->SetIcon(IDI_ICON1, IDI_ICON1);
 
 		//throw LCH::WinAPIException(E_OUTOFMEMORY);
 		unitTest.FormatTest();
