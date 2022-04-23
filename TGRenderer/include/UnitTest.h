@@ -5,17 +5,15 @@
 *****************************************************************/
 #pragma once
 
-namespace LCH::Math
+namespace LCH
 {
-	// 数学工具类
-	class MathUtil
+	class UnitTest
 	{
 	public:
-		// 地址是否满足对齐条件
-		template <typename T>
-		inline static bool IsAligned(T const* value, size_t alignment)
-		{
-			return 0 == ((size_t)value & (alignment - 1));
-		}
+		void FormatTest();
+		void TextEncodeTest();
+		void TimeTest();
+		void ArrayAlignmentTest();
+		void MathLibTest();
 	};
 }

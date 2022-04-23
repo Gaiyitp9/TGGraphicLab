@@ -5,6 +5,7 @@
 *****************************************************************/
 #pragma once
 
+#include <array>
 #include <type_traits>
 
 namespace LCH::Math
@@ -18,7 +19,7 @@ namespace LCH::Math
 
 	// 向量和矩阵的元素类型和维度的concept
 	template<typename T, size_t Size>
-	concept type_and_size = (std::is_same_v<T, int> || std::is_same_v<T, float> ||
+	concept mathlib_type_and_size = (std::is_same_v<T, int> || std::is_same_v<T, float> ||
 		std::is_same_v<T, double>) && (Size > 1);
 }
 

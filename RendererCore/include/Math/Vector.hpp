@@ -10,7 +10,7 @@
 
 namespace LCH::Math
 {
-	template<typename T, size_t Size> requires type_and_size<T, Size>
+	template<typename T, size_t Size> requires mathlib_type_and_size<T, Size>
 	class Vector
 	{
 		using simd = simd_trait<T>;
@@ -36,7 +36,7 @@ namespace LCH::Math
 		aligned_array<T, Size> data;
 	};
 
-	template<typename T>
+	template<typename T> requires mathlib_type_and_size<T, 4>
 	class Vector<T, 4>
 	{
 		using simd = simd_trait<T>;

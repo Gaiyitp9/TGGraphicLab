@@ -21,6 +21,9 @@
     <ClCompile Include="src\Application.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="src\UnitTest.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="TGRenderer.rc">
@@ -40,6 +43,9 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="include\Application.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\UnitTest.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
