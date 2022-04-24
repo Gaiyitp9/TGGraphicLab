@@ -27,8 +27,10 @@ namespace LCH
 	private:
 		std::locale locale;		// 语言区域
 		TimeSystem timer;		// 时间系统
-
 		std::unordered_map<std::wstring, std::unique_ptr<Window>> windows;	// 所有窗口集合
+
+		int screenWidth;		// 主显示器的宽
+		int screenHeight;		// 主显示器的高
 
 	private:
 		UnitTest unitTest;		// 单元测试类

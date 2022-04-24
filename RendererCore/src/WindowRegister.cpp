@@ -201,7 +201,7 @@ namespace LCH
 		wc.hInstance = hInstance;
 		wc.hIcon = nullptr;
 		wc.hCursor = nullptr;
-		wc.hbrBackground = nullptr;
+		wc.hbrBackground = (HBRUSH)GetStockObject(WHITE_BRUSH);
 		wc.hIconSm = nullptr;
 		wc.lpszMenuName = nullptr;
 		wc.lpszClassName = L"Default";

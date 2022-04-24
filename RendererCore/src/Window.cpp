@@ -186,7 +186,7 @@ namespace LCH
 			parentHwnd = parentWnd->hwnd;
 		// 创建窗口
 		hwnd = CreateWindowW(wndClassName.c_str(), name.c_str(), WS_OVERLAPPEDWINDOW,
-			CW_USEDEFAULT, CW_USEDEFAULT, rect.right - rect.left, rect.bottom - rect.top,
+			200, 100, rect.right - rect.left, rect.bottom - rect.top,
 			parentHwnd, nullptr, windowRegister.GetHInstance(), this);
 
 		if (hwnd == nullptr)

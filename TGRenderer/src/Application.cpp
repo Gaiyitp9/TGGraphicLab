@@ -20,6 +20,10 @@ namespace LCH
 		// 编码设置为UTF-8
 		locale = std::locale(".utf8");
 		std::wcout.imbue(locale);
+
+		// 获取当前显示器的宽和高
+		screenWidth = GetSystemMetrics(SM_CXSCREEN);
+		screenHeight = GetSystemMetrics(SM_CYSCREEN);
 	}
 
 	Application::~Application()
@@ -33,6 +37,9 @@ namespace LCH
 		windows[L"天工渲染器"]->SpyInputEvent(false);
 		windows[L"辅助窗口"] = std::make_unique<Window>(400, 300, L"辅助窗口", windows[L"天工渲染器"].get());
 		windows[L"辅助窗口"]->SpyMessage(false);
+		SetWindowLongPtrW(windows[L"辅助窗口"]->Hwnd(), GWL_STYLE, WS_POPUP | WS_BORDER);
+		SetWindowPos(windows[L"辅助窗口"]->Hwnd(), HWND_TOPMOST, 
+			(screenWidth - 400) / 2, (screenHeight - 300) / 2, 400, 300, 0);
 		windows[L"天工渲染器"]->SetIcon(IDI_ICON1);
 
 		//throw LCH::WinAPIException(E_OUTOFMEMORY);
