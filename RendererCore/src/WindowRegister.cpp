@@ -244,7 +244,7 @@ namespace LCH
 
 		// 是否监控窗口消息
 		if (pWnd->spyMessage)
-			Debug::Log(WindowRegister::GetInstance().GetWindowMesssageInfo(pWnd->name, msg, wParam, lParam));
+			Debug::LogLine(WindowRegister::GetInstance().GetWindowMesssageInfo(pWnd->name, msg, wParam, lParam));
 
 		// 窗口被销毁后，窗口类也需要被销毁
 		if (msg == WM_DESTROY)
@@ -283,7 +283,7 @@ namespace LCH
 			msgInfo += std::format(L"	{:<25}", it->second);
 		}
 		msgInfo += std::format(L"    LP: {:#018x}", lp);
-		msgInfo += std::format(L"    WP: {:#018x}\n", wp);
+		msgInfo += std::format(L"    WP: {:#018x}", wp);
 		return msgInfo;
 	}
 }

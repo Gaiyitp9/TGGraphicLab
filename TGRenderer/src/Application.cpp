@@ -30,10 +30,10 @@ namespace LCH
 	int Application::Run()
 	{
 		windows[L"天工渲染器"] = std::make_unique<Window>(800, 600, L"天工渲染器");
-		windows[L"天工渲染器"]->input.SpyInputEvent();
-		windows[L"辅助窗口"] = std::make_unique<Window>(400, 300, L"辅助窗口", windows[L"天工渲染器"]->Hwnd());
-		windows[L"辅助窗口"]->SpyMessage();
-		windows[L"天工渲染器"]->SetIcon(IDI_ICON1, IDI_ICON1);
+		windows[L"天工渲染器"]->SpyInputEvent(false);
+		windows[L"辅助窗口"] = std::make_unique<Window>(400, 300, L"辅助窗口", windows[L"天工渲染器"].get());
+		windows[L"辅助窗口"]->SpyMessage(false);
+		windows[L"天工渲染器"]->SetIcon(IDI_ICON1);
 
 		//throw LCH::WinAPIException(E_OUTOFMEMORY);
 		unitTest.FormatTest();
@@ -59,6 +59,21 @@ namespace LCH
 					it->second->Update();
 					++it;
 				}
+			}
+
+			if (windows[L"天工渲染器"]->Input().GetKeyDown(KeyCode::S))
+			{
+				windows[L"天工渲染器"]->SetIcon(IDI_ICON1);
+				Debug::LogLine(L"按下S");
+			}
+			else if (windows[L"天工渲染器"]->Input().GetKeyDown(KeyCode::D))
+			{
+				windows[L"天工渲染器"]->SetIcon(IDI_ICON2);
+				Debug::LogLine(L"按下D");
+			}
+			else if (windows[L"天工渲染器"]->Input().GetKey(KeyCode::RightMouseButton))
+			{
+				Debug::LogLine(L"按住鼠标右键");
 			}
 		}
 	}

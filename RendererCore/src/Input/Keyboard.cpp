@@ -108,6 +108,14 @@ namespace LCH
 		return mappedVK;
 	}
 
+	bool Keyboard::IsKeyboardCode(KeyCode code)
+	{
+		unsigned char index = static_cast<unsigned char>(code);
+		if (index > 0x08 && index <= 0xDE)
+			return true;
+		return false;
+	}
+
 	inline void Keyboard::TrimEventBuffer()
 	{
 		// 移除旧的按键事件

@@ -89,6 +89,14 @@ namespace LCH
 		return wheelDelta / WHEEL_DELTA;
 	}
 
+	bool Mouse::IsMouseCode(KeyCode code)
+	{
+		unsigned char index = static_cast<unsigned char>(code);
+		if (index >= 0x01 && index <= 0x04)
+			return true;
+		return false;
+	}
+
 	inline void Mouse::TrimEventBuffer()
 	{
 		while (eventBuffer.size() > BUFSIZE)

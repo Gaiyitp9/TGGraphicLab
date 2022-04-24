@@ -9,8 +9,8 @@
 
 namespace LCH
 {
-	Window::Window(int width, int height, wchar_t const* title, HWND parent)
-		: width(width), height(height), hwnd(nullptr), name(title), parentHwnd(parent)
+	Window::Window(int width, int height, wchar_t const* title, Window const* parent)
+		: width(width), height(height), hwnd(nullptr), name(title), parentWnd(parent)
 	{
 		Initialize();
 	}
@@ -121,22 +121,16 @@ namespace LCH
 		return std::nullopt;
 	}
 
-	void Window::SetIcon(int iconSource, int iconsmSource)
+	void Window::SetIcon(int iconSource)
 	{
 		HICON icon = LoadIconW(GetModuleHandleW(nullptr), MAKEINTRESOURCEW(iconSource));
 		if (icon == nullptr)
 			ThrowLastErrorWithDesc(L"Invalid icon source");
 
-		HICON iconsm;
-		if (iconsmSource != iconSource)
-			iconsm = LoadIconW(GetModuleHandleW(nullptr), MAKEINTRESOURCEW(iconsmSource));
-		else
-			iconsm = icon;
-		if (iconsm == nullptr)
-			ThrowLastErrorWithDesc(L"Invalid iconsm source");
-
-		SetClassLongPtrW(hwnd, GCLP_HICON, reinterpret_cast<LONG_PTR>(icon));
-		SetClassLongPtrW(hwnd, GCLP_HICONSM, reinterpret_cast<LONG_PTR>(iconsm));
+		if (SetClassLongPtrW(hwnd, GCLP_HICON, reinterpret_cast<LONG_PTR>(icon)) == 0)
+			ThrowLastError();
+		if (SetClassLongPtrW(hwnd, GCLP_HICONSM, reinterpret_cast<LONG_PTR>(icon)) == 0)
+			ThrowLastError();
 	}
 
 	const std::wstring& Window::Name() const noexcept
@@ -154,19 +148,25 @@ namespace LCH
 		return hwnd;
 	}
 
-	const HWND Window::ParentHwnd() const noexcept
+	Window const* Window::ParentWindow() const noexcept
 	{
-		return parentHwnd;
+		return parentWnd;
 	}
 
-	void Window::SpyMessage() noexcept
+	const InputSystem& Window::Input() const noexcept
 	{
-		spyMessage = true;
+		return input;
 	}
 
-	void Window::StopSpyMessage() noexcept
+	void Window::SpyMessage(bool enable) noexcept
 	{
-		spyMessage = false;
+		spyMessage = enable;
+	}
+
+	void Window::SpyInputEvent(bool enable) noexcept
+	{
+		input.keyboard.spyKeyboard = enable;
+		input.mouse.spyMouse = enable;
 	}
 
 	void Window::Initialize()
@@ -177,11 +177,13 @@ namespace LCH
 
 		// 客户端区域大小
 		RECT rect = { 0, 0, width, height };
-
 		// 根据客户区域宽和高计算整个窗口的宽和高
 		if (!AdjustWindowRect(&rect, WS_OVERLAPPEDWINDOW, false))
 			ThrowLastError();
 
+		HWND parentHwnd = nullptr;
+		if (parentWnd != nullptr)
+			parentHwnd = parentWnd->hwnd;
 		// 创建窗口
 		hwnd = CreateWindowW(wndClassName.c_str(), name.c_str(), WS_OVERLAPPEDWINDOW,
 			CW_USEDEFAULT, CW_USEDEFAULT, rect.right - rect.left, rect.bottom - rect.top,

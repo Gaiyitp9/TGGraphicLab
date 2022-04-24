@@ -27,6 +27,8 @@ namespace LCH
 
 		WPARAM MapLeftRightKey(WPARAM, LPARAM);			// 映射左右按键(shift, ctrl, alt)
 
+		static bool IsKeyboardCode(KeyCode keyCode);
+
 	private:
 		void TrimEventBuffer();
 		void TrimCharBuffer();

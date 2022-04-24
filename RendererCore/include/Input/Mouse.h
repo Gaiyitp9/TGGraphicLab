@@ -29,6 +29,8 @@ namespace LCH
 		short RawWheelDelta() const noexcept;			// 鼠标滚轮变化值是WHEEL_DELTA的整数倍
 		short WheelDelta() const noexcept;				// 两个函数分别取没有除以和除以WHEEL_DELTA后的变化值
 
+		static bool IsMouseCode(KeyCode code);
+
 	private:
 		void TrimEventBuffer();
 		void SpyMouseEvent(InputEvent e);

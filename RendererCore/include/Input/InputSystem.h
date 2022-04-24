@@ -18,14 +18,12 @@ namespace LCH
 		InputSystem& operator=(const InputSystem&) = delete;
 		~InputSystem();
 
-		void Update();							// 更新输入系统
-
 		bool GetKey(KeyCode key) const;			// 是否按住按键
 		bool GetKeyDown(KeyCode key) const;		// 是否按下按键
 		bool GetKeyUp(KeyCode key) const;		// 是否释放按键
 
-		void SpyInputEvent() noexcept;			// 是否监控输入事件
-		void StopSpyInputEvent() noexcept;		// 是否停止监控输入事件
+	private:
+		void Update();							// 更新输入系统
 
 	private:
 		Keyboard keyboard;
