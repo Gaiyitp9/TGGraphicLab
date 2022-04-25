@@ -41,19 +41,19 @@ namespace LCH::Math
 
 		static void add(float const* lhs, float const* rhs, float* result)
 		{
-			__m128 val = _mm_add_ps(_mm_load_ps(lhs), _mm_load_ps(rhs));
+			__m128 val = _mm_add_ps(_mm_loadu_ps(lhs), _mm_loadu_ps(rhs));
 			_mm_store_ps(result, val);
 		}
 
 		static void sub(float const* lhs, float const* rhs, float* result)
 		{
-			__m128 val = _mm_sub_ps(_mm_load_ps(lhs), _mm_load_ps(rhs));
+			__m128 val = _mm_sub_ps(_mm_loadu_ps(lhs), _mm_loadu_ps(rhs));
 			_mm_store_ps(result, val);
 		}
 
 		static void dot(float const* lhs, float const* rhs, float* result)
 		{
-			__m128 val = _mm_dp_ps(_mm_load_ps(lhs), _mm_load_ps(rhs), 31);
+			__m128 val = _mm_dp_ps(_mm_loadu_ps(lhs), _mm_loadu_ps(rhs), 31);
 			_mm_store_ps(result, val);
 		}
 	};

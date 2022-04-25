@@ -38,7 +38,7 @@ namespace LCH::Math
 		}
 
 	private:
-		aligned_array<T, Size> data;
+		aligned_array<T, Size, simd::Alignment> data;
 	};
 
 	template<typename T> requires mathlib_type_and_size<T, 4>
@@ -47,35 +47,39 @@ namespace LCH::Math
 		using simd = simd_trait<T>;
 
 	public:
-		Vector()
+		Vector(T x = {})
 		{
-			value = _mm_setzero_ps();
+			data.fill(x);
 		}
 
-		Vector(float x)
+		Vector(T x, T y, T z, T w)
 		{
-			value = _mm_set_ps1(x);
+			data[0] = x;
+			data[1] = y;
+			data[2] = z;
+			data[3] = w;
 		}
 
-		Vector(float x, float y, float z, float w)
+		const T& operator[](size_t pos) const
 		{
-			value = _mm_set_ps(x, y, z, w);
+			return data.at(pos);
 		}
 
-		T operator[](size_t pos) const
+		T& operator[](size_t pos)
 		{
-			if (pos > 3)
-				throw std::out_of_range();
-
-			return value.m128_f32[pos];
+			return data.at(pos);
 		}
 
-		T x() { return value.m128_f32[0]; }
-		T y() { return value.m128_f32[1]; }
-		T z() { return value.m128_f32[2]; }
-		T w() { return value.m128_f32[3]; }
+		const T& x() const { return data[0]; }
+		const T& y() const { return data[1]; }
+		const T& z() const { return data[2]; }
+		const T& w() const { return data[3]; }
+		T& x() { return data[0]; }
+		T& y() { return data[1]; }
+		T& z() { return data[2]; }
+		T& w() { return data[3]; }
 
 	private:
-		__m128 value;
+		aligned_array<T, 4> data;
 	};
 }

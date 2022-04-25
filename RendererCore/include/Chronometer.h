@@ -9,6 +9,7 @@
 
 namespace LCH
 {
+	// 高精度计时器
 	class Chronometer
 	{
 	public:

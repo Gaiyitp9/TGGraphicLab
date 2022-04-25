@@ -80,6 +80,18 @@ namespace LCH
 	{
 		Math::Vector<float, 4> v;
 		std::cout << "Vector<float, 4> value address = " << &v << std::boolalpha << Math::MathUtil::IsAligned(&v, 16) << std::endl;
+		std::cout << v.x() << " " << v.y() << " " << v.z() << " " << v.w() << std::endl;
+		v.x() = 2.3f;
+		v.y() = 1.2f;
+		v.z() = 3.6f;
+		v.w() = 1.0f;
+		std::cout << v.x() << " " << v.y() << " " << v.z() << " " << v.w() << std::endl;
+		std::cout << v[0] << " " << v[1] << " " << v[2] << " " << v[3] << std::endl;
+		v[0] = 2.2f;
+		v[1] = 5.3f;
+		v[2] = 8.2f;
+		v[3] = 1.2f;
+		std::cout << v[0] << " " << v[1] << " " << v[2] << " " << v[3] << std::endl;
 	}
 
 	void UnitTest::SIMDTest()
