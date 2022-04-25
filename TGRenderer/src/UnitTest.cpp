@@ -7,10 +7,10 @@
 #include "UnitTest.h"
 #include <iostream>
 #include "Utility.h"
-#include "TimeSystem.h"
 #include "Math/MathUtil.h"
 #include "Math/Vector.hpp"
 #include "Input/InputEvent.h"
+#include <cstdlib>
 
 namespace LCH
 {
@@ -37,13 +37,12 @@ namespace LCH
 
 	void UnitTest::TimeTest()
 	{
-		LCH::TimeSystem timer;
 		timer.Tick();
 		int i = 1000000;
 		while (i-- > 0);
 		timer.Tick();
 
-		std::wcout << timer.DeltaTime() << std::endl;
+		std::wcout << timer.DeltaTime() << " ms" << std::endl;
 	}
 
 	void UnitTest::ArrayAlignmentTest()
@@ -79,6 +78,96 @@ namespace LCH
 
 	void UnitTest::MathLibTest()
 	{
-		Math::Vector<double, 2> v;
+		Math::Vector<float, 4> v;
+		std::cout << "Vector<float, 4> value address = " << &v << std::boolalpha << Math::MathUtil::IsAligned(&v, 16) << std::endl;
+	}
+
+	void UnitTest::SIMDTest()
+	{
+		size_t n = 10000000;
+		int* nums = static_cast<int*>(_aligned_malloc(n * sizeof(int), 32));
+		std::cout << "SIMDTest nums = " << nums << " Is 32-byte Aligned? " << Math::MathUtil::IsAligned(nums, 32) << std::endl;
+
+		for (size_t i = 0; i < n; i++)
+			nums[i] = 3;
+
+		NormalAdd(nums, n);
+		SSEAdd(nums, n);
+		AVX2Add(nums, n);
+
+		_aligned_free(nums);
+	}
+
+	void UnitTest::NormalAdd(int* nums, size_t n)
+	{
+		timer.Tick();
+		int sum = 0;
+		for (size_t i = 0; i < n; i++)
+		{
+			sum += nums[i];
+		}
+		timer.Tick();
+		std::cout << "NormalAdd: " << timer.DeltaTime() << " ms, result = " << sum << std::endl;
+	}
+
+	void UnitTest::SSEAdd(int* nums, size_t n)
+	{
+		timer.Tick();
+
+		__m128i simd_sum = _mm_setzero_si128();
+		int normal_sum = 0;
+
+		size_t loop = n / 4;
+		size_t reserve = n % 4;
+
+		__m128i* p = (__m128i*)nums;
+		for (size_t i = 0; i < loop; i++)
+		{
+			simd_sum = _mm_add_epi32(simd_sum, *p);
+			p++;
+		}
+
+		int* q = (int*)p;
+		for (size_t i = 0; i < reserve; i++)
+		{
+			normal_sum += q[i];
+		}
+		normal_sum += (((int*)&simd_sum)[0] + ((int*)&simd_sum)[1] + ((int*)&simd_sum)[2] + ((int*)&simd_sum)[3]);
+
+		timer.Tick();
+		std::cout << "SSEAdd: " << timer.DeltaTime() << " ms, result = " << normal_sum << std::endl;
+	}
+
+	void UnitTest::AVX2Add(int* nums, size_t n)
+	{
+		timer.Tick();
+
+		__m256i simd_sum = _mm256_setzero_si256();
+		__m256i simd_load;
+		int normal_sum = 0;
+
+		size_t loop = n / 8;
+		size_t reserve = n % 8;
+
+		__m256i* p = (__m256i*)nums;
+		for (size_t i = 0; i < loop; i++)
+		{
+			simd_load = _mm256_load_si256((const __m256i*)p);
+			simd_sum = _mm256_add_epi32(simd_sum, simd_load);
+			p++;
+		}
+
+		int* q = (int*)p;
+		for (size_t i = 0; i < reserve; i++)
+		{
+			normal_sum += q[i];
+		}
+		normal_sum += (((int*)&simd_sum)[0] + ((int*)&simd_sum)[1] +
+			((int*)&simd_sum)[2] + ((int*)&simd_sum)[3] +
+			((int*)&simd_sum)[4] + ((int*)&simd_sum)[5] +
+			((int*)&simd_sum)[6] + ((int*)&simd_sum)[7]);
+
+		timer.Tick();
+		std::cout << "AVX2Add: " << timer.DeltaTime() << " ms, result = " << normal_sum << std::endl;
 	}
 }

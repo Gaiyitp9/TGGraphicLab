@@ -42,7 +42,7 @@
     <ClInclude Include="include\Window.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="include\TimeSystem.h">
+    <ClInclude Include="include\Chronometer.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="include\WindowRegister.h">
@@ -86,7 +86,7 @@
     <ClCompile Include="src\Window.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="src\TimeSystem.cpp">
+    <ClCompile Include="src\Chronometer.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="src\WindowRegister.cpp">

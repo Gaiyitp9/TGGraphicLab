@@ -9,13 +9,13 @@
 
 namespace LCH
 {
-	class TimeSystem
+	class Chronometer
 	{
 	public:
-		TimeSystem();
-		TimeSystem(const TimeSystem&) = delete;
-		TimeSystem& operator=(const TimeSystem&) = delete;
-		~TimeSystem();
+		Chronometer();
+		Chronometer(const Chronometer&) = delete;
+		Chronometer& operator=(const Chronometer&) = delete;
+		~Chronometer();
 
 		float DeltaTime() const;
 		float TotalTime() const;

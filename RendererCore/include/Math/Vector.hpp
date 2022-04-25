@@ -6,7 +6,7 @@
 #pragma once
 
 #include "Simd.hpp"
-#include "MathUtil.h"
+#include <stdexcept>
 
 namespace LCH::Math
 {
@@ -18,6 +18,11 @@ namespace LCH::Math
 		Vector()
 		{
 
+		}
+
+		T operator[](size_t index)
+		{
+			return data.at(index);
 		}
 
 		Vector operator+(const Vector& v)
@@ -42,13 +47,35 @@ namespace LCH::Math
 		using simd = simd_trait<T>;
 
 	public:
-		Vector();
-		T x() { return data[0]; }
-		T y() { return data[1]; }
-		T z() { return data[2]; }
-		T w() { return data[3]; }
+		Vector()
+		{
+			value = _mm_setzero_ps();
+		}
+
+		Vector(float x)
+		{
+			value = _mm_set_ps1(x);
+		}
+
+		Vector(float x, float y, float z, float w)
+		{
+			value = _mm_set_ps(x, y, z, w);
+		}
+
+		T operator[](size_t pos) const
+		{
+			if (pos > 3)
+				throw std::out_of_range();
+
+			return value.m128_f32[pos];
+		}
+
+		T x() { return value.m128_f32[0]; }
+		T y() { return value.m128_f32[1]; }
+		T z() { return value.m128_f32[2]; }
+		T w() { return value.m128_f32[3]; }
 
 	private:
-		aligned_array<T, 4, simd::Alignment> data;
+		__m128 value;
 	};
 }

@@ -48,6 +48,7 @@ namespace LCH
 		unitTest.TimeTest();
 		unitTest.MathLibTest();
 		unitTest.ArrayAlignmentTest();
+		unitTest.SIMDTest();
 
 		while (true)
 		{

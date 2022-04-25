@@ -7,7 +7,7 @@
 #pragma once
 
 #include "Window.h"
-#include "TimeSystem.h"
+#include "Chronometer.h"
 #include "UnitTest.h"
 #include <locale>
 #include <unordered_map>
@@ -26,7 +26,7 @@ namespace LCH
 
 	private:
 		std::locale locale;		// 语言区域
-		TimeSystem timer;		// 时间系统
+		Chronometer timer;		// 高精度计时器
 		std::unordered_map<std::wstring, std::unique_ptr<Window>> windows;	// 所有窗口集合
 
 		int screenWidth;		// 主显示器的宽

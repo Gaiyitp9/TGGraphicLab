@@ -4,28 +4,28 @@
 * This code is licensed under the MIT License (MIT).			*
 *****************************************************************/
 
-#include "TimeSystem.h"
+#include "Chronometer.h"
 
 namespace LCH
 {
-	TimeSystem::TimeSystem()
+	Chronometer::Chronometer()
 	{
 		base = timer.now();
 		last = timer.now();
 		paused = std::chrono::duration<double, std::milli>(0.0);
 	}
 
-	TimeSystem::~TimeSystem()
+	Chronometer::~Chronometer()
 	{
 
 	}
 
-	float TimeSystem::DeltaTime() const
+	float Chronometer::DeltaTime() const
 	{
 		return static_cast<float>(deltaTime);
 	}
 
-	float TimeSystem::TotalTime() const
+	float Chronometer::TotalTime() const
 	{
 		std::chrono::duration<double, std::milli> total;
 		if (stopped)
@@ -41,7 +41,7 @@ namespace LCH
 		return static_cast<float>(total.count());
 	}
 
-	std::wstring TimeSystem::Time() const
+	std::wstring Chronometer::Time() const
 	{
 		std::chrono::system_clock::time_point t = wallClock.now();
 		auto const localT = std::chrono::current_zone()->to_local(t);
@@ -50,7 +50,7 @@ namespace LCH
 		return std::format(L"{:%T}", std::chrono::hh_mm_ss(hhmmss));
 	}
 
-	void TimeSystem::Reset()
+	void Chronometer::Reset()
 	{
 		base = timer.now();
 		last = timer.now();
@@ -59,7 +59,7 @@ namespace LCH
 		stopped = false;
 	}
 
-	void TimeSystem::Pause()
+	void Chronometer::Pause()
 	{
 		if (!stopped)
 		{
@@ -68,7 +68,7 @@ namespace LCH
 		}
 	}
 
-	void TimeSystem::Start()
+	void Chronometer::Start()
 	{
 		if (stopped)
 		{
@@ -79,7 +79,7 @@ namespace LCH
 		}
 	}
 
-	void TimeSystem::Tick()
+	void Chronometer::Tick()
 	{
 		if (stopped)
 		{

@@ -5,6 +5,10 @@
 *****************************************************************/
 #pragma once
 
+#include <ctime>
+#include <string>
+#include "Chronometer.h"
+
 namespace LCH
 {
 	class UnitTest
@@ -15,5 +19,14 @@ namespace LCH
 		void TimeTest();
 		void ArrayAlignmentTest();
 		void MathLibTest();
+		void SIMDTest();
+
+	private:
+		void NormalAdd(int* nums, size_t n);
+		void SSEAdd(int* nums, size_t n);
+		void AVX2Add(int* nums, size_t n);
+
+	private:
+		Chronometer timer;
 	};
 }
