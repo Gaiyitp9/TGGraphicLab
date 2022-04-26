@@ -6,14 +6,13 @@
 #pragma once
 
 #include "Simd.hpp"
-#include <stdexcept>
 
 namespace LCH::Math
 {
 	template<typename T, size_t Size> requires mathlib_type_and_size<T, Size>
 	class Vector
 	{
-		using simd = simd_trait<T>;
+		using simd = simd_trait<T, SimdInstruction<Size>::type>;
 	public:
 		Vector()
 		{
@@ -44,7 +43,7 @@ namespace LCH::Math
 	template<typename T> requires mathlib_type_and_size<T, 4>
 	class Vector<T, 4>
 	{
-		using simd = simd_trait<T>;
+		using simd = simd_trait<T, SimdInstruction<4>::type>;
 
 	public:
 		Vector(T x = {})
