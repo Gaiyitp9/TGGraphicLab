@@ -9,8 +9,8 @@
 
 namespace LCH
 {
-	Window::Window(int width, int height, wchar_t const* title, Window const* parent)
-		: width(width), height(height), hwnd(nullptr), name(title), parentWnd(parent)
+	Window::Window(int x, int y, int width, int height, wchar_t const* title, Window const* parent)
+		: posX(x), posY(y), width(width), height(height), hwnd(nullptr), name(title), parentWnd(parent)
 	{
 		Initialize();
 	}
@@ -186,7 +186,7 @@ namespace LCH
 			parentHwnd = parentWnd->hwnd;
 		// 创建窗口
 		hwnd = CreateWindowW(wndClassName.c_str(), name.c_str(), WS_OVERLAPPEDWINDOW,
-			200, 100, rect.right - rect.left, rect.bottom - rect.top,
+			posX, posY, rect.right - rect.left, rect.bottom - rect.top,
 			parentHwnd, nullptr, windowRegister.GetHInstance(), this);
 
 		if (hwnd == nullptr)

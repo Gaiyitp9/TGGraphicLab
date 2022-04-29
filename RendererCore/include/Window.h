@@ -17,7 +17,7 @@ namespace LCH
 	class Window
 	{
 	public:
-		Window(int width, int height, wchar_t const* title = L"TG RenderLab", Window const* parent = nullptr);
+		Window(int x, int y, int width, int height, wchar_t const* title = L"TG RenderLab", Window const* parent = nullptr);
 		Window(const Window&) = delete;
 		Window& operator=(const Window&) = delete;
 		virtual ~Window();
@@ -41,7 +41,8 @@ namespace LCH
 		virtual LRESULT CALLBACK WindowProc(HWND, UINT, WPARAM, LPARAM);	// 消息处理函数，子类可以重写
 
 	private:
-		HWND hwnd; 
+		HWND hwnd;
+		int posX, posY;
 		int width, height;
 		std::wstring name;
 		Window const* parentWnd = nullptr;
