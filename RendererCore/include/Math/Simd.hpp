@@ -140,6 +140,23 @@ namespace LCH::Math
 	{
 		static constexpr size_t Alignment = 32;
 		static constexpr size_t DataCount = 4;
+
+		static void add(double const* lhs, double const* rhs, double* result)
+		{
+			__m256d val = _mm256_add_pd(_mm256_load_pd(lhs), _mm256_load_pd(rhs));
+			_mm256_store_pd(result, val);
+		}
+
+		static void sub(double const* lhs, double const* rhs, double* result)
+		{
+			__m256d val = _mm256_sub_pd(_mm256_load_pd(lhs), _mm256_load_pd(rhs));
+			_mm256_store_pd(result, val);
+		}
+
+		static double dot(double const* lhs, double const* rhs)
+		{
+
+		}
 	};
 
 #else
