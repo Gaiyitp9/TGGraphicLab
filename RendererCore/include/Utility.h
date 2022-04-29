@@ -12,6 +12,7 @@
 #pragma once
 
 #include "SlimWindows.h"
+#include "Diagnostics/MemoryDbg.h"
 #include <locale>
 
 namespace LCH

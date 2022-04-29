@@ -78,6 +78,9 @@
     <ClInclude Include="include\Math\Simd.hpp">
       <Filter>头文件\Math</Filter>
     </ClInclude>
+    <ClInclude Include="include\Diagnostics\MemoryDbg.h">
+      <Filter>头文件\Diagnostics</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Utility.cpp">

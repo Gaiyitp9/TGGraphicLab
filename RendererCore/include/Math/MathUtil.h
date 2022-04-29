@@ -5,6 +5,8 @@
 *****************************************************************/
 #pragma once
 
+#include "Diagnostics/MemoryDbg.h"
+
 namespace LCH::Math
 {
 	// 数学工具类

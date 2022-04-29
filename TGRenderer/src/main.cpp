@@ -32,5 +32,6 @@ int CALLBACK _tWinMain(_In_ HINSTANCE hInstance,
 	{
 		LCH::Debug::Log(L"Unknown Exception");
 	}
+
 	return -1;
 }

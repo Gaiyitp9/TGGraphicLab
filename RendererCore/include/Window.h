@@ -6,8 +6,9 @@
 #pragma once
 
 #include "SlimWindows.h"
-#include "Input/InputSystem.h"
 #include "Diagnostics/Debug.h"
+#include "Diagnostics/MemoryDbg.h"
+#include "Input/InputSystem.h"
 #include <optional>
 
 namespace LCH
@@ -24,7 +25,7 @@ namespace LCH
 		static std::optional<int> ProcessMessage();		// 处理所有窗口的消息
 		void Update();									// 更新窗口
 
-		void SetIcon(int icon);		// 设置窗口的icon
+		void SetIcon(int icon);							// 设置窗口的icon
 
 		const HWND Hwnd() const noexcept;				// 窗口句柄
 		const std::wstring& Name() const noexcept;		// 窗口名称

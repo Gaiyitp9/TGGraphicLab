@@ -6,6 +6,7 @@
 #pragma once
 
 #include "SlimWindows.h"
+#include "Diagnostics/MemoryDbg.h"
 #include <unordered_map>
 
 namespace LCH

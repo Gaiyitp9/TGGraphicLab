@@ -5,6 +5,7 @@
 *****************************************************************/
 
 #include "../resource.h"
+//#include "Diagnostics/MemoryDbg.h"
 #include "Application.h"
 #include "WindowRegister.h"
 #include "Diagnostics/WinAPIException.h"
@@ -13,6 +14,12 @@ namespace LCH
 {
 	Application::Application()
 	{
+		// 开启内存泄漏检测
+		_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
+		// 设置内存泄漏消息输出到控制台
+		_CrtSetReportMode(_CRT_WARN, _CRTDBG_MODE_FILE);
+		_CrtSetReportFile(_CRT_WARN, _CRTDBG_FILE_STDOUT);
+
 		// 为了能在控制台查看日志，需要把控制台的代码页(code page)设置为UTF-8
 		SetConsoleCP(65001);
 		SetConsoleOutputCP(65001);

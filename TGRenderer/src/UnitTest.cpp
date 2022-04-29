@@ -4,20 +4,21 @@
 * This code is licensed under the MIT License (MIT).			*
 *****************************************************************/
 
+#include "SlimWindows.h"
 #include "UnitTest.h"
 #include <iostream>
 #include "Utility.h"
 #include "Math/MathUtil.h"
 #include "Math/Vector.hpp"
 #include "Input/InputEvent.h"
-#include <cstdlib>
+#include "Diagnostics/Debug.h"
 
 namespace LCH
 {
 	void UnitTest::FormatTest()
 	{
 		InputEvent ie{ KeyCode::BackSlash, InputEvent::Type::Press };
-		std::wcout << std::format(L"{:e}", ie) << std::endl;
+		Debug::LogLine(std::format(L"{:e}", ie));
 	}
 
 	void UnitTest::TextEncodeTest()

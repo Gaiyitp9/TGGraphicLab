@@ -4,6 +4,7 @@
 * This code is licensed under the MIT License (MIT).			*
 *****************************************************************/
 
+#include "Diagnostics/MemoryDbg.h"
 #include "Diagnostics/BaseException.h"
 #include "Utility.h"
 #include <format>
@@ -14,18 +15,22 @@ namespace LCH
 	BaseException::BaseException(const std::wstring& description)
 		: description(description)
 	{
+#ifdef _DEBUG
 		// 初始化符号处理器，用于堆栈信息追踪
 		hProcess = GetCurrentProcess();
 		SymInitialize(hProcess, nullptr, true);
 
 		// 记录栈帧信息
 		StackTrace();
+#endif
 	}
 	
 	BaseException::~BaseException()
 	{
+#ifdef _DEBUG
 		// 释放符号处理器资源
 		SymCleanup(hProcess);
+#endif
 	}
 
 	char const* BaseException::what() const
@@ -51,6 +56,7 @@ namespace LCH
 
 	void BaseException::StackTrace()
 	{
+#ifdef _DEBUG
 		void* stackFrames[FRAMESTOCAPTURE];
 		USHORT frameCount = CaptureStackBackTrace(0, FRAMESTOCAPTURE, stackFrames, nullptr);
 
@@ -72,5 +78,6 @@ namespace LCH
 		}
 
 		free(symbol);
+#endif
 	}
 }

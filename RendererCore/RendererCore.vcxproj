@@ -162,6 +162,7 @@
   <ItemGroup>
     <ClInclude Include="include\Diagnostics\BaseException.h" />
     <ClInclude Include="include\Diagnostics\Debug.h" />
+    <ClInclude Include="include\Diagnostics\MemoryDbg.h" />
     <ClInclude Include="include\Diagnostics\WinAPIException.h" />
     <ClInclude Include="include\Input\InputEvent.h" />
     <ClInclude Include="include\Input\InputSystem.h" />

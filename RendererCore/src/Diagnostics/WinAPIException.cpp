@@ -46,13 +46,11 @@ namespace LCH
 
 	void WinAPIException::TranslateHrErrorCode()
 	{
-		wchar_t* msgBuf = nullptr;
+		wchar_t msgBuf[256];
 		DWORD msgLen = FormatMessageW(FORMAT_MESSAGE_FROM_SYSTEM |
-			FORMAT_MESSAGE_ALLOCATE_BUFFER |
 			FORMAT_MESSAGE_IGNORE_INSERTS,
-			nullptr, errorCode, LANG_SYSTEM_DEFAULT, reinterpret_cast<LPWSTR>(&msgBuf), 0, nullptr);
+			nullptr, errorCode, LANG_SYSTEM_DEFAULT, msgBuf, 256, nullptr);
 		errorMsg = msgLen > 0 ? msgBuf : L"Unidentified error code";
-		LocalFree(msgBuf);
 
 		/*
 		注意：FormatMessage中的lpBuffer参数与dwFlags有关。
@@ -68,6 +66,7 @@ namespace LCH
 			FORMAT_MESSAGE_ALLOCATE_BUFFER |
 			FORMAT_MESSAGE_IGNORE_INSERTS,
 			nullptr, errorCode, LANG_SYSTEM_DEFAULT, (wchar_t*)&msgBuf, 0, nullptr);
+		LocalFree(msgBuf);
 		
 		不同之处在于，lpBuffer需要传入指针的地址，这样才能将分配的内存地址赋给lpBuffer，
 		所以要做一个看上去很奇怪的转换：取wchar_t指针的地址，再强转为whar_t指针*/
