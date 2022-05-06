@@ -26,17 +26,17 @@ namespace LCH::Math
 		std::is_same_v<T, double>) && (Size > 1);
 
 	// 根据向量和矩阵的维度选择指令集
-	template<size_t Size, typename Enable = void>
+	template<typename T, size_t Size, typename Enable = void>
 	struct SimdInstruction;
 	// 根据维度定义两种特化
-	template<size_t Size>
-	struct SimdInstruction<Size, std::enable_if_t<(Size >= 16)>> 
+	template<typename T, size_t Size>
+	struct SimdInstruction<T, Size, std::enable_if_t<std::is_same_v<T, double> || (Size >= 16)>>
 	{ 
 		static constexpr InstructionType type = InstructionType::AVX; 
 	};
 
-	template<size_t Size>
-	struct SimdInstruction<Size, std::enable_if_t<(Size < 16)>>
+	template<typename T, size_t Size>
+	struct SimdInstruction<T, Size, std::enable_if_t<!std::is_same_v<T, double> && (Size < 16)>>
 	{ 
 		static constexpr InstructionType type = InstructionType::SSE; 
 	};
@@ -131,6 +131,34 @@ namespace LCH::Math
 			__m128i dot = _mm_mullo_epi32(_mm_load_si128((__m128i*)lhs), _mm_load_si128((__m128i*)rhs));
 			dot = _mm_hadd_epi32(dot, dot);
 			dot = _mm_hadd_epi32(dot, dot);
+			return _mm_cvtsi128_si32(dot);
+		}
+	};
+
+	template<>
+	struct simd_trait<int, InstructionType::AVX>
+	{
+		static constexpr size_t Alignment = 32;
+		static constexpr size_t DataCount = 8;
+
+		static void add(int const* lhs, int const* rhs, int* result)
+		{
+			__m256i val = _mm256_add_epi32(_mm256_load_si256((__m256i*)lhs), _mm256_load_si256((__m256i*)rhs));
+			_mm256_store_si256((__m256i*)result, val);
+		}
+
+		static void sub(int const* lhs, int const* rhs, int* result)
+		{
+			__m256i val = _mm256_sub_epi32(_mm256_load_si256((__m256i*)lhs), _mm256_load_si256((__m256i*)rhs));
+			_mm256_store_si256((__m256i*)result, val);
+		}
+
+		static int dot(int const* lhs, int const* rhs)
+		{
+			__m256i val = _mm256_mullo_epi32(_mm256_load_si256((__m256i*)lhs), _mm256_load_si256((__m256i*)rhs));
+			val = _mm256_hadd_epi32(val, val);
+			val = _mm256_hadd_epi32(val, val);
+			__m128i dot = _mm_add_epi32(_mm256_extractf128_si256(val, 1), _mm256_castsi256_si128(val));
 			return _mm_cvtsi128_si32(dot);
 		}
 	};

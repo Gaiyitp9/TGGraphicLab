@@ -80,7 +80,6 @@ namespace LCH
 	void UnitTest::MathLibTest()
 	{
 		Math::Vector<float, 4> v;
-		Math::Vector<float, 15> v1;
 		std::cout << "Vector<float, 4> value address = " << &v << std::boolalpha << Math::MathUtil::IsAligned(&v, 16) << std::endl;
 		std::cout << v.x() << " " << v.y() << " " << v.z() << " " << v.w() << std::endl;
 		v.x() = 2.3f;
@@ -94,6 +93,25 @@ namespace LCH
 		v[2] = 8.2f;
 		v[3] = 1.2f;
 		std::cout << v[0] << " " << v[1] << " " << v[2] << " " << v[3] << std::endl;
+
+		Math::Vector<float, 15> v1;
+		Math::Vector<float, 15> v2;
+		for (size_t i = 0; i < 8; ++i)
+		{
+			v1[i] = 1;
+			v2[i] = 2;
+		}
+		for (size_t i = 8; i < 15; ++i)
+		{
+			v1[i] = 1.2f;
+			v2[i] = 2.3f;
+		}
+		Math::Vector<float, 15> v3 = v1 + v2;
+		for (size_t i = 0; i < 15; ++i)
+		{
+			std::cout << v3[i] << " ";
+		}
+		std::cout << std::endl;
 	}
 
 	void UnitTest::SIMDTest()
