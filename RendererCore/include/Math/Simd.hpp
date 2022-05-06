@@ -28,7 +28,7 @@ namespace LCH::Math
 	// 根据向量和矩阵的维度选择指令集
 	template<size_t Size, typename Enable = void>
 	struct SimdInstruction;
-	// 根据维度定义两种类特化
+	// 根据维度定义两种特化
 	template<size_t Size>
 	struct SimdInstruction<Size, std::enable_if_t<(Size >= 16)>> 
 	{ 
@@ -155,7 +155,10 @@ namespace LCH::Math
 
 		static double dot(double const* lhs, double const* rhs)
 		{
-
+			__m256d val = _mm256_mul_pd(_mm256_load_pd(lhs), _mm256_load_pd(rhs));
+			val = _mm256_hadd_pd(val, val);
+			__m128d dot = _mm_add_pd(_mm256_extractf128_pd(val, 1), _mm256_castpd256_pd128(val));
+			return _mm_cvtsd_f64(dot);
 		}
 	};
 

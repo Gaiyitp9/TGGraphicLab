@@ -100,16 +100,24 @@ namespace LCH
 	{
 		size_t n = 10000000;
 		int* nums = static_cast<int*>(_aligned_malloc(n * sizeof(int), 32));
+		float* numsf = static_cast<float*>(_aligned_malloc(n * sizeof(float), 32));
 		std::cout << "SIMDTest nums = " << nums << " Is 32-byte Aligned? " << Math::MathUtil::IsAligned(nums, 32) << std::endl;
 
 		for (size_t i = 0; i < n; i++)
+		{
 			nums[i] = 3;
+			numsf[i] = 3;
+		}
 
 		NormalAdd(nums, n);
 		SSEAdd(nums, n);
 		AVX2Add(nums, n);
+		NormalAddf(numsf, n);
+		SSEAddf(numsf, n);
+		AVX2Addf(numsf, n);
 
 		_aligned_free(nums);
+		_aligned_free(numsf);
 	}
 
 	void UnitTest::NormalAdd(int* nums, size_t n)
@@ -124,11 +132,24 @@ namespace LCH
 		std::cout << "NormalAdd: " << timer.DeltaTime() << " ms, result = " << sum << std::endl;
 	}
 
+	void UnitTest::NormalAddf(float* nums, size_t n)
+	{
+		timer.Tick();
+		float sum = 0;
+		for (size_t i = 0; i < n; i++)
+		{
+			sum += nums[i];
+		}
+		timer.Tick();
+		std::cout << "NormalAddf: " << timer.DeltaTime() << " ms, result = " << sum << std::endl;
+	}
+
 	void UnitTest::SSEAdd(int* nums, size_t n)
 	{
 		timer.Tick();
 
 		__m128i simd_sum = _mm_setzero_si128();
+		__m128i simd_load;
 		int normal_sum = 0;
 
 		size_t loop = n / 4;
@@ -137,7 +158,8 @@ namespace LCH
 		__m128i* p = (__m128i*)nums;
 		for (size_t i = 0; i < loop; i++)
 		{
-			simd_sum = _mm_add_epi32(simd_sum, *p);
+			simd_load = _mm_load_si128((__m128i const*)p);
+			simd_sum = _mm_add_epi32(simd_sum, simd_load);
 			p++;
 		}
 
@@ -150,6 +172,36 @@ namespace LCH
 
 		timer.Tick();
 		std::cout << "SSEAdd: " << timer.DeltaTime() << " ms, result = " << normal_sum << std::endl;
+	}
+
+	void UnitTest::SSEAddf(float* nums, size_t n)
+	{
+		timer.Tick();
+
+		__m128 simd_sum = _mm_setzero_ps();
+		__m128 simd_load;
+		float normal_sum = 0;
+
+		size_t loop = n / 4;
+		size_t reserve = n % 4;
+
+		__m128* p = (__m128*)nums;
+		for (size_t i = 0; i < loop; i++)
+		{
+			simd_load = _mm_load_ps((float const*)p);
+			simd_sum = _mm_add_ps(simd_sum, simd_load);
+			p++;
+		}
+
+		float* q = (float*)p;
+		for (size_t i = 0; i < reserve; i++)
+		{
+			normal_sum += q[i];
+		}
+		normal_sum += (((float*)&simd_sum)[0] + ((float*)&simd_sum)[1] + ((float*)&simd_sum)[2] + ((float*)&simd_sum)[3]);
+
+		timer.Tick();
+		std::cout << "SSEAddf: " << timer.DeltaTime() << " ms, result = " << normal_sum << std::endl;
 	}
 
 	void UnitTest::AVX2Add(int* nums, size_t n)
@@ -183,5 +235,38 @@ namespace LCH
 
 		timer.Tick();
 		std::cout << "AVX2Add: " << timer.DeltaTime() << " ms, result = " << normal_sum << std::endl;
+	}
+
+	void UnitTest::AVX2Addf(float* nums, size_t n)
+	{
+		timer.Tick();
+
+		__m256 simd_sum = _mm256_setzero_ps();
+		__m256 simd_load;
+		float normal_sum = 0;
+
+		size_t loop = n / 8;
+		size_t reserve = n % 8;
+
+		__m256* p = (__m256*)nums;
+		for (size_t i = 0; i < loop; i++)
+		{
+			simd_load = _mm256_load_ps((float const*)p);
+			simd_sum = _mm256_add_ps(simd_sum, simd_load);
+			p++;
+		}
+
+		int* q = (int*)p;
+		for (size_t i = 0; i < reserve; i++)
+		{
+			normal_sum += q[i];
+		}
+		normal_sum += (((float*)&simd_sum)[0] + ((float*)&simd_sum)[1] +
+			((float*)&simd_sum)[2] + ((float*)&simd_sum)[3] +
+			((float*)&simd_sum)[4] + ((float*)&simd_sum)[5] +
+			((float*)&simd_sum)[6] + ((float*)&simd_sum)[7]);
+
+		timer.Tick();
+		std::cout << "AVX2Addf: " << timer.DeltaTime() << " ms, result = " << normal_sum << std::endl;
 	}
 }

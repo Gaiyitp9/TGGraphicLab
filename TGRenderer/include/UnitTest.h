@@ -24,8 +24,11 @@ namespace LCH
 
 	private:
 		void NormalAdd(int* nums, size_t n);
+		void NormalAddf(float* nums, size_t n);
 		void SSEAdd(int* nums, size_t n);
+		void SSEAddf(float* nums, size_t n);
 		void AVX2Add(int* nums, size_t n);
+		void AVX2Addf(float* nums, size_t n);
 
 	private:
 		Chronometer timer;
