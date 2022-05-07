@@ -103,6 +103,41 @@ namespace LCH::Math
 		T& z() { return data[2]; }
 		T& w() { return data[3]; }
 
+		T Dot(const Vector& vec)
+		{
+			T dot;
+			if constexpr (support_simd_t)
+				dot = simd::dot(data.data(), vec.data.data());
+			else
+				dot = data[0] * vec.data[0] + data[1] * vec.data[1] + data[2] * vec.data[2] + data[3] * vec.data[3];
+			return dot;
+		}
+
+		T magnitude()
+		{
+			T mag;
+			if constexpr (support_simd_t)
+				mag = static_cast<T>(sqrt(simd::dot(data.data(), data.data())));
+			else
+				mag = static_cast<T>(sqrt(data[0] * data[0] + data[1] * data[1] + data[2] * data[2] + data[3] * data[3]));
+			return mag;
+		}
+
+		Vector operator+(const Vector& vec)
+		{
+			Vector res;
+			if constexpr (support_simd_t)
+				simd::add(data.data(), vec.data.data(), res.data.data());
+			else
+			{
+				for (size_t i = 0; i < 4; ++i)
+				{
+					res.data[i] = data[i] + vec.data[i];
+				}
+			}
+			return res;
+		}
+
 	private:
 		aligned_array<T, 4> data;
 	};

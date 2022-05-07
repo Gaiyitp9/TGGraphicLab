@@ -87,29 +87,34 @@ namespace LCH
 		v.z() = 3.6f;
 		v.w() = 1.0f;
 		std::cout << v.x() << " " << v.y() << " " << v.z() << " " << v.w() << std::endl;
-		std::cout << v[0] << " " << v[1] << " " << v[2] << " " << v[3] << std::endl;
-		v[0] = 2.2f;
-		v[1] = 5.3f;
-		v[2] = 8.2f;
-		v[3] = 1.2f;
-		std::cout << v[0] << " " << v[1] << " " << v[2] << " " << v[3] << std::endl;
+		std::cout << "v magnitude: " << v.magnitude() << std::endl;
 
-		Math::Vector<float, 15> v1;
+		Math::Vector<float, 4> v1;
+		std::cout << v1[0] << " " << v1[1] << " " << v1[2] << " " << v1[3] << std::endl;
+		v1[0] = 2.2f;
+		v1[1] = 5.3f;
+		v1[2] = 8.2f;
+		v1[3] = 1.2f;
+		std::cout << v1[0] << " " << v1[1] << " " << v1[2] << " " << v1[3] << std::endl;
+		std::cout << "v1 magnitude: " << v1.magnitude() << std::endl;
+		std::cout << "v dot v1: " << v.Dot(v1) << std::endl;
+
 		Math::Vector<float, 15> v2;
+		Math::Vector<float, 15> v3;
 		for (size_t i = 0; i < 8; ++i)
 		{
-			v1[i] = 1;
-			v2[i] = 2;
+			v2[i] = 1;
+			v3[i] = 2;
 		}
 		for (size_t i = 8; i < 15; ++i)
 		{
-			v1[i] = 1.2f;
-			v2[i] = 2.3f;
+			v2[i] = 1.2f;
+			v3[i] = 2.3f;
 		}
-		Math::Vector<float, 15> v3 = v1 + v2;
+		Math::Vector<float, 15> v4 = v2 + v3;
 		for (size_t i = 0; i < 15; ++i)
 		{
-			std::cout << v3[i] << " ";
+			std::cout << v4[i] << " ";
 		}
 		std::cout << std::endl;
 	}
