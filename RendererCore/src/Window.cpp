@@ -63,8 +63,10 @@ namespace LCH
 
 			// 鼠标移动
 		case WM_MOUSEMOVE:
-			input.mouse.OnMouseMove(MAKEPOINTS(lParam));
+		{
+			input.mouse.OnMouseMove(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
 			return 0;
+		}
 
 			// 按下鼠标左键
 		case WM_LBUTTONDOWN:

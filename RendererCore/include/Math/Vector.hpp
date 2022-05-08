@@ -16,50 +16,12 @@ namespace LCH::Math
 		static const size_t loop = Size / simd::DataCount;
 		static const size_t remainder = Size % simd::DataCount;
 	public:
-		Vector(T x = {})
-		{
-			data.fill(x);
-		}
+		Vector(T x = {});
 
-		const T& operator[](size_t index) const
-		{
-			return data.at(index);
-		}
+		const T& operator[](size_t index) const;
+		T& operator[](size_t index);
 
-		T& operator[](size_t index)
-		{
-			return data.at(index);
-		}
-
-		Vector operator+(const Vector& vec)
-		{
-			Vector res;
-			if constexpr (support_simd_t)
-			{
-				T const* v1 = data.data();
-				T const* v2 = vec.data.data();
-				T* vr = res.data.data();
-				for (size_t i = 0; i < loop; ++i)
-				{
-					simd::add(v1, v2, vr);
-					v1 += simd::DataCount;
-					v2 += simd::DataCount;
-					vr += simd::DataCount;
-				}
-				for (size_t i = 0; i < remainder; ++i)
-				{
-					vr[i] = v1[i] + v2[i];
-				}
-			}
-			else
-			{
-				for (size_t i = 0; i < Size; ++i)
-				{
-					res.data[i] = data[i] + vec.data[i];
-				}
-			}
-			return res;
-		}
+		Vector operator+(const Vector& vec) const;
 
 	private:
 		aligned_array<T, Size, simd::Alignment> data;
@@ -69,76 +31,79 @@ namespace LCH::Math
 	class Vector<T, 4>
 	{
 		using simd = simd_trait<T, SimdInstruction<T, 4>::type>;
+	public:
+		Vector(T x = {});
+		Vector(T x, T y, T z, T w);
 
 	public:
-		Vector(T x = {})
-		{
-			data.fill(x);
-		}
+		const T& operator[](size_t pos) const;
+		T& operator[](size_t pos);
 
-		Vector(T x, T y, T z, T w)
-		{
-			data[0] = x;
-			data[1] = y;
-			data[2] = z;
-			data[3] = w;
-		}
+		const T& x() const;
+		const T& y() const;
+		const T& z() const;
+		const T& w() const;
+		T& x();
+		T& y();
+		T& z();
+		T& w();
 
-		const T& operator[](size_t pos) const
-		{
-			return data.at(pos);
-		}
+		T magnitude() const;
+		T sqrMagnitude() const;
+		Vector normalized() const;
 
-		T& operator[](size_t pos)
-		{
-			return data.at(pos);
-		}
+	public:
+		T Dot(const Vector& vec) const;
 
-		const T& x() const { return data[0]; }
-		const T& y() const { return data[1]; }
-		const T& z() const { return data[2]; }
-		const T& w() const { return data[3]; }
-		T& x() { return data[0]; }
-		T& y() { return data[1]; }
-		T& z() { return data[2]; }
-		T& w() { return data[3]; }
-
-		T Dot(const Vector& vec)
-		{
-			T dot;
-			if constexpr (support_simd_t)
-				dot = simd::dot(data.data(), vec.data.data());
-			else
-				dot = data[0] * vec.data[0] + data[1] * vec.data[1] + data[2] * vec.data[2] + data[3] * vec.data[3];
-			return dot;
-		}
-
-		T magnitude()
-		{
-			T mag;
-			if constexpr (support_simd_t)
-				mag = static_cast<T>(sqrt(simd::dot(data.data(), data.data())));
-			else
-				mag = static_cast<T>(sqrt(data[0] * data[0] + data[1] * data[1] + data[2] * data[2] + data[3] * data[3]));
-			return mag;
-		}
-
-		Vector operator+(const Vector& vec)
-		{
-			Vector res;
-			if constexpr (support_simd_t)
-				simd::add(data.data(), vec.data.data(), res.data.data());
-			else
-			{
-				for (size_t i = 0; i < 4; ++i)
-				{
-					res.data[i] = data[i] + vec.data[i];
-				}
-			}
-			return res;
-		}
-
+		Vector operator+(const Vector& vec) const;
+		Vector operator-(const Vector& vec) const;
+		Vector operator*(T a) const;
+		Vector operator/(T a) const;
 	private:
-		aligned_array<T, 4> data;
+		aligned_array<T, 4, simd::Alignment> data;
 	};
+
+	template<typename T> requires mathlib_type_and_size<T, 2>
+	class Vector<T, 2>
+	{
+		using simd = simd_trait<T, SimdInstruction<T, 2>::type>;
+	public:
+		Vector(T x = {});
+		Vector(T x, T y);
+
+	public:
+		const T& operator[](size_t pos) const;
+		T& operator[](size_t pos);
+
+		const T& x() const;
+		const T& y() const;
+		T& x();
+		T& y();
+
+		T magnitude() const;
+		T sqrMagnitude() const;
+		Vector normalized() const;
+
+	public:
+		T Dot(const Vector& vec) const;
+
+		Vector operator+(const Vector& vec) const;
+		Vector operator-(const Vector& vec) const;
+		Vector operator*(T a) const;
+		Vector operator/(T a) const;
+	private:
+		aligned_array<T, 2, simd::Alignment> data;
+	};
+
+	using Vector4f = Vector<float, 4>;
+	using Vector4d = Vector<double, 4>;
+	using Vector4i = Vector<int, 4>;
+	using Vector3f = Vector<float, 3>;
+	using Vector3d = Vector<double, 3>;
+	using Vector3i = Vector<int, 3>;
+	using Vector2f = Vector<float, 2>;
+	using Vector2d = Vector<double, 2>;
+	using Vector2i = Vector<int, 2>;
 }
+
+#include "Implementation/Vector.inl"

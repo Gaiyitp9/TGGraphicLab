@@ -79,7 +79,7 @@ namespace LCH
 
 	void UnitTest::MathLibTest()
 	{
-		Math::Vector<float, 4> v;
+		Math::Vector4f v;
 		std::cout << "Vector<float, 4> value address = " << &v << std::boolalpha << Math::MathUtil::IsAligned(&v, 16) << std::endl;
 		std::cout << v.x() << " " << v.y() << " " << v.z() << " " << v.w() << std::endl;
 		v.x() = 2.3f;
@@ -88,8 +88,10 @@ namespace LCH
 		v.w() = 1.0f;
 		std::cout << v.x() << " " << v.y() << " " << v.z() << " " << v.w() << std::endl;
 		std::cout << "v magnitude: " << v.magnitude() << std::endl;
+		Math::Vector4f vn = v.normalized();
+		std::cout << "v normalized: " << vn.x() << " " << vn.y() << " " << vn.z() << " " << vn.w() << std::endl;
 
-		Math::Vector<float, 4> v1;
+		Math::Vector4f v1;
 		std::cout << v1[0] << " " << v1[1] << " " << v1[2] << " " << v1[3] << std::endl;
 		v1[0] = 2.2f;
 		v1[1] = 5.3f;
@@ -98,6 +100,8 @@ namespace LCH
 		std::cout << v1[0] << " " << v1[1] << " " << v1[2] << " " << v1[3] << std::endl;
 		std::cout << "v1 magnitude: " << v1.magnitude() << std::endl;
 		std::cout << "v dot v1: " << v.Dot(v1) << std::endl;
+		Math::Vector4f v1d = 2 * v1;
+		std::cout << v1d[0] << " " << v1d[1] << " " << v1d[2] << " " << v1d[3] << std::endl;
 
 		Math::Vector<float, 15> v2;
 		Math::Vector<float, 15> v3;

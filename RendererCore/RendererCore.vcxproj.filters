@@ -28,6 +28,9 @@
     <Filter Include="源文件\Input">
       <UniqueIdentifier>{41c8a9fc-f68f-4359-9423-a571b428e1b4}</UniqueIdentifier>
     </Filter>
+    <Filter Include="头文件\Math\Implementation">
+      <UniqueIdentifier>{a95b2e43-6103-410f-8751-e9e1d11e8fec}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\SlimWindows.h">
@@ -110,5 +113,10 @@
     <ClCompile Include="src\Input\Mouse.cpp">
       <Filter>源文件\Input</Filter>
     </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="include\Math\Implementation\Vector.inl">
+      <Filter>头文件\Math\Implementation</Filter>
+    </None>
   </ItemGroup>
 </Project>

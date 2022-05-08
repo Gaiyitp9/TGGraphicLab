@@ -5,7 +5,6 @@
 *****************************************************************/
 
 #include "../resource.h"
-//#include "Diagnostics/MemoryDbg.h"
 #include "Application.h"
 #include "WindowRegister.h"
 #include "Diagnostics/WinAPIException.h"
@@ -40,6 +39,12 @@ namespace LCH
 
 	int Application::Run()
 	{
+		std::array<int, 3> a{2, 3, 4};
+		std::array<int, 3> b;
+		b = a;
+		b[0] = 3;
+		std::cout << a[0] << a[1] << a[2] << std::endl << b[0] << b[1] << b[2] << std::endl;
+
 		windows[L"天工渲染器"] = std::make_unique<Window>(200, 100, 800, 600, L"天工渲染器");
 		windows[L"天工渲染器"]->SpyInputEvent(false);
 		windows[L"辅助窗口"] = std::make_unique<Window>((screenWidth - 400) / 2, (screenHeight - 300) / 2, 
@@ -73,21 +78,6 @@ namespace LCH
 					it->second->Update();
 					++it;
 				}
-			}
-
-			if (windows[L"天工渲染器"]->Input().GetKeyDown(KeyCode::S))
-			{
-				windows[L"天工渲染器"]->SetIcon(IDI_ICON1);
-				Debug::LogLine(L"按下S");
-			}
-			else if (windows[L"天工渲染器"]->Input().GetKeyDown(KeyCode::D))
-			{
-				windows[L"天工渲染器"]->SetIcon(IDI_ICON2);
-				Debug::LogLine(L"按下D");
-			}
-			else if (windows[L"天工渲染器"]->Input().GetKey(KeyCode::RightMouseButton))
-			{
-				Debug::LogLine(L"按住鼠标右键");
 			}
 		}
 	}

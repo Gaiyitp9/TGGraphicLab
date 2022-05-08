@@ -48,9 +48,10 @@ namespace LCH
 		}
 	}
 
-	void Mouse::OnMouseMove(const POINTS& position)
+	void Mouse::OnMouseMove(int x, int y)
 	{
-		this->position = position;
+		position.x() = x;
+		position.y() = y;
 		eventBuffer.push(InputEvent{ KeyCode::None, InputEvent::Type::MouseMove });
 		TrimEventBuffer();
 	}
@@ -74,7 +75,7 @@ namespace LCH
 		wheelDelta = delta;
 	}
 
-	const POINTS& Mouse::Position() const noexcept
+	const Vector2i& Mouse::Position() const noexcept
 	{
 		return position;
 	}
@@ -109,7 +110,7 @@ namespace LCH
 		{
 		case InputEvent::Type::MouseMove:
 			Debug::Log(std::format(L"{}\t", e));
-			Debug::LogLine(std::format(L"MouseX: {}\tMouseY: {}", position.x, position.y));
+			Debug::LogLine(std::format(L"MouseX: {}\tMouseY: {}", position.x(), position.y()));
 			break;
 
 		case InputEvent::Type::WheelRoll:

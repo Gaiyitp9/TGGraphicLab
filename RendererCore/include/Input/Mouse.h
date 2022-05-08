@@ -5,13 +5,15 @@
 *****************************************************************/
 #pragma once
 
-#include "../SlimWindows.h"
 #include "InputEvent.h"
+#include "../Math/Vector.hpp"
 #include <queue>
 #include <bitset>
 
 namespace LCH
 {
+	using namespace Math;
+
 	class Mouse
 	{
 	public:
@@ -20,12 +22,12 @@ namespace LCH
 
 		void Update();
 
-		void OnMouseMove(const POINTS& position);
+		void OnMouseMove(int x, int y);
 		void OnButtonPress(KeyCode key);
 		void OnButtonRelease(KeyCode key);
 		void OnWheelRoll(KeyCode key, short delta);
 
-		const POINTS& Position() const noexcept;
+		const Vector2i& Position() const noexcept;
 		short RawWheelDelta() const noexcept;			// 鼠标滚轮变化值是WHEEL_DELTA的整数倍
 		short WheelDelta() const noexcept;				// 两个函数分别取没有除以和除以WHEEL_DELTA后的变化值
 
@@ -43,8 +45,8 @@ namespace LCH
 		bool spyMouse = false;							// 是否监控鼠标
 
 	private:
-		POINTS position{0};								// 鼠标位置
-		short wheelDelta;								// 滚轮变化值，正值表示向前滚动，远离使用者；负值表示向后滚动，朝向使用者
+		Vector2i position;								// 鼠标位置
+		short wheelDelta = 0;							// 滚轮变化值，正值表示向前滚动，远离使用者；负值表示向后滚动，朝向使用者
 
 		std::queue<InputEvent> eventBuffer;				// 输入事件队列
 		static constexpr unsigned int BUFSIZE = 16u;	// 队列最大长度

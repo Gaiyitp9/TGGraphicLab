@@ -189,6 +189,9 @@
     <ClCompile Include="src\Window.cpp" />
     <ClCompile Include="src\WindowRegister.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="include\Math\Implementation\Vector.inl" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
