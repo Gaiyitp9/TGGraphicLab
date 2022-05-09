@@ -6,7 +6,6 @@
 
 #include "../resource.h"
 #include "Application.h"
-#include "WindowRegister.h"
 #include "Diagnostics/WinAPIException.h"
 
 namespace LCH
@@ -39,12 +38,6 @@ namespace LCH
 
 	int Application::Run()
 	{
-		std::array<int, 3> a{2, 3, 4};
-		std::array<int, 3> b;
-		b = a;
-		b[0] = 3;
-		std::cout << a[0] << a[1] << a[2] << std::endl << b[0] << b[1] << b[2] << std::endl;
-
 		windows[L"天工渲染器"] = std::make_unique<Window>(200, 100, 800, 600, L"天工渲染器");
 		windows[L"天工渲染器"]->SpyInputEvent(false);
 		windows[L"辅助窗口"] = std::make_unique<Window>((screenWidth - 400) / 2, (screenHeight - 300) / 2, 
@@ -53,7 +46,7 @@ namespace LCH
 		SetWindowLongPtrW(windows[L"辅助窗口"]->Hwnd(), GWL_STYLE, WS_POPUP | WS_BORDER);
 		windows[L"天工渲染器"]->SetIcon(IDI_ICON1);
 
-		//throw LCH::WinAPIException(E_OUTOFMEMORY);
+		throw LCH::WinAPIException(E_OUTOFMEMORY);
 		unitTest.FormatTest();
 		unitTest.TextEncodeTest();
 		unitTest.TimeTest();

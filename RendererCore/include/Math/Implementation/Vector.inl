@@ -11,19 +11,19 @@ namespace LCH::Math
 	template<typename T, size_t Size> requires mathlib_type_and_size<T, Size>
 	Vector<T, Size>::Vector(T x)
 	{
-		data.fill(x);
+		elements.fill(x);
 	}
 
 	template<typename T, size_t Size> requires mathlib_type_and_size<T, Size>
 	const T& Vector<T, Size>::operator[](size_t index) const
 	{
-		return data.at(index);
+		return elements.at(index);
 	}
 
 	template<typename T, size_t Size> requires mathlib_type_and_size<T, Size>
 	T& Vector<T, Size>::operator[](size_t index)
 	{
-		return data.at(index);
+		return elements.at(index);
 	}
 
 	template<typename T, size_t Size> requires mathlib_type_and_size<T, Size>
@@ -32,9 +32,9 @@ namespace LCH::Math
 		Vector res;
 		if constexpr (support_simd_t)
 		{
-			T const* v1 = data.data();
-			T const* v2 = vec.data.data();
-			T* vr = res.data.data();
+			T const* v1 = elements.data();
+			T const* v2 = vec.elements.data();
+			T* vr = res.elements.data();
 			for (size_t i = 0; i < loop; ++i)
 			{
 				simd::add(v1, v2, vr);
@@ -51,7 +51,7 @@ namespace LCH::Math
 		{
 			for (size_t i = 0; i < Size; ++i)
 			{
-				res.data[i] = data[i] + vec.data[i];
+				res.elements[i] = elements[i] + vec.elements[i];
 			}
 		}
 		return res;
@@ -60,53 +60,53 @@ namespace LCH::Math
 	template<typename T> requires mathlib_type_and_size<T, 4>
 	Vector<T, 4>::Vector(T x)
 	{
-		data.fill(x);
+		elements.fill(x);
 	}
 
 	template<typename T> requires mathlib_type_and_size<T, 4>
 	Vector<T, 4>::Vector(T x, T y, T z, T w)
 	{
-		data[0] = x;
-		data[1] = y;
-		data[2] = z;
-		data[3] = w;
+		elements[0] = x;
+		elements[1] = y;
+		elements[2] = z;
+		elements[3] = w;
 	}
 
 	template<typename T> requires mathlib_type_and_size<T, 4>
 	const T& Vector<T, 4>::operator[](size_t pos) const
 	{
-		return data.at(pos);
+		return elements.at(pos);
 	}
 
 	template<typename T> requires mathlib_type_and_size<T, 4>
 	T& Vector<T, 4>::operator[](size_t pos)
 	{
-		return data.at(pos);
+		return elements.at(pos);
 	}
 
 	template<typename T> requires mathlib_type_and_size<T, 4>
-	const T& Vector<T, 4>::x() const { return data[0]; }
+	const T& Vector<T, 4>::x() const { return elements[0]; }
 
 	template<typename T> requires mathlib_type_and_size<T, 4>
-	const T& Vector<T, 4>::y() const { return data[1]; }
+	const T& Vector<T, 4>::y() const { return elements[1]; }
 
 	template<typename T> requires mathlib_type_and_size<T, 4>
-	const T& Vector<T, 4>::z() const { return data[2]; }
+	const T& Vector<T, 4>::z() const { return elements[2]; }
 
 	template<typename T> requires mathlib_type_and_size<T, 4>
-	const T& Vector<T, 4>::w() const { return data[3]; }
+	const T& Vector<T, 4>::w() const { return elements[3]; }
 
 	template<typename T> requires mathlib_type_and_size<T, 4>
-	T& Vector<T, 4>::x() { return data[0]; }
+	T& Vector<T, 4>::x() { return elements[0]; }
 
 	template<typename T> requires mathlib_type_and_size<T, 4>
-	T& Vector<T, 4>::y() { return data[1]; }
+	T& Vector<T, 4>::y() { return elements[1]; }
 
 	template<typename T> requires mathlib_type_and_size<T, 4>
-	T& Vector<T, 4>::z() { return data[2]; }
+	T& Vector<T, 4>::z() { return elements[2]; }
 
 	template<typename T> requires mathlib_type_and_size<T, 4>
-	T& Vector<T, 4>::w() { return data[3]; }
+	T& Vector<T, 4>::w() { return elements[3]; }
 
 	template<typename T> requires mathlib_type_and_size<T, 4>
 	T Vector<T, 4>::magnitude() const
@@ -131,9 +131,13 @@ namespace LCH::Math
 	{
 		T dot;
 		if constexpr (support_simd_t)
-			dot = simd::dot(data.data(), vec.data.data());
+			dot = simd::dot(elements.data(), vec.elements.data());
 		else
-			dot = data[0] * vec.data[0] + data[1] * vec.data[1] + data[2] * vec.data[2] + data[3] * vec.data[3];
+		{
+			dot = 0;
+			for (size_t i = 0; i < 4; ++i)
+				dot += elements[i] * vec.elements[i];
+		}
 		return dot;
 	}
 
@@ -142,12 +146,12 @@ namespace LCH::Math
 	{
 		Vector res;
 		if constexpr (support_simd_t)
-			simd::add(data.data(), vec.data.data(), res.data.data());
+			simd::add(elements.data(), vec.elements.data(), res.elements.data());
 		else
 		{
 			for (size_t i = 0; i < 4; ++i)
 			{
-				res.data[i] = data[i] + vec.data[i];
+				res.elements[i] = elements[i] + vec.elements[i];
 			}
 		}
 		return res;
@@ -158,12 +162,12 @@ namespace LCH::Math
 	{
 		Vector res;
 		if constexpr (support_simd_t)
-			simd::sub(data.data(), vec.data.data(), res.data.data());
+			simd::sub(elements.data(), vec.elements.data(), res.elements.data());
 		else
 		{
 			for (size_t i = 0; i < 4; ++i)
 			{
-				res.data[i] = data[i] - vec.data[i];
+				res.elements[i] = elements[i] - vec.elements[i];
 			}
 		}
 		return res;
@@ -173,7 +177,7 @@ namespace LCH::Math
 	Vector<T, 4> Vector<T, 4>::operator*(T a) const
 	{
 		Vector res(a);
-		simd::elementwise_product(data.data(), res.data.data(), res.data.data());
+		simd::elementwise_product(elements.data(), res.elements.data(), res.elements.data());
 		return res;
 	}
 
@@ -181,7 +185,7 @@ namespace LCH::Math
 	Vector<T, 4> Vector<T, 4>::operator/(T a) const
 	{
 		Vector res(a);
-		simd::elementwise_div(data.data(), res.data.data(), res.data.data());
+		simd::elementwise_div(elements.data(), res.elements.data(), res.elements.data());
 		return res;
 	}
 
@@ -192,42 +196,146 @@ namespace LCH::Math
 		return v * static_cast<T>(a);
 	}
 
+	template<typename T> requires mathlib_type_and_size<T, 3>
+	Vector<T, 3>::Vector(T x)
+	{
+		elements.fill(x);
+	}
+
+	template<typename T> requires mathlib_type_and_size<T, 3>
+	Vector<T, 3>::Vector(T x, T y, T z)
+	{
+		elements[0] = x;
+		elements[1] = y;
+		elements[2] = z;
+	}
+
+	template<typename T> requires mathlib_type_and_size<T, 3>
+	const T& Vector<T, 3>::operator[](size_t index) const
+	{
+		return elements.at(index);
+	}
+
+	template<typename T> requires mathlib_type_and_size<T, 3>
+	T& Vector<T, 3>::operator[](size_t index)
+	{
+		return elements.at(index);
+	}
+
+	template<typename T> requires mathlib_type_and_size<T, 3>
+	const T& Vector<T, 3>::x() const { return elements[0]; }
+
+	template<typename T> requires mathlib_type_and_size<T, 3>
+	const T& Vector<T, 3>::y() const { return elements[1]; }
+
+	template<typename T> requires mathlib_type_and_size<T, 3>
+	const T& Vector<T, 3>::z() const { return elements[2]; }
+
+	template<typename T> requires mathlib_type_and_size<T, 3>
+	T& Vector<T, 3>::x() { return elements[0]; }
+
+	template<typename T> requires mathlib_type_and_size<T, 3>
+	T& Vector<T, 3>::y() { return elements[1]; }
+
+	template<typename T> requires mathlib_type_and_size<T, 3>
+	T& Vector<T, 3>::z() { return elements[2]; }
+
+	template<typename T> requires mathlib_type_and_size<T, 3>
+	T Vector<T, 3>::magnitude() const
+	{
+		return sqrt(Dot(*this));
+	}
+
+	template<typename T> requires mathlib_type_and_size<T, 3>
+	T Vector<T, 3>::sqrMagnitude() const
+	{
+		return Dot(*this);
+	}
+
+	template<typename T> requires mathlib_type_and_size<T, 3>
+	Vector<T, 3> Vector<T, 3>::normalized() const
+	{
+		return *this / magnitude();
+	}
+
+	template<typename T> requires mathlib_type_and_size<T, 3>
+	T Vector<T, 3>::Dot(const Vector& vec) const
+	{
+		return elements[0] * vec.elements[0] + elements[1] * vec.elements[1] + elements[2] * vec.elements[2];
+	}
+
+	template<typename T> requires mathlib_type_and_size<T, 3>
+	Vector<T, 3> Vector<T, 3>::operator+(const Vector& vec) const
+	{
+		Vector res;
+		for (size_t i = 0; i < 3; ++i)
+			res.elements[i] = elements[i] + vec.elements[i];
+		return res;
+	}
+
+	template<typename T> requires mathlib_type_and_size<T, 3>
+	Vector<T, 3> Vector<T, 3>::operator-(const Vector& vec) const
+	{
+		Vector res;
+		for (size_t i = 0; i < 3; ++i)
+			res.elements[i] = elements[i] - vec.elements[i];
+		return res;
+	}
+
+	template<typename T> requires mathlib_type_and_size<T, 3>
+	Vector<T, 3> Vector<T, 3>::operator*(T a) const
+	{
+		Vector res;
+		for (size_t i = 0; i < 3; ++i)
+			res.elements[i] = elements[i] * a;
+		return res;
+	}
+
+	template<typename T> requires mathlib_type_and_size<T, 3>
+	Vector<T, 3> Vector<T, 3>::operator/(T a) const
+	{
+		Vector res;
+		for (size_t i = 0; i < 3; ++i)
+			res.elements[i] = elements[i] / a;
+		return res;
+	}
+
 	template<typename T> requires mathlib_type_and_size<T, 2>
 	Vector<T, 2>::Vector(T x)
 	{
-		data.fill(x);
+		elements.fill(x);
 	}
 
 	template<typename T> requires mathlib_type_and_size<T, 2>
 	Vector<T, 2>::Vector(T x, T y)
 	{
-		data[0] = x;
-		data[1] = y;
+		elements[0] = x;
+		elements[1] = y;
 	}
 
 	template<typename T> requires mathlib_type_and_size<T, 2>
 	const T& Vector<T, 2>::operator[](size_t pos) const
 	{
-		return data.at(pos);
+		return elements.at(pos);
 	}
 
 	template<typename T> requires mathlib_type_and_size<T, 2>
 	T& Vector<T, 2>::operator[](size_t pos)
 	{
-		return data.at(pos);
+		return elements.at(pos);
 	}
 
 	template<typename T> requires mathlib_type_and_size<T, 2>
-	const T& Vector<T, 2>::x() const { return data[0]; }
+	const T& Vector<T, 2>::x() const { return elements[0]; }
 
 	template<typename T> requires mathlib_type_and_size<T, 2>
-	const T& Vector<T, 2>::y() const { return data[1]; }
+	const T& Vector<T, 2>::y() const { return elements[1]; }
 
 	template<typename T> requires mathlib_type_and_size<T, 2>
-	T& Vector<T, 2>::x() { return data[0]; }
+	T& Vector<T, 2>::x() { return elements[0]; }
 
 	template<typename T> requires mathlib_type_and_size<T, 2>
-	T& Vector<T, 2>::y() { return data[1]; }
+	T& Vector<T, 2>::y() { return elements[1]; }
 
 	template<typename T> requires mathlib_type_and_size<T, 2>
 	T Vector<T, 2>::magnitude() const
@@ -250,15 +358,15 @@ namespace LCH::Math
 	template<typename T> requires mathlib_type_and_size<T, 2>
 	T Vector<T, 2>::Dot(const Vector& vec) const
 	{
-		return data[0] * vec.data[0] + data[1] * vec.data[1];
+		return elements[0] * vec.elements[0] + elements[1] * vec.elements[1];
 	}
 
 	template<typename T> requires mathlib_type_and_size<T, 2>
 	Vector<T, 2> Vector<T, 2>::operator+(const Vector& vec) const
 	{
 		Vector res;
-		res.data[0] = data[0] + vec.data[0];
-		res.data[1] = data[1] + vec.data[1];
+		for (size_t i = 0; i < 2; ++i)
+			res.elements[i] = elements[i] + vec.elements[i];
 		return res;
 	}
 
@@ -266,8 +374,8 @@ namespace LCH::Math
 	Vector<T, 2> Vector<T, 2>::operator-(const Vector& vec) const
 	{
 		Vector res;
-		res.data[0] = data[0] - vec.data[0];
-		res.data[1] = data[1] - vec.data[1];
+		res.elements[0] = elements[0] - vec.elements[0];
+		res.elements[1] = elements[1] - vec.elements[1];
 		return res;
 	}
 
@@ -275,8 +383,8 @@ namespace LCH::Math
 	Vector<T, 2> Vector<T, 2>::operator*(T a) const
 	{
 		Vector res;
-		res.data[0] = data[0] * a;
-		res.data[1] = data[1] * a;
+		res.elements[0] = elements[0] * a;
+		res.elements[1] = elements[1] * a;
 		return res;
 	}
 
@@ -284,8 +392,8 @@ namespace LCH::Math
 	Vector<T, 2> Vector<T, 2>::operator/(T a) const
 	{
 		Vector res;
-		res.data[0] = data[0] / a;
-		res.data[1] = data[1] / a;
+		res.elements[0] = elements[0] / a;
+		res.elements[1] = elements[1] / a;
 		return res;
 	}
 }

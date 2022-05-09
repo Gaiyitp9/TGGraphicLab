@@ -24,7 +24,7 @@ namespace LCH::Math
 		Vector operator+(const Vector& vec) const;
 
 	private:
-		aligned_array<T, Size, simd::Alignment> data;
+		aligned_array<T, Size, simd::Alignment> elements;
 	};
 
 	template<typename T> requires mathlib_type_and_size<T, 4>
@@ -59,14 +59,48 @@ namespace LCH::Math
 		Vector operator-(const Vector& vec) const;
 		Vector operator*(T a) const;
 		Vector operator/(T a) const;
+
 	private:
-		aligned_array<T, 4, simd::Alignment> data;
+		aligned_array<T, 4, simd::Alignment> elements;
+	};
+
+	template<typename T> requires mathlib_type_and_size<T, 3>
+	class Vector<T, 3>
+	{
+	public:
+		Vector(T x = {});
+		Vector(T x, T y, T z);
+
+	public:
+		const T& operator[](size_t pos) const;
+		T& operator[](size_t pos);
+
+		const T& x() const;
+		const T& y() const;
+		const T& z() const;
+		T& x();
+		T& y();
+		T& z();
+
+		T magnitude() const;
+		T sqrMagnitude() const;
+		Vector normalized() const;
+
+	public:
+		T Dot(const Vector& vec) const;
+
+		Vector operator+(const Vector& vec) const;
+		Vector operator-(const Vector& vec) const;
+		Vector operator*(T a) const;
+		Vector operator/(T a) const;
+
+	private:
+		std::array<T, 3> elements;
 	};
 
 	template<typename T> requires mathlib_type_and_size<T, 2>
 	class Vector<T, 2>
 	{
-		using simd = simd_trait<T, SimdInstruction<T, 2>::type>;
 	public:
 		Vector(T x = {});
 		Vector(T x, T y);
@@ -91,8 +125,9 @@ namespace LCH::Math
 		Vector operator-(const Vector& vec) const;
 		Vector operator*(T a) const;
 		Vector operator/(T a) const;
+
 	private:
-		aligned_array<T, 2, simd::Alignment> data;
+		std::array<T, 2> elements;
 	};
 
 	using Vector4f = Vector<float, 4>;

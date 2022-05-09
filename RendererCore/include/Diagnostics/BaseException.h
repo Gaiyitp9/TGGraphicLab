@@ -6,7 +6,6 @@
 #pragma once
 
 #include "../SlimWindows.h"
-#include "Diagnostics/MemoryDbg.h"
 #include <exception>
 #include <string>
 #include <vector>

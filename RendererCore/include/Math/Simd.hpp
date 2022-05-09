@@ -5,7 +5,6 @@
 *****************************************************************/
 #pragma once
 
-#include "Diagnostics/MemoryDbg.h"
 #include <array>
 #include <type_traits>
 
