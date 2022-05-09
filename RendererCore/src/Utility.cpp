@@ -4,7 +4,7 @@
 * This code is licensed under the MIT License (MIT).			*
 *****************************************************************/
 
-#include "Diagnostics/MemoryDbg.h"		// 必须放在文件头部，保证malloc使用的是debug版本
+#include "Diagnostics/MemoryDbg.h"		// 蹇呴』鏀惧湪鏂囦欢澶撮儴锛屼繚璇乵alloc浣跨敤鐨勬槸debug鐗堟湰
 #include "Utility.h"
 
 namespace LCH

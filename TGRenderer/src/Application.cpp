@@ -46,7 +46,7 @@ namespace LCH
 		SetWindowLongPtrW(windows[L"辅助窗口"]->Hwnd(), GWL_STYLE, WS_POPUP | WS_BORDER);
 		windows[L"天工渲染器"]->SetIcon(IDI_ICON1);
 
-		throw LCH::WinAPIException(E_OUTOFMEMORY);
+		//throw LCH::WinAPIException(E_OUTOFMEMORY);
 		unitTest.FormatTest();
 		unitTest.TextEncodeTest();
 		unitTest.TimeTest();
