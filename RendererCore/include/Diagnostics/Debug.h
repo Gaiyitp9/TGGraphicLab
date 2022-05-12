@@ -7,6 +7,7 @@
 
 #include "WinAPIException.h"
 #include <iostream>
+#include <format>
 
 #ifdef ThrowIfFailed
 #undef ThrowIfFailed

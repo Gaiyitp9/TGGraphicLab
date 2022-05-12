@@ -18,7 +18,7 @@ namespace LCH
 	void UnitTest::FormatTest()
 	{
 		InputEvent ie{ KeyCode::BackSlash, InputEvent::Type::Press };
-		Debug::LogLine(std::format(L"{:e}", ie));
+		std::wcout << std::format(L"{:k}", ie) << std::endl;
 	}
 
 	void UnitTest::TextEncodeTest()
