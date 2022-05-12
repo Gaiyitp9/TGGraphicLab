@@ -63,7 +63,7 @@ struct std::formatter<LCH::InputEvent, CharT>
 	}
 
 	template<typename FormatContext>
-	auto format(const LCH::InputEvent& e, FormatContext& ctx)
+	auto format(const LCH::InputEvent& e, FormatContext& ctx) const
 	{
 		switch (outputType)
 		{
