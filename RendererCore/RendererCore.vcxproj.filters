@@ -31,6 +31,12 @@
     <Filter Include="头文件\Math\Implementation">
       <UniqueIdentifier>{a95b2e43-6103-410f-8751-e9e1d11e8fec}</UniqueIdentifier>
     </Filter>
+    <Filter Include="头文件\Graphics">
+      <UniqueIdentifier>{73aef975-c482-436f-b4e7-29f5ff86b9bb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\Graphics">
+      <UniqueIdentifier>{d18f7b1c-bc48-4cc5-93fa-da5c5598a96b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\SlimWindows.h">
@@ -84,6 +90,12 @@
     <ClInclude Include="include\Diagnostics\MemoryDbg.h">
       <Filter>头文件\Diagnostics</Filter>
     </ClInclude>
+    <ClInclude Include="include\Graphics\Graphics.h">
+      <Filter>头文件\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Graphics\D3D11Layer.h">
+      <Filter>头文件\Graphics</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Utility.cpp">
@@ -115,6 +127,9 @@
     </ClCompile>
     <ClCompile Include="src\Input\InputEvent.cpp">
       <Filter>源文件\Input</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Graphics\D3D11Layer.cpp">
+      <Filter>源文件\Graphics</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

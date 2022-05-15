@@ -161,6 +161,16 @@ namespace LCH
 		return input;
 	}
 
+	int Window::Width() const noexcept
+	{
+		return width;
+	}
+
+	int Window::Height() const noexcept
+	{
+		return height;
+	}
+
 	void Window::SpyMessage(bool enable) noexcept
 	{
 		spyMessage = enable;

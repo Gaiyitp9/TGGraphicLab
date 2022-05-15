@@ -54,6 +54,8 @@ namespace LCH
 		unitTest.ArrayAlignmentTest();
 		unitTest.SIMDTest();
 
+		LCH::Graphics::D3D11Layer d3d11Layer(*windows[L"天工渲染器"]);
+
 		while (true)
 		{
 			if (const auto code = LCH::Window::ProcessMessage())
@@ -72,6 +74,8 @@ namespace LCH
 					++it;
 				}
 			}
+
+			d3d11Layer.EndFrame();
 		}
 	}
 }

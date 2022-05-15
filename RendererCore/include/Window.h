@@ -30,6 +30,8 @@ namespace LCH
 		const std::wstring& Name() const noexcept;		// 窗口名称
 		Window const* ParentWindow() const noexcept;	// 返回父母窗口
 		const InputSystem& Input() const noexcept;		// 获取输入系统
+		int Width() const noexcept;					// 获取窗口宽和高
+		int Height() const noexcept;
 
 		bool Destroy() const noexcept;					// 是否销毁窗口
 		void SpyMessage(bool enable) noexcept;			// 捕捉窗口消息
