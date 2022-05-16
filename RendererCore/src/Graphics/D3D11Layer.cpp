@@ -61,7 +61,7 @@ namespace LCH::Graphics
 				Debug::LogLine(std::format(L"Device name: {}", outputDesc.DeviceName));
 
 				UINT modeCount = 0;
-				pOutput1->GetDisplayModeList1(DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_ENUM_MODES_SCALING,
+				pOutput1->GetDisplayModeList1(backBufferFormat, DXGI_ENUM_MODES_SCALING,
 					&modeCount, nullptr);
 				if (modeCount > 0)
 				{
@@ -76,7 +76,7 @@ namespace LCH::Graphics
 							outputModeDesc[k].RefreshRate.Denominator,
 							outputModeDesc[k].RefreshRate.Numerator));
 					}
-					refreshRate = outputModeDesc->RefreshRate;
+					refreshRate = outputModeDesc[0].RefreshRate;
 					delete[] outputModeDesc;
 				}
 			}
@@ -117,5 +117,19 @@ namespace LCH::Graphics
 		swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
 
 		ThrowIfFailed(pFactory->CreateSwapChain(pDevice.Get(), &swapChainDesc, &pSwapChain));
+
+		ComPtr<ID3D11Resource> pBackBuffer;
+		pSwapChain->GetBuffer(0, IID_PPV_ARGS(&pBackBuffer));
+		pDevice->CreateRenderTargetView(
+			pBackBuffer.Get(),
+			nullptr,
+			&pRenderTargetView
+		);
+	}
+
+	void D3D11Layer::ClearRenderTarget(float red, float green, float blue)
+	{
+		const float color[] = { red, green, blue, 1.0f };
+		pContext->ClearRenderTargetView(pRenderTargetView.Get(), color);
 	}
 }

@@ -43,7 +43,9 @@ namespace LCH
 		windows[L"辅助窗口"] = std::make_unique<Window>((screenWidth - 400) / 2, (screenHeight - 300) / 2, 
 			400, 300, L"辅助窗口", windows[L"天工渲染器"].get());
 		windows[L"辅助窗口"]->SpyMessage(false);
-		SetWindowLongPtrW(windows[L"辅助窗口"]->Hwnd(), GWL_STYLE, WS_POPUP | WS_BORDER);
+		// 调用了SetWindowLongPtrW之后需要调用ShowWindow来激活窗口
+		SetWindowLongPtrW(windows[L"辅助窗口"]->Hwnd(), GWL_STYLE, WS_POPUP);
+		ShowWindow(windows[L"辅助窗口"]->Hwnd(), SW_SHOW);
 		windows[L"天工渲染器"]->SetIcon(IDI_ICON1);
 
 		//throw LCH::WinAPIException(E_OUTOFMEMORY);
@@ -55,6 +57,7 @@ namespace LCH
 		unitTest.SIMDTest();
 
 		LCH::Graphics::D3D11Layer d3d11Layer(*windows[L"天工渲染器"]);
+		LCH::Graphics::D3D11Layer d3d11Layer2(*windows[L"辅助窗口"]);
 
 		while (true)
 		{
@@ -75,7 +78,11 @@ namespace LCH
 				}
 			}
 
+			const float c = sin(timer.TotalTime() * 0.001f) / 2.0f + 0.5f;
+			d3d11Layer.ClearRenderTarget(c, c * 0.5f, 1.0f);
 			d3d11Layer.EndFrame();
+			d3d11Layer2.ClearRenderTarget(c, c, 1.0f);
+			d3d11Layer2.EndFrame();
 		}
 	}
 }

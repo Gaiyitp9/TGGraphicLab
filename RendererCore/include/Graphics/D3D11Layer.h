@@ -25,6 +25,7 @@ namespace LCH::Graphics
 
 		void Initialize() override;
 
+		void ClearRenderTarget(float red, float green, float blue);
 		void EndFrame();
 
 	private:
@@ -36,7 +37,7 @@ namespace LCH::Graphics
 		ComPtr<IDXGISwapChain> pSwapChain;
 		ComPtr<ID3D11DeviceContext> pContext;
 		ComPtr<IDXGIFactory1> pFactory;
-
+		ComPtr<ID3D11RenderTargetView> pRenderTargetView;
 
 	private:
 		const Window& window;
