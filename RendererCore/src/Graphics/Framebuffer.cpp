@@ -3,16 +3,13 @@
 * Copyright (c) Gaiyitp9. All rights reserved.					*
 * This code is licensed under the MIT License (MIT).			*
 *****************************************************************/
-#pragma once
-
-#include "../Window.h"
+#include "Graphics/Framebuffer.h"
 
 namespace LCH::Graphics
 {
-	class IGraphics
+	void Framebuffer::ClearRenderTarget(float red, float green, float blue)
 	{
-	public:
-		//virtual void Device() = 0;
-		//virtual void Context() = 0;
-	};
+		const float color[] = { red, green, blue, 1.0f };
+		//pContext->ClearRenderTargetView(pRenderTargetView.Get(), color);
+	}
 }

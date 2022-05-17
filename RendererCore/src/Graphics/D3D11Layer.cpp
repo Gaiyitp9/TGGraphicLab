@@ -23,11 +23,6 @@ namespace LCH::Graphics
 
 	}
 
-	void D3D11Layer::Initialize()
-	{
-
-	}
-
 	void D3D11Layer::EndFrame()
 	{
 		pSwapChain->Present(1u, 0u);

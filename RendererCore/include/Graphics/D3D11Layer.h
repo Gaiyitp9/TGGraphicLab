@@ -23,8 +23,6 @@ namespace LCH::Graphics
 		D3D11Layer& operator=(const D3D11Layer&) = delete;
 		~D3D11Layer();
 
-		void Initialize() override;
-
 		void ClearRenderTarget(float red, float green, float blue);
 		void EndFrame();
 
@@ -34,10 +32,10 @@ namespace LCH::Graphics
 
 	private:
 		ComPtr<ID3D11Device> pDevice;
-		ComPtr<IDXGISwapChain> pSwapChain;
 		ComPtr<ID3D11DeviceContext> pContext;
 		ComPtr<IDXGIFactory1> pFactory;
 		ComPtr<ID3D11RenderTargetView> pRenderTargetView;
+		ComPtr<IDXGISwapChain> pSwapChain;
 
 	private:
 		const Window& window;
