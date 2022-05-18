@@ -7,9 +7,14 @@
 
 namespace LCH::Graphics
 {
-	void Framebuffer::ClearRenderTarget(float red, float green, float blue)
+	Framebuffer::Framebuffer(const Window& window)
+		: window(window)
 	{
-		const float color[] = { red, green, blue, 1.0f };
-		//pContext->ClearRenderTargetView(pRenderTargetView.Get(), color);
+
+	}
+
+	Framebuffer::~Framebuffer()
+	{
+
 	}
 }

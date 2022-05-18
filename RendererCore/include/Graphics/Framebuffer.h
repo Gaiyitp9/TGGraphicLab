@@ -18,11 +18,11 @@ namespace LCH::Graphics
 		Framebuffer(const Window&);
 		~Framebuffer();
 
-		void ClearRenderTarget(float red, float green, float blue);
-
 	private:
+		const Window& window;		// 帧缓存绑定的窗口
 		ComPtr<IDXGISwapChain> pSwapChain;
 		ComPtr<ID3D11RenderTargetView> pRenderTargetView;
+
 		DXGI_FORMAT backBufferFormat = DXGI_FORMAT_R8G8B8A8_UNORM;
 		DXGI_RATIONAL refreshRate;
 		UINT sampleCount = 4;
