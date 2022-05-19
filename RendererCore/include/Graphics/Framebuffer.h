@@ -12,14 +12,13 @@ using Microsoft::WRL::ComPtr;
 
 namespace LCH::Graphics
 {
-	class Framebuffer
+	class FrameBuffer
 	{
 	public:
-		Framebuffer(const Window&);
-		~Framebuffer();
+		FrameBuffer(const Window&);
+		~FrameBuffer();
 
 	private:
-		const Window& window;		// 帧缓存绑定的窗口
 		ComPtr<IDXGISwapChain> pSwapChain;
 		ComPtr<ID3D11RenderTargetView> pRenderTargetView;
 

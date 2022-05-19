@@ -8,6 +8,7 @@
 #include "Graphics.h"
 #include <d3d11_4.h>
 #include <wrl/client.h>
+#include "Framebuffer.h"
 using Microsoft::WRL::ComPtr;
 
 #pragma comment(lib, "dxgi.lib")
@@ -41,6 +42,7 @@ namespace LCH::Graphics
 		const Window& window;
 		std::vector<ComPtr<IDXGIAdapter1>> adapters;
 		std::vector<std::vector<ComPtr<IDXGIOutput>>> adapterOutputs;
+		std::vector<FrameBuffer> frameBuffers;
 		DXGI_FORMAT backBufferFormat = DXGI_FORMAT_R8G8B8A8_UNORM;
 		DXGI_RATIONAL refreshRate;
 		UINT sampleCount = 4;
