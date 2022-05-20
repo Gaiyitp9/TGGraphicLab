@@ -56,8 +56,8 @@ namespace LCH
 		unitTest.ArrayAlignmentTest();
 		unitTest.SIMDTest();
 
-		LCH::Graphics::D3D11Layer d3d11Layer(*windows[L"天工渲染器"]);
-		LCH::Graphics::D3D11Layer d3d11Layer2(*windows[L"辅助窗口"]);
+		Graphics::GraphicsLayer<Graphics::LowLevelAPI::DirectX11> d3d11Layer(*windows[L"天工渲染器"]);
+		Graphics::GraphicsLayer<Graphics::LowLevelAPI::DirectX11> d3d11Layer2(*windows[L"辅助窗口"]);
 
 		while (true)
 		{

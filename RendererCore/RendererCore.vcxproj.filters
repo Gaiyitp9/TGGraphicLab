@@ -90,13 +90,13 @@
     <ClInclude Include="include\Diagnostics\MemoryDbg.h">
       <Filter>头文件\Diagnostics</Filter>
     </ClInclude>
-    <ClInclude Include="include\Graphics\Graphics.h">
+    <ClInclude Include="include\Graphics\Graphics.hpp">
       <Filter>头文件\Graphics</Filter>
     </ClInclude>
-    <ClInclude Include="include\Graphics\D3D11Layer.h">
+    <ClInclude Include="include\Graphics\D3D11Details.hpp">
       <Filter>头文件\Graphics</Filter>
     </ClInclude>
-    <ClInclude Include="include\Graphics\FrameBuffer.h">
+    <ClInclude Include="include\Graphics\GraphicsLayer.hpp">
       <Filter>头文件\Graphics</Filter>
     </ClInclude>
   </ItemGroup>
@@ -132,9 +132,6 @@
       <Filter>源文件\Input</Filter>
     </ClCompile>
     <ClCompile Include="src\Graphics\D3D11Layer.cpp">
-      <Filter>源文件\Graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Graphics\FrameBuffer.cpp">
       <Filter>源文件\Graphics</Filter>
     </ClCompile>
   </ItemGroup>

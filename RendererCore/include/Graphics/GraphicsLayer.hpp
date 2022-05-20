@@ -5,23 +5,19 @@
 *****************************************************************/
 #pragma once
 
-#include "../Window.h"
+#include "Graphics.hpp"
 
 namespace LCH::Graphics
 {
-	enum class GraphicAPI
-	{
-		DirectX11,
-		DirectX12,
-		OpenGL,
-		Vulcan,
-	};
-
-	template <GraphicAPI API>
-	class IGraphics
+	template <LowLevelAPI API = LowLevelAPI::DirectX11>
+	class GraphicsLayer
 	{
 	public:
-		//virtual void Device() = 0;
-		//virtual void Context() = 0;
+		GraphicsLayer();
+
+	public:
+		Device<API> device;
+		Context<API> context;
+		FrameBuffer<API> frameBuffer;
 	};
 }

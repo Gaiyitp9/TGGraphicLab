@@ -5,12 +5,12 @@
 *****************************************************************/
 
 #include "Diagnostics/MemoryDbg.h"
-#include "Graphics/D3D11Layer.h"
 #include "Diagnostics/Debug.h"
+#include "Graphics/D3D11Details.hpp"
 
 namespace LCH::Graphics
 {
-	D3D11Layer::D3D11Layer(const Window& window)
+	GraphicsLayer<LowLevelAPI::DirectX11>::GraphicsLayer(const Window& window)
 		: window(window)
 	{
 		ThrowIfFailed(CreateDXGIFactory1(IID_PPV_ARGS(&pFactory)));
@@ -18,22 +18,22 @@ namespace LCH::Graphics
 		CreateDeviceAndSwapChain();
 	}
 
-	D3D11Layer::~D3D11Layer()
+	GraphicsLayer<LowLevelAPI::DirectX11>::~GraphicsLayer()
 	{
 
 	}
 
-	void D3D11Layer::EndFrame()
+	void GraphicsLayer<LowLevelAPI::DirectX11>::EndFrame()
 	{
 		pSwapChain->Present(1u, 0u);
 	}
 
-	void D3D11Layer::CreateFrameBuffer()
+	void GraphicsLayer<LowLevelAPI::DirectX11>::CreateFrameBuffer()
 	{
 
 	}
 
-	void D3D11Layer::EnumerateAdapters()
+	void GraphicsLayer<LowLevelAPI::DirectX11>::EnumerateAdapters()
 	{
 		ComPtr<IDXGIAdapter1> pAdapter;
 		for (UINT i = 0; pFactory->EnumAdapters1(i, &pAdapter) != DXGI_ERROR_NOT_FOUND; ++i)
@@ -83,7 +83,7 @@ namespace LCH::Graphics
 		}
 	}
 
-	void D3D11Layer::CreateDeviceAndSwapChain()
+	void GraphicsLayer<LowLevelAPI::DirectX11>::CreateDeviceAndSwapChain()
 	{
 		UINT creationFlags = D3D11_CREATE_DEVICE_BGRA_SUPPORT;
 #if defined(_DEBUG)
@@ -127,7 +127,7 @@ namespace LCH::Graphics
 		);
 	}
 
-	void D3D11Layer::ClearRenderTarget(float red, float green, float blue)
+	void GraphicsLayer<LowLevelAPI::DirectX11>::ClearRenderTarget(float red, float green, float blue)
 	{
 		const float color[] = { red, green, blue, 1.0f };
 		pContext->ClearRenderTargetView(pRenderTargetView.Get(), color);
