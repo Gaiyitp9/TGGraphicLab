@@ -16,7 +16,7 @@ using Microsoft::WRL::ComPtr;
 
 namespace LCH::Graphics
 {
-	class D3D11Layer : public IGraphics
+	class D3D11Layer
 	{
 	public:
 		D3D11Layer(const Window& window);
@@ -26,6 +26,8 @@ namespace LCH::Graphics
 
 		void ClearRenderTarget(float red, float green, float blue);
 		void EndFrame();
+
+		void CreateFrameBuffer();
 
 	private:
 		void EnumerateAdapters();

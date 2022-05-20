@@ -15,12 +15,12 @@ namespace LCH::Graphics
 	class FrameBuffer
 	{
 	public:
-		FrameBuffer(const Window&);
+		FrameBuffer(IDXGIFactory* factory, ID3D11Device* device, Window const*);
 		~FrameBuffer();
 
 	private:
-		ComPtr<IDXGISwapChain> pSwapChain;
-		ComPtr<ID3D11RenderTargetView> pRenderTargetView;
+		ComPtr<IDXGISwapChain> swapChain;
+		ComPtr<ID3D11RenderTargetView> renderTargetView;
 
 		DXGI_FORMAT backBufferFormat = DXGI_FORMAT_R8G8B8A8_UNORM;
 		DXGI_RATIONAL refreshRate;

@@ -9,6 +9,15 @@
 
 namespace LCH::Graphics
 {
+	enum class GraphicAPI
+	{
+		DirectX11,
+		DirectX12,
+		OpenGL,
+		Vulcan,
+	};
+
+	template <GraphicAPI API>
 	class IGraphics
 	{
 	public:

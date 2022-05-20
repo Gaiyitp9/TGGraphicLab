@@ -28,6 +28,11 @@ namespace LCH::Graphics
 		pSwapChain->Present(1u, 0u);
 	}
 
+	void D3D11Layer::CreateFrameBuffer()
+	{
+
+	}
+
 	void D3D11Layer::EnumerateAdapters()
 	{
 		ComPtr<IDXGIAdapter1> pAdapter;
