@@ -96,9 +96,6 @@
     <ClInclude Include="include\Graphics\D3D11Details.hpp">
       <Filter>头文件\Graphics</Filter>
     </ClInclude>
-    <ClInclude Include="include\Graphics\GraphicsLayer.hpp">
-      <Filter>头文件\Graphics</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Utility.cpp">

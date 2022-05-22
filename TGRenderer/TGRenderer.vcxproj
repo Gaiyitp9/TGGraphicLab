@@ -180,6 +180,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Application.h" />
+    <ClInclude Include="include\GraphicsLayer.hpp" />
     <ClInclude Include="include\UnitTest.h" />
     <ClInclude Include="resource.h" />
   </ItemGroup>

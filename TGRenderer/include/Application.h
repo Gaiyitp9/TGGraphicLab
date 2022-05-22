@@ -11,7 +11,7 @@
 #include "UnitTest.h"
 #include <locale>
 #include <unordered_map>
-#include "Graphics/GraphicsLayer.hpp"
+#include "GraphicsLayer.hpp"
 
 namespace LCH
 {

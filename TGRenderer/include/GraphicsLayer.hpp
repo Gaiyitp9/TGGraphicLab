@@ -5,7 +5,7 @@
 *****************************************************************/
 #pragma once
 
-#include "D3D11Details.hpp"
+#include "Graphics/D3D11Details.hpp"
 
 namespace LCH::Graphics
 {
@@ -21,9 +21,9 @@ namespace LCH::Graphics
 
 		void Update()
 		{
-			for (int i = 0; i < frameBuffers.size(); ++i)
+			for (const auto& frameBuffer : frameBuffers)
 			{
-				frameBuffers[i]->Present();
+				frameBuffer.second->Present();
 			}
 		}
 
@@ -37,7 +37,7 @@ namespace LCH::Graphics
 			return false;
 		}
 
-		bool ClearBackground(Window const* window, float red, float green, float blue)
+		void ClearBackground(Window const* window, float red, float green, float blue)
 		{
 			context->ClearFrameBuffer(frameBuffers[window].get(), red, green, blue);
 		}

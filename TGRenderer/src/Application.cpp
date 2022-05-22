@@ -78,6 +78,9 @@ namespace LCH
 				}
 			}
 
+			const float c = sin(timer.TotalTime() * 0.001f) / 2.0f + 0.5f;
+			d3d11Layer.ClearBackground(windows[L"天工渲染器"].get(), c, c * 0.5f, 1.0f);
+			d3d11Layer.ClearBackground(windows[L"辅助窗口"].get(), c, c, 1.0f);
 			d3d11Layer.Update();
 		}
 	}
