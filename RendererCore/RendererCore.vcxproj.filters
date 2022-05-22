@@ -90,10 +90,10 @@
     <ClInclude Include="include\Diagnostics\MemoryDbg.h">
       <Filter>头文件\Diagnostics</Filter>
     </ClInclude>
-    <ClInclude Include="include\Graphics\Graphics.hpp">
+    <ClInclude Include="include\Graphics\D3D11Details.hpp">
       <Filter>头文件\Graphics</Filter>
     </ClInclude>
-    <ClInclude Include="include\Graphics\D3D11Details.hpp">
+    <ClInclude Include="include\Graphics\Graphics.hpp">
       <Filter>头文件\Graphics</Filter>
     </ClInclude>
   </ItemGroup>
