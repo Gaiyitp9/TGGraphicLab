@@ -30,13 +30,6 @@ namespace LCH::Graphics
 	template <LowLevelAPI API>
 	class FrameBuffer;
 
-	// 有理数，用来记录刷新率
-	struct Rational
-	{
-		unsigned int numerator;
-		unsigned int denominator;
-	};
-
 	// 缓存格式
 	enum class Format
 	{

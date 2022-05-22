@@ -11,7 +11,7 @@
 #include "UnitTest.h"
 #include <locale>
 #include <unordered_map>
-#include "Graphics/D3D11Details.hpp"
+#include "Graphics/GraphicsLayer.hpp"
 
 namespace LCH
 {
@@ -29,6 +29,7 @@ namespace LCH
 		std::locale locale;		// 语言区域
 		Chronometer timer;		// 高精度计时器
 		std::unordered_map<std::wstring, std::unique_ptr<Window>> windows;	// 所有窗口集合
+		Graphics::GraphicsLayer<Graphics::LowLevelAPI::DirectX11> d3d11Layer;
 
 		int screenWidth;		// 主显示器的宽
 		int screenHeight;		// 主显示器的高

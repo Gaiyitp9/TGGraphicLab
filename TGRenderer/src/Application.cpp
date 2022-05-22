@@ -56,8 +56,8 @@ namespace LCH
 		unitTest.ArrayAlignmentTest();
 		unitTest.SIMDTest();
 
-		Graphics::GraphicsLayer<Graphics::LowLevelAPI::DirectX11> d3d11Layer(*windows[L"天工渲染器"]);
-		Graphics::GraphicsLayer<Graphics::LowLevelAPI::DirectX11> d3d11Layer2(*windows[L"辅助窗口"]);
+		d3d11Layer.CreateFrameBuffer(windows[L"天工渲染器"].get());
+		d3d11Layer.CreateFrameBuffer(windows[L"辅助窗口"].get());
 
 		while (true)
 		{
@@ -78,11 +78,7 @@ namespace LCH
 				}
 			}
 
-			const float c = sin(timer.TotalTime() * 0.001f) / 2.0f + 0.5f;
-			d3d11Layer.ClearRenderTarget(c, c * 0.5f, 1.0f);
-			d3d11Layer.EndFrame();
-			d3d11Layer2.ClearRenderTarget(c, c, 1.0f);
-			d3d11Layer2.EndFrame();
+			d3d11Layer.Update();
 		}
 	}
 }

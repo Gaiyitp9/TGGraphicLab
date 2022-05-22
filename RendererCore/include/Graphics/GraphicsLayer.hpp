@@ -5,19 +5,46 @@
 *****************************************************************/
 #pragma once
 
-#include "Graphics.hpp"
+#include "D3D11Details.hpp"
 
 namespace LCH::Graphics
 {
-	template <LowLevelAPI API = LowLevelAPI::DirectX11>
+	template <LowLevelAPI API>
 	class GraphicsLayer
 	{
 	public:
-		GraphicsLayer();
+		GraphicsLayer()
+		{
+			device = std::make_unique<Device<API>>();
+			context = std::make_unique<Context<API>>(device.get());
+		}
+
+		void Update()
+		{
+			for (int i = 0; i < frameBuffers.size(); ++i)
+			{
+				frameBuffers[i]->Present();
+			}
+		}
+
+		bool CreateFrameBuffer(Window const* window)
+		{
+			if (!frameBuffers.contains(window))
+			{
+				frameBuffers[window] = std::make_unique<FrameBuffer<API>>(device.get(), window);
+				return true;
+			}
+			return false;
+		}
+
+		bool ClearBackground(Window const* window, float red, float green, float blue)
+		{
+			context->ClearFrameBuffer(frameBuffers[window].get(), red, green, blue);
+		}
 
 	public:
-		Device<API> device;
-		Context<API> context;
-		FrameBuffer<API> frameBuffer;
+		std::unique_ptr<Device<API>> device;
+		std::unique_ptr<Context<API>> context;
+		std::unordered_map<Window const*, std::unique_ptr<FrameBuffer<API>>> frameBuffers;
 	};
 }

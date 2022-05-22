@@ -185,7 +185,6 @@
     <ClCompile Include="src\Diagnostics\BaseException.cpp" />
     <ClCompile Include="src\Diagnostics\WinAPIException.cpp" />
     <ClCompile Include="src\Graphics\D3D11Details.cpp" />
-    <ClCompile Include="src\Graphics\D3D11Layer.cpp" />
     <ClCompile Include="src\Input\InputEvent.cpp" />
     <ClCompile Include="src\Input\InputSystem.cpp" />
     <ClCompile Include="src\Input\Keyboard.cpp" />
