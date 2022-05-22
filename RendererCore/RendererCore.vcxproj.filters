@@ -134,6 +134,9 @@
     <ClCompile Include="src\Graphics\D3D11Layer.cpp">
       <Filter>源文件\Graphics</Filter>
     </ClCompile>
+    <ClCompile Include="src\Graphics\D3D11Details.cpp">
+      <Filter>源文件\Graphics</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="include\Math\Implementation\Vector.inl">
