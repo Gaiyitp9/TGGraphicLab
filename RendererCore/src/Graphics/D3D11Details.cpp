@@ -102,10 +102,9 @@ namespace LCH::Graphics
 	}
 
 	void Context<LowLevelAPI::DirectX11>::ClearFrameBuffer(FrameBuffer<LowLevelAPI::DirectX11>* frameBuffer,
-		float red, float green, float blue)
+		const Color& color)
 	{
-		const float color[] = { red, green, blue, 1.0f };
-		d3dContext->ClearRenderTargetView(frameBuffer->renderTargetView.Get(), color);
+		d3dContext->ClearRenderTargetView(frameBuffer->renderTargetView.Get(), color.RGBA());
 	}
 
 	FrameBuffer<LowLevelAPI::DirectX11>::FrameBuffer(Device<LowLevelAPI::DirectX11>* device, Window const* window)

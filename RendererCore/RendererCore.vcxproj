@@ -191,6 +191,7 @@
     <ClCompile Include="src\Input\Keyboard.cpp" />
     <ClCompile Include="src\Input\Mouse.cpp" />
     <ClCompile Include="src\Chronometer.cpp" />
+    <ClCompile Include="src\Math\Color.cpp" />
     <ClCompile Include="src\Utility.cpp" />
     <ClCompile Include="src\Window.cpp" />
     <ClCompile Include="src\WindowRegister.cpp" />

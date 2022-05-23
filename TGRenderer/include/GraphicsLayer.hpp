@@ -37,9 +37,9 @@ namespace LCH::Graphics
 			return false;
 		}
 
-		void ClearBackground(Window const* window, float red, float green, float blue)
+		void ClearBackground(Window const* window, const Color& color)
 		{
-			context->ClearFrameBuffer(frameBuffers[window].get(), red, green, blue);
+			context->ClearFrameBuffer(frameBuffers[window].get(), color);
 		}
 
 	public:

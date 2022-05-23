@@ -47,7 +47,7 @@ namespace LCH::Graphics
 		Context(Device<LowLevelAPI::DirectX11>* device);
 		ID3D11DeviceContext* operator->();
 
-		void ClearFrameBuffer(FrameBuffer<LowLevelAPI::DirectX11>* buffer, float red, float green, float blue);
+		void ClearFrameBuffer(FrameBuffer<LowLevelAPI::DirectX11>* buffer, const Color& color);
 
 	public:
 		ComPtr<ID3D11DeviceContext> d3dContext;

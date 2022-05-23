@@ -37,6 +37,9 @@
     <Filter Include="源文件\Graphics">
       <UniqueIdentifier>{d18f7b1c-bc48-4cc5-93fa-da5c5598a96b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="源文件\Math">
+      <UniqueIdentifier>{9c08db6e-f22b-461f-8db7-b16dd6c6803b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\SlimWindows.h">
@@ -136,6 +139,9 @@
     </ClCompile>
     <ClCompile Include="src\Graphics\D3D11Details.cpp">
       <Filter>源文件\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Math\Color.cpp">
+      <Filter>源文件\Math</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
