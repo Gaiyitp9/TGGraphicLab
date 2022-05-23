@@ -5,7 +5,7 @@
 *****************************************************************/
 #pragma once
 
-#include "Graphics/D3D11Details.hpp"
+#include "Graphics/Graphics.h"
 
 namespace LCH::Graphics
 {

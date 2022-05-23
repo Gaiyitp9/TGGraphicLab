@@ -165,7 +165,8 @@
     <ClInclude Include="include\Diagnostics\MemoryDbg.h" />
     <ClInclude Include="include\Diagnostics\WinAPIException.h" />
     <ClInclude Include="include\Graphics\D3D11Details.hpp" />
-    <ClInclude Include="include\Graphics\Graphics.hpp" />
+    <ClInclude Include="include\Graphics\Graphics.h" />
+    <ClInclude Include="include\Graphics\GraphicsBase.hpp" />
     <ClInclude Include="include\Input\InputEvent.h" />
     <ClInclude Include="include\Input\InputSystem.h" />
     <ClInclude Include="include\Input\Keyboard.h" />

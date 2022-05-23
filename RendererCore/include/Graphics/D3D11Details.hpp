@@ -5,7 +5,7 @@
 *****************************************************************/
 #pragma once
 
-#include "Graphics.hpp"
+#include "GraphicsBase.hpp"
 #include <d3d11_4.h>
 #include <wrl/client.h>
 using Microsoft::WRL::ComPtr;
