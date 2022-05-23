@@ -172,6 +172,7 @@
     <ClInclude Include="include\Input\Keyboard.h" />
     <ClInclude Include="include\Input\KeyCode.h" />
     <ClInclude Include="include\Input\Mouse.h" />
+    <ClInclude Include="include\Math\Color.h" />
     <ClInclude Include="include\Math\Simd.hpp" />
     <ClInclude Include="include\Math\Vector.hpp" />
     <ClInclude Include="include\Window.h" />

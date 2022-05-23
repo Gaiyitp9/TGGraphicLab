@@ -99,6 +99,9 @@
     <ClInclude Include="include\Graphics\Graphics.h">
       <Filter>头文件\Graphics</Filter>
     </ClInclude>
+    <ClInclude Include="include\Math\Color.h">
+      <Filter>头文件\Math</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Utility.cpp">
