@@ -25,25 +25,19 @@
 #endif
 
 #define ThrowBaseExcept(description)\
-		{\
-			throw LCH::BaseException(description);\
-		}
+			throw LCH::BaseException(description);
 
 #define ThrowIfFailed(hr)\
-		{\
 			if (FAILED(hr))\
 			{\
 				throw LCH::WinAPIException(hr);\
-			}\
-		}
+			}
 
 #define ThrowIfFailedWithDesc(hr, description)\
-		{\
 			if (FAILED(hr))\
 			{\
 				throw LCH::WinAPIException(hr, description);\
-			}\
-		}
+			}
 
 #define ThrowLastError()\
 		{\

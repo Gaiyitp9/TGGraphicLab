@@ -32,18 +32,18 @@ namespace LCH::Graphics
 	std::vector<DXGI_MODE_DESC1> Device<LowLevelAPI::DirectX11>::GetOutputModes(DXGI_FORMAT format)
 	{
 		ComPtr<IDXGIOutput1> pOutput1;
-		dxgiOutputs[0][0].As(&pOutput1);
+		ThrowIfFailed(dxgiOutputs[0][0].As(&pOutput1));
 		DXGI_OUTPUT_DESC outputDesc;
-		pOutput1->GetDesc(&outputDesc);
+		ThrowIfFailed(pOutput1->GetDesc(&outputDesc));
 		Debug::LogLine(std::format(L"Device name: {}", outputDesc.DeviceName));
 
 		UINT modeCount = 0;
-		pOutput1->GetDisplayModeList1(format, DXGI_ENUM_MODES_SCALING, &modeCount, nullptr);
+		ThrowIfFailed(pOutput1->GetDisplayModeList1(format, DXGI_ENUM_MODES_SCALING, &modeCount, nullptr));
 		std::vector<DXGI_MODE_DESC1> outputModes(modeCount);
 		if (modeCount > 0)
 		{
-			pOutput1->GetDisplayModeList1(format, DXGI_ENUM_MODES_SCALING,
-				&modeCount, outputModes.data());
+			ThrowIfFailed(pOutput1->GetDisplayModeList1(format, DXGI_ENUM_MODES_SCALING,
+				&modeCount, outputModes.data()));
 			for (UINT i = 0; i < modeCount; ++i)
 			{
 				Debug::LogLine(std::format(L"Width: {}  Height: {} Format: {} Refresh rate denominator: {} numerator: {}",
@@ -87,8 +87,8 @@ namespace LCH::Graphics
 			D3D_FEATURE_LEVEL_11_1,
 			D3D_FEATURE_LEVEL_11_0,
 		};
-		D3D11CreateDevice(dxgiAdapters[0].Get(), D3D_DRIVER_TYPE_UNKNOWN, nullptr, creationFlags,
-			featureLevels, 2, D3D11_SDK_VERSION, &d3dDevice, nullptr, &d3dContext);
+		ThrowIfFailed(D3D11CreateDevice(dxgiAdapters[0].Get(), D3D_DRIVER_TYPE_UNKNOWN, nullptr, creationFlags,
+			featureLevels, 2, D3D11_SDK_VERSION, &d3dDevice, nullptr, &d3dContext));
 	}
 
 	Context<LowLevelAPI::DirectX11>::Context(Device<LowLevelAPI::DirectX11>* device)
@@ -137,16 +137,16 @@ namespace LCH::Graphics
 		ThrowIfFailed(device->dxgiFactory->CreateSwapChain(device->d3dDevice.Get(), &swapChainDesc, &swapChain));
 
 		ComPtr<ID3D11Resource> pBackBuffer;
-		swapChain->GetBuffer(0, IID_PPV_ARGS(&pBackBuffer));
-		device->d3dDevice->CreateRenderTargetView(
+		ThrowIfFailed(swapChain->GetBuffer(0, IID_PPV_ARGS(&pBackBuffer)));
+		ThrowIfFailed(device->d3dDevice->CreateRenderTargetView(
 			pBackBuffer.Get(),
 			nullptr,
 			&renderTargetView
-		);
+		));
 	}
 
 	void FrameBuffer<LowLevelAPI::DirectX11>::Present()
 	{
-		swapChain->Present(1u, 0u);
+		ThrowIfFailed(swapChain->Present(1u, 0u));
 	}
 }
