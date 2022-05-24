@@ -4,7 +4,7 @@
 * This code is licensed under the MIT License (MIT).			*
 *****************************************************************/
 
-#include "Input/InputSystem.h"
+#include "Input/InputSystem.hpp"
 
 namespace LCH
 {

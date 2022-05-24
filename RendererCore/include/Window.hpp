@@ -6,8 +6,8 @@
 #pragma once
 
 #include "SlimWindows.h"
-#include "Diagnostics/Debug.h"
-#include "Input/InputSystem.h"
+#include "Diagnostics/Debug.hpp"
+#include "Input/InputSystem.hpp"
 #include <optional>
 
 namespace LCH

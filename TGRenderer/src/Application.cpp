@@ -5,8 +5,8 @@
 *****************************************************************/
 
 #include "../resource.h"
-#include "Application.h"
-#include "Diagnostics/WinAPIException.h"
+#include "Application.hpp"
+#include "Diagnostics/WinAPIException.hpp"
 
 namespace LCH
 {

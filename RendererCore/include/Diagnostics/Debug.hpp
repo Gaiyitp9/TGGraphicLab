@@ -5,7 +5,7 @@
 *****************************************************************/
 #pragma once
 
-#include "WinAPIException.h"
+#include "WinAPIException.hpp"
 #include <iostream>
 
 #ifdef ThrowIfFailed

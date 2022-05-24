@@ -4,9 +4,9 @@
 * This code is licensed under the MIT License (MIT).			*
 *****************************************************************/
 
-#include "WindowRegister.h"
-#include "Window.h"
-#include "Diagnostics/Debug.h"
+#include "WindowRegister.hpp"
+#include "Window.hpp"
+#include "Diagnostics/Debug.hpp"
 #include <format>
 
 #define REGISTER_MESSAGE(msg) {msg, L#msg}

@@ -5,7 +5,7 @@
 *****************************************************************/
 #pragma once
 
-#include "BaseException.h"
+#include "BaseException.hpp"
 
 namespace LCH
 {

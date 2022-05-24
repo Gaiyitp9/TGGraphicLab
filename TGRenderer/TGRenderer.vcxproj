@@ -179,9 +179,9 @@
     <Image Include="maple-leaf2.ico" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\Application.h" />
+    <ClInclude Include="include\Application.hpp" />
     <ClInclude Include="include\GraphicsLayer.hpp" />
-    <ClInclude Include="include\UnitTest.h" />
+    <ClInclude Include="include\UnitTest.hpp" />
     <ClInclude Include="resource.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

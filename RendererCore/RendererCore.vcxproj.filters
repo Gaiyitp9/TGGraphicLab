@@ -45,43 +45,43 @@
     <ClInclude Include="include\SlimWindows.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="include\Utility.h">
+    <ClInclude Include="include\Utility.hpp">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="include\Math\MathUtil.h">
+    <ClInclude Include="include\Math\MathUtil.hpp">
       <Filter>头文件\Math</Filter>
     </ClInclude>
-    <ClInclude Include="include\Window.h">
+    <ClInclude Include="include\Window.hpp">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="include\Chronometer.h">
+    <ClInclude Include="include\Chronometer.hpp">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="include\WindowRegister.h">
+    <ClInclude Include="include\WindowRegister.hpp">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="include\Diagnostics\Debug.h">
+    <ClInclude Include="include\Diagnostics\Debug.hpp">
       <Filter>头文件\Diagnostics</Filter>
     </ClInclude>
-    <ClInclude Include="include\Diagnostics\BaseException.h">
+    <ClInclude Include="include\Diagnostics\BaseException.hpp">
       <Filter>头文件\Diagnostics</Filter>
     </ClInclude>
-    <ClInclude Include="include\Diagnostics\WinAPIException.h">
+    <ClInclude Include="include\Diagnostics\WinAPIException.hpp">
       <Filter>头文件\Diagnostics</Filter>
     </ClInclude>
-    <ClInclude Include="include\Input\InputEvent.h">
+    <ClInclude Include="include\Input\InputEvent.hpp">
       <Filter>头文件\Input</Filter>
     </ClInclude>
-    <ClInclude Include="include\Input\InputSystem.h">
+    <ClInclude Include="include\Input\InputSystem.hpp">
       <Filter>头文件\Input</Filter>
     </ClInclude>
-    <ClInclude Include="include\Input\KeyCode.h">
+    <ClInclude Include="include\Input\KeyCode.hpp">
       <Filter>头文件\Input</Filter>
     </ClInclude>
-    <ClInclude Include="include\Input\Keyboard.h">
+    <ClInclude Include="include\Input\Keyboard.hpp">
       <Filter>头文件\Input</Filter>
     </ClInclude>
-    <ClInclude Include="include\Input\Mouse.h">
+    <ClInclude Include="include\Input\Mouse.hpp">
       <Filter>头文件\Input</Filter>
     </ClInclude>
     <ClInclude Include="include\Math\Vector.hpp">
@@ -90,7 +90,7 @@
     <ClInclude Include="include\Math\Simd.hpp">
       <Filter>头文件\Math</Filter>
     </ClInclude>
-    <ClInclude Include="include\Diagnostics\MemoryDbg.h">
+    <ClInclude Include="include\Diagnostics\MemoryDbg.hpp">
       <Filter>头文件\Diagnostics</Filter>
     </ClInclude>
     <ClInclude Include="include\Graphics\D3D11Details.hpp">
@@ -102,7 +102,7 @@
     <ClInclude Include="include\Graphics\Graphics.h">
       <Filter>头文件\Graphics</Filter>
     </ClInclude>
-    <ClInclude Include="include\Math\Color.h">
+    <ClInclude Include="include\Math\Color.hpp">
       <Filter>头文件\Math</Filter>
     </ClInclude>
   </ItemGroup>

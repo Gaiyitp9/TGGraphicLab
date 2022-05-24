@@ -5,8 +5,8 @@
 *****************************************************************/
 #pragma once
 
-#include "Keyboard.h"
-#include "Mouse.h"
+#include "Keyboard.hpp"
+#include "Mouse.hpp"
 
 namespace LCH
 {

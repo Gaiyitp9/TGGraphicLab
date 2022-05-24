@@ -4,7 +4,7 @@
 * This code is licensed under the MIT License (MIT).			*
 *****************************************************************/
 
-#include "Input/InputEvent.h"
+#include "Input/InputEvent.hpp"
 
 std::unordered_map<LCH::KeyCode, wchar_t const*> LCH::InputEventInfo::keysName =
 {

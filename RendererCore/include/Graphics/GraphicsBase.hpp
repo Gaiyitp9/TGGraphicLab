@@ -5,9 +5,9 @@
 *****************************************************************/
 #pragma once
 
-#include "Diagnostics/MemoryDbg.h"		// 必须放在文件头部，保证malloc使用的是debug版本
-#include "../Window.h"
-#include "../Math/Color.h"
+#include "Diagnostics/MemoryDbg.hpp"		// 必须放在文件头部，保证malloc使用的是debug版本
+#include "../Window.hpp"
+#include "../Math/Color.hpp"
 
 namespace LCH::Graphics
 {

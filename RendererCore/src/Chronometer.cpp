@@ -4,7 +4,7 @@
 * This code is licensed under the MIT License (MIT).			*
 *****************************************************************/
 
-#include "Chronometer.h"
+#include "Chronometer.hpp"
 
 namespace LCH
 {

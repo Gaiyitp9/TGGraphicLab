@@ -5,7 +5,7 @@
 *****************************************************************/
 #pragma once
 
-#include "Chronometer.h"
+#include "Chronometer.hpp"
 #include <ctime>
 #include <string>
 

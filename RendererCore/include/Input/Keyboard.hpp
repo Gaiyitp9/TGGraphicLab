@@ -6,10 +6,10 @@
 #pragma once
 
 #include "../SlimWindows.h"
-#include "KeyCode.h"
+#include "KeyCode.hpp"
 #include <bitset>
 #include <queue>
-#include "InputEvent.h"
+#include "InputEvent.hpp"
 
 namespace LCH
 {

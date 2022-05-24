@@ -4,8 +4,8 @@
 * This code is licensed under the MIT License (MIT).			*
 *****************************************************************/
 
-#include "Input/Keyboard.h"
-#include "Diagnostics/Debug.h"
+#include "Input/Keyboard.hpp"
+#include "Diagnostics/Debug.hpp"
 
 namespace LCH
 {

@@ -5,8 +5,8 @@
 *****************************************************************/
 
 #include "SlimWindows.h"
-#include "Application.h"
-#include "Diagnostics/Debug.h"
+#include "Application.hpp"
+#include "Diagnostics/Debug.hpp"
 #include <tchar.h>
 
 int CALLBACK _tWinMain(_In_ HINSTANCE hInstance,

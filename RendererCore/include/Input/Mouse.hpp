@@ -5,7 +5,7 @@
 *****************************************************************/
 #pragma once
 
-#include "InputEvent.h"
+#include "InputEvent.hpp"
 #include "../Math/Vector.hpp"
 #include <queue>
 #include <bitset>

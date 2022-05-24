@@ -4,7 +4,7 @@
 * This code is licensed under the MIT License (MIT).			*
 *****************************************************************/
 
-#include "Math/Color.h"
+#include "Math/Color.hpp"
 
 namespace LCH::Math
 {

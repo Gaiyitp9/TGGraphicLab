@@ -5,9 +5,9 @@
 *****************************************************************/
 #pragma once
 
-#include "Window.h"
-#include "Chronometer.h"
-#include "UnitTest.h"
+#include "Window.hpp"
+#include "Chronometer.hpp"
+#include "UnitTest.hpp"
 #include <locale>
 #include <unordered_map>
 #include "GraphicsLayer.hpp"

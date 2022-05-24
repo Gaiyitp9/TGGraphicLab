@@ -4,8 +4,8 @@
 * This code is licensed under the MIT License (MIT).			*
 *****************************************************************/
 
-#include "Input/Mouse.h"
-#include "Diagnostics/Debug.h"
+#include "Input/Mouse.hpp"
+#include "Diagnostics/Debug.hpp"
 
 namespace LCH
 {

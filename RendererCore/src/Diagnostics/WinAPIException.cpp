@@ -4,8 +4,8 @@
 * This code is licensed under the MIT License (MIT).			*
 *****************************************************************/
 
-#include "Diagnostics/WinAPIException.h"
-#include "Utility.h"
+#include "Diagnostics/WinAPIException.hpp"
+#include "Utility.hpp"
 #include <format>
 
 namespace LCH

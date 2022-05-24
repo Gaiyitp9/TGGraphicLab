@@ -42,10 +42,10 @@
     <ClInclude Include="resource.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="include\Application.h">
+    <ClInclude Include="include\Application.hpp">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="include\UnitTest.h">
+    <ClInclude Include="include\UnitTest.hpp">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="include\GraphicsLayer.hpp">

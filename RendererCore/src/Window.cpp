@@ -4,9 +4,9 @@
 * This code is licensed under the MIT License (MIT).			*
 *****************************************************************/
 
-#include "Diagnostics/MemoryDbg.h"		// 必须放在文件头部，保证malloc使用的是debug版本
-#include "Window.h"
-#include "WindowRegister.h"
+#include "Diagnostics/MemoryDbg.hpp"		// 必须放在文件头部，保证malloc使用的是debug版本
+#include "Window.hpp"
+#include "WindowRegister.hpp"
 
 namespace LCH
 {

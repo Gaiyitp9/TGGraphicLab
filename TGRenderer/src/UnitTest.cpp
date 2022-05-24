@@ -5,13 +5,13 @@
 *****************************************************************/
 
 #include "SlimWindows.h"
-#include "UnitTest.h"
+#include "UnitTest.hpp"
 #include <iostream>
-#include "Utility.h"
-#include "Math/MathUtil.h"
+#include "Utility.hpp"
+#include "Math/MathUtil.hpp"
 #include "Math/Vector.hpp"
-#include "Input/InputEvent.h"
-#include "Diagnostics/Debug.h"
+#include "Input/InputEvent.hpp"
+#include "Diagnostics/Debug.hpp"
 
 namespace LCH
 {
