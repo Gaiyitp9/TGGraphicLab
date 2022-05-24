@@ -14,28 +14,6 @@ namespace LCH::Math
 	{
 		using simd = simd_trait<float, SimdInstruction<float, 4>::type>;
 	public:
-		static Color AliceBlue;				// 爱丽丝蓝
-		static Color AntiqueWhite;			// 古董白
-		static Color Aqua;					// 浅绿色
-		static Color Aquamarine;			// 碧绿色
-		static Color Azure;					// 蔚蓝色
-		static Color Beige;					// 米黄色
-		static Color Bisque;				// 橘黄色
-		static Color Black;					// 黑色
-		static Color Blanchedalmond;		// 杏仁白
-		static Color Blue;					// 蓝色
-		static Color BlueViolet;			// 紫罗兰色
-		static Color Brown;					// 棕色
-		static Color BurlyWood;				// 实木色
-		static Color Chartreuse;			// 查特酒绿
-		static Color Chocolate;				// 巧克力色
-		static Color Coral;					// 橘红色
-		static Color CornflowerBlue;		// 矢车菊蓝
-		static Color Cornsilk;				// 玉米丝色
-		static Color Crimson;				// 深红色
-		static Color Cyan;					// 青色
-
-	public:
 		Color() { elements.fill(0); }
 		Color(float r, float g, float b, float a)
 		{
@@ -65,5 +43,35 @@ namespace LCH::Math
 
 	private:
 		aligned_array<float, 4, simd::Alignment> elements;
+
+	public:
+		static Color AliceBlue;				// 爱丽丝蓝
+		static Color AntiqueWhite;			// 古董白
+		static Color Aqua;					// 浅绿色
+		static Color Aquamarine;			// 碧绿色
+		static Color Azure;					// 蔚蓝色
+		static Color Beige;					// 米黄色
+		static Color Bisque;				// 橘黄色
+		static Color Black;					// 黑色
+		static Color Blanchedalmond;		// 杏仁白
+		static Color Blue;					// 蓝色
+		static Color BlueViolet;			// 紫罗兰色
+		static Color Brown;					// 棕色
+		static Color BurlyWood;				// 实木色
+		static Color Chartreuse;			// 查特酒绿
+		static Color Chocolate;				// 巧克力色
+		static Color Coral;					// 橘红色
+		static Color CornflowerBlue;		// 矢车菊蓝
+		static Color Cornsilk;				// 玉米丝色
+		static Color Crimson;				// 深红色
+		static Color Cyan;					// 青色
+		static Color DarkBlue;				// 深蓝色
+		static Color DarkCyan;				// 深青色
+		static Color DarkGoldenrod;			// 深金黄色
+		static Color DarkGrey;				// 深灰色
+		static Color DarkGreen;				// 深绿色
+		static Color DarkKhaki;				// 深卡其色(深黄褐色)
+		static Color DarkMagenta;			// 深洋红色
+		static Color DarkOliverGreen;		// 深橄榄绿
 	};
 }

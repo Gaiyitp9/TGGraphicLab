@@ -75,7 +75,7 @@ namespace LCH
 		wheelDelta = delta;
 	}
 
-	const Vector2i& Mouse::Position() const noexcept
+	const Math::Vector2i& Mouse::Position() const noexcept
 	{
 		return position;
 	}

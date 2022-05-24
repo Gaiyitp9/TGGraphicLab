@@ -99,7 +99,7 @@
     <ClInclude Include="include\Graphics\GraphicsBase.hpp">
       <Filter>头文件\Graphics</Filter>
     </ClInclude>
-    <ClInclude Include="include\Graphics\Graphics.h">
+    <ClInclude Include="include\Graphics\Graphics.hpp">
       <Filter>头文件\Graphics</Filter>
     </ClInclude>
     <ClInclude Include="include\Math\Color.hpp">

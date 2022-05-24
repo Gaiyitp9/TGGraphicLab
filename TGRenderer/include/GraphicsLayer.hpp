@@ -5,7 +5,7 @@
 *****************************************************************/
 #pragma once
 
-#include "Graphics/Graphics.h"
+#include "Graphics/Graphics.hpp"
 
 namespace LCH::Graphics
 {
@@ -37,7 +37,7 @@ namespace LCH::Graphics
 			return false;
 		}
 
-		void ClearBackground(Window const* window, const Color& color)
+		void ClearBackground(Window const* window, const Math::Color& color)
 		{
 			context->ClearFrameBuffer(frameBuffers[window].get(), color);
 		}

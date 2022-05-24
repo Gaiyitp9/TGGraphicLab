@@ -12,8 +12,6 @@
 
 namespace LCH
 {
-	using namespace Math;
-
 	class Mouse
 	{
 	public:
@@ -27,7 +25,7 @@ namespace LCH
 		void OnButtonRelease(KeyCode key);
 		void OnWheelRoll(KeyCode key, short delta);
 
-		const Vector2i& Position() const noexcept;
+		const Math::Vector2i& Position() const noexcept;
 		short RawWheelDelta() const noexcept;			// 鼠标滚轮变化值是WHEEL_DELTA的整数倍
 		short WheelDelta() const noexcept;				// 两个函数分别取没有除以和除以WHEEL_DELTA后的变化值
 
@@ -45,7 +43,7 @@ namespace LCH
 		bool spyMouse = false;							// 是否监控鼠标
 
 	private:
-		Vector2i position;								// 鼠标位置
+		Math::Vector2i position;								// 鼠标位置
 		short wheelDelta = 0;							// 滚轮变化值，正值表示向前滚动，远离使用者；负值表示向后滚动，朝向使用者
 
 		std::queue<InputEvent> eventBuffer;				// 输入事件队列

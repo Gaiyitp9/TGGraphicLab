@@ -102,7 +102,7 @@ namespace LCH::Graphics
 	}
 
 	void Context<LowLevelAPI::DirectX11>::ClearFrameBuffer(FrameBuffer<LowLevelAPI::DirectX11>* frameBuffer,
-		const Color& color)
+		const Math::Color& color)
 	{
 		d3dContext->ClearRenderTargetView(frameBuffer->renderTargetView.Get(), color.RGBA());
 	}
