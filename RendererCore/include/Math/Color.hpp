@@ -7,6 +7,7 @@
 
 #include "Simd.hpp"
 #include <DirectXColors.h>
+#include <unordered_map>
 
 namespace LCH::Math
 {
@@ -14,7 +15,7 @@ namespace LCH::Math
 	{
 		using simd = simd_trait<float, SimdInstruction<float, 4>::type>;
 	public:
-		Color() { elements.fill(0); }
+		Color(float c = {}) { elements.fill(c); }
 		Color(float r, float g, float b, float a)
 		{
 			elements[0] = r;
@@ -32,12 +33,18 @@ namespace LCH::Math
 		float& b() { return elements[2]; }
 		float& a() { return elements[3]; }
 
-		const float* RGBA() const { return elements.data(); }
+		float const* RGBA() const { return elements.data(); }
 
-		Color operator*(const Color& color)
+		Color operator*(const Color& color) const
 		{
 			Color result;
 			simd::elementwise_product(elements.data(), color.elements.data(), result.elements.data());
+			return result;
+		}
+		Color operator*(float c) const
+		{
+			Color result(c);
+			simd::elementwise_product(elements.data(), result.elements.data(), result.elements.data());
 			return result;
 		}
 
@@ -73,5 +80,30 @@ namespace LCH::Math
 		static Color DarkKhaki;				// 深卡其色(深黄褐色)
 		static Color DarkMagenta;			// 深洋红色
 		static Color DarkOliverGreen;		// 深橄榄绿
+		static Color DarkOrange;			// 深橘黄色
+		static Color DarkOrchid;			// 深紫色
+		static Color DarkRed;				// 深红色
+		static Color DarkSalmon;			// 深橙红色
+		static Color DarkSeaGreen;			// 深海绿色
+		static Color DarkSlateBlue;			// 深板岩蓝
+		static Color DarkSlateGray;			// 深板岩灰
+		static Color DarkTurquoise;			// 深宝石绿
+		static Color DarkViolet;			// 深紫色
+		static Color DeepPink;				// 深粉红色
+		static Color DeepSkyBlue;			// 深天蓝色
+		static Color DimGray;				// 暗灰色
+		static Color DodgerBlue;			// 道奇蓝(闪蓝色)
+		static Color Firebrick;				// 砖色
+		static Color FloralWhite;			// 花白色
+		static Color ForestGreen;			// 森林绿
+		static Color Fuchsia;				// 紫红色
+		static Color Gainsboro;				// 淡灰色
+		static Color GhostWhite;			// 苍白色
+		static Color Gold;					// 金色
 	};
+
+	inline Color operator*(float c, const Color& color)
+	{
+		return color * c;
+	}
 }

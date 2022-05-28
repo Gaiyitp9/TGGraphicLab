@@ -116,14 +116,14 @@ namespace LCH
 		return false;
 	}
 
-	inline void Keyboard::TrimEventBuffer()
+	void Keyboard::TrimEventBuffer()
 	{
 		// 移除旧的按键事件
 		while (eventBuffer.size() > BUFSIZE)
 			eventBuffer.pop();
 	}
 
-	inline void Keyboard::TrimCharBuffer()
+	void Keyboard::TrimCharBuffer()
 	{
 		// 移除旧的字符
 		while (charBuffer.size() > BUFSIZE)
