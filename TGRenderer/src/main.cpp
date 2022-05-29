@@ -14,9 +14,9 @@ int CALLBACK _tWinMain(_In_ HINSTANCE hInstance,
 	_In_ LPTSTR     lpCmdLine,
 	_In_ int       nShowCmd)
 {
-	LCH::Application app;
 	try
 	{
+		LCH::Application app;
 		return app.Run();
 	}
 	catch (const LCH::BaseException& e)

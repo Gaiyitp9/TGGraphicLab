@@ -21,9 +21,9 @@ namespace LCH::Graphics
 
 		void Update()
 		{
-			for (const auto& frameBuffer : frameBuffers)
+			for (const auto& windowBufferPair : frameBuffers)
 			{
-				frameBuffer.second->Present();
+				windowBufferPair.second->Present();
 			}
 		}
 

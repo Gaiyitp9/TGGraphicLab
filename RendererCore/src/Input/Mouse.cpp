@@ -98,7 +98,7 @@ namespace LCH
 		return false;
 	}
 
-	inline void Mouse::TrimEventBuffer()
+	void Mouse::TrimEventBuffer()
 	{
 		while (eventBuffer.size() > BUFSIZE)
 			eventBuffer.pop();

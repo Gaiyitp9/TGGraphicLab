@@ -61,4 +61,5 @@ namespace LCH::Math
 	Color Color::Fuchsia		{ 1.000000000f, 0.000000000f, 1.000000000f, 1.000000000f };
 	Color Color::Gainsboro		{ 0.862745166f, 0.862745166f, 0.862745166f, 1.000000000f };
 	Color Color::GhostWhite		{ 0.972549081f, 0.972549081f, 1.000000000f, 1.000000000f };
+	Color Color::Gold			{ 1.000000000f, 0.843137324f, 0.000000000f, 1.000000000f };
 }

@@ -22,7 +22,6 @@ namespace LCH::Graphics
 	{
 	public:
 		Device();
-		ID3D11Device* operator->();
 
 	private:
 		std::vector<DXGI_MODE_DESC1> GetOutputModes(DXGI_FORMAT format);
@@ -33,6 +32,7 @@ namespace LCH::Graphics
 		ComPtr<IDXGIFactory> dxgiFactory;
 		ComPtr<ID3D11Device> d3dDevice;
 		ComPtr<ID3D11DeviceContext> d3dContext;
+
 		std::vector<ComPtr<IDXGIAdapter>> dxgiAdapters;
 		std::vector<std::vector<ComPtr<IDXGIOutput>>> dxgiOutputs;
 
@@ -45,7 +45,6 @@ namespace LCH::Graphics
 	{
 	public:
 		Context(Device<LowLevelAPI::DirectX11>* device);
-		ID3D11DeviceContext* operator->();
 
 		void ClearFrameBuffer(FrameBuffer<LowLevelAPI::DirectX11>* buffer, const Math::Color& color);
 

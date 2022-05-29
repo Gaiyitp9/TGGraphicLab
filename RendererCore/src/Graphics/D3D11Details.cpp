@@ -24,11 +24,6 @@ namespace LCH::Graphics
 		CreateDeviceAndContext();
 	}
 
-	inline ID3D11Device* Device<LowLevelAPI::DirectX11>::operator->()
-	{
-		return d3dDevice.Get();
-	}
-
 	std::vector<DXGI_MODE_DESC1> Device<LowLevelAPI::DirectX11>::GetOutputModes(DXGI_FORMAT format)
 	{
 		ComPtr<IDXGIOutput1> pOutput1;
@@ -96,11 +91,6 @@ namespace LCH::Graphics
 		d3dContext.Swap(device->d3dContext);
 	}
 
-	inline ID3D11DeviceContext* Context<LowLevelAPI::DirectX11>::operator->()
-	{
-		return d3dContext.Get();
-	}
-
 	void Context<LowLevelAPI::DirectX11>::ClearFrameBuffer(FrameBuffer<LowLevelAPI::DirectX11>* frameBuffer,
 		const Math::Color& color)
 	{
@@ -133,7 +123,6 @@ namespace LCH::Graphics
 		swapChainDesc.OutputWindow = window->Hwnd();
 		swapChainDesc.Windowed = true;
 		swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
-
 		ThrowIfFailed(device->dxgiFactory->CreateSwapChain(device->d3dDevice.Get(), &swapChainDesc, &swapChain));
 
 		ComPtr<ID3D11Resource> pBackBuffer;
