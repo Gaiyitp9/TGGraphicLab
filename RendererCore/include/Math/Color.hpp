@@ -7,7 +7,6 @@
 
 #include "Simd.hpp"
 #include <DirectXColors.h>
-#include <unordered_map>
 
 namespace LCH::Math
 {
@@ -81,13 +80,13 @@ namespace LCH::Math
 		static Color DarkMagenta;			// 深洋红色
 		static Color DarkOliverGreen;		// 深橄榄绿
 		static Color DarkOrange;			// 深橘黄色
-		static Color DarkOrchid;			// 深紫色
+		static Color DarkOrchid;			// 深紫兰色
 		static Color DarkRed;				// 深红色
 		static Color DarkSalmon;			// 深橙红色
 		static Color DarkSeaGreen;			// 深海绿色
 		static Color DarkSlateBlue;			// 深板岩蓝
 		static Color DarkSlateGray;			// 深板岩灰
-		static Color DarkTurquoise;			// 深宝石绿
+		static Color DarkTurquoise;			// 深绿松石色
 		static Color DarkViolet;			// 深紫色
 		static Color DeepPink;				// 深粉红色
 		static Color DeepSkyBlue;			// 深天蓝色
@@ -100,6 +99,98 @@ namespace LCH::Math
 		static Color Gainsboro;				// 淡灰色
 		static Color GhostWhite;			// 苍白色
 		static Color Gold;					// 金色
+		static Color Goldenrod;				// 秋麒麟色
+		static Color Gray;					// 灰色
+		static Color Green;					// 绿色
+		static Color GreenYellow;			// 黄绿色
+		static Color Honeydew;				// 哈密瓜色
+		static Color HotPink;				// 亮粉色
+		static Color IndianRed;				// 印第安红
+		static Color Indigo;				// 靛蓝色
+		static Color Ivory;					// 象牙白
+		static Color Khaki;					// 卡其色(黄褐色)
+		static Color Lavender;				// 薰衣草色(淡紫色)
+		static Color LavenderBlush;			// 淡紫红
+		static Color LawnGreen;				// 草坪绿
+		static Color LemonChiffon;			// 柠檬绸色
+		static Color LightBlue;				// 浅蓝色
+		static Color LightCoral;			// 浅珊瑚色
+		static Color LightCyan;				// 浅青绿色
+		static Color LightGoldenrodYellow;	// 浅秋麒麟色
+		static Color LightGreen;			// 浅绿色
+		static Color LightGray;				// 浅灰色
+		static Color LightPink;				// 浅粉色
+		static Color LightSalmon;			// 浅橙红色
+		static Color LightSeaGreen;			// 浅海绿色
+		static Color LightSkyBlue;			// 浅天空蓝
+		static Color LightSlateGray;		// 浅板岩灰
+		static Color LightSteelBlue;		// 浅钢铁蓝
+		static Color LightYellow;			// 浅黄色
+		static Color Lime;					// 青柠色
+		static Color LimeGreen;				// 青柠绿
+		static Color Linen;					// 亚麻色
+		static Color Magenta;				// 洋红色
+		static Color Maroon;				// 褐红色
+		static Color MediumAquamarine;		// 间碧绿色
+		static Color MediumBlue;			// 间蓝色
+		static Color MediumOrchid;			// 间紫兰色
+		static Color MediumPurple;			// 间紫红色
+		static Color MediumSeaGreen;		// 间海绿色
+		static Color MediumSlateBlue;		// 间板岩蓝
+		static Color MediumSpringGreen;		// 间春绿色
+		static Color MediumTurquoise;		// 间绿松石色
+		static Color MediumVioletRed;		// 间紫罗兰红
+		static Color MidnightBlue;			// 午夜蓝
+		static Color MintCream;				// 薄荷奶油色
+		static Color MistyRose;				// 粉玫瑰红
+		static Color Moccasin;				// 鹿皮色
+		static Color NavajoWhite;			// 纳瓦白
+		static Color Navy;					// 藏青色(海军蓝)
+		static Color OldLace;				// 旧布黄
+		static Color Olive;					// 橄榄绿
+		static Color OliveDrab;				// 深绿褐色
+		static Color Orange;				// 橘黄色
+		static Color OrangeRed;				// 橘红色
+		static Color Orchid;				// 兰花紫
+		static Color PaleGoldenrod;			// 苍菊黄色
+		static Color PaleGreen;				// 苍绿色
+		static Color PaleTurquoise;			// 苍宝石绿
+		static Color PaleVioletRed;			// 苍紫红色
+		static Color PapayaWhip;			// 番木瓜色
+		static Color PeachPuff;				// 桃色
+		static Color Peru;					// 秘鲁色
+		static Color Pink;					// 粉色
+		static Color Plum;					// 李子色(浅紫色)
+		static Color PowderBlue;			// 粉末蓝
+		static Color Purple;				// 紫红色
+		static Color Red;					// 红色
+		static Color RosyBrown;				// 玫瑰棕色
+		static Color RoyalBlue;				// 皇家蓝
+		static Color SaddleBrown;			// 马鞍棕
+		static Color Salmon;				// 鲑鱼红
+		static Color SandyBrown;			// 沙褐色
+		static Color SeaGreen;				// 海绿色
+		static Color SeaShell;				// 海贝色
+		static Color Sienna;				// 赭色(褐色)
+		static Color Silver;				// 银色
+		static Color SkyBlue;				// 天蓝色
+		static Color SlateBlue;				// 板岩蓝
+		static Color SlateGray;				// 板岩灰
+		static Color Snow;					// 雪白色
+		static Color SpringGreen;			// 春绿色
+		static Color SteelBlue;				// 钢铁蓝
+		static Color Tan;					// 棕褐色
+		static Color Teal;					// 蓝绿色
+		static Color Thistle;				// 蓟色
+		static Color Tomato;				// 番茄色
+		static Color Transparent;			// 透明
+		static Color Turquoise;				// 绿松石色
+		static Color Violet;				// 紫色
+		static Color Wheat;					// 小麦色
+		static Color White;					// 白色
+		static Color WhiteSmoke;			// 白烟色
+		static Color Yellow;				// 黄色
+		static Color YellowGreen;			// 黄绿色
 	};
 
 	inline Color operator*(float c, const Color& color)
