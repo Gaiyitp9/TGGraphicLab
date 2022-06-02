@@ -6,6 +6,8 @@
 #pragma once
 
 #include <dxgidebug.h>
+#include <wrl/client.h>
+using Microsoft::WRL::ComPtr;
 
 namespace LCH::Graphics
 {
@@ -15,6 +17,9 @@ namespace LCH::Graphics
 		DxgiDbgInfo();
 
 	private:
+		using DXGIGetDebugInterface = HRESULT(*)(REFIID, void**);
+		DXGIGetDebugInterface DxgiGetDebugInterface;
 
+		ComPtr<IDXGIInfoQueue> dxgiInfoQueue;
 	};
 }
