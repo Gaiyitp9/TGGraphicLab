@@ -13,6 +13,11 @@ using Microsoft::WRL::ComPtr;
 #pragma comment(lib, "dxgi.lib")
 #pragma comment(lib, "d3d11.lib")
 
+#ifdef _DEBUG
+#include <dxgidebug.h>
+#pragma comment(lib, "dxguid.lib")
+#endif
+
 namespace LCH::Graphics
 {
 	DXGI_FORMAT DirectXFormatMapping(Format format);
@@ -73,4 +78,27 @@ namespace LCH::Graphics
 
 		friend class Context<LowLevelAPI::DirectX11>;
 	};
+
+#ifdef _DEBUG
+	template<>
+	class DebugInfo<LowLevelAPI::DirectX11>
+	{
+	public:
+		DebugInfo();
+		DebugInfo(const DebugInfo&) = delete;
+		DebugInfo& operator=(const DebugInfo&) = delete;
+
+		void ReportLiveObjects();		// 输出所有d3d和dxgi物体
+		void OutputMessages();
+
+	private:
+		using DXGIGetDebugInterface = HRESULT(*)(REFIID, void**);
+		HMODULE module;
+		DXGIGetDebugInterface DxgiGetDebugInterface;
+
+		ComPtr<IDXGIDebug1> dxgiDebug;
+		ComPtr<IDXGIInfoQueue> dxgiInfoQueue;
+		unsigned long long next;						// 下一条消息的索引
+	};
+#endif
 }

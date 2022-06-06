@@ -17,6 +17,9 @@ namespace LCH::Graphics
 		{
 			device = std::make_unique<Device<API>>();
 			context = std::make_unique<Context<API>>(device.get());
+#ifdef _DEBUG
+			dbgInfo = std::make_unique<DebugInfo<API>>();
+#endif
 		}
 
 		void Update()
@@ -42,9 +45,19 @@ namespace LCH::Graphics
 			context->ClearFrameBuffer(frameBuffers[window].get(), color);
 		}
 
+	private:
+		void OutputMessage()
+		{
+
+		}
+
 	public:
 		std::unique_ptr<Device<API>> device;
 		std::unique_ptr<Context<API>> context;
 		std::unordered_map<Window const*, std::unique_ptr<FrameBuffer<API>>> frameBuffers;
+
+#ifdef _DEBUG
+		std::unique_ptr<DebugInfo<API>> dbgInfo;
+#endif
 	};
 }

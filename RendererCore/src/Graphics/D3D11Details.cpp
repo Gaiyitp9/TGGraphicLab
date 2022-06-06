@@ -74,7 +74,7 @@ namespace LCH::Graphics
 	void Device<LowLevelAPI::DirectX11>::CreateDeviceAndContext()
 	{
 		UINT creationFlags = D3D11_CREATE_DEVICE_BGRA_SUPPORT;
-#if defined(_DEBUG)
+#ifdef _DEBUG
 		creationFlags |= D3D11_CREATE_DEVICE_DEBUG;
 #endif
 		D3D_FEATURE_LEVEL featureLevels[] =
@@ -101,7 +101,7 @@ namespace LCH::Graphics
 		: window(window)
 	{
 		if (window == nullptr)
-			ThrowBaseExcept(L"Parameter window can not be nullptr");
+			ThrowBaseExcept(L"Parameter 'window' can not be nullptr");
 
 		ThrowIfFailed(device->d3dDevice->CheckMultisampleQualityLevels(backBufferFormat, sampleCount,
 			&numQualityLevels));
@@ -138,4 +138,33 @@ namespace LCH::Graphics
 	{
 		ThrowIfFailed(swapChain->Present(1u, 0u));
 	}
+
+#ifdef _DEBUG
+	DebugInfo<LowLevelAPI::DirectX11>::DebugInfo()
+	{
+		module = GetModuleHandleW(L"dxgidebug.dll");
+		if (nullptr == module)
+			ThrowLastErrorWithDesc(L"Can not load dxgidebug.dll");
+
+		DxgiGetDebugInterface = reinterpret_cast<DXGIGetDebugInterface>(
+			GetProcAddress(module, "DXGIGetDebugInterface"));
+		if (nullptr == DxgiGetDebugInterface)
+			ThrowLastErrorWithDesc(L"Can not find DXGIGetDebugInterface function procedure address");
+
+		ThrowIfFailed(DxgiGetDebugInterface(IID_PPV_ARGS(&dxgiDebug)));
+		ThrowIfFailed(DxgiGetDebugInterface(IID_PPV_ARGS(&dxgiInfoQueue)));
+
+		next = 0;
+	}
+
+	void DebugInfo<LowLevelAPI::DirectX11>::ReportLiveObjects()
+	{
+		dxgiDebug->ReportLiveObjects(DXGI_DEBUG_ALL, DXGI_DEBUG_RLO_ALL);
+	}
+
+	void DebugInfo<LowLevelAPI::DirectX11>::OutputMessages()
+	{
+
+	}
+#endif
 }

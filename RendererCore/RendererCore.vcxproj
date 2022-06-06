@@ -165,7 +165,6 @@
     <ClInclude Include="include\Diagnostics\MemoryDbg.hpp" />
     <ClInclude Include="include\Diagnostics\WinAPIException.hpp" />
     <ClInclude Include="include\Graphics\D3D11Details.hpp" />
-    <ClInclude Include="include\Graphics\DxgiDbgInfo.hpp" />
     <ClInclude Include="include\Graphics\Graphics.hpp" />
     <ClInclude Include="include\Graphics\GraphicsBase.hpp" />
     <ClInclude Include="include\Input\InputEvent.hpp" />
@@ -187,7 +186,6 @@
     <ClCompile Include="src\Diagnostics\BaseException.cpp" />
     <ClCompile Include="src\Diagnostics\WinAPIException.cpp" />
     <ClCompile Include="src\Graphics\D3D11Details.cpp" />
-    <ClCompile Include="src\Graphics\DxgiDbgInfo.cpp" />
     <ClCompile Include="src\Input\InputEvent.cpp" />
     <ClCompile Include="src\Input\InputSystem.cpp" />
     <ClCompile Include="src\Input\Keyboard.cpp" />

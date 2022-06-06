@@ -36,4 +36,9 @@ namespace LCH::Graphics
 	{
 		R8G8B8A8_UNORM = 28,
 	};
+
+#ifdef _DEBUG
+	template<LowLevelAPI API>
+	class DebugInfo;
+#endif
 }

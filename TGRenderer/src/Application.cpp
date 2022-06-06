@@ -26,6 +26,8 @@ namespace LCH
 		locale = std::locale(".utf8");
 		std::wcout.imbue(locale);
 
+		d3d11Layer = std::make_unique<Graphics::GraphicsLayer<Graphics::LowLevelAPI::DirectX11>>();
+
 		// 获取当前显示器的宽和高
 		screenWidth = GetSystemMetrics(SM_CXSCREEN);
 		screenHeight = GetSystemMetrics(SM_CYSCREEN);
@@ -56,8 +58,8 @@ namespace LCH
 		unitTest.ArrayAlignmentTest();
 		unitTest.SIMDTest();
 
-		d3d11Layer.CreateFrameBuffer(windows[L"天工渲染器"].get());
-		d3d11Layer.CreateFrameBuffer(windows[L"辅助窗口"].get());
+		d3d11Layer->CreateFrameBuffer(windows[L"天工渲染器"].get());
+		d3d11Layer->CreateFrameBuffer(windows[L"辅助窗口"].get());
 
 		while (true)
 		{
@@ -79,9 +81,9 @@ namespace LCH
 			}
 
 			const float c = sin(timer.TotalTime() * 0.001f) / 2.0f + 0.5f;
-			d3d11Layer.ClearBackground(windows[L"天工渲染器"].get(), Math::Color::AliceBlue * c);
-			d3d11Layer.ClearBackground(windows[L"辅助窗口"].get(), c * Math::Color::Aquamarine);
-			d3d11Layer.Update();
+			d3d11Layer->ClearBackground(windows[L"天工渲染器"].get(), Math::Color::AliceBlue * c);
+			d3d11Layer->ClearBackground(windows[L"辅助窗口"].get(), c * Math::Color::Aquamarine);
+			d3d11Layer->Update();
 		}
 	}
 }
