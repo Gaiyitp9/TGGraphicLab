@@ -15,8 +15,8 @@ namespace LCH::Graphics
 	public:
 		GraphicsLayer()
 		{
-			device = std::make_unique<Device<API>>();
-			context = std::make_unique<Context<API>>(device.get());
+			device = std::make_shared<Device<API>>();
+			context = std::make_shared<Context<API>>(device);
 #ifdef _DEBUG
 			dbgInfo = std::make_unique<DebugInfo<API>>();
 #endif
@@ -24,38 +24,43 @@ namespace LCH::Graphics
 
 		void Update()
 		{
-			for (const auto& windowBufferPair : frameBuffers)
+			auto it = frameBuffers.begin();
+			while (it != frameBuffers.end())
 			{
-				windowBufferPair.second->Present();
+				// 如果Windows窗口被销毁，则移除对应的帧缓存
+				if (it->first->Destroy())
+					it = frameBuffers.erase(it);
+				else
+				{
+					it->second->Present();
+					++it;
+				}
 			}
+#ifdef _DEBUG
+			dbgInfo->OutputMessages();
+#endif
 		}
 
-		bool CreateFrameBuffer(Window const* window)
+		bool CreateFrameBuffer(const std::shared_ptr<Window>& window)
 		{
 			if (!frameBuffers.contains(window))
 			{
-				frameBuffers[window] = std::make_unique<FrameBuffer<API>>(device.get(), window);
+				frameBuffers[window] = std::make_shared<FrameBuffer<API>>(device, window);
 				return true;
 			}
 			return false;
 		}
 
-		void ClearBackground(Window const* window, const Math::Color& color)
+		void ClearBackground(const std::shared_ptr<Window>& window, const Math::Color& color)
 		{
-			context->ClearFrameBuffer(frameBuffers[window].get(), color);
-		}
-
-	private:
-		void OutputMessage()
-		{
-
+			if (frameBuffers.contains(window))
+				context->ClearFrameBuffer(frameBuffers[window], color);
 		}
 
 	public:
-		std::unique_ptr<Device<API>> device;
-		std::unique_ptr<Context<API>> context;
-		std::unordered_map<Window const*, std::unique_ptr<FrameBuffer<API>>> frameBuffers;
-
+		std::shared_ptr<Device<API>> device;
+		std::shared_ptr<Context<API>> context;
+		std::unordered_map<std::shared_ptr<Window>, std::shared_ptr<FrameBuffer<API>>> frameBuffers;
 #ifdef _DEBUG
 		std::unique_ptr<DebugInfo<API>> dbgInfo;
 #endif

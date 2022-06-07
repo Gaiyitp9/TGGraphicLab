@@ -10,8 +10,8 @@
 
 namespace LCH
 {
-	Window::Window(int x, int y, int width, int height, wchar_t const* title, Window const* parent)
-		: posX(x), posY(y), width(width), height(height), hwnd(nullptr), name(title), parentWnd(parent)
+	Window::Window(int x, int y, int width, int height, wchar_t const* title, std::shared_ptr<Window> parent)
+		: posX(x), posY(y), width(width), height(height), hwnd(nullptr), name(title), parent(parent)
 	{
 		Initialize();
 	}
@@ -151,9 +151,9 @@ namespace LCH
 		return hwnd;
 	}
 
-	Window const* Window::ParentWindow() const noexcept
+	const std::weak_ptr<Window>& Window::ParentWindow() const noexcept
 	{
-		return parentWnd;
+		return parent;
 	}
 
 	const InputSystem& Window::Input() const noexcept
@@ -195,8 +195,8 @@ namespace LCH
 			ThrowLastError();
 
 		HWND parentHwnd = nullptr;
-		if (parentWnd != nullptr)
-			parentHwnd = parentWnd->hwnd;
+		if (auto observe = parent.lock())
+			parentHwnd = observe->hwnd;
 		// 创建窗口
 		hwnd = CreateWindowW(wndClassName.c_str(), name.c_str(), WS_OVERLAPPEDWINDOW,
 			posX, posY, rect.right - rect.left, rect.bottom - rect.top,

@@ -86,18 +86,19 @@ namespace LCH::Graphics
 			featureLevels, 2, D3D11_SDK_VERSION, &d3dDevice, nullptr, &d3dContext));
 	}
 
-	Context<LowLevelAPI::DirectX11>::Context(Device<LowLevelAPI::DirectX11>* device)
+	Context<LowLevelAPI::DirectX11>::Context(const std::shared_ptr<Device<LowLevelAPI::DirectX11>>& device)
 	{
 		d3dContext.Swap(device->d3dContext);
 	}
 
-	void Context<LowLevelAPI::DirectX11>::ClearFrameBuffer(FrameBuffer<LowLevelAPI::DirectX11>* frameBuffer,
+	void Context<LowLevelAPI::DirectX11>::ClearFrameBuffer(const std::shared_ptr<FrameBuffer<LowLevelAPI::DirectX11>>& frameBuffer,
 		const Math::Color& color)
 	{
 		d3dContext->ClearRenderTargetView(frameBuffer->renderTargetView.Get(), color.RGBA());
 	}
 
-	FrameBuffer<LowLevelAPI::DirectX11>::FrameBuffer(Device<LowLevelAPI::DirectX11>* device, Window const* window)
+	FrameBuffer<LowLevelAPI::DirectX11>::FrameBuffer(const std::shared_ptr<Device<LowLevelAPI::DirectX11>>& device,
+		const std::shared_ptr<Window>& window)
 		: window(window)
 	{
 		if (window == nullptr)
@@ -157,6 +158,27 @@ namespace LCH::Graphics
 		next = 0;
 	}
 
+	DebugInfo<LowLevelAPI::DirectX11>::~DebugInfo()
+	{
+		const auto end = dxgiInfoQueue->GetNumStoredMessages(DXGI_DEBUG_ALL);
+		while (next < end)
+		{
+			HRESULT hr;
+			SIZE_T messageLength;
+			hr = dxgiInfoQueue->GetMessage(DXGI_DEBUG_ALL, next, nullptr, &messageLength);
+			if (hr == S_OK)
+			{
+				DXGI_INFO_QUEUE_MESSAGE* pMessage = (DXGI_INFO_QUEUE_MESSAGE*)malloc(messageLength);
+				hr = dxgiInfoQueue->GetMessage(DXGI_DEBUG_ALL, next, pMessage, &messageLength);
+				if (hr == S_OK)
+					Debug::Log(std::format("{}\n", pMessage->pDescription));
+				free(pMessage);
+			}
+
+			next++;
+		}
+	}
+
 	void DebugInfo<LowLevelAPI::DirectX11>::ReportLiveObjects()
 	{
 		dxgiDebug->ReportLiveObjects(DXGI_DEBUG_ALL, DXGI_DEBUG_RLO_ALL);
@@ -164,7 +186,16 @@ namespace LCH::Graphics
 
 	void DebugInfo<LowLevelAPI::DirectX11>::OutputMessages()
 	{
-
+		const auto end = dxgiInfoQueue->GetNumStoredMessages(DXGI_DEBUG_ALL);
+		while (next < end)
+		{
+			SIZE_T messageLength;
+			ThrowIfFailed(dxgiInfoQueue->GetMessage(DXGI_DEBUG_ALL, next, nullptr, &messageLength));
+			DXGI_INFO_QUEUE_MESSAGE* pMessage = (DXGI_INFO_QUEUE_MESSAGE*)malloc(messageLength);
+			ThrowIfFailed(dxgiInfoQueue->GetMessage(DXGI_DEBUG_ALL, next++, pMessage, &messageLength));
+			Debug::Log(std::format("{}\n", pMessage->pDescription));
+			free(pMessage);
+		}
 	}
 #endif
 }

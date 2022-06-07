@@ -40,10 +40,10 @@ namespace LCH
 
 	int Application::Run()
 	{
-		windows[L"天工渲染器"] = std::make_unique<Window>(200, 100, 800, 600, L"天工渲染器");
+		windows[L"天工渲染器"] = std::make_shared<Window>(200, 100, 800, 600, L"天工渲染器");
 		windows[L"天工渲染器"]->SpyInputEvent(false);
-		windows[L"辅助窗口"] = std::make_unique<Window>((screenWidth - 400) / 2, (screenHeight - 300) / 2, 
-			400, 300, L"辅助窗口", windows[L"天工渲染器"].get());
+		windows[L"辅助窗口"] = std::make_shared<Window>((screenWidth - 400) / 2, (screenHeight - 300) / 2,
+			400, 300, L"辅助窗口", windows[L"天工渲染器"]);
 		windows[L"辅助窗口"]->SpyMessage(false);
 		// 调用了SetWindowLongPtrW之后需要调用ShowWindow来激活窗口
 		SetWindowLongPtrW(windows[L"辅助窗口"]->Hwnd(), GWL_STYLE, WS_POPUP);
@@ -58,8 +58,8 @@ namespace LCH
 		unitTest.ArrayAlignmentTest();
 		unitTest.SIMDTest();
 
-		d3d11Layer->CreateFrameBuffer(windows[L"天工渲染器"].get());
-		d3d11Layer->CreateFrameBuffer(windows[L"辅助窗口"].get());
+		d3d11Layer->CreateFrameBuffer(windows[L"天工渲染器"]);
+		d3d11Layer->CreateFrameBuffer(windows[L"辅助窗口"]);
 
 		while (true)
 		{
@@ -81,9 +81,11 @@ namespace LCH
 			}
 
 			const float c = sin(timer.TotalTime() * 0.001f) / 2.0f + 0.5f;
-			d3d11Layer->ClearBackground(windows[L"天工渲染器"].get(), Math::Color::AliceBlue * c);
-			d3d11Layer->ClearBackground(windows[L"辅助窗口"].get(), c * Math::Color::Aquamarine);
+			d3d11Layer->ClearBackground(windows[L"天工渲染器"], Math::Color::AliceBlue * c);
+			d3d11Layer->ClearBackground(windows[L"辅助窗口"], c * Math::Color::Aquamarine);
 			d3d11Layer->Update();
+			if (windows[L"天工渲染器"]->Input().GetKeyDown(KeyCode::Space))
+				d3d11Layer->dbgInfo->ReportLiveObjects();
 		}
 	}
 }

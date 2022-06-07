@@ -27,6 +27,8 @@ namespace LCH::Graphics
 	{
 	public:
 		Device();
+		Device(const Device&) = delete;
+		Device& operator=(const Device&) = delete;
 
 	private:
 		std::vector<DXGI_MODE_DESC1> GetOutputModes(DXGI_FORMAT format);
@@ -49,9 +51,12 @@ namespace LCH::Graphics
 	class Context<LowLevelAPI::DirectX11>
 	{
 	public:
-		Context(Device<LowLevelAPI::DirectX11>* device);
+		Context(const std::shared_ptr<Device<LowLevelAPI::DirectX11>>& device);
+		Context(const Context&) = delete;
+		Context& operator=(const Context&) = delete;
 
-		void ClearFrameBuffer(FrameBuffer<LowLevelAPI::DirectX11>* buffer, const Math::Color& color);
+		void ClearFrameBuffer(const std::shared_ptr<FrameBuffer<LowLevelAPI::DirectX11>>& buffer, 
+			const Math::Color& color);
 
 	public:
 		ComPtr<ID3D11DeviceContext> d3dContext;
@@ -61,12 +66,15 @@ namespace LCH::Graphics
 	class FrameBuffer<LowLevelAPI::DirectX11>
 	{
 	public:
-		FrameBuffer(Device<LowLevelAPI::DirectX11>* device, Window const* window);
+		FrameBuffer(const std::shared_ptr<Device<LowLevelAPI::DirectX11>>& device, 
+			const std::shared_ptr<Window>& window);
+		FrameBuffer(const FrameBuffer&) = delete;
+		FrameBuffer& operator=(const FrameBuffer&) = delete;
 
 		void Present();
 
 	private:
-		Window const* window;
+		std::weak_ptr<Window> window;
 		ComPtr<IDXGISwapChain> swapChain;
 		ComPtr<ID3D11RenderTargetView> renderTargetView;
 		std::vector<DXGI_MODE_DESC1> outputModes;
@@ -85,11 +93,12 @@ namespace LCH::Graphics
 	{
 	public:
 		DebugInfo();
+		~DebugInfo();
 		DebugInfo(const DebugInfo&) = delete;
 		DebugInfo& operator=(const DebugInfo&) = delete;
 
 		void ReportLiveObjects();		// 输出所有d3d和dxgi物体
-		void OutputMessages();
+		void OutputMessages();			// 输出调试信息
 
 	private:
 		using DXGIGetDebugInterface = HRESULT(*)(REFIID, void**);

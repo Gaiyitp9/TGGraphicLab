@@ -27,7 +27,7 @@ namespace LCH
 	private:
 		std::locale locale;		// 语言区域
 		Chronometer timer;		// 高精度计时器
-		std::unordered_map<std::wstring, std::unique_ptr<Window>> windows;	// 所有窗口集合
+		std::unordered_map<std::wstring, std::shared_ptr<Window>> windows;						// 窗口集合
 		std::unique_ptr<Graphics::GraphicsLayer<Graphics::LowLevelAPI::DirectX11>> d3d11Layer;	// 渲染层
 
 		int screenWidth;		// 主显示器的宽

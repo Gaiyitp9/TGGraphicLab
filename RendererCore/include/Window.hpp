@@ -16,26 +16,26 @@ namespace LCH
 	class Window
 	{
 	public:
-		Window(int x, int y, int width, int height, wchar_t const* title = L"TG RenderLab", Window const* parent = nullptr);
+		Window(int x, int y, int width, int height, wchar_t const* title = L"TG RenderLab", std::shared_ptr<Window> parent = {});
 		Window(const Window&) = delete;
 		Window& operator=(const Window&) = delete;
 		virtual ~Window();
 
-		static std::optional<int> ProcessMessage();		// 处理所有窗口的消息
-		void Update();									// 更新窗口
+		static std::optional<int> ProcessMessage();					// 处理所有窗口的消息
+		void Update();												// 更新窗口
 
-		void SetIcon(int icon);							// 设置窗口的icon
+		void SetIcon(int icon);										// 设置窗口的icon
 
-		const HWND Hwnd() const noexcept;				// 窗口句柄
-		const std::wstring& Name() const noexcept;		// 窗口名称
-		Window const* ParentWindow() const noexcept;	// 返回父母窗口
-		const InputSystem& Input() const noexcept;		// 获取输入系统
-		int Width() const noexcept;					// 获取窗口宽和高
+		const HWND Hwnd() const noexcept;							// 窗口句柄
+		const std::wstring& Name() const noexcept;					// 窗口名称
+		const InputSystem& Input() const noexcept;					// 获取输入系统
+		const std::weak_ptr<Window>& ParentWindow() const noexcept;	// 返回父母窗口
+		int Width() const noexcept;									// 获取窗口宽和高
 		int Height() const noexcept;
 
-		bool Destroy() const noexcept;					// 是否销毁窗口
-		void SpyMessage(bool enable) noexcept;			// 捕捉窗口消息
-		void SpyInputEvent(bool enable) noexcept;		// 是否监控输入事件
+		bool Destroy() const noexcept;								// 是否销毁窗口
+		void SpyMessage(bool enable) noexcept;						// 捕捉窗口消息
+		void SpyInputEvent(bool enable) noexcept;					// 是否监控输入事件
 
 	private:
 		virtual void Initialize();											// 初始化窗口，子类窗口可以重写初始化窗口函数
@@ -46,7 +46,7 @@ namespace LCH
 		int posX, posY;
 		int width, height;
 		std::wstring name;
-		Window const* parentWnd = nullptr;
+		std::weak_ptr<Window> parent;
 
 		InputSystem input;				// 输入系统，用于记录输入信息，比如键盘和鼠标
 
