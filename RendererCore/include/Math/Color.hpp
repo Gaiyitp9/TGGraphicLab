@@ -6,7 +6,6 @@
 #pragma once
 
 #include "Simd.hpp"
-#include <DirectXColors.h>
 
 namespace LCH::Math
 {
@@ -14,7 +13,7 @@ namespace LCH::Math
 	{
 		using simd = simd_trait<float, SimdInstruction<float, 4>::type>;
 	public:
-		Color(float c = {}) { elements.fill(c); }
+		Color(float c = {}) { elements.fill(c); elements[3] = 1.0f; }
 		Color(float r, float g, float b, float a)
 		{
 			elements[0] = r;

@@ -88,21 +88,25 @@ namespace LCH::Graphics
 
 	Context<LowLevelAPI::DirectX11>::Context(const std::shared_ptr<Device<LowLevelAPI::DirectX11>>& device)
 	{
+		if (!device)
+			ThrowBaseExcept(L"'device' can not be null");
+
 		d3dContext.Swap(device->d3dContext);
 	}
 
 	void Context<LowLevelAPI::DirectX11>::ClearFrameBuffer(const std::shared_ptr<FrameBuffer<LowLevelAPI::DirectX11>>& frameBuffer,
 		const Math::Color& color)
 	{
-		d3dContext->ClearRenderTargetView(frameBuffer->renderTargetView.Get(), color.RGBA());
+		if (frameBuffer)
+			d3dContext->ClearRenderTargetView(frameBuffer->renderTargetView.Get(), color.RGBA());
 	}
 
 	FrameBuffer<LowLevelAPI::DirectX11>::FrameBuffer(const std::shared_ptr<Device<LowLevelAPI::DirectX11>>& device,
 		const std::shared_ptr<Window>& window)
 		: window(window)
 	{
-		if (window == nullptr)
-			ThrowBaseExcept(L"Parameter 'window' can not be nullptr");
+		if (!device || !window)
+			ThrowBaseExcept(L"'device' and/or 'window' can not be null");
 
 		ThrowIfFailed(device->d3dDevice->CheckMultisampleQualityLevels(backBufferFormat, sampleCount,
 			&numQualityLevels));

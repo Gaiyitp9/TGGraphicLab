@@ -84,8 +84,10 @@ namespace LCH
 			d3d11Layer->ClearBackground(windows[L"天工渲染器"], Math::Color::AliceBlue * c);
 			d3d11Layer->ClearBackground(windows[L"辅助窗口"], c * Math::Color::Aquamarine);
 			d3d11Layer->Update();
+#ifdef _DEBUG
 			if (windows[L"天工渲染器"]->Input().GetKeyDown(KeyCode::Space))
 				d3d11Layer->dbgInfo->ReportLiveObjects();
+#endif
 		}
 	}
 }
