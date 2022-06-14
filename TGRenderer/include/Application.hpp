@@ -5,7 +5,8 @@
 *****************************************************************/
 #pragma once
 
-#include "Window.hpp"
+#include "Window/MainWindow.hpp"
+#include "Window/PopupWindow.hpp"
 #include "Chronometer.hpp"
 #include "UnitTest.hpp"
 #include <locale>
@@ -25,8 +26,8 @@ namespace LCH
 		int Run();
 
 	private:
-		std::locale locale;		// 语言区域
-		Chronometer timer;		// 高精度计时器
+		std::locale locale;						// 语言区域
+		std::shared_ptr<Chronometer> timer;		// 高精度计时器
 		std::unordered_map<std::wstring, std::shared_ptr<Window>> windows;						// 窗口集合
 		std::unique_ptr<Graphics::GraphicsLayer<Graphics::LowLevelAPI::DirectX11>> d3d11Layer;	// 渲染层
 

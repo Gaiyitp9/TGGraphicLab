@@ -4,8 +4,8 @@
 * This code is licensed under the MIT License (MIT).			*
 *****************************************************************/
 
-#include "WindowRegister.hpp"
-#include "Window.hpp"
+#include "Window/WindowRegister.hpp"
+#include "Window/Window.hpp"
 #include "Diagnostics/Debug.hpp"
 #include <format>
 
@@ -241,10 +241,6 @@ namespace LCH
 		// 注：窗口处理函数不能向上传递异常，还没有想到好的解决方案。这个项目里的异常主要是为了定位，
 		// 涉及的函数是一些简单的WIN32函数和c++的STL，基本上不会出错，所以在这里不处理异常
 		Window* const pWnd = reinterpret_cast<Window*>(GetWindowLongPtrW(hwnd, GWLP_USERDATA));
-
-		// 是否监控窗口消息
-		if (pWnd->spyMessage)
-			Debug::LogLine(WindowRegister::GetInstance().GetWindowMesssageInfo(pWnd->name, msg, wParam, lParam));
 
 		// 窗口被销毁后，窗口类也需要被销毁
 		if (msg == WM_DESTROY)

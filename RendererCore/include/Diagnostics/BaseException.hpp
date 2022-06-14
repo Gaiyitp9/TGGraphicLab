@@ -5,7 +5,7 @@
 *****************************************************************/
 #pragma once
 
-#include "../SlimWindows.h"
+#include "SlimWindows.h"
 #include <exception>
 #include <string>
 #include <vector>

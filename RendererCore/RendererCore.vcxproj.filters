@@ -40,24 +40,21 @@
     <Filter Include="源文件\Math">
       <UniqueIdentifier>{9c08db6e-f22b-461f-8db7-b16dd6c6803b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="头文件\Window">
+      <UniqueIdentifier>{07e2cf1d-4534-4a8c-964e-9065bf18fac0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\Window">
+      <UniqueIdentifier>{5592fbc2-d750-493d-b168-837ecce7055d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\SlimWindows.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="include\Utility.hpp">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="include\Math\MathUtil.hpp">
       <Filter>头文件\Math</Filter>
     </ClInclude>
-    <ClInclude Include="include\Window.hpp">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="include\Chronometer.hpp">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="include\WindowRegister.hpp">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="include\Diagnostics\Debug.hpp">
@@ -105,18 +102,27 @@
     <ClInclude Include="include\Math\Color.hpp">
       <Filter>头文件\Math</Filter>
     </ClInclude>
+    <ClInclude Include="include\Window\Window.hpp">
+      <Filter>头文件\Window</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Window\WindowRegister.hpp">
+      <Filter>头文件\Window</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SlimWindows.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Window\MainWindow.hpp">
+      <Filter>头文件\Window</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Window\PopupWindow.hpp">
+      <Filter>头文件\Window</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Utility.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="src\Window.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="src\Chronometer.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="src\WindowRegister.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="src\Diagnostics\BaseException.cpp">
@@ -142,6 +148,18 @@
     </ClCompile>
     <ClCompile Include="src\Math\Color.cpp">
       <Filter>源文件\Math</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Window\Window.cpp">
+      <Filter>源文件\Window</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Window\WindowRegister.cpp">
+      <Filter>源文件\Window</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Window\MainWindow.cpp">
+      <Filter>源文件\Window</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Window\PopupWindow.cpp">
+      <Filter>源文件\Window</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

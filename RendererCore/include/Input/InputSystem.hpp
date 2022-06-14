@@ -29,6 +29,6 @@ namespace LCH
 		Keyboard keyboard;
 		Mouse mouse;
 
-		friend class Window;
+		friend class MainWindow;
 	};
 }

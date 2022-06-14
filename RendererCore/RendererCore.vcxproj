@@ -175,12 +175,14 @@
     <ClInclude Include="include\Math\Color.hpp" />
     <ClInclude Include="include\Math\Simd.hpp" />
     <ClInclude Include="include\Math\Vector.hpp" />
-    <ClInclude Include="include\Window.hpp" />
     <ClInclude Include="include\Chronometer.hpp" />
     <ClInclude Include="include\Math\MathUtil.hpp" />
     <ClInclude Include="include\SlimWindows.h" />
     <ClInclude Include="include\Utility.hpp" />
-    <ClInclude Include="include\WindowRegister.hpp" />
+    <ClInclude Include="include\Window\MainWindow.hpp" />
+    <ClInclude Include="include\Window\PopupWindow.hpp" />
+    <ClInclude Include="include\Window\Window.hpp" />
+    <ClInclude Include="include\Window\WindowRegister.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Diagnostics\BaseException.cpp" />
@@ -193,8 +195,10 @@
     <ClCompile Include="src\Chronometer.cpp" />
     <ClCompile Include="src\Math\Color.cpp" />
     <ClCompile Include="src\Utility.cpp" />
-    <ClCompile Include="src\Window.cpp" />
-    <ClCompile Include="src\WindowRegister.cpp" />
+    <ClCompile Include="src\Window\MainWindow.cpp" />
+    <ClCompile Include="src\Window\PopupWindow.cpp" />
+    <ClCompile Include="src\Window\Window.cpp" />
+    <ClCompile Include="src\Window\WindowRegister.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="include\Math\Implementation\Vector.inl" />

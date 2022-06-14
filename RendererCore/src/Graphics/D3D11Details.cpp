@@ -5,6 +5,7 @@
 *****************************************************************/
 
 #include "Graphics/D3D11Details.hpp"
+#include <format>
 
 namespace LCH::Graphics
 {

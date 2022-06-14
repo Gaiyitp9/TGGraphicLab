@@ -43,7 +43,7 @@ namespace LCH
 		bool spyMouse = false;							// 是否监控鼠标
 
 	private:
-		Math::Vector2i position;								// 鼠标位置
+		Math::Vector2i position;						// 鼠标位置
 		short wheelDelta = 0;							// 滚轮变化值，正值表示向前滚动，远离使用者；负值表示向后滚动，朝向使用者
 
 		std::queue<InputEvent> eventBuffer;				// 输入事件队列
