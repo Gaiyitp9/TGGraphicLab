@@ -47,7 +47,7 @@ namespace LCH
 		return input;
 	}
 
-	void MainWindow::SetTimer(const std::shared_ptr<Chronometer>& timer)
+	void MainWindow::SetTimer(const std::shared_ptr<Chronometer>& timer) noexcept
 	{
 		this->timer = timer;
 	}
@@ -172,6 +172,8 @@ namespace LCH
 			return 0;
 
 		case WM_SIZE:
+			width = LOWORD(lParam);
+			height = HIWORD(lParam);
 			if (auto observer = timer.lock())
 			{
 				if (wParam == SIZE_MINIMIZED)

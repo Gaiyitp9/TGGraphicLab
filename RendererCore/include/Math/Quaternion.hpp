@@ -5,22 +5,13 @@
 *****************************************************************/
 #pragma once
 
-#include "../Diagnostics/MemoryDbg.hpp"
-
 namespace LCH::Math
 {
-	// 数学工具类
-	class MathUtil
+	template <typename T>
+	class Quaternion
 	{
 	public:
-		// 地址是否满足对齐条件
-		template <typename T>
-		inline static bool IsAligned(T const* value, size_t alignment)
-		{
-			return 0 == ((size_t)value & (alignment - 1));
-		}
-
-	public:
-		static float epsilon;
+		Quaternion();
+		Quaternion(T x, T y, T z, T w);
 	};
 }

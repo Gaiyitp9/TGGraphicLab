@@ -6,6 +6,7 @@
 #pragma once
 
 #include "Simd.hpp"
+#include "MathUtil.hpp"
 
 namespace LCH::Math
 {
@@ -88,6 +89,7 @@ namespace LCH::Math
 
 	public:
 		T Dot(const Vector& vec) const;
+		Vector Cross(const Vector& vec) const;
 
 		Vector operator+(const Vector& vec) const;
 		Vector operator-(const Vector& vec) const;

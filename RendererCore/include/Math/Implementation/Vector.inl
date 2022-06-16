@@ -255,13 +255,25 @@ namespace LCH::Math
 	template<typename T> requires mathlib_type_and_size<T, 3>
 	inline Vector<T, 3> Vector<T, 3>::normalized() const
 	{
-		return *this / magnitude();
+		T mag = magnitude();
+		if (mag < MathUtil::epsilon)
+			return { 0, 0, 0 };
+
+		return *this / mag;
 	}
 
 	template<typename T> requires mathlib_type_and_size<T, 3>
 	inline T Vector<T, 3>::Dot(const Vector& vec) const
 	{
 		return elements[0] * vec.elements[0] + elements[1] * vec.elements[1] + elements[2] * vec.elements[2];
+	}
+
+	template<typename T> requires mathlib_type_and_size<T, 3>
+	inline Vector<T, 3> Vector<T, 3>::Cross(const Vector& vec) const
+	{
+		return { elements[1] * vec.elements[2] - vec.elements[1] * elements[2],
+				 vec.elements[0] * elements[2] - elements[0] * vec.elements[2],
+				 elements[0] * vec.elements[1] - vec.elements[0] * elements[1] };
 	}
 
 	template<typename T> requires mathlib_type_and_size<T, 3>
@@ -352,7 +364,11 @@ namespace LCH::Math
 	template<typename T> requires mathlib_type_and_size<T, 2>
 	inline Vector<T, 2> Vector<T, 2>::normalized() const
 	{
-		return *this / magnitude();
+		T mag = magnitude();
+		if (mag < MathUtil::epsilon)
+			return { 0, 0 };
+
+		return *this / mag;
 	}
 
 	template<typename T> requires mathlib_type_and_size<T, 2>

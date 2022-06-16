@@ -117,6 +117,9 @@
     <ClInclude Include="include\Window\PopupWindow.hpp">
       <Filter>头文件\Window</Filter>
     </ClInclude>
+    <ClInclude Include="include\Math\Quaternion.hpp">
+      <Filter>头文件\Math</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Utility.cpp">
@@ -160,6 +163,9 @@
     </ClCompile>
     <ClCompile Include="src\Window\PopupWindow.cpp">
       <Filter>源文件\Window</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Math\MathUtil.cpp">
+      <Filter>源文件\Math</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

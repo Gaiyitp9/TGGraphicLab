@@ -121,6 +121,11 @@ namespace LCH
 			std::cout << v4[i] << " ";
 		}
 		std::cout << std::endl;
+
+		Math::Vector3f vf1{ 3.2f, 2.1f, 5.0f };
+		Math::Vector3f vf2{ -0.2f, 6.1f, 1.0f };
+		Math::Vector3f vcross = vf1.Cross(vf2);
+		std::cout << "cross: " << vcross.x() << " " << vcross.y() << " " << vcross.z() << std::endl;
 	}
 
 	void UnitTest::SIMDTest()
