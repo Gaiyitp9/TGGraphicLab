@@ -102,7 +102,7 @@ namespace LCH
 			PostQuitMessage(0);
 			return 0;
 
-			// 按下按键
+		// 按下按键
 		case WM_KEYDOWN:
 		case WM_SYSKEYDOWN:
 		{
@@ -128,7 +128,7 @@ namespace LCH
 			}
 			return 0;
 
-			// 鼠标移动
+		// 鼠标移动
 		case WM_MOUSEMOVE:
 		{
 			input.mouse.OnMouseMove(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
@@ -140,32 +140,32 @@ namespace LCH
 			input.mouse.OnButtonPress(KeyCode::LeftMouseButton);
 			return 0;
 
-			// 松开鼠标左键
+		// 松开鼠标左键
 		case WM_LBUTTONUP:
 			input.mouse.OnButtonRelease(KeyCode::LeftMouseButton);
 			return 0;
 
-			// 按下鼠标右键
+		// 按下鼠标右键
 		case WM_RBUTTONDOWN:
 			input.mouse.OnButtonPress(KeyCode::RightMouseButton);
 			return 0;
 
-			// 松开鼠标右键
+		// 松开鼠标右键
 		case WM_RBUTTONUP:
 			input.mouse.OnButtonRelease(KeyCode::RightMouseButton);
 			return 0;
 
-			// 按下鼠标中键
+		// 按下鼠标中键
 		case WM_MBUTTONDOWN:
 			input.mouse.OnButtonPress(KeyCode::MidMouseButton);
 			return 0;
 
-			// 松开鼠标中键
+		// 松开鼠标中键
 		case WM_MBUTTONUP:
 			input.mouse.OnButtonRelease(KeyCode::MidMouseButton);
 			return 0;
 
-			// 滚动鼠标滚轮
+		// 滚动鼠标滚轮
 		case WM_MOUSEWHEEL:
 			// 每帧只会产生一个WM_MOUSEWHEEL
 			input.mouse.OnWheelRoll(KeyCode::MidMouseButton, GET_WHEEL_DELTA_WPARAM(wParam));
