@@ -172,5 +172,8 @@
     <None Include="include\Math\Implementation\Vector.inl">
       <Filter>头文件\Math\Implementation</Filter>
     </None>
+    <None Include="include\Math\Implementation\Quaternion.inl">
+      <Filter>头文件\Math\Implementation</Filter>
+    </None>
   </ItemGroup>
 </Project>

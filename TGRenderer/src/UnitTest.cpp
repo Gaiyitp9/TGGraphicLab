@@ -79,6 +79,7 @@ namespace LCH
 
 	void UnitTest::MathLibTest()
 	{
+		Math::Vector4d vvv;
 		Math::Vector4f v;
 		std::cout << "Vector<float, 4> value address = " << &v << std::boolalpha << Math::MathUtil::IsAligned(&v, 16) << std::endl;
 		std::cout << v.x() << " " << v.y() << " " << v.z() << " " << v.w() << std::endl;

@@ -10,34 +10,25 @@
 
 namespace LCH::Math
 {
-	// 是否支持SIMD的trait
-	struct support_simd;
+	struct instruction_sse {};
+	struct instruction_avx {};
 
-	enum class InstructionType
-	{
-		SSE,
-		AVX,
-	};
-
-	// 向量和矩阵的元素类型和维度的concept
-	template<typename T, size_t Size>
-	concept mathlib_type_and_size = (std::is_same_v<T, int> || std::is_same_v<T, float> ||
-		std::is_same_v<T, double>) && (Size > 1);
+	// 向量和矩阵的元素类型及维度的concept
+	template<typename T, size_t Dimension>
+	concept type_and_dimension = (std::is_same_v<T, int> || std::is_same_v<T, float> ||
+		std::is_same_v<T, double>) && (Dimension > 1);
 
 	// 根据向量和矩阵的维度选择指令集
-	template<typename T, size_t Size, typename Enable = void>
-	struct SimdInstruction;
-	// 根据维度定义两种特化
-	template<typename T, size_t Size>
-	struct SimdInstruction<T, Size, std::enable_if_t<std::is_same_v<T, double> || (Size >= 16)>>
-	{ 
-		static constexpr InstructionType type = InstructionType::AVX; 
+	template<typename T, size_t Dimension, typename Enable = void>
+	struct SimdInstruction
+	{
+		using type = instruction_sse;
 	};
-
-	template<typename T, size_t Size>
-	struct SimdInstruction<T, Size, std::enable_if_t<!std::is_same_v<T, double> && (Size < 16)>>
+	// 偏特化
+	template<typename T, size_t Dimension>
+	struct SimdInstruction<T, Dimension, std::enable_if_t<std::is_same_v<T, double> || (Dimension >= 16)>>
 	{ 
-		static constexpr InstructionType type = InstructionType::SSE; 
+		using type = instruction_avx;
 	};
 
 	// 内存对齐数组
@@ -51,13 +42,14 @@ namespace LCH::Math
 
 namespace LCH::Math
 {
+	// 是否支持SIMD的trait
 	struct support_simd : std::true_type { };
 
-	template<typename T, InstructionType type>
+	template<typename T, typename InstructionSet>
 	struct simd_trait;
 
 	template<>
-	struct simd_trait<float, InstructionType::SSE>
+	struct simd_trait<float, instruction_sse>
 	{
 		static constexpr size_t Alignment = 16;
 		static constexpr size_t DataCount = 4;
@@ -94,7 +86,7 @@ namespace LCH::Math
 	};
 
 	template<>
-	struct simd_trait<float, InstructionType::AVX>
+	struct simd_trait<float, instruction_avx>
 	{
 		static constexpr size_t Alignment = 32;
 		static constexpr size_t DataCount = 8;
@@ -132,7 +124,7 @@ namespace LCH::Math
 	};
 
 	template<>
-	struct simd_trait<int, InstructionType::SSE>
+	struct simd_trait<int, instruction_sse>
 	{
 		static constexpr size_t Alignment = 16;
 		static constexpr size_t DataCount = 4;
@@ -171,7 +163,7 @@ namespace LCH::Math
 	};
 
 	template<>
-	struct simd_trait<int, InstructionType::AVX>
+	struct simd_trait<int, instruction_avx>
 	{
 		static constexpr size_t Alignment = 32;
 		static constexpr size_t DataCount = 8;
@@ -211,7 +203,7 @@ namespace LCH::Math
 	};
 
 	template<>
-	struct simd_trait<double, InstructionType::AVX>
+	struct simd_trait<double, instruction_avx>
 	{
 		static constexpr size_t Alignment = 32;
 		static constexpr size_t DataCount = 4;

@@ -10,12 +10,12 @@
 
 namespace LCH::Math
 {
-	template<typename T, size_t Size> requires mathlib_type_and_size<T, Size>
+	template<typename T, size_t Dimension> requires type_and_dimension<T, Dimension>
 	class Vector
 	{
-		using simd = simd_trait<T, SimdInstruction<T, Size>::type>;
-		static const size_t loop = Size / simd::DataCount;
-		static const size_t remainder = Size % simd::DataCount;
+		using simd = simd_trait<T, typename SimdInstruction<T, Dimension>::type>;
+		static constexpr size_t loop = Dimension / simd::DataCount;
+		static constexpr size_t remainder = Dimension % simd::DataCount;
 	public:
 		Vector(T x = {});
 
@@ -25,13 +25,13 @@ namespace LCH::Math
 		Vector operator+(const Vector& vec) const;
 
 	private:
-		aligned_array<T, Size, simd::Alignment> elements;
+		aligned_array<T, Dimension, simd::Alignment> elements;
 	};
 
-	template<typename T> requires mathlib_type_and_size<T, 4>
+	template<typename T> requires type_and_dimension<T, 4>
 	class Vector<T, 4>
 	{
-		using simd = simd_trait<T, SimdInstruction<T, 4>::type>;
+		using simd = simd_trait<T, typename SimdInstruction<T, 4>::type>;
 	public:
 		Vector(T x = {});
 		Vector(T x, T y, T z, T w);
@@ -65,7 +65,7 @@ namespace LCH::Math
 		aligned_array<T, 4, simd::Alignment> elements;
 	};
 
-	template<typename T> requires mathlib_type_and_size<T, 3>
+	template<typename T> requires type_and_dimension<T, 3>
 	class Vector<T, 3>
 	{
 	public:
@@ -100,7 +100,7 @@ namespace LCH::Math
 		std::array<T, 3> elements;
 	};
 
-	template<typename T> requires mathlib_type_and_size<T, 2>
+	template<typename T> requires type_and_dimension<T, 2>
 	class Vector<T, 2>
 	{
 	public:

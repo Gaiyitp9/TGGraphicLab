@@ -8,26 +8,26 @@
 
 namespace LCH::Math
 {
-	template<typename T, size_t Size> requires mathlib_type_and_size<T, Size>
-	inline Vector<T, Size>::Vector(T x)
+	template<typename T, size_t Dimension> requires type_and_dimension<T, Dimension>
+	inline Vector<T, Dimension>::Vector(T x)
 	{
 		elements.fill(x);
 	}
 
-	template<typename T, size_t Size> requires mathlib_type_and_size<T, Size>
-	inline const T& Vector<T, Size>::operator[](size_t index) const
+	template<typename T, size_t Dimension> requires type_and_dimension<T, Dimension>
+	inline const T& Vector<T, Dimension>::operator[](size_t index) const
 	{
 		return elements.at(index);
 	}
 
-	template<typename T, size_t Size> requires mathlib_type_and_size<T, Size>
-	inline T& Vector<T, Size>::operator[](size_t index)
+	template<typename T, size_t Dimension> requires type_and_dimension<T, Dimension>
+	inline T& Vector<T, Dimension>::operator[](size_t index)
 	{
 		return elements.at(index);
 	}
 
-	template<typename T, size_t Size> requires mathlib_type_and_size<T, Size>
-	Vector<T, Size> Vector<T, Size>::operator+(const Vector& vec) const
+	template<typename T, size_t Dimension> requires type_and_dimension<T, Dimension>
+	Vector<T, Dimension> Vector<T, Dimension>::operator+(const Vector& vec) const
 	{
 		Vector res;
 		if constexpr (support_simd_t)
@@ -49,7 +49,7 @@ namespace LCH::Math
 		}
 		else
 		{
-			for (size_t i = 0; i < Size; ++i)
+			for (size_t i = 0; i < Dimension; ++i)
 			{
 				res.elements[i] = elements[i] + vec.elements[i];
 			}
@@ -57,13 +57,13 @@ namespace LCH::Math
 		return res;
 	}
 
-	template<typename T> requires mathlib_type_and_size<T, 4>
+	template<typename T> requires type_and_dimension<T, 4>
 	inline Vector<T, 4>::Vector(T x)
 	{
 		elements.fill(x);
 	}
 
-	template<typename T> requires mathlib_type_and_size<T, 4>
+	template<typename T> requires type_and_dimension<T, 4>
 	inline Vector<T, 4>::Vector(T x, T y, T z, T w)
 	{
 		elements[0] = x;
@@ -72,61 +72,61 @@ namespace LCH::Math
 		elements[3] = w;
 	}
 
-	template<typename T> requires mathlib_type_and_size<T, 4>
+	template<typename T> requires type_and_dimension<T, 4>
 	inline const T& Vector<T, 4>::operator[](size_t pos) const
 	{
 		return elements.at(pos);
 	}
 
-	template<typename T> requires mathlib_type_and_size<T, 4>
+	template<typename T> requires type_and_dimension<T, 4>
 	inline T& Vector<T, 4>::operator[](size_t pos)
 	{
 		return elements.at(pos);
 	}
 
-	template<typename T> requires mathlib_type_and_size<T, 4>
+	template<typename T> requires type_and_dimension<T, 4>
 	inline const T& Vector<T, 4>::x() const { return elements[0]; }
 
-	template<typename T> requires mathlib_type_and_size<T, 4>
+	template<typename T> requires type_and_dimension<T, 4>
 	inline const T& Vector<T, 4>::y() const { return elements[1]; }
 
-	template<typename T> requires mathlib_type_and_size<T, 4>
+	template<typename T> requires type_and_dimension<T, 4>
 	inline const T& Vector<T, 4>::z() const { return elements[2]; }
 
-	template<typename T> requires mathlib_type_and_size<T, 4>
+	template<typename T> requires type_and_dimension<T, 4>
 	inline const T& Vector<T, 4>::w() const { return elements[3]; }
 
-	template<typename T> requires mathlib_type_and_size<T, 4>
+	template<typename T> requires type_and_dimension<T, 4>
 	inline T& Vector<T, 4>::x() { return elements[0]; }
 
-	template<typename T> requires mathlib_type_and_size<T, 4>
+	template<typename T> requires type_and_dimension<T, 4>
 	inline T& Vector<T, 4>::y() { return elements[1]; }
 
-	template<typename T> requires mathlib_type_and_size<T, 4>
+	template<typename T> requires type_and_dimension<T, 4>
 	inline T& Vector<T, 4>::z() { return elements[2]; }
 
-	template<typename T> requires mathlib_type_and_size<T, 4>
+	template<typename T> requires type_and_dimension<T, 4>
 	inline T& Vector<T, 4>::w() { return elements[3]; }
 
-	template<typename T> requires mathlib_type_and_size<T, 4>
+	template<typename T> requires type_and_dimension<T, 4>
 	inline T Vector<T, 4>::magnitude() const
 	{
 		return sqrt(Dot(*this));
 	}
 
-	template<typename T> requires mathlib_type_and_size<T, 4>
+	template<typename T> requires type_and_dimension<T, 4>
 	inline T Vector<T, 4>::sqrMagnitude() const
 	{
 		return Dot(*this);
 	}
 
-	template<typename T> requires mathlib_type_and_size<T, 4>
+	template<typename T> requires type_and_dimension<T, 4>
 	inline Vector<T, 4> Vector<T, 4>::normalized() const
 	{
 		return *this / magnitude();
 	}
 
-	template<typename T> requires mathlib_type_and_size<T, 4>
+	template<typename T> requires type_and_dimension<T, 4>
 	inline T Vector<T, 4>::Dot(const Vector& vec) const
 	{
 		T dot;
@@ -141,7 +141,7 @@ namespace LCH::Math
 		return dot;
 	}
 
-	template<typename T> requires mathlib_type_and_size<T, 4>
+	template<typename T> requires type_and_dimension<T, 4>
 	inline Vector<T, 4> Vector<T, 4>::operator+(const Vector& vec) const
 	{
 		Vector res;
@@ -157,7 +157,7 @@ namespace LCH::Math
 		return res;
 	}
 
-	template<typename T> requires mathlib_type_and_size<T, 4>
+	template<typename T> requires type_and_dimension<T, 4>
 	inline Vector<T, 4> Vector<T, 4>::operator-(const Vector& vec) const
 	{
 		Vector res;
@@ -173,7 +173,7 @@ namespace LCH::Math
 		return res;
 	}
 
-	template<typename T> requires mathlib_type_and_size<T, 4>
+	template<typename T> requires type_and_dimension<T, 4>
 	inline Vector<T, 4> Vector<T, 4>::operator*(T a) const
 	{
 		Vector res(a);
@@ -181,7 +181,7 @@ namespace LCH::Math
 		return res;
 	}
 
-	template<typename T> requires mathlib_type_and_size<T, 4>
+	template<typename T> requires type_and_dimension<T, 4>
 	inline Vector<T, 4> Vector<T, 4>::operator/(T a) const
 	{
 		Vector res(a);
@@ -190,19 +190,19 @@ namespace LCH::Math
 	}
 
 	template<typename T, typename U, size_t Size> 
-		requires mathlib_type_and_size<T, Size> && std::is_arithmetic_v<U>
+		requires type_and_dimension<T, Size> && std::is_arithmetic_v<U>
 	inline Vector<T, Size> operator*(U a, Vector<T, Size> v)
 	{
 		return v * static_cast<T>(a);
 	}
 
-	template<typename T> requires mathlib_type_and_size<T, 3>
+	template<typename T> requires type_and_dimension<T, 3>
 	inline Vector<T, 3>::Vector(T x)
 	{
 		elements.fill(x);
 	}
 
-	template<typename T> requires mathlib_type_and_size<T, 3>
+	template<typename T> requires type_and_dimension<T, 3>
 	inline Vector<T, 3>::Vector(T x, T y, T z)
 	{
 		elements[0] = x;
@@ -210,49 +210,49 @@ namespace LCH::Math
 		elements[2] = z;
 	}
 
-	template<typename T> requires mathlib_type_and_size<T, 3>
+	template<typename T> requires type_and_dimension<T, 3>
 	inline const T& Vector<T, 3>::operator[](size_t index) const
 	{
 		return elements.at(index);
 	}
 
-	template<typename T> requires mathlib_type_and_size<T, 3>
+	template<typename T> requires type_and_dimension<T, 3>
 	inline T& Vector<T, 3>::operator[](size_t index)
 	{
 		return elements.at(index);
 	}
 
-	template<typename T> requires mathlib_type_and_size<T, 3>
+	template<typename T> requires type_and_dimension<T, 3>
 	inline const T& Vector<T, 3>::x() const { return elements[0]; }
 
-	template<typename T> requires mathlib_type_and_size<T, 3>
+	template<typename T> requires type_and_dimension<T, 3>
 	inline const T& Vector<T, 3>::y() const { return elements[1]; }
 
-	template<typename T> requires mathlib_type_and_size<T, 3>
+	template<typename T> requires type_and_dimension<T, 3>
 	inline const T& Vector<T, 3>::z() const { return elements[2]; }
 
-	template<typename T> requires mathlib_type_and_size<T, 3>
+	template<typename T> requires type_and_dimension<T, 3>
 	inline T& Vector<T, 3>::x() { return elements[0]; }
 
-	template<typename T> requires mathlib_type_and_size<T, 3>
+	template<typename T> requires type_and_dimension<T, 3>
 	inline T& Vector<T, 3>::y() { return elements[1]; }
 
-	template<typename T> requires mathlib_type_and_size<T, 3>
+	template<typename T> requires type_and_dimension<T, 3>
 	inline T& Vector<T, 3>::z() { return elements[2]; }
 
-	template<typename T> requires mathlib_type_and_size<T, 3>
+	template<typename T> requires type_and_dimension<T, 3>
 	inline T Vector<T, 3>::magnitude() const
 	{
 		return sqrt(Dot(*this));
 	}
 
-	template<typename T> requires mathlib_type_and_size<T, 3>
+	template<typename T> requires type_and_dimension<T, 3>
 	inline T Vector<T, 3>::sqrMagnitude() const
 	{
 		return Dot(*this);
 	}
 
-	template<typename T> requires mathlib_type_and_size<T, 3>
+	template<typename T> requires type_and_dimension<T, 3>
 	inline Vector<T, 3> Vector<T, 3>::normalized() const
 	{
 		T mag = magnitude();
@@ -262,13 +262,13 @@ namespace LCH::Math
 		return *this / mag;
 	}
 
-	template<typename T> requires mathlib_type_and_size<T, 3>
+	template<typename T> requires type_and_dimension<T, 3>
 	inline T Vector<T, 3>::Dot(const Vector& vec) const
 	{
 		return elements[0] * vec.elements[0] + elements[1] * vec.elements[1] + elements[2] * vec.elements[2];
 	}
 
-	template<typename T> requires mathlib_type_and_size<T, 3>
+	template<typename T> requires type_and_dimension<T, 3>
 	inline Vector<T, 3> Vector<T, 3>::Cross(const Vector& vec) const
 	{
 		return { elements[1] * vec.elements[2] - vec.elements[1] * elements[2],
@@ -276,7 +276,7 @@ namespace LCH::Math
 				 elements[0] * vec.elements[1] - vec.elements[0] * elements[1] };
 	}
 
-	template<typename T> requires mathlib_type_and_size<T, 3>
+	template<typename T> requires type_and_dimension<T, 3>
 	inline Vector<T, 3> Vector<T, 3>::operator+(const Vector& vec) const
 	{
 		Vector res;
@@ -285,7 +285,7 @@ namespace LCH::Math
 		return res;
 	}
 
-	template<typename T> requires mathlib_type_and_size<T, 3>
+	template<typename T> requires type_and_dimension<T, 3>
 	inline Vector<T, 3> Vector<T, 3>::operator-(const Vector& vec) const
 	{
 		Vector res;
@@ -294,7 +294,7 @@ namespace LCH::Math
 		return res;
 	}
 
-	template<typename T> requires mathlib_type_and_size<T, 3>
+	template<typename T> requires type_and_dimension<T, 3>
 	inline Vector<T, 3> Vector<T, 3>::operator*(T a) const
 	{
 		Vector res;
@@ -303,7 +303,7 @@ namespace LCH::Math
 		return res;
 	}
 
-	template<typename T> requires mathlib_type_and_size<T, 3>
+	template<typename T> requires type_and_dimension<T, 3>
 	inline Vector<T, 3> Vector<T, 3>::operator/(T a) const
 	{
 		Vector res;
@@ -312,56 +312,56 @@ namespace LCH::Math
 		return res;
 	}
 
-	template<typename T> requires mathlib_type_and_size<T, 2>
+	template<typename T> requires type_and_dimension<T, 2>
 	inline Vector<T, 2>::Vector(T x)
 	{
 		elements.fill(x);
 	}
 
-	template<typename T> requires mathlib_type_and_size<T, 2>
+	template<typename T> requires type_and_dimension<T, 2>
 	inline Vector<T, 2>::Vector(T x, T y)
 	{
 		elements[0] = x;
 		elements[1] = y;
 	}
 
-	template<typename T> requires mathlib_type_and_size<T, 2>
+	template<typename T> requires type_and_dimension<T, 2>
 	inline const T& Vector<T, 2>::operator[](size_t pos) const
 	{
 		return elements.at(pos);
 	}
 
-	template<typename T> requires mathlib_type_and_size<T, 2>
+	template<typename T> requires type_and_dimension<T, 2>
 	inline T& Vector<T, 2>::operator[](size_t pos)
 	{
 		return elements.at(pos);
 	}
 
-	template<typename T> requires mathlib_type_and_size<T, 2>
+	template<typename T> requires type_and_dimension<T, 2>
 	inline const T& Vector<T, 2>::x() const { return elements[0]; }
 
-	template<typename T> requires mathlib_type_and_size<T, 2>
+	template<typename T> requires type_and_dimension<T, 2>
 	inline const T& Vector<T, 2>::y() const { return elements[1]; }
 
-	template<typename T> requires mathlib_type_and_size<T, 2>
+	template<typename T> requires type_and_dimension<T, 2>
 	inline T& Vector<T, 2>::x() { return elements[0]; }
 
-	template<typename T> requires mathlib_type_and_size<T, 2>
+	template<typename T> requires type_and_dimension<T, 2>
 	inline T& Vector<T, 2>::y() { return elements[1]; }
 
-	template<typename T> requires mathlib_type_and_size<T, 2>
+	template<typename T> requires type_and_dimension<T, 2>
 	inline T Vector<T, 2>::magnitude() const
 	{
 		return sqrt(Dot(*this));
 	}
 
-	template<typename T> requires mathlib_type_and_size<T, 2>
+	template<typename T> requires type_and_dimension<T, 2>
 	inline T Vector<T, 2>::sqrMagnitude() const
 	{
 		return Dot(*this);
 	}
 
-	template<typename T> requires mathlib_type_and_size<T, 2>
+	template<typename T> requires type_and_dimension<T, 2>
 	inline Vector<T, 2> Vector<T, 2>::normalized() const
 	{
 		T mag = magnitude();
@@ -371,13 +371,13 @@ namespace LCH::Math
 		return *this / mag;
 	}
 
-	template<typename T> requires mathlib_type_and_size<T, 2>
+	template<typename T> requires type_and_dimension<T, 2>
 	inline T Vector<T, 2>::Dot(const Vector& vec) const
 	{
 		return elements[0] * vec.elements[0] + elements[1] * vec.elements[1];
 	}
 
-	template<typename T> requires mathlib_type_and_size<T, 2>
+	template<typename T> requires type_and_dimension<T, 2>
 	inline Vector<T, 2> Vector<T, 2>::operator+(const Vector& vec) const
 	{
 		Vector res;
@@ -386,7 +386,7 @@ namespace LCH::Math
 		return res;
 	}
 
-	template<typename T> requires mathlib_type_and_size<T, 2>
+	template<typename T> requires type_and_dimension<T, 2>
 	inline Vector<T, 2> Vector<T, 2>::operator-(const Vector& vec) const
 	{
 		Vector res;
@@ -395,7 +395,7 @@ namespace LCH::Math
 		return res;
 	}
 
-	template<typename T> requires mathlib_type_and_size<T, 2>
+	template<typename T> requires type_and_dimension<T, 2>
 	inline Vector<T, 2> Vector<T, 2>::operator*(T a) const
 	{
 		Vector res;
@@ -404,7 +404,7 @@ namespace LCH::Math
 		return res;
 	}
 
-	template<typename T> requires mathlib_type_and_size<T, 2>
+	template<typename T> requires type_and_dimension<T, 2>
 	inline Vector<T, 2> Vector<T, 2>::operator/(T a) const
 	{
 		Vector res;

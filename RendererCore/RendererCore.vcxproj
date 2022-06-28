@@ -203,6 +203,7 @@
     <ClCompile Include="src\Window\WindowRegister.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="include\Math\Implementation\Quaternion.inl" />
     <None Include="include\Math\Implementation\Vector.inl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
