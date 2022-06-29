@@ -6,7 +6,7 @@
 #pragma once
 
 #include "Simd.hpp"
-#include "MathUtil.hpp"
+#include "Utility.hpp"
 
 namespace LCH::Math
 {
@@ -16,6 +16,7 @@ namespace LCH::Math
 		using simd = simd_trait<T, typename SimdInstruction<T, Dimension>::type>;
 		static constexpr size_t loop = Dimension / simd::DataCount;
 		static constexpr size_t remainder = Dimension % simd::DataCount;
+		static constexpr T epsilon = static_cast<T>(1e-5);
 	public:
 		Vector(T x = {});
 
@@ -28,10 +29,11 @@ namespace LCH::Math
 		aligned_array<T, Dimension, simd::Alignment> elements;
 	};
 
-	template<typename T> requires type_and_dimension<T, 4>
+	template<typename T>
 	class Vector<T, 4>
 	{
 		using simd = simd_trait<T, typename SimdInstruction<T, 4>::type>;
+		static constexpr T epsilon = static_cast<T>(1e-5);
 	public:
 		Vector(T x = {});
 		Vector(T x, T y, T z, T w);
@@ -65,9 +67,10 @@ namespace LCH::Math
 		aligned_array<T, 4, simd::Alignment> elements;
 	};
 
-	template<typename T> requires type_and_dimension<T, 3>
+	template<typename T>
 	class Vector<T, 3>
 	{
+		static constexpr T epsilon = static_cast<T>(1e-5);
 	public:
 		Vector(T x = {});
 		Vector(T x, T y, T z);
@@ -100,9 +103,10 @@ namespace LCH::Math
 		std::array<T, 3> elements;
 	};
 
-	template<typename T> requires type_and_dimension<T, 2>
+	template<typename T>
 	class Vector<T, 2>
 	{
+		static constexpr T epsilon = static_cast<T>(1e-5);
 	public:
 		Vector(T x = {});
 		Vector(T x, T y);
@@ -132,12 +136,38 @@ namespace LCH::Math
 		std::array<T, 2> elements;
 	};
 
+	template<>
+	class Vector<int, 2>
+	{
+	public:
+		Vector(int x = {});
+		Vector(int x, int y);
+
+	public:
+		const int& operator[](size_t pos) const;
+		int& operator[](size_t pos);
+
+		const int& x() const;
+		const int& y() const;
+		int& x();
+		int& y();
+
+	public:
+		int Dot(const Vector& vec) const;
+
+		Vector operator+(const Vector& vec) const;
+		Vector operator-(const Vector& vec) const;
+		Vector operator*(int a) const;
+		Vector operator/(int a) const;
+
+	private:
+		std::array<int, 2> elements;
+	};
+
 	using Vector4f = Vector<float, 4>;
 	using Vector4d = Vector<double, 4>;
-	using Vector4i = Vector<int, 4>;
 	using Vector3f = Vector<float, 3>;
 	using Vector3d = Vector<double, 3>;
-	using Vector3i = Vector<int, 3>;
 	using Vector2f = Vector<float, 2>;
 	using Vector2d = Vector<double, 2>;
 	using Vector2i = Vector<int, 2>;

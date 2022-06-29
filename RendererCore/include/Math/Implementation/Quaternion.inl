@@ -8,14 +8,14 @@
 
 namespace LCH::Math
 {
-	template<typename T> requires std::is_same_v<T, double> || std::is_same_v<T, float>
+	template<typename T> requires quaternion_type<T>
 	inline Quaternion<T>::Quaternion()
 	{
 		elements[0] = elements[1] = elements[2] = 0;
 		elements[3] = 1;
 	}
 
-	template<typename T> requires std::is_same_v<T, double> || std::is_same_v<T, float>
+	template<typename T> requires quaternion_type<T>
 	inline Quaternion<T>::Quaternion(T x, T y, T z, T w)
 	{
 		elements[0] = x;
@@ -24,7 +24,7 @@ namespace LCH::Math
 		elements[3] = w;
 	}
 
-	template<typename T> requires std::is_same_v<T, double> || std::is_same_v<T, float>
+	template<typename T> requires quaternion_type<T>
 	inline Quaternion<T> Quaternion<T>::normalized() const
 	{
 		Quaternion normalized;
@@ -42,7 +42,7 @@ namespace LCH::Math
 		return normalized;
 	}
 
-	template<typename T> requires std::is_same_v<T, double> || std::is_same_v<T, float>
+	template<typename T> requires quaternion_type<T>
 	inline T Quaternion<T>::Dot(Quaternion q)
 	{
 		T dot;

@@ -177,7 +177,7 @@
     <ClInclude Include="include\Math\Simd.hpp" />
     <ClInclude Include="include\Math\Vector.hpp" />
     <ClInclude Include="include\Chronometer.hpp" />
-    <ClInclude Include="include\Math\MathUtil.hpp" />
+    <ClInclude Include="include\Math\Utility.hpp" />
     <ClInclude Include="include\SlimWindows.h" />
     <ClInclude Include="include\Utility.hpp" />
     <ClInclude Include="include\Window\MainWindow.hpp" />
@@ -195,7 +195,6 @@
     <ClCompile Include="src\Input\Mouse.cpp" />
     <ClCompile Include="src\Chronometer.cpp" />
     <ClCompile Include="src\Math\Color.cpp" />
-    <ClCompile Include="src\Math\MathUtil.cpp" />
     <ClCompile Include="src\Utility.cpp" />
     <ClCompile Include="src\Window\MainWindow.cpp" />
     <ClCompile Include="src\Window\PopupWindow.cpp" />

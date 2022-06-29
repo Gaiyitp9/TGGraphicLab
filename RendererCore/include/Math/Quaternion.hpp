@@ -9,7 +9,10 @@
 
 namespace LCH::Math
 {
-	template<typename T> requires std::is_same_v<T, double> || std::is_same_v<T, float>
+	template<typename T>
+	concept quaternion_type = std::is_same_v<T, double> || std::is_same_v<T, float>;
+
+	template<typename T> requires quaternion_type<T>
 	class Quaternion
 	{
 		using simd = simd_trait<T, typename SimdInstruction<T, 4>::type>;

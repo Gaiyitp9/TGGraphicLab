@@ -51,7 +51,7 @@
     <ClInclude Include="include\Utility.hpp">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="include\Math\MathUtil.hpp">
+    <ClInclude Include="include\Math\Utility.hpp">
       <Filter>头文件\Math</Filter>
     </ClInclude>
     <ClInclude Include="include\Chronometer.hpp">
@@ -163,9 +163,6 @@
     </ClCompile>
     <ClCompile Include="src\Window\PopupWindow.cpp">
       <Filter>源文件\Window</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Math\MathUtil.cpp">
-      <Filter>源文件\Math</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
