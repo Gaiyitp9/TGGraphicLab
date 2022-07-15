@@ -51,7 +51,7 @@
     <ClInclude Include="include\Utility.hpp">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="include\Math\Utility.hpp">
+    <ClInclude Include="include\Math\CommonFunction.hpp">
       <Filter>头文件\Math</Filter>
     </ClInclude>
     <ClInclude Include="include\Chronometer.hpp">

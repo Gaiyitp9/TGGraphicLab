@@ -6,7 +6,7 @@
 #pragma once
 
 #include "Simd.hpp"
-#include "Utility.hpp"
+#include "CommonFunction.hpp"
 
 namespace LCH::Math
 {

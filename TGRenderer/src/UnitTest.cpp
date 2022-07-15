@@ -4,11 +4,8 @@
 * This code is licensed under the MIT License (MIT).			*
 *****************************************************************/
 
-#include "SlimWindows.h"
 #include "UnitTest.hpp"
-#include <iostream>
 #include "Utility.hpp"
-#include "Math/Utility.hpp"
 #include "Math/Vector.hpp"
 #include "Input/InputEvent.hpp"
 #include "Diagnostics/Debug.hpp"
@@ -62,26 +59,26 @@ namespace LCH
 		Math::aligned_array<float, 10> e1;
 		Math::aligned_array<double, 10> f1;
 
-		std::cout << "array<bool,10>.data()       = " << a.data() << std::boolalpha << Math::Utility::IsAligned(a.data(), 16) << std::endl;
-		std::cout << "array<char,10>.data()       = " << (void*)b.data() << Math::Utility::IsAligned(b.data(), 16) << std::endl;
-		std::cout << "array<int,10>.data()        = " << c.data() << Math::Utility::IsAligned(c.data(), 16) << std::endl;
-		std::cout << "array<long long, 10>.data() = " << d.data() << Math::Utility::IsAligned(d.data(), 16) << std::endl;
-		std::cout << "array<float, 10>.data()     = " << e.data() << Math::Utility::IsAligned(e.data(), 16) << std::endl;
-		std::cout << "array<double, 10>.data()    = " << f.data() << Math::Utility::IsAligned(f.data(), 16) << std::endl;
+		std::cout << "array<bool,10>.data()       = " << a.data() << std::boolalpha << Math::IsAligned(a.data(), 16) << std::endl;
+		std::cout << "array<char,10>.data()       = " << (void*)b.data() << Math::IsAligned(b.data(), 16) << std::endl;
+		std::cout << "array<int,10>.data()        = " << c.data() << Math::IsAligned(c.data(), 16) << std::endl;
+		std::cout << "array<long long, 10>.data() = " << d.data() << Math::IsAligned(d.data(), 16) << std::endl;
+		std::cout << "array<float, 10>.data()     = " << e.data() << Math::IsAligned(e.data(), 16) << std::endl;
+		std::cout << "array<double, 10>.data()    = " << f.data() << Math::IsAligned(f.data(), 16) << std::endl;
 
-		std::cout << "aligned_array<bool,10>.data()       = " << a1.data() << std::boolalpha << Math::Utility::IsAligned(a1.data(), 8) << std::endl;
-		std::cout << "aligned_array<char,10>.data()       = " << (void*)b1.data() << Math::Utility::IsAligned(b1.data(), 16) << std::endl;
-		std::cout << "aligned_array<int,10>.data()        = " << c1.data() << Math::Utility::IsAligned(c1.data(), 16) << std::endl;
-		std::cout << "aligned_array<long long, 10>.data() = " << d1.data() << Math::Utility::IsAligned(d1.data(), 16) << std::endl;
-		std::cout << "aligned_array<float, 10>.data()     = " << e1.data() << Math::Utility::IsAligned(e1.data(), 16) << std::endl;
-		std::cout << "aligned_array<double, 10>.data()    = " << f1.data() << Math::Utility::IsAligned(f1.data(), 16) << std::endl;
+		std::cout << "aligned_array<bool,10>.data()       = " << a1.data() << std::boolalpha << Math::IsAligned(a1.data(), 8) << std::endl;
+		std::cout << "aligned_array<char,10>.data()       = " << (void*)b1.data() << Math::IsAligned(b1.data(), 16) << std::endl;
+		std::cout << "aligned_array<int,10>.data()        = " << c1.data() << Math::IsAligned(c1.data(), 16) << std::endl;
+		std::cout << "aligned_array<long long, 10>.data() = " << d1.data() << Math::IsAligned(d1.data(), 16) << std::endl;
+		std::cout << "aligned_array<float, 10>.data()     = " << e1.data() << Math::IsAligned(e1.data(), 16) << std::endl;
+		std::cout << "aligned_array<double, 10>.data()    = " << f1.data() << Math::IsAligned(f1.data(), 16) << std::endl;
 	}
 
 	void UnitTest::MathLibTest()
 	{
 		Math::Vector4d vvv;
 		Math::Vector4f v;
-		std::cout << "Vector<float, 4> value address = " << &v << std::boolalpha << Math::Utility::IsAligned(&v, 16) << std::endl;
+		std::cout << "Vector<float, 4> value address = " << &v << std::boolalpha << Math::IsAligned(&v, 16) << std::endl;
 		std::cout << v.x() << " " << v.y() << " " << v.z() << " " << v.w() << std::endl;
 		v.x() = 2.3f;
 		v.y() = 1.2f;
@@ -134,7 +131,7 @@ namespace LCH
 		size_t n = 10000000;
 		int* nums = static_cast<int*>(_aligned_malloc(n * sizeof(int), 32));
 		float* numsf = static_cast<float*>(_aligned_malloc(n * sizeof(float), 32));
-		std::cout << "SIMDTest nums = " << nums << " Is 32-byte Aligned? " << Math::Utility::IsAligned(nums, 32) << std::endl;
+		std::cout << "SIMDTest nums = " << nums << " Is 32-byte Aligned? " << Math::IsAligned(nums, 32) << std::endl;
 
 		for (size_t i = 0; i < n; i++)
 		{
