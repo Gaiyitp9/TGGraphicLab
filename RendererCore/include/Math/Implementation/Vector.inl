@@ -270,6 +270,19 @@ namespace LCH::Math
 	}
 
 	template<typename T>
+	inline void Vector<T, 3>::Normalize()
+	{
+		T mag = magnitude();
+		if (mag < epsilon)
+			return;
+
+		elements[0] /= mag;
+		elements[1] /= mag;
+		elements[2] /= mag;
+		elements[3] /= mag;
+	}
+
+	template<typename T>
 	inline T Vector<T, 3>::Dot(const Vector& vec) const
 	{
 		return elements[0] * vec.elements[0] + elements[1] * vec.elements[1] + elements[2] * vec.elements[2];

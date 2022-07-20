@@ -13,11 +13,6 @@ namespace LCH::Math
 	struct instruction_sse {};
 	struct instruction_avx {};
 
-	// 向量和矩阵的元素类型及维度的concept
-	template<typename T, size_t Dimension>
-	concept type_and_dimension = (std::is_same_v<T, int> || std::is_same_v<T, float> ||
-		std::is_same_v<T, double>) && (Dimension > 1);
-
 	// 根据向量和矩阵的维度选择指令集
 	template<typename T, size_t Dimension, typename Enable = void>
 	struct SimdInstruction

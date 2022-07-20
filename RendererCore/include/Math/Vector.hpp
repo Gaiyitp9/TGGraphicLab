@@ -10,6 +10,11 @@
 
 namespace LCH::Math
 {
+	// 向量和矩阵的元素类型及维度的concept
+	template<typename T, size_t Dimension>
+	concept type_and_dimension = (std::is_same_v<T, int> || std::is_same_v<T, float> ||
+		std::is_same_v<T, double>) && (Dimension > 1);
+
 	template<typename T, size_t Dimension> requires type_and_dimension<T, Dimension>
 	class Vector
 	{
@@ -91,6 +96,7 @@ namespace LCH::Math
 		Vector normalized() const;
 
 	public:
+		void Normalize();
 		T Dot(const Vector& vec) const;
 		Vector Cross(const Vector& vec) const;
 

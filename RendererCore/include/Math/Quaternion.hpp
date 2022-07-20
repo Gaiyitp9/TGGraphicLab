@@ -16,9 +16,11 @@ namespace LCH::Math
 	class Quaternion
 	{
 		using simd = simd_trait<T, typename SimdInstruction<T, 4>::type>;
+		static constexpr T epsilon = static_cast<T>(1e-5);
 	public:
 		Quaternion();
 		Quaternion(T x, T y, T z, T w);
+		Quaternion(T angle, Vector<T, 3> axis);
 
 		const T& x() const;
 		const T& y() const;
@@ -30,9 +32,6 @@ namespace LCH::Math
 		T& w();
 
 		Quaternion normalized() const;
-
-	public:
-		static Quaternion AngleAxis(T anlge, Vector<T, 3> axis);
 
 	public:
 		T Dot(Quaternion q);
