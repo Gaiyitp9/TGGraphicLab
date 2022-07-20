@@ -9,6 +9,10 @@
 
 namespace LCH::Math
 {
+	extern double PI;
+	extern double Rad2Deg;
+	extern double Deg2Rad;
+
 	// 地址是否满足对齐条件
 	template<typename T>
 	inline bool IsAligned(T const* value, size_t alignment)

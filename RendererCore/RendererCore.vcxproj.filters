@@ -164,6 +164,9 @@
     <ClCompile Include="src\Window\PopupWindow.cpp">
       <Filter>源文件\Window</Filter>
     </ClCompile>
+    <ClCompile Include="src\Math\CommonFunction.cpp">
+      <Filter>源文件\Math</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="include\Math\Implementation\Vector.inl">

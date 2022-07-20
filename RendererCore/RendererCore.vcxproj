@@ -195,6 +195,7 @@
     <ClCompile Include="src\Input\Mouse.cpp" />
     <ClCompile Include="src\Chronometer.cpp" />
     <ClCompile Include="src\Math\Color.cpp" />
+    <ClCompile Include="src\Math\CommonFunction.cpp" />
     <ClCompile Include="src\Utility.cpp" />
     <ClCompile Include="src\Window\MainWindow.cpp" />
     <ClCompile Include="src\Window\PopupWindow.cpp" />

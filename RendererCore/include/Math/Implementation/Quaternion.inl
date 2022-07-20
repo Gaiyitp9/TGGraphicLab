@@ -28,8 +28,8 @@ namespace LCH::Math
 	inline Quaternion<T>::Quaternion(T angle, Vector<T, 3> axis)
 	{
 		axis.Normalize();
-		T halfAngle = angle / 2;
-		Vector<T, 3> sinu = static_cast<T>(sin(halfAngle)) * axis;
+		T halfAngle = static_cast<T>(angle * 0.5 * Deg2Rad);
+		Vector<T, 3> sinu = static_cast<T>(sin(halfAngle) * axis);
 		elements[0] = sinu.x();
 		elements[0] = sinu.y();
 		elements[0] = sinu.z();
