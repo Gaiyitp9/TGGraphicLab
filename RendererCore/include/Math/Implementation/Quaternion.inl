@@ -37,17 +37,74 @@ namespace LCH::Math
 	}
 
 	template<typename T> requires quaternion_type<T>
+	inline Quaternion<T>::Quaternion(Vector<T, 3> euler)
+	{
+
+	}
+
+	template<typename T> requires quaternion_type<T>
+	inline const T& Quaternion<T>::x() const
+	{
+		return elements[0];
+	}
+
+	template<typename T> requires quaternion_type<T>
+	inline const T& Quaternion<T>::y() const
+	{
+		return elements[1];
+	}
+
+	template<typename T> requires quaternion_type<T>
+	inline const T& Quaternion<T>::z() const
+	{
+		return elements[2];
+	}
+
+	template<typename T> requires quaternion_type<T>
+	inline const T& Quaternion<T>::w() const
+	{
+		return elements[3];
+	}
+
+	template<typename T> requires quaternion_type<T>
+	inline T& Quaternion<T>::x()
+	{
+		return elements[0];
+	}
+
+	template<typename T> requires quaternion_type<T>
+	inline T& Quaternion<T>::y()
+	{
+		return elements[1];
+	}
+
+	template<typename T> requires quaternion_type<T>
+	inline T& Quaternion<T>::z()
+	{
+		return elements[2];
+	}
+
+	template<typename T> requires quaternion_type<T>
+	inline T& Quaternion<T>::w()
+	{
+		return elements[3];
+	}
+
+	template<typename T> requires quaternion_type<T>
 	inline Quaternion<T> Quaternion<T>::normalized() const
 	{
+		T norm = static_cast<T>(sqrt(Dot(*this)));
+		if (Abs(norm) < epsilon)
+			return {};
+
 		Quaternion normalized;
 		if constexpr (support_simd_t)
 		{
-			Vector<T, 4> norm(sqrt(Dot(*this)));
-			simd::elementwise_div(elements.data(), norm.data(), normalized.elements.data());
+			Vector<T, 4> normVec(norm);
+			simd::elementwise_div(elements.data(), normVec.data(), normalized.elements.data());
 		}
 		else
 		{
-			T norm = sqrt(Dot(*this));
 			for (size_t i = 0; i < 4; ++i)
 				normalized.elements[i] = elements[i] / norm;
 		}

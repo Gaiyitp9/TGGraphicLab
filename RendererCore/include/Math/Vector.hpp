@@ -38,7 +38,7 @@ namespace LCH::Math
 	class Vector<T, 4>
 	{
 		using simd = simd_trait<T, typename SimdInstruction<T, 4>::type>;
-		static constexpr T epsilon = static_cast<T>(1e-5);
+		static constexpr T epsilon = static_cast<T>(1e-6);
 	public:
 		Vector(T x = {});
 		Vector(T x, T y, T z, T w);
@@ -75,7 +75,7 @@ namespace LCH::Math
 	template<typename T>
 	class Vector<T, 3>
 	{
-		static constexpr T epsilon = static_cast<T>(1e-5);
+		static constexpr T epsilon = static_cast<T>(1e-6);
 	public:
 		Vector(T x = {});
 		Vector(T x, T y, T z);
@@ -112,7 +112,7 @@ namespace LCH::Math
 	template<typename T>
 	class Vector<T, 2>
 	{
-		static constexpr T epsilon = static_cast<T>(1e-5);
+		static constexpr T epsilon = static_cast<T>(1e-6);
 	public:
 		Vector(T x = {});
 		Vector(T x, T y);

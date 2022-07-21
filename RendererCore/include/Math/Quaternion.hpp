@@ -16,11 +16,12 @@ namespace LCH::Math
 	class Quaternion
 	{
 		using simd = simd_trait<T, typename SimdInstruction<T, 4>::type>;
-		static constexpr T epsilon = static_cast<T>(1e-5);
+		static constexpr T epsilon = static_cast<T>(1e-6);
 	public:
 		Quaternion();
 		Quaternion(T x, T y, T z, T w);
 		Quaternion(T angle, Vector<T, 3> axis);
+		Quaternion(Vector<T, 3> euler);
 
 		const T& x() const;
 		const T& y() const;
@@ -43,3 +44,5 @@ namespace LCH::Math
 	using Quaternionf = Quaternion<float>;
 	using Quaterniond = Quaternion<double>;
 }
+
+#include "Implementation/Quaternion.inl"
