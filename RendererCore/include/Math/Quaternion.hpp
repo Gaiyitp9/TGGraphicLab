@@ -21,8 +21,8 @@ namespace LCH::Math
 		Quaternion();
 		Quaternion(T x, T y, T z, T w);
 		Quaternion(T angle, Vector<T, 3> axis);
-		Quaternion(Vector<T, 3> euler);
-
+		Quaternion(Vector<T, 3> euler);				// 欧拉角环绕顺序为heading-pitch-bank(yaw-pitch-roll)
+													// Y-X-Z(Object Space)或Z-X-Y(World Space 或 Parent Space)
 		const T& x() const;
 		const T& y() const;
 		const T& z() const;
