@@ -5,7 +5,15 @@
 *****************************************************************/
 #pragma once
 
-#include "Constants.hpp"
-#include "ForwardDeclarations.hpp"
-#include "MatrixBase.hpp"
-#include "Matrix.hpp"
+namespace LCH::Math
+{
+	enum StorageOption
+	{
+		RowMajor = 0x01,
+		ColMajor = 0x02,
+		AutoAlign = 0x04,
+		DontAlign = 0x08
+	};
+
+	const StorageOption DEFAULT_MATRIX_STORAGE_ORDER_OPTION = StorageOption::RowMajor;
+}

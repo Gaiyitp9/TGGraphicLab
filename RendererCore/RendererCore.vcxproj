@@ -173,6 +173,7 @@
     <ClInclude Include="include\Input\KeyCode.hpp" />
     <ClInclude Include="include\Input\Mouse.hpp" />
     <ClInclude Include="include\Math\Color.hpp" />
+    <ClInclude Include="include\Math\Constants.hpp" />
     <ClInclude Include="include\Math\Core.hpp" />
     <ClInclude Include="include\Math\ForwardDeclarations.hpp" />
     <ClInclude Include="include\Math\Matrix.hpp" />

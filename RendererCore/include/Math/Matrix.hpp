@@ -7,9 +7,19 @@
 
 namespace LCH::Math
 {
-	template<typename Scalar_, int Rows_, int Cols_, int Options_, int MaxRows_, int MaxCols_>
+	template<typename Scalar_, int Rows, int Cols, int Options_>
+	struct traits<Matrix<Scalar_, Rows, Cols, Options_>>
+	{
+	public:
+		using Scalar = Scalar_;
+		constexpr static int RowsAtCompileTime = Rows;
+		constexpr static int ColsAtCompileTime = Cols;
+		constexpr static int Options = Options_;
+	};
+
+	template<typename Scalar_, int Rows, int Cols, int Options_>
 	class Matrix
-		: public MatrixBase<Matrix<Scalar_, Rows_, Cols_, Options_, MaxRows_, MaxCols_>>
+		: public MatrixBase<Matrix<Scalar_, Rows, Cols, Options_>>
 	{
 
 	};

@@ -132,6 +132,9 @@
     <ClInclude Include="include\Math\ForwardDeclarations.hpp">
       <Filter>头文件\Math</Filter>
     </ClInclude>
+    <ClInclude Include="include\Math\Constants.hpp">
+      <Filter>头文件\Math</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Utility.cpp">
