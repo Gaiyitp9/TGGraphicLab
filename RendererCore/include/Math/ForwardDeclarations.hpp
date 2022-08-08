@@ -13,10 +13,10 @@ namespace LCH::Math
 	template<typename T>
 	struct traits<const T> : traits<T> {};
 
-	template<typename Scalar_, int Rows, int Cols, 
+	template<typename ScalarT, int Rows, int Cols, 
 		int Options_ = AutoAlign | (Rows == 1 && Cols != 1 ? StorageOption::RowMajor :
 									Rows != 1 && Cols == 1 ? StorageOption::ColMajor :
-									DEFAULT_MATRIX_STORAGE_ORDER_OPTION)
+									DefaultMatrixStorageOrderOption)
 	>
 	class Matrix;
 }

@@ -5,17 +5,13 @@
 *****************************************************************/
 #pragma once
 
+#include <array>
+
 namespace LCH::Math
 {
-	enum StorageOption
+	template<typename T, int Size, int Rows, int Cols, int Options>
+	class Storage
 	{
-		RowMajor = 0x01,
-		ColMajor = 0x02,
-		AutoAlign = 0x04,
-		DontAlign = 0x08
+
 	};
-
-	const StorageOption DefaultMatrixStorageOrderOption = StorageOption::RowMajor;
-
-	const int Dynamic = -1;
 }
