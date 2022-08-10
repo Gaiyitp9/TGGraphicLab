@@ -17,12 +17,14 @@ namespace LCH::Math
 	template<typename T, size_t Dimension, typename Enable = void>
 	struct SimdInstruction
 	{
+		constexpr static int Alignment = 16;
 		using type = instruction_sse;
 	};
 	// 偏特化
 	template<typename T, size_t Dimension>
 	struct SimdInstruction<T, Dimension, std::enable_if_t<std::is_same_v<T, double> || (Dimension >= 16)>>
 	{ 
+		constexpr static int Alignment = 32;
 		using type = instruction_avx;
 	};
 

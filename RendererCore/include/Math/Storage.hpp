@@ -7,10 +7,24 @@
 
 namespace LCH::Math
 {
-	template<typename T, int Size, int Options>
+	// 对齐数组
+	template<typename T, int Size, int Options, 
+		int Alignment = (Options & DontAlign) ? 0 : SimdInstruction<T, Size>::Alignment>
 	struct plain_array
 	{
+		T array[Size];
+	};
 
+	// 非对齐数组
+	template<typename T, int Size, int Options>
+	struct plain_array<T, Size, Options, 16>
+	{
+		alignas(16) T array[Size];
+
+		plain_array()
+		{
+
+		}
 	};
 
 	template<typename T, int Size, int Rows, int Cols, int Options> 

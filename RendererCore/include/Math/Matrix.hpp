@@ -12,7 +12,7 @@ namespace LCH::Math
 	{
 	public:
 		using Scalar = ScalarT;
-		constexpr static int size = (Rows == Dynamic || Cols == Dynamic) ? Dynamic : Rows * Cols;
+		constexpr static int Size = (Rows == Dynamic || Cols == Dynamic) ? Dynamic : Rows * Cols;
 		constexpr static int RowsAtCompileTime = Rows;
 		constexpr static int ColsAtCompileTime = Cols;
 		constexpr static int Options = Options_;
