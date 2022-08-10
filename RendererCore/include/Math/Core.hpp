@@ -8,6 +8,7 @@
 
 #include "Constants.hpp"
 #include "ForwardDeclarations.hpp"
+#include "Simd.hpp"
 #include "Storage.hpp"
 #include "MatrixBase.hpp"
 #include "Matrix.hpp"
