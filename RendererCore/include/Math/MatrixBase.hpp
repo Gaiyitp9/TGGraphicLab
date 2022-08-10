@@ -18,5 +18,9 @@ namespace LCH::Math
 		using IsVectorAtCompileTime = traits<Derived>::RowsAtCompileTime == 1 ||
 									  traits<Derived>::ColsAtCompileTime == 1;
 		using Options = traits<Derived>::Options;
+
+	public:
+
+		MatrixBase operator+(const MatrixBase&);
 	};
 }
