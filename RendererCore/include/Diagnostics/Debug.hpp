@@ -61,24 +61,30 @@ namespace LCH
 {
 	template<typename Text> struct text_trait;
 	template<typename Text> struct text_trait<const Text> : text_trait<Text> {};
-	template<typename Text> struct text_trait<const Text&> : text_trait<Text> {};
 
 	template<typename CharT>
 	struct text_trait<std::basic_string<CharT>>
 	{
-		static constexpr bool wide = std::is_same_v<CharT, wchar_t>;
+		static constexpr bool WideStream = std::is_same_v<CharT, wchar_t>;
+	};
+
+	template<typename CharT>
+	struct text_trait<CharT const*>
+	{
+		static constexpr bool WideStream = std::is_same_v<CharT, wchar_t>;
 	};
 
 	template<typename CharT>
 	struct text_trait<CharT*>
 	{
-		static constexpr bool wide = std::is_same_v<CharT, wchar_t>;
+		static constexpr bool WideStream = std::is_same_v<CharT, wchar_t>;
 	};
 
-	template<typename CharT>
-	struct text_trait<CharT[]>
+	// 字符串常量
+	template<typename CharT, size_t N>
+	struct text_trait<CharT[N]>
 	{
-		static constexpr bool wide = std::is_same_v<CharT, wchar_t>;
+		static constexpr bool WideStream = std::is_same_v<CharT, wchar_t>;
 	};
 	
 	class Debug
@@ -89,57 +95,12 @@ namespace LCH
 
 	public:
 		template<typename Text>
-		static void Log(const Text& log)
-		{
-			if constexpr (text_trait<Text>::wide)
-				std::wcout << log;
-			else
-				std::cout << log;
-		}
-
+		static void Log(const Text& log) { std::cout << log; }
+		template<typename Text> requires text_trait<Text>::WideStream
+		static void Log(const Text& log) { std::wcout << log; }
 		template<typename Text>
-		static void LogLine(const Text& log)
-		{
-			if constexpr (text_trait<Text>::wide)
-				std::wcout << log << std::endl;
-			else
-				std::cout << log << std::endl;
-		}
-
-		/*template <typename charT>
-		static void Log(const std::basic_string<charT>& log)
-		{
-			if constexpr (std::is_same_v<charT, char>)
-				std::cout << log;
-			else
-				std::wcout << log;
-		}
-
-		template <typename charT>
-		static void LogLine(const std::basic_string<charT>& log)
-		{
-			if constexpr (std::is_same_v<charT, char>)
-				std::cout << log << std::endl;
-			else
-				std::wcout << log << std::endl;
-		}
-
-		template <typename charT>
-		static void Log(charT const* log)
-		{
-			if constexpr (std::is_same_v<charT, char>)
-				std::cout << log;
-			else
-				std::wcout << log;
-		}
-
-		template <typename charT>
-		static void LogLine(charT const* log)
-		{
-			if constexpr (std::is_same_v<charT, char>)
-				std::cout << log << std::endl;
-			else
-				std::wcout << log << std::endl;
-		}*/
+		static void LogLine(const Text& log) { std::cout << log << std::endl; }
+		template<typename Text> requires text_trait<Text>::WideStream
+		static void LogLine(const Text& log) { std::wcout << log << std::endl; }
 	};
 }
