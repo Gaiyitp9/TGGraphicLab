@@ -59,15 +59,54 @@
 
 namespace LCH
 {
+	template<typename Text> struct text_trait;
+	template<typename Text> struct text_trait<const Text> : text_trait<Text> {};
+	template<typename Text> struct text_trait<const Text&> : text_trait<Text> {};
+
+	template<typename CharT>
+	struct text_trait<std::basic_string<CharT>>
+	{
+		static constexpr bool wide = std::is_same_v<CharT, wchar_t>;
+	};
+
+	template<typename CharT>
+	struct text_trait<CharT*>
+	{
+		static constexpr bool wide = std::is_same_v<CharT, wchar_t>;
+	};
+
+	template<typename CharT>
+	struct text_trait<CharT[]>
+	{
+		static constexpr bool wide = std::is_same_v<CharT, wchar_t>;
+	};
+	
 	class Debug
 	{
-	public:
 		Debug() = delete;
 		Debug(const Debug&) = delete;
 		Debug& operator=(const Debug&) = delete;
 
 	public:
-		template <typename charT>
+		template<typename Text>
+		static void Log(const Text& log)
+		{
+			if constexpr (text_trait<Text>::wide)
+				std::wcout << log;
+			else
+				std::cout << log;
+		}
+
+		template<typename Text>
+		static void LogLine(const Text& log)
+		{
+			if constexpr (text_trait<Text>::wide)
+				std::wcout << log << std::endl;
+			else
+				std::cout << log << std::endl;
+		}
+
+		/*template <typename charT>
 		static void Log(const std::basic_string<charT>& log)
 		{
 			if constexpr (std::is_same_v<charT, char>)
@@ -101,6 +140,6 @@ namespace LCH
 				std::cout << log << std::endl;
 			else
 				std::wcout << log << std::endl;
-		}
+		}*/
 	};
 }
