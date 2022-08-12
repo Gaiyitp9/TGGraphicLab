@@ -8,7 +8,9 @@
 
 #include "Constants.hpp"
 #include "ForwardDeclarations.hpp"
+#include "XprHelper.hpp"
 #include "Simd.hpp"
 #include "Storage.hpp"
+#include "CwiseBinaryOp.hpp"
 #include "MatrixBase.hpp"
 #include "Matrix.hpp"

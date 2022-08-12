@@ -138,6 +138,12 @@
     <ClInclude Include="include\Math\Storage.hpp">
       <Filter>头文件\Math</Filter>
     </ClInclude>
+    <ClInclude Include="include\Math\CwiseBinaryOp.hpp">
+      <Filter>头文件\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Math\XprHelper.hpp">
+      <Filter>头文件\Math</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Utility.cpp">

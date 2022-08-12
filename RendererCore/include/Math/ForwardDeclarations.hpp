@@ -7,11 +7,10 @@
 
 namespace LCH::Math
 {
-	template<typename T>
-	struct traits;
+	template<typename T> struct traits;
+	template<typename T> struct traits<const T> : traits<T> {};
 
-	template<typename T>
-	struct traits<const T> : traits<T> {};
+	template<typename Derived> class MatrixBase;
 
 	template<typename ScalarT, int Rows, int Cols, 
 		int Options_ = AutoAlign | (Rows == 1 && Cols != 1 ? StorageOption::RowMajor :
@@ -19,4 +18,7 @@ namespace LCH::Math
 									DefaultMatrixStorageOrderOption)
 	>
 	class Matrix;
+
+	template<typename T, int Size, int Rows, int Cols, int Options>
+	class Storage;
 }

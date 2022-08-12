@@ -7,7 +7,7 @@
 
 namespace LCH::Math
 {
-	// ¾ØÕóºÍËùÓĞ¾ØÕó±í´ïÊ½µÄ»ùÀà
+	// çŸ©é˜µå’Œæ‰€æœ‰çŸ©é˜µè¡¨è¾¾å¼çš„åŸºç±»
 	template<typename Derived>
 	class MatrixBase
 	{
@@ -15,9 +15,9 @@ namespace LCH::Math
 		using RowsAtCompileTime = traits<Derived>::RowsAtCompileTime;
 		using ColsAtCompileTime = traits<Derived>::ColsAtCompileTime;
 		using SizeAtCompileTime = traits<Derived>::SizeAtCompileTime;
-		using IsVectorAtCompileTime = traits<Derived>::RowsAtCompileTime == 1 ||
-									  traits<Derived>::ColsAtCompileTime == 1;
 		using Options = traits<Derived>::Options;
+		static constexpr bool IsVectorAtCompileTime = traits<Derived>::RowsAtCompileTime == 1 ||
+													  traits<Derived>::ColsAtCompileTime == 1;
 
 	public:
 
