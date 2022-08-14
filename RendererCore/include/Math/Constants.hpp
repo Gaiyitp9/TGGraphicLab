@@ -18,4 +18,6 @@ namespace LCH::Math
 	const StorageOption DefaultMatrixStorageOrderOption = StorageOption::RowMajor;
 
 	const int Dynamic = -1;
+
+	const int NestByRefBit = 0x1;
 }

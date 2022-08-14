@@ -18,9 +18,12 @@ namespace LCH::Math
 		using Options = traits<Derived>::Options;
 		static constexpr bool IsVectorAtCompileTime = traits<Derived>::RowsAtCompileTime == 1 ||
 													  traits<Derived>::ColsAtCompileTime == 1;
-
 	public:
-
-		MatrixBase operator+(const MatrixBase&);
+		template<typename OtherDerived>
+		CwiseBinaryOp operator+(const MatrixBase<OtherDerived>& other)
+		{
+			return CwiseBinaryOp<scalar_sum_op<Scalar, traits<OtherDerived>::Scalar>, 
+				Derived, OtherDerived>(this, other);
+		}
 	};
 }

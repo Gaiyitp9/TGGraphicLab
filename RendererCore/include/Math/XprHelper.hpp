@@ -25,4 +25,13 @@ namespace LCH::Math
 		using type = std::conditional_t<traits<T>::Flags, const T&, const T>;
 		using non_const_type = std::conditional_t<traits<T>::Flags, T&, T>;
 	};
+
+	template<typename ScalarA, typename ScalarB, typename BinaryOp = scalar_sum_op<ScalarA, ScalarB>>
+	struct scalar_binaryop_traits;
+
+	template<typename T, typename BinaryOp>
+	struct scalar_binaryop_traits<T, T, BinaryOp>
+	{
+		using return_type = T;
+	};
 }

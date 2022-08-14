@@ -21,4 +21,7 @@ namespace LCH::Math
 
 	template<typename T, int Size, int Rows, int Cols, int Options>
 	class Storage;
+
+	template<typename LhsScalar, typename RhsScalar>
+	struct scalar_sum_op;
 }

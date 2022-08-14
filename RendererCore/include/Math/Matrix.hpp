@@ -16,6 +16,7 @@ namespace LCH::Math
 		constexpr static int RowsAtCompileTime = Rows;
 		constexpr static int ColsAtCompileTime = Cols;
 		constexpr static int Options = Options_;
+		constexpr static int Flags = NestByRefBit;
 	};
 
 	template<typename Scalar_, int Rows, int Cols, int Options_>
@@ -28,6 +29,16 @@ namespace LCH::Math
 		using Base::SizeAtCompileTime;
 		using Base::IsVectorAtCompileTime;
 		using Base::Options;
+
+	public:
+		Matrix& operator=(const MatrixBase& other)
+		{
+			for (int i = 0; i < SizeAtCompileTime; ++i)
+			{
+
+
+			}
+		}
 
 	private:
 		Storage<Scalar, SizeAtCompileTime, RowsAtCompileTime, ColsAtCompileTime, Options> storage;

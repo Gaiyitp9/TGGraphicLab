@@ -22,6 +22,10 @@ namespace LCH::Math
 			: m_lhs(lhs), m_rhs(rhs), m_functor(functor)
 		{}
 
+		const LhsNested& lhs() const { return m_lhs; }
+		const RhsNested& rhs() const { return m_rhs; }
+		const Functor& functor() const { return m_functor; }
+
 	private:
 		const Functor m_functor;
 		LhsNested m_lhs;
