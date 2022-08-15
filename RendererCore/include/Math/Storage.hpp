@@ -69,13 +69,7 @@ namespace LCH::Math
 		handmade_aligned_free(ptr);
 	}
 
-	template<typename T, int Size, int Rows, int Cols, int Options>
-	struct traits<Storage<T, Size, Rows, Cols, Options>>
-	{
-		static constexpr int Alignment = (Options & DontAlign) ? 0 : SimdInstruction<T, Size>::Alignment;
-	};
-
-	template<typename T, int Size, int Rows, int Cols, int Options> 
+	template<typename T, int Size, int Rows, int Cols, int Alignment> 
 	class Storage
 	{
 	public:
@@ -84,23 +78,23 @@ namespace LCH::Math
 		int cols() { return Cols; }
 
 	private:
-		PlainArray<T, Size, traits<Storage>::Alignment> m_data;
+		PlainArray<T, Size, Alignment> m_data;
 	};
 
-	template<typename T, int Options>
-	class Storage<T, Dynamic, Dynamic, Dynamic, Options>
+	template<typename T, int Alignment>
+	class Storage<T, Dynamic, Dynamic, Dynamic, Alignment>
 	{
 	public:
 		Storage() : m_data(nullptr), m_rows(0), m_cols(0) {}
-		~Storage() { conditional_aligned_free<T, traits<Storage>::Alignment>(m_data); }
+		~Storage() { conditional_aligned_free<T, Alignment>(m_data); }
 
 		void resize(int size, int rows, int cols)
 		{
 			if (size != m_rows * m_cols)
 			{
-				conditional_aligned_free<T, traits<Storage>::Alignment>(m_data);
+				conditional_aligned_free<T, Alignment>(m_data);
 				if (size > 0)
-					m_data = conditional_aligned_alloc<T, traits<Storage>::Alignment>(size);
+					m_data = conditional_aligned_alloc<T, Alignment>(size);
 				else
 					m_data = nullptr;
 			}

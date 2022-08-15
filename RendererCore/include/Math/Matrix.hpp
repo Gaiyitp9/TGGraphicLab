@@ -17,6 +17,7 @@ namespace LCH::Math
 		constexpr static int ColsAtCompileTime = Cols;
 		constexpr static int Options = Options_;
 		constexpr static int Flags = NestByRefBit;
+		constexpr static int Alignment = (Options & DontAlign) ? SimdInstruction<Scalar, Size>::Alignment : 0;
 	};
 
 	template<typename Scalar_, int Rows, int Cols, int Options_>
@@ -29,6 +30,7 @@ namespace LCH::Math
 		using Base::SizeAtCompileTime;
 		using Base::IsVectorAtCompileTime;
 		using Base::Options;
+		using Base::Alignment;
 
 	public:
 		Matrix& operator=(const MatrixBase& other)
@@ -41,6 +43,6 @@ namespace LCH::Math
 		}
 
 	private:
-		Storage<Scalar, SizeAtCompileTime, RowsAtCompileTime, ColsAtCompileTime, Options> storage;
+		Storage<Scalar, SizeAtCompileTime, RowsAtCompileTime, ColsAtCompileTime, Alignment> storage;
 	};
 }

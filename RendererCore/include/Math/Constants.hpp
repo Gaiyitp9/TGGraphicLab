@@ -14,9 +14,7 @@ namespace LCH::Math
 		AutoAlign = 0x04,
 		DontAlign = 0x08
 	};
-
 	const StorageOption DefaultMatrixStorageOrderOption = StorageOption::RowMajor;
-
 	const int Dynamic = -1;
 
 	const int NestByRefBit = 0x1;

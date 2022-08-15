@@ -16,6 +16,7 @@ namespace LCH::Math
 		using ColsAtCompileTime = traits<Derived>::ColsAtCompileTime;
 		using SizeAtCompileTime = traits<Derived>::SizeAtCompileTime;
 		using Options = traits<Derived>::Options;
+		using Alignment = traits<Derived>::Alignment;
 		static constexpr bool IsVectorAtCompileTime = traits<Derived>::RowsAtCompileTime == 1 ||
 													  traits<Derived>::ColsAtCompileTime == 1;
 	public:
