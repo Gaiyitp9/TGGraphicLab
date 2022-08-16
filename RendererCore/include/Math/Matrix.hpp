@@ -33,16 +33,21 @@ namespace LCH::Math
 		using Base::Alignment;
 
 	public:
+		int rows() const { return m_storage.rows(); }
+		int cols() const { return m_storage.cols(); }
+
+		const Scalar& operator[](size_t index) const { return m_storage[index]; }
+		Scalar& operator[](size_t index) const { return m_storage[index]; }
+
 		Matrix& operator=(const MatrixBase& other)
 		{
 			for (int i = 0; i < SizeAtCompileTime; ++i)
 			{
 
-
 			}
 		}
 
 	private:
-		Storage<Scalar, SizeAtCompileTime, RowsAtCompileTime, ColsAtCompileTime, Alignment> storage;
+		Storage<Scalar, SizeAtCompileTime, RowsAtCompileTime, ColsAtCompileTime, Alignment> m_storage;
 	};
 }
