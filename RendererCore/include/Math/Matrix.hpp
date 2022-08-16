@@ -35,6 +35,7 @@ namespace LCH::Math
 	public:
 		int rows() const { return m_storage.rows(); }
 		int cols() const { return m_storage.cols(); }
+		int size() const { return m_storage.size(); }
 
 		const Scalar& operator[](size_t index) const { return m_storage[index]; }
 		Scalar& operator[](size_t index) const { return m_storage[index]; }
@@ -43,11 +44,14 @@ namespace LCH::Math
 		{
 			for (int i = 0; i < SizeAtCompileTime; ++i)
 			{
-
+				m_storage[i] = other.derived()[i];
 			}
+			return *this;
 		}
 
 	private:
 		Storage<Scalar, SizeAtCompileTime, RowsAtCompileTime, ColsAtCompileTime, Alignment> m_storage;
 	};
+
+	using Vector3f = Matrix<float, 1, 3>;
 }
