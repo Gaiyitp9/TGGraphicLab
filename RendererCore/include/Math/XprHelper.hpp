@@ -5,8 +5,6 @@
 *****************************************************************/
 #pragma once
 
-#include <type_traits>
-
 namespace LCH::Math
 {
 	template<typename T> struct remove_all { using type = T; };
@@ -34,4 +32,16 @@ namespace LCH::Math
 	{
 		using return_type = T;
 	};
+
+	template<typename T, typename... ArgTypes> 
+	struct invoke_result_of 
+	{
+		typedef typename std::invoke_result<T, ArgTypes...>::type type1;
+		typedef remove_all_t<type1> type;
+	};
+
+	constexpr inline int size_at_compile_time(int rows, int cols)
+	{
+		return (rows == Dynamic || cols == Dynamic) ? Dynamic : rows * cols;
+	}
 }

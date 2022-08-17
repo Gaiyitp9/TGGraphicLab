@@ -10,9 +10,8 @@ namespace LCH::Math
 	template<typename Scalar_, int Rows, int Cols, int Options_>
 	struct traits<Matrix<Scalar_, Rows, Cols, Options_>>
 	{
-	public:
 		using Scalar = Scalar_;
-		constexpr static int Size = (Rows == Dynamic || Cols == Dynamic) ? Dynamic : Rows * Cols;
+		constexpr static int Size = size_at_compile_time(Rows, Cols);
 		constexpr static int RowsAtCompileTime = Rows;
 		constexpr static int ColsAtCompileTime = Cols;
 		constexpr static int Options = Options_;
@@ -23,14 +22,14 @@ namespace LCH::Math
 	template<typename Scalar_, int Rows, int Cols, int Options_>
 	class Matrix : public MatrixBase<Matrix<Scalar_, Rows, Cols, Options_>>
 	{
+	public:
 		using Base = MatrixBase<Matrix>;
-		using Base::Scalar;
+		using typename Base::Scalar;
 		using Base::RowsAtCompileTime;
 		using Base::ColsAtCompileTime;
 		using Base::SizeAtCompileTime;
 		using Base::IsVectorAtCompileTime;
-		using Base::Options;
-		using Base::Alignment;
+		constexpr static int Alignment = traits<Matrix>::Alignment;
 
 	public:
 		int rows() const { return m_storage.rows(); }
@@ -38,9 +37,10 @@ namespace LCH::Math
 		int size() const { return m_storage.size(); }
 
 		const Scalar& operator[](size_t index) const { return m_storage[index]; }
-		Scalar& operator[](size_t index) const { return m_storage[index]; }
+		Scalar& operator[](size_t index) { return m_storage[index]; }
 
-		Matrix& operator=(const MatrixBase& other)
+		template<typename OtherDerived>
+		Matrix& operator=(const MatrixBase<OtherDerived>& other)
 		{
 			for (int i = 0; i < SizeAtCompileTime; ++i)
 			{
@@ -53,5 +53,5 @@ namespace LCH::Math
 		Storage<Scalar, SizeAtCompileTime, RowsAtCompileTime, ColsAtCompileTime, Alignment> m_storage;
 	};
 
-	using Vector3f = Matrix<float, 1, 3>;
+	using Vectorm3f = Matrix<float, 1, 3>;
 }

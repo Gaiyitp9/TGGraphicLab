@@ -9,21 +9,21 @@
 
 namespace LCH::Math
 {
-	// ¶ÔÆëÊı×é
+	// å¯¹é½æ•°ç»„
 	template<typename T, int Size, int Alignment>
 	struct PlainArray
 	{
 		alignas(Alignment) T array[Size];
 	};
 
-	// ·Ç¶ÔÆëÊı×é
+	// éå¯¹é½æ•°ç»„
 	template<typename T, int Size>
 	struct PlainArray<T, Size, 0>
 	{
 		T array[Size];
 	};
 
-	// ·ÖÅä¶ÔÆëÄÚ´æ
+	// åˆ†é…å¯¹é½å†…å­˜
 	inline void* handmade_aligned_malloc(std::size_t size, std::size_t alignment)
 	{
 		assert(alignment >= sizeof(void*) && (alignment & (alignment - 1)) == 0 && "Alignment must be at least sizeof(void*) and a power of 2");
@@ -35,36 +35,36 @@ namespace LCH::Math
 		*(reinterpret_cast<void**>(original) - 1) = original;
 	}
 
-	// ÊÍ·Å¶ÔÆëÄÚ´æ
+	// é‡Šæ”¾å¯¹é½å†…å­˜
 	inline void handmade_aligned_free(void* ptr)
 	{
 		if (ptr)
 			std::free(*(reinterpret_cast<void**>(ptr) - 1));
 	}
 
-	// ¸ù¾İÌõ¼ş·ÖÅä¶¯Ì¬ÄÚ´æ(Ä¬ÈÏ16×Ö½Ú¶ÔÆë)
-	template<typename T, int Alignment>
-	inline T* conditional_aligned_alloc(size_t size)
+	// æ ¹æ®æ¡ä»¶åˆ†é…åŠ¨æ€å†…å­˜(é»˜è®¤16å­—èŠ‚å¯¹é½)
+	template<int Alignment>
+	inline void* conditional_aligned_alloc(size_t size)
 	{
-		return std::malloc(sizeof(T) * size);
+		return std::malloc(size);
 	}
 
-	template<typename T>
-	inline T* conditional_aligned_alloc<T, 32>(size_t size)
+	template<>
+	inline void* conditional_aligned_alloc<32>(size_t size)
 	{
-		return reinterpret_cast<T*>(handmade_aligned_malloc(sizeof(T) * size, 32));
+		return handmade_aligned_malloc(size, 32);
 	}
 
-	// ¸ù¾İÌõ¼şÊÍ·ÅÄÚ´æ
-	template<typename T, int Alignment>
+	// æ ¹æ®æ¡ä»¶é‡Šæ”¾å†…å­˜
+	template<int Alignment>
 	inline void conditional_aligned_free(void* ptr)
 	{
 		if (ptr)
 			std::free(ptr);
 	}
 
-	template<typename T>
-	inline void conditional_aligned_free<T, 32>(void* ptr)
+	template<>
+	inline void conditional_aligned_free<32>(void* ptr)
 	{
 		handmade_aligned_free(ptr);
 	}
@@ -89,15 +89,15 @@ namespace LCH::Math
 	{
 	public:
 		Storage() : m_data(nullptr), m_rows(0), m_cols(0) {}
-		~Storage() { conditional_aligned_free<T, Alignment>(m_data); }
+		~Storage() { conditional_aligned_free<Alignment>(m_data); }
 
 		void resize(int size, int rows, int cols)
 		{
 			if (size != m_rows * m_cols)
 			{
-				conditional_aligned_free<T, Alignment>(m_data);
+				conditional_aligned_free<Alignment>(m_data);
 				if (size > 0)
-					m_data = conditional_aligned_alloc<T, Alignment>(size);
+					m_data = static_cast<T*>(conditional_aligned_alloc<Alignment>(sizeof(T) * size));
 				else
 					m_data = nullptr;
 			}

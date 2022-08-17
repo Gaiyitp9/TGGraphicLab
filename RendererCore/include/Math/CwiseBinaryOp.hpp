@@ -7,6 +7,16 @@
 
 namespace LCH::Math
 {
+	template<typename BinaryOp, typename Lhs, typename Rhs>
+	struct traits<CwiseBinaryOp<BinaryOp, Lhs, Rhs>>
+	{
+		using Ancestor = remove_all_t<Lhs>;
+		using Scalar = invoke_result_of <BinaryOp, const typename Lhs::Scalar&, const typename Rhs::Scalar&>::type;
+		constexpr static int RowsAtCompileTime = traits<Ancestor>::RowsAtCompileTime;
+		constexpr static int ColsAtCompileTime = traits<Ancestor>::ColsAtCompileTime;
+		constexpr static int Flags = traits<Ancestor>::Flags;
+	};
+
 	// 二元运算表达式
 	template<typename BinaryOp, typename LhsType, typename RhsType>
 	class CwiseBinaryOp : public MatrixBase<CwiseBinaryOp<BinaryOp, LhsType, RhsType>>
@@ -24,6 +34,8 @@ namespace LCH::Math
 		{
 
 		}
+
+		CwiseBinaryOp(const CwiseBinaryOp<BinaryOp, LhsType, RhsType>&) = default;
 
 		const LhsNested& lhs() const { return m_lhs; }
 		const RhsNested& rhs() const { return m_rhs; }

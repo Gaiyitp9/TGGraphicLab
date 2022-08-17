@@ -12,12 +12,12 @@ namespace LCH::Math
 	{
 		using result_type = scalar_binaryop_traits<LhsScalar, RhsScalar, scalar_sum_op>::return_type;
 
-		result_type operator()(const LhsScalar& a, const RhsScalar& b)
+		result_type operator()(const LhsScalar& a, const RhsScalar& b) const
 		{
 			return a + b;
 		}
 	};
 
 	template<>
-	bool scalar_sum_op<bool, bool>::operator()(const bool& a, const bool& b) { return a || b; };
+	bool scalar_sum_op<bool, bool>::operator()(const bool& a, const bool& b) const { return a || b; };
 }

@@ -7,6 +7,7 @@
 #include "UnitTest.hpp"
 #include "Utility.hpp"
 #include "Math/Vector.hpp"
+#include "Math/Core.hpp"
 #include "Input/InputEvent.hpp"
 #include "Diagnostics/Debug.hpp"
 
@@ -76,7 +77,7 @@ namespace LCH
 
 	void UnitTest::MathLibTest()
 	{
-		Math::Vector4d vvv;
+		/*Math::Vector4d vvv;
 		Math::Vector4f v;
 		std::cout << "Vector<float, 4> value address = " << &v << std::boolalpha << Math::IsAligned(&v, 16) << std::endl;
 		std::cout << v.x() << " " << v.y() << " " << v.z() << " " << v.w() << std::endl;
@@ -123,7 +124,14 @@ namespace LCH
 		Math::Vector3f vf1{ 3.2f, 2.1f, 5.0f };
 		Math::Vector3f vf2{ -0.2f, 6.1f, 1.0f };
 		Math::Vector3f vcross = vf1.Cross(vf2);
-		std::cout << "cross: " << vcross.x() << " " << vcross.y() << " " << vcross.z() << std::endl;
+		std::cout << "cross: " << vcross.x() << " " << vcross.y() << " " << vcross.z() << std::endl;*/
+		Math::Vectorm3f v1, v2, v3;
+		v1[0] = 0; v1[1] = 1; v1[2] = 2;
+		v2[0] = 0; v2[1] = 2; v2[2] = 2;
+		v3[0] = 0; v3[1] = 1; v3[2] = 2;
+		Math::Vectorm3f result;
+		result = v1 + v2 + v3 + v3;
+		std::cout << "result: " << result[0] << " " << result[1] << " " << result[2] << std::endl;
 	}
 
 	void UnitTest::SIMDTest()

@@ -11,24 +11,24 @@ namespace LCH::Math
 	template<typename Derived>
 	class MatrixBase
 	{
+	public:
 		using Scalar = traits<Derived>::Scalar;
-		using RowsAtCompileTime = traits<Derived>::RowsAtCompileTime;
-		using ColsAtCompileTime = traits<Derived>::ColsAtCompileTime;
-		using SizeAtCompileTime = traits<Derived>::SizeAtCompileTime;
-		using Options = traits<Derived>::Options;
-		using Alignment = traits<Derived>::Alignment;
+		static constexpr int RowsAtCompileTime = traits<Derived>::RowsAtCompileTime;
+		static constexpr int ColsAtCompileTime = traits<Derived>::ColsAtCompileTime;
+		static constexpr int SizeAtCompileTime = size_at_compile_time(traits<Derived>::RowsAtCompileTime, traits<Derived>::ColsAtCompileTime);
 		static constexpr bool IsVectorAtCompileTime = traits<Derived>::RowsAtCompileTime == 1 ||
 													  traits<Derived>::ColsAtCompileTime == 1;
 
 	public:
 		Derived& derived() { return *static_cast<Derived*>(this); }
-		const Derived& derived() { return *static_cast<const Derived*>(this); }
+		const Derived& derived() const { return *static_cast<const Derived*>(this); }
 
 	public:
 		template<typename OtherDerived>
-		CwiseBinaryOp operator+(const MatrixBase<OtherDerived>& other)
+		CwiseBinaryOp<scalar_sum_op<Scalar, typename traits<OtherDerived>::Scalar>, 
+			Derived, OtherDerived> operator+(const MatrixBase<OtherDerived>& other)
 		{
-			return CwiseBinaryOp<scalar_sum_op<Scalar, traits<OtherDerived>::Scalar>, 
+			return CwiseBinaryOp<scalar_sum_op<Scalar, typename traits<OtherDerived>::Scalar>, 
 				Derived, OtherDerived>(derived(), other.derived());
 		}
 	};

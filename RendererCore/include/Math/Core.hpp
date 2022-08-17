@@ -6,6 +6,7 @@
 #pragma once
 #define MATH_CORE_H
 
+#include <type_traits>
 #include "Constants.hpp"
 #include "ForwardDeclarations.hpp"
 #include "XprHelper.hpp"

@@ -11,17 +11,14 @@ namespace LCH::Math
 	template<typename T> struct traits<const T> : traits<T> {};
 
 	template<typename Derived> class MatrixBase;
-
 	template<typename ScalarT, int Rows, int Cols, 
 		int Options_ = AutoAlign | (Rows == 1 && Cols != 1 ? StorageOption::RowMajor :
 									Rows != 1 && Cols == 1 ? StorageOption::ColMajor :
 									DefaultMatrixStorageOrderOption)
-	>
-	class Matrix;
+	> class Matrix;
 
-	template<typename T, int Size, int Rows, int Cols, int Options>
-	class Storage;
+	template<typename T, int Size, int Rows, int Cols, int Options> class Storage;
 
-	template<typename LhsScalar, typename RhsScalar>
-	struct scalar_sum_op;
+	template<typename BinaryOp, typename Lhs, typename Rhs> class CwiseBinaryOp;
+	template<typename LhsScalar, typename RhsScalar> struct scalar_sum_op;
 }
