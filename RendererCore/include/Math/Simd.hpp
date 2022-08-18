@@ -6,7 +6,6 @@
 #pragma once
 
 #include <array>
-#include <type_traits>
 
 namespace LCH::Math
 {
@@ -36,6 +35,113 @@ namespace LCH::Math
 // 使用SIMD需要支持AVX2或AVX指令集
 #if defined(__AVX2__) || defined(__AVX__)
 #include <immintrin.h>
+
+namespace LCH::Math
+{
+
+template<typename T>
+struct packet_traits
+{
+	using type = T;
+	using half = T;
+	constexpr static bool Vectorizable = false;			// 是否向量化
+	constexpr static int  Size = 1;						// 包尺寸
+	constexpr static bool AlignedOnScalar = false;		// 是否对齐
+	constexpr static bool HasHalfPacket = false;		// 是否有半包
+};
+template<typename T> struct packet_traits<const T> : packet_traits<T> {};
+
+template<typename T> struct unpacket_traits
+{
+	using type = T;
+	using half = T;
+	constexpr static bool Vectorizable = false;
+	constexpr static int  Size = 1;
+	constexpr static int  Alignment = 1;
+};
+template<typename T> struct unpacket_traits<const T> : unpacket_traits<T> { };
+
+using Packet4f = __m128;
+using Packet2d = __m128d;
+using Packet4i = __m128i;
+using Packet8f = __m256;
+using Packet4d = __m256d;
+using Packet8i = __m256i;
+
+template<>
+struct packet_traits<float>
+{
+	using type = Packet8f;
+	using half = Packet4f;
+	constexpr static bool Vectorizable = true;	
+	constexpr static int  Size = 8;
+	constexpr static bool AlignedOnScalar = true;
+	constexpr static bool HasHalfPacket = true;
+};
+
+template<>
+struct packet_traits<double>
+{
+	using type = Packet4d;
+	using half = Packet2d;
+	constexpr static bool Vectorizable = true;
+	constexpr static int  Size = 4;
+	constexpr static bool AlignedOnScalar = true;
+	constexpr static bool HasHalfPacket = true;
+};
+
+template<>
+struct packet_traits<int>
+{
+	using type = Packet8i;
+	using half = Packet4i;
+	constexpr static bool Vectorizable = true;
+	constexpr static int  Size = 8;
+	constexpr static bool AlignedOnScalar = true;
+	constexpr static bool HasHalfPacket = true;
+};
+
+template<>
+struct unpacket_traits<Packet8f>
+{
+	using type = float;
+	using half = Packet4f;
+	constexpr static bool Vectorizable = true;
+	constexpr static int  Size = 8;
+	constexpr static int  Alignment = 32;
+};
+
+template<>
+struct unpacket_traits<Packet4f>
+{
+	using type = float;
+	using half = Packet4f;
+	constexpr static bool Vectorizable = true;
+	constexpr static int  Size = 4;
+	constexpr static int  Alignment = 16;
+};
+
+template<>
+struct unpacket_traits<Packet4d>
+{
+	using type = double;
+	using half = Packet2d;
+	constexpr static bool Vectorizable = true;
+	constexpr static int  Size = 4;
+	constexpr static int  Alignment = 32;
+};
+
+template<>
+struct unpacket_traits<Packet2d>
+{
+	using type = double;
+	using half = Packet2d;
+	constexpr static bool Vectorizable = true;
+	constexpr static int  Size = 2;
+	constexpr static int  Alignment = 16;
+};
+
+}
 
 namespace LCH::Math
 {

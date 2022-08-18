@@ -11,7 +11,7 @@ namespace LCH::Math
 	struct traits<CwiseBinaryOp<BinaryOp, Lhs, Rhs>>
 	{
 		using Ancestor = remove_all_t<Lhs>;
-		using Scalar = invoke_result_of <BinaryOp, const typename Lhs::Scalar&, const typename Rhs::Scalar&>::type;
+		using Scalar = invoke_result_of<BinaryOp, const typename Lhs::Scalar&, const typename Rhs::Scalar&>::type;
 		constexpr static int RowsAtCompileTime = traits<Ancestor>::RowsAtCompileTime;
 		constexpr static int ColsAtCompileTime = traits<Ancestor>::ColsAtCompileTime;
 		constexpr static int Flags = traits<Ancestor>::Flags;
