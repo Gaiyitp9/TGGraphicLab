@@ -11,8 +11,6 @@ namespace LCH::Math
 	{
 		RowMajor = 0x01,
 		ColMajor = 0x02,
-		AutoAlign = 0x04,
-		DontAlign = 0x08
 	};
 	const StorageOption DefaultMatrixStorageOrderOption = StorageOption::RowMajor;
 	const int Dynamic = -1;

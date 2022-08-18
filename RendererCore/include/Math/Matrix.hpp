@@ -12,11 +12,12 @@ namespace LCH::Math
 	{
 		using Scalar = Scalar_;
 		constexpr static int Size = size_at_compile_time(Rows, Cols);
+		using PacketScalar = find_best_packet<Scalar_, Size>::type;
 		constexpr static int RowsAtCompileTime = Rows;
 		constexpr static int ColsAtCompileTime = Cols;
 		constexpr static int Options = Options_;
 		constexpr static int Flags = NestByRefBit;
-		constexpr static int Alignment = (Options & DontAlign) ? SimdInstruction<Scalar, Size>::Alignment : 0;
+		constexpr static int Alignment = unpacket_traits<PacketScalar>::Alignment;
 	};
 
 	template<typename Scalar_, int Rows, int Cols, int Options_>

@@ -141,6 +141,26 @@ struct unpacket_traits<Packet2d>
 	constexpr static int  Alignment = 16;
 };
 
+template<>
+struct unpacket_traits<Packet8i>
+{
+	using type = int;
+	using half = Packet4i;
+	constexpr static bool Vectorizable = true;
+	constexpr static int Size = 8;
+	constexpr static int Alignment = 32;
+};
+
+template<>
+struct unpacket_traits<Packet4i>
+{
+	using type = int;
+	using half = Packet4i;
+	constexpr static bool Vectorizable = true;
+	constexpr static int Size = 4;
+	constexpr static int Alignment = 16;
+};
+
 }
 
 namespace LCH::Math

@@ -26,7 +26,7 @@ namespace LCH::Math
 		using non_const_type = std::conditional_t<traits<T>::Flags, T&, T>;
 	};
 
-	// 二元运算符包含变量的特性
+	// 二元运算符操作数的特性
 	template<typename ScalarA, typename ScalarB, typename BinaryOp = scalar_sum_op<ScalarA, ScalarB>>
 	struct scalar_binaryop_traits;
 
@@ -36,7 +36,7 @@ namespace LCH::Math
 		using return_type = T;
 	};
 
-	// 获取可调用变量(比如函数)的返回值
+	// 获取可调用变量(比如函数或者lambada表达式)的返回值
 	template<typename Callable, typename... ArgTypes>
 	struct invoke_result_of
 	{
@@ -75,6 +75,7 @@ namespace LCH::Math
 		using type = find_best_packet_helper<Size, typename packet_traits<T>::type>::type;
 	};
 
+	// 编译期计算矩阵尺寸
 	constexpr inline int size_at_compile_time(int rows, int cols)
 	{
 		return (rows == Dynamic || cols == Dynamic) ? Dynamic : rows * cols;
