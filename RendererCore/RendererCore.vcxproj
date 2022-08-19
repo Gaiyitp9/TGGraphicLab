@@ -176,6 +176,7 @@
     <ClInclude Include="include\Math\Color.hpp" />
     <ClInclude Include="include\Math\Constants.hpp" />
     <ClInclude Include="include\Math\Core.hpp" />
+    <ClInclude Include="include\Math\CoreEvaluator.hpp" />
     <ClInclude Include="include\Math\CwiseBinaryOp.hpp" />
     <ClInclude Include="include\Math\ForwardDeclarations.hpp" />
     <ClInclude Include="include\Math\Matrix.hpp" />
