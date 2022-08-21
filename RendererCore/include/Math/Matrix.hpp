@@ -23,7 +23,6 @@ namespace LCH::Math
 		constexpr static int Options = Options_;
 		constexpr static int Flags = DirectAccessBit | LvalueBit | NestByRefBit | row_major_bit;
 		constexpr static int Alignment = unpacket_traits<PacketScalar>::Alignment;
-		constexpr static int EvaluatorFlags = LinearAccessBit | DirectAccessBit | row_major_bit | packet_access_bit;
 	};
 
 	template<typename Scalar_, int Rows, int Cols, int Options_>
