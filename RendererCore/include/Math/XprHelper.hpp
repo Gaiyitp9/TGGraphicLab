@@ -22,8 +22,8 @@ namespace LCH::Math
 	template<typename T>
 	struct ref_selector
 	{
-		using type = std::conditional_t<traits<T>::Flags, const T&, const T>;
-		using non_const_type = std::conditional_t<traits<T>::Flags, T&, T>;
+		using type = std::conditional_t<traits<T>::Flags & NestByRefBit, const T&, const T>;
+		using non_const_type = std::conditional_t<traits<T>::Flags & NestByRefBit, T&, T>;
 	};
 
 	// 二元运算符操作数的特性

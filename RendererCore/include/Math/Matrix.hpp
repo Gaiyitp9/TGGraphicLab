@@ -10,14 +10,20 @@ namespace LCH::Math
 	template<typename Scalar_, int Rows, int Cols, int Options_>
 	struct traits<Matrix<Scalar_, Rows, Cols, Options_>>
 	{
+	private:
+		constexpr static int row_major_bit = Options_ & RowMajor ? RowMajorBit : 0;
+		constexpr static int packet_access_bit = packet_traits<Scalar_>::Vectorizable ? PacketAccessBit : 0;
+
+	public:
 		using Scalar = Scalar_;
 		constexpr static int Size = size_at_compile_time(Rows, Cols);
 		using PacketScalar = find_best_packet<Scalar_, Size>::type;
 		constexpr static int RowsAtCompileTime = Rows;
 		constexpr static int ColsAtCompileTime = Cols;
 		constexpr static int Options = Options_;
-		constexpr static int Flags = NestByRefBit;
+		constexpr static int Flags = DirectAccessBit | LvalueBit | NestByRefBit | row_major_bit;
 		constexpr static int Alignment = unpacket_traits<PacketScalar>::Alignment;
+		constexpr static int EvaluatorFlags = LinearAccessBit | DirectAccessBit | row_major_bit | packet_access_bit;
 	};
 
 	template<typename Scalar_, int Rows, int Cols, int Options_>
@@ -49,6 +55,8 @@ namespace LCH::Math
 			}
 			return *this;
 		}
+
+
 
 	private:
 		Storage<Scalar, SizeAtCompileTime, RowsAtCompileTime, ColsAtCompileTime, Alignment> m_storage;

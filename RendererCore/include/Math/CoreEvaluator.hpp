@@ -8,9 +8,11 @@
 namespace LCH::Math
 {
 
-// 二元运算求值
+// 二元运算求值器
 template<typename T, 
 		 typename LhsScalar = typename traits<typename T::Lhs>::Scalar,
 		 typename RhsScalar = typename traits<typename T::Rhs>::Scalar>
 struct binary_evaluator;
+
+
 }
