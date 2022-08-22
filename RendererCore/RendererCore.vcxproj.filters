@@ -150,6 +150,9 @@
     <ClInclude Include="include\Math\CoreEvaluator.hpp">
       <Filter>头文件\Math</Filter>
     </ClInclude>
+    <ClInclude Include="include\Math\AssignEvaluator.hpp">
+      <Filter>头文件\Math</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Utility.cpp">

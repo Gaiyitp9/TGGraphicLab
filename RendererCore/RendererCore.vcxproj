@@ -172,6 +172,7 @@
     <ClInclude Include="include\Input\Keyboard.hpp" />
     <ClInclude Include="include\Input\KeyCode.hpp" />
     <ClInclude Include="include\Input\Mouse.hpp" />
+    <ClInclude Include="include\Math\AssignEvaluator.hpp" />
     <ClInclude Include="include\Math\BinaryFunctors.hpp" />
     <ClInclude Include="include\Math\Color.hpp" />
     <ClInclude Include="include\Math\Constants.hpp" />

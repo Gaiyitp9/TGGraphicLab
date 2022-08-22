@@ -20,7 +20,7 @@ namespace LCH::Math
 						DefaultMatrixStorageOrderOption)
 	> class Matrix;
 	// 矩阵底层存储类
-	template<typename T, int Size, int Rows, int Cols, int Options> class Storage;
+	template<typename T, int Size, int Rows, int Cols> class Storage;
 
 	// 二元运算
 	template<typename BinaryOp, typename Lhs, typename Rhs> class CwiseBinaryOp;

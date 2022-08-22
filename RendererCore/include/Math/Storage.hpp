@@ -10,7 +10,7 @@
 namespace LCH::Math
 {
 	// 对齐数组
-	template<typename T, int Size, int Alignment>
+	template<typename T, int Size, int Alignment = compute_default_alignment<T, Size>::value>
 	struct PlainArray
 	{
 		alignas(Alignment) T array[Size];
@@ -43,20 +43,20 @@ namespace LCH::Math
 	}
 
 	// 根据条件分配动态内存(默认16字节对齐)
-	template<int Alignment>
+	template<bool Align>
 	inline void* conditional_aligned_alloc(size_t size)
 	{
 		return std::malloc(size);
 	}
 
 	template<>
-	inline void* conditional_aligned_alloc<32>(size_t size)
+	inline void* conditional_aligned_alloc<true>(size_t size)
 	{
-		return handmade_aligned_malloc(size, 32);
+		return handmade_aligned_malloc(size, DEFAULT_ALIGN_BYTES);
 	}
 
 	// 根据条件释放内存
-	template<int Alignment>
+	template<bool Align>
 	inline void conditional_aligned_free(void* ptr)
 	{
 		if (ptr)
@@ -64,39 +64,40 @@ namespace LCH::Math
 	}
 
 	template<>
-	inline void conditional_aligned_free<32>(void* ptr)
+	inline void conditional_aligned_free<true>(void* ptr)
 	{
 		handmade_aligned_free(ptr);
 	}
 
-	template<typename T, int Size, int Rows, int Cols, int Alignment> 
+	template<typename T, int Size, int Rows, int Cols> 
 	class Storage
 	{
 	public:
 		const T& operator[](size_t index) const { return m_data.array[index]; }
 		T& operator[](size_t index) { return m_data.array[index]; }
 		T const* data() const { return m_data.array; }
-		int rows() noexcept { return Rows; }
-		int cols() noexcept { return Cols; }
+		T* data() { return m_data.array; }
+		constexpr int rows() noexcept { return Rows; }
+		constexpr int cols() noexcept { return Cols; }
 
 	private:
-		PlainArray<T, Size, Alignment> m_data;
+		PlainArray<T, Size> m_data;
 	};
 
-	template<typename T, int Alignment>
-	class Storage<T, Dynamic, Dynamic, Dynamic, Alignment>
+	template<typename T>
+	class Storage<T, Dynamic, Dynamic, Dynamic>
 	{
 	public:
 		Storage() : m_data(nullptr), m_rows(0), m_cols(0) {}
-		~Storage() { conditional_aligned_free<Alignment>(m_data); }
+		~Storage() { conditional_aligned_free<true>(m_data); }
 
 		void resize(int size, int rows, int cols)
 		{
 			if (size != m_rows * m_cols)
 			{
-				conditional_aligned_free<Alignment>(m_data);
+				conditional_aligned_free<true>(m_data);
 				if (size > 0)
-					m_data = static_cast<T*>(conditional_aligned_alloc<Alignment>(sizeof(T) * size));
+					m_data = reinterpret_cast<T*>(conditional_aligned_alloc<true>(sizeof(T) * size));
 				else
 					m_data = nullptr;
 			}
@@ -106,8 +107,8 @@ namespace LCH::Math
 		}
 
 		T const* data() const { return m_data; }
-		int rows() noexcept { return m_rows; }
-		int cols() noexcept { return m_cols; }
+		int rows() const noexcept { return m_rows; }
+		int cols() const noexcept { return m_cols; }
 
 	private:
 		T* m_data;

@@ -37,6 +37,14 @@ namespace LCH::Math
 
 		CwiseBinaryOp(const CwiseBinaryOp<BinaryOp, LhsType, RhsType>&) = default;
 
+		constexpr int rows() const noexcept
+		{
+			return traits<Lhs>::RowsAtCompileTime == Dynamic ? m_rhs.rows() : m_lhs.rows();
+		}
+		constexpr int cols() const noexcept
+		{
+			return traits<Lhs>::ColsAtCompileTime == Dynamic ? m_rhs.cols() : m_lhs.cols();
+		}
 		const LhsNested& lhs() const { return m_lhs; }
 		const RhsNested& rhs() const { return m_rhs; }
 		const Functor& functor() const { return m_functor; }

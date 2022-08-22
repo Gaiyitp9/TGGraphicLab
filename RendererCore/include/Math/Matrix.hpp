@@ -36,7 +36,6 @@ namespace LCH::Math
 		using Base::ColsAtCompileTime;
 		using Base::SizeAtCompileTime;
 		using Base::IsVectorAtCompileTime;
-		constexpr static int Alignment = traits<Matrix>::Alignment;
 
 	public:
 		int rows() const { return m_storage.rows(); }
@@ -55,10 +54,8 @@ namespace LCH::Math
 			return *this;
 		}
 
-
-
 	private:
-		Storage<Scalar, SizeAtCompileTime, RowsAtCompileTime, ColsAtCompileTime, Alignment> m_storage;
+		Storage<Scalar, SizeAtCompileTime, RowsAtCompileTime, ColsAtCompileTime> m_storage;
 	};
 
 	using Vectorm3f = Matrix<float, 1, 3>;
