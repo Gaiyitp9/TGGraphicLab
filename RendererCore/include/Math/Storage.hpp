@@ -76,9 +76,8 @@ namespace LCH::Math
 		const T& operator[](size_t index) const { return m_data.array[index]; }
 		T& operator[](size_t index) { return m_data.array[index]; }
 		T const* data() const { return m_data.array; }
-		int rows() { return Rows; }
-		int cols() { return Cols; }
-		int size() { return Size; }
+		int rows() noexcept { return Rows; }
+		int cols() noexcept { return Cols; }
 
 	private:
 		PlainArray<T, Size, Alignment> m_data;
@@ -107,9 +106,8 @@ namespace LCH::Math
 		}
 
 		T const* data() const { return m_data; }
-		int rows() { return m_rows; }
-		int cols() { return m_cols; }
-		int size() { return m_size; }
+		int rows() noexcept { return m_rows; }
+		int cols() noexcept { return m_cols; }
 
 	private:
 		T* m_data;

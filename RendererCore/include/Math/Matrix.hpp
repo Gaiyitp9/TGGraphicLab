@@ -11,18 +11,19 @@ namespace LCH::Math
 	struct traits<Matrix<Scalar_, Rows, Cols, Options_>>
 	{
 	private:
+		constexpr static int size = size_at_compile_time(Rows, Cols);
 		constexpr static int row_major_bit = Options_ & RowMajor ? RowMajorBit : 0;
 		constexpr static int packet_access_bit = packet_traits<Scalar_>::Vectorizable ? PacketAccessBit : 0;
-
 	public:
 		using Scalar = Scalar_;
-		constexpr static int Size = size_at_compile_time(Rows, Cols);
-		using PacketScalar = find_best_packet<Scalar_, Size>::type;
+		using PacketScalar = find_best_packet<Scalar_, size>::type;
 		constexpr static int RowsAtCompileTime = Rows;
 		constexpr static int ColsAtCompileTime = Cols;
 		constexpr static int Options = Options_;
 		constexpr static int Flags = DirectAccessBit | LvalueBit | NestByRefBit | row_major_bit;
-		constexpr static int Alignment = unpacket_traits<PacketScalar>::Alignment;
+		constexpr static int InnerStrideAtCompileTime = 1;
+		constexpr static int OuterStrideAtCompileTime = (Options & RowMajor) ? ColsAtCompileTime : RowsAtCompileTime;
+		constexpr static int Alignment = compute_default_alignment<Scalar_, size>::value;
 	};
 
 	template<typename Scalar_, int Rows, int Cols, int Options_>
@@ -40,7 +41,6 @@ namespace LCH::Math
 	public:
 		int rows() const { return m_storage.rows(); }
 		int cols() const { return m_storage.cols(); }
-		int size() const { return m_storage.size(); }
 
 		const Scalar& operator[](size_t index) const { return m_storage[index]; }
 		Scalar& operator[](size_t index) { return m_storage[index]; }
