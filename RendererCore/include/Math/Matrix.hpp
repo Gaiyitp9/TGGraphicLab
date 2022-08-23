@@ -7,26 +7,25 @@
 
 namespace LCH::Math
 {
-	template<typename Scalar_, int Rows, int Cols, int Options_>
+	template<typename Scalar_, int Rows, int Cols, StorageOption Options_>
 	struct traits<Matrix<Scalar_, Rows, Cols, Options_>>
 	{
 	private:
 		constexpr static int size = size_at_compile_time(Rows, Cols);
-		constexpr static int row_major_bit = Options_ & RowMajor ? RowMajorBit : 0;
+		constexpr static int row_major_bit = (Options_ == StorageOption::RowMajor) ? RowMajorBit : 0;
 		constexpr static int packet_access_bit = packet_traits<Scalar_>::Vectorizable ? PacketAccessBit : 0;
 	public:
 		using Scalar = Scalar_;
 		using PacketScalar = find_best_packet<Scalar_, size>::type;
 		constexpr static int RowsAtCompileTime = Rows;
 		constexpr static int ColsAtCompileTime = Cols;
-		constexpr static int Options = Options_;
 		constexpr static int Flags = DirectAccessBit | LvalueBit | NestByRefBit | row_major_bit;
 		constexpr static int InnerStrideAtCompileTime = 1;
-		constexpr static int OuterStrideAtCompileTime = (Options & RowMajor) ? ColsAtCompileTime : RowsAtCompileTime;
+		constexpr static int OuterStrideAtCompileTime = (Options_ == StorageOption::RowMajor) ? ColsAtCompileTime : RowsAtCompileTime;
 		constexpr static int Alignment = compute_default_alignment<Scalar_, size>::value;
 	};
 
-	template<typename Scalar_, int Rows, int Cols, int Options_>
+	template<typename Scalar_, int Rows, int Cols, StorageOption Options_>
 	class Matrix : public MatrixBase<Matrix<Scalar_, Rows, Cols, Options_>>
 	{
 	public:

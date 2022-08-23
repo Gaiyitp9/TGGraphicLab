@@ -7,17 +7,18 @@
 
 namespace LCH::Math
 {
-	template<typename LhsScalar, typename RhsScalar>
-	struct scalar_sum_op
+
+template<typename LhsScalar, typename RhsScalar>
+struct scalar_sum_op
+{
+	using result_type = scalar_binaryop_traits<LhsScalar, RhsScalar, scalar_sum_op>::return_type;
+
+	result_type operator()(const LhsScalar& a, const RhsScalar& b) const
 	{
-		using result_type = scalar_binaryop_traits<LhsScalar, RhsScalar, scalar_sum_op>::return_type;
+		return a + b;
+	}
+};
 
-		result_type operator()(const LhsScalar& a, const RhsScalar& b) const
-		{
-			return a + b;
-		}
-	};
+template<> bool scalar_sum_op<bool, bool>::operator()(const bool& a, const bool& b) const { return a || b; };
 
-	template<>
-	bool scalar_sum_op<bool, bool>::operator()(const bool& a, const bool& b) const { return a || b; };
 }

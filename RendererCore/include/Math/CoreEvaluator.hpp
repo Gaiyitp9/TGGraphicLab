@@ -14,5 +14,10 @@ template<typename T,
 		 typename RhsScalar = typename traits<typename T::Rhs>::Scalar>
 struct binary_evaluator;
 
+template<typename T>
+struct evaluator_assume_aliasing
+{
+	constexpr static bool value = false;
+};
 
 }

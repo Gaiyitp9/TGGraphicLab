@@ -9,21 +9,18 @@
 
 namespace LCH::Math
 {
-	extern double PI;
-	extern double Rad2Deg;
-	extern double Deg2Rad;
 
-	// 地址是否满足对齐条件
-	template<typename T>
-	inline bool IsAligned(T const* value, size_t alignment)
-	{
-		return 0 == ((size_t)value & (alignment - 1));
-	}
+const double PI = 3.14159265358979;
+const double Rad2Deg = 57.2957795130823;
+const double Deg2Rad = 0.0174532925199433;
 
-	// 绝对值
-	template<typename T>
-	inline T Abs(T a)
-	{
-		return a < 0 ? -a : a;
-	}
+// 地址是否满足对齐条件
+template<typename T>
+inline bool IsAligned(T const* value, size_t alignment)
+{
+	return 0 == ((size_t)value & (alignment - 1));
+}
+
+template<typename T> inline T Abs(T a) { return a < 0 ? -a : a; }
+
 }

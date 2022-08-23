@@ -153,6 +153,12 @@
     <ClInclude Include="include\Math\AssignEvaluator.hpp">
       <Filter>头文件\Math</Filter>
     </ClInclude>
+    <ClInclude Include="include\Math\AssignmentFunctors.hpp">
+      <Filter>头文件\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Math\Transpose.hpp">
+      <Filter>头文件\Math</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Utility.cpp">
@@ -196,9 +202,6 @@
     </ClCompile>
     <ClCompile Include="src\Window\PopupWindow.cpp">
       <Filter>源文件\Window</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Math\CommonFunction.cpp">
-      <Filter>源文件\Math</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

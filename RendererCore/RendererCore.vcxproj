@@ -173,6 +173,7 @@
     <ClInclude Include="include\Input\KeyCode.hpp" />
     <ClInclude Include="include\Input\Mouse.hpp" />
     <ClInclude Include="include\Math\AssignEvaluator.hpp" />
+    <ClInclude Include="include\Math\AssignmentFunctors.hpp" />
     <ClInclude Include="include\Math\BinaryFunctors.hpp" />
     <ClInclude Include="include\Math\Color.hpp" />
     <ClInclude Include="include\Math\Constants.hpp" />
@@ -185,6 +186,7 @@
     <ClInclude Include="include\Math\Quaternion.hpp" />
     <ClInclude Include="include\Math\Simd.hpp" />
     <ClInclude Include="include\Math\Storage.hpp" />
+    <ClInclude Include="include\Math\Transpose.hpp" />
     <ClInclude Include="include\Math\Vector.hpp" />
     <ClInclude Include="include\Chronometer.hpp" />
     <ClInclude Include="include\Math\CommonFunction.hpp" />
@@ -206,7 +208,6 @@
     <ClCompile Include="src\Input\Mouse.cpp" />
     <ClCompile Include="src\Chronometer.cpp" />
     <ClCompile Include="src\Math\Color.cpp" />
-    <ClCompile Include="src\Math\CommonFunction.cpp" />
     <ClCompile Include="src\Utility.cpp" />
     <ClCompile Include="src\Window\MainWindow.cpp" />
     <ClCompile Include="src\Window\PopupWindow.cpp" />

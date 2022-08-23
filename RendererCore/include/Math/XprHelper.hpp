@@ -23,8 +23,8 @@ using remove_all_t = remove_all<T>::type;
 template<typename T>
 struct ref_selector
 {
-	using type = std::conditional_t<bool(traits<T>::Flags & NestByRefBit), const T&, const T>;
-	using non_const_type = std::conditional_t<bool(traits<T>::Flags & NestByRefBit), T&, T>;
+	using type = std::conditional_t<static_cast<bool>(traits<T>::Flags & NestByRefBit), const T&, const T>;
+	using non_const_type = std::conditional_t<static_cast<bool>(traits<T>::Flags & NestByRefBit), T&, T>;
 };
 
 // 二元运算符操作数的特性
@@ -43,6 +43,12 @@ struct invoke_result_of
 {
 	typedef typename std::invoke_result<Callable, ArgTypes...>::type type1;
 	typedef remove_all_t<type1> type;
+};
+
+template<typename T> 
+struct functor_traits
+{
+	constexpr static bool PacketAccess = false;
 };
 
 // 变量对应的包特性(包中有多个变量，表示SIMD中使用的变量，比如__m128)
@@ -95,11 +101,43 @@ constexpr inline int compute_default_alignment_helper(int arrayBytes, int alignm
 	else
 		return 0;
 }
+
 // 计算默认对齐
 template<typename T, int Size>
 struct compute_default_alignment
 {
 	constexpr static int value = compute_default_alignment_helper(Size * sizeof(T), MAX_ALIGN_BYTES);
+};
+
+template<typename Derived, bool HasDirectAccess = has_direct_access<Derived>::ret>
+struct inner_stride_at_compile_time
+{
+	constexpr static int value = traits<Derived>::InnerStrideAtCompileTime;
+};
+
+template<typename Derived>
+struct inner_stride_at_compile_time<Derived, false>
+{
+	constexpr static int value = 0;
+};
+
+template<typename Derived, bool HasDirectAccess = has_direct_access<Derived>::ret>
+struct outer_stride_at_compile_time
+{
+	constexpr static int value = traits<Derived>::OuterStrideAtCompileTime;
+};
+
+template<typename Derived>
+struct outer_stride_at_compile_time<Derived, false>
+{
+	constexpr static int value = 0;
+};
+
+template<typename ExpressionType>
+struct is_lvalue
+{
+	constexpr static bool value = (!static_cast<bool>(std::is_const<ExpressionType>::value)) &&
+									static_cast<bool>(traits<ExpressionType>::Flags & LvalueBit);
 };
 
 }
