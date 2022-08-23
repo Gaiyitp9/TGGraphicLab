@@ -9,7 +9,7 @@ namespace LCH::Math
 {
 
 template<typename MatrixType>
-struct traits<Transpose<MatrixType>> : public traits<MatrixType>
+struct traits<Transpose<MatrixType>>
 {
 private:
 	constexpr static int FlagsLvalueBit = is_lvalue<MatrixType>::value ? LvalueBit : 0;
