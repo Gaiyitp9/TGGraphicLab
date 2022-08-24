@@ -27,7 +27,7 @@ enum Flags : unsigned int
 	NestByRefBit = 0x100,
 };
 
-enum AccessorLevels
+enum AccessorLevels : char
 {
 	ReadOnlyAccessors,
 	WriteAccessors,

@@ -22,6 +22,7 @@ namespace LCH::Math
 		constexpr static int Flags = DirectAccessBit | LvalueBit | NestByRefBit | row_major_bit;
 		constexpr static int InnerStrideAtCompileTime = 1;
 		constexpr static int OuterStrideAtCompileTime = (Options_ == StorageOption::RowMajor) ? ColsAtCompileTime : RowsAtCompileTime;
+		constexpr static int EvaluatorFlags = LinearAccessBit | DirectAccessBit | packet_access_bit | row_major_bit;
 		constexpr static int Alignment = compute_default_alignment<Scalar_, size>::value;
 	};
 
