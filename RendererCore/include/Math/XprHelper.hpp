@@ -19,6 +19,15 @@ template<typename T> struct remove_all<T*>			{ using type = remove_all<T>::type;
 template<typename T>
 using remove_all_t = remove_all<T>::type;
 
+template<typename T> struct add_const_on_value_type { typedef const T type; };
+template<typename T> struct add_const_on_value_type<T&> { typedef T const& type; };
+template<typename T> struct add_const_on_value_type<T*> { typedef T const* type; };
+template<typename T> struct add_const_on_value_type<T* const> { typedef T const* const type; };
+template<typename T> struct add_const_on_value_type<T const* const> { typedef T const* const type; };
+
+template<typename T>
+using add_const_on_value_type_t = typename add_const_on_value_type<T>::type;
+
 // 选择变量声明方式
 template<typename T>
 struct ref_selector

@@ -23,6 +23,8 @@ namespace LCH::Math
 		constexpr static bool has_direct_access = static_cast<bool>(traits<Derived>::Flags & DirectAccessBit);
 	};
 
+	template<typename Derived> struct Base;
+	template<typename Derived, int Level> class CoeffsBase;
 	// 矩阵及矩阵表达式基类
 	template<typename Derived> class MatrixBase;
 	// 矩阵类

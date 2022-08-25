@@ -16,6 +16,8 @@
 #include "CoreEvaluator.hpp"
 #include "AssignEvaluator.hpp"
 #include "Simd.hpp"
+#include "Base.hpp"
+#include "CoeffsBase.hpp"
 #include "Storage.hpp"
 #include "MatrixBase.hpp"
 #include "Matrix.hpp"

@@ -174,7 +174,9 @@
     <ClInclude Include="include\Input\Mouse.hpp" />
     <ClInclude Include="include\Math\AssignEvaluator.hpp" />
     <ClInclude Include="include\Math\AssignmentFunctors.hpp" />
+    <ClInclude Include="include\Math\Base.hpp" />
     <ClInclude Include="include\Math\BinaryFunctors.hpp" />
+    <ClInclude Include="include\Math\CoeffsBase.hpp" />
     <ClInclude Include="include\Math\Color.hpp" />
     <ClInclude Include="include\Math\Constants.hpp" />
     <ClInclude Include="include\Math\Core.hpp" />
