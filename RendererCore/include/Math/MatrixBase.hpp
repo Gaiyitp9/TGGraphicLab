@@ -18,6 +18,7 @@ namespace LCH::Math
 		static constexpr int SizeAtCompileTime = size_at_compile_time(traits<Derived>::RowsAtCompileTime, traits<Derived>::ColsAtCompileTime);
 		static constexpr bool IsVectorAtCompileTime = traits<Derived>::RowsAtCompileTime == 1 ||
 													  traits<Derived>::ColsAtCompileTime == 1;
+		static constexpr bool IsRowMajor = bool(traits<Derived>::Flags & RowMajorBit);
 
 	public:
 		Derived& derived() { return *static_cast<Derived*>(this); }

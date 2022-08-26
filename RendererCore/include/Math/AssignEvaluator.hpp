@@ -8,6 +8,12 @@
 namespace LCH::Math
 {
 
+template<typename DstEvaluator, typename SrcEvaluator, typename AssignFunc, int MaxPacketSize = -1>
+struct copy_using_evaluator_traits
+{
+
+};
+
 // 赋值类
 template<typename DstXprType, typename SrcXprType, typename Functor>
 struct Assignment;
@@ -39,6 +45,11 @@ void call_assignment(Dst& dst, const Src& src)
 	call_assignment(dst, src, assign_op<typename Dst::Scalar, typename Src::Scalar>());
 }
 
+template<typename Kernel,
+		 int Traversal = Kernel::AssignmentTraits::Traversal,
+		 int Unrolling = Kernel::AssignmentTraits::Unrolling>
+struct assignment_loop;
+
 template<typename DstEvaluatorTypeT, typename SrcEvaluatorTypeT, typename Functor>
 class generic_assignment_kernel
 {
@@ -65,7 +76,7 @@ protected:
 };
 
 template<typename DstXprType, typename SrcXprType, typename Functor>
-struct Alignment
+struct Assignment
 {
 	static void run(DstXprType& dst, const SrcXprType& src, const Functor& func)
 	{
