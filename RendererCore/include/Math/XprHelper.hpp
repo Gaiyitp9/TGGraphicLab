@@ -19,6 +19,7 @@ template<typename T> struct remove_all<T*>			{ using type = remove_all<T>::type;
 template<typename T>
 using remove_all_t = remove_all<T>::type;
 
+// 添加const修饰符
 template<typename T> struct add_const_on_value_type { typedef const T type; };
 template<typename T> struct add_const_on_value_type<T&> { typedef T const& type; };
 template<typename T> struct add_const_on_value_type<T*> { typedef T const* type; };
@@ -118,6 +119,7 @@ struct compute_default_alignment
 	constexpr static int value = compute_default_alignment_helper(Size * sizeof(T), MAX_ALIGN_BYTES);
 };
 
+// 判断是否是左值
 template<typename ExpressionType>
 struct is_lvalue
 {

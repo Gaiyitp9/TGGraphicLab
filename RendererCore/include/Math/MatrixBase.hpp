@@ -9,7 +9,7 @@ namespace LCH::Math
 {
 	// 矩阵和所有矩阵表达式的基类
 	template<typename Derived>
-	class MatrixBase
+	class MatrixBase : public CoeffsBase<Derived, accessors_level<Derived>::value>
 	{
 	public:
 		using Scalar = traits<Derived>::Scalar;
