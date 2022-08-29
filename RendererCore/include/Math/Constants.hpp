@@ -35,4 +35,21 @@ enum AccessorLevels : char
 	DirectWriteAccessors,
 };
 
+enum TranversalType : char
+{
+	DefaultTraversal,
+	LinearTraversal,
+	InnerVectorizedTraversal,
+	LinearVectorizedTraversal,
+	SliceVectorizedTraversal,
+	InvalidTraversal,
+	AllAtOnceTraversal,
+};
+
+enum UnrollingType : char
+{
+	NoUnrolling,
+	CompleteUnrolling,
+};
+
 }

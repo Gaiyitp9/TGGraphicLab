@@ -11,7 +11,20 @@ namespace LCH::Math
 template<typename DstEvaluator, typename SrcEvaluator, typename AssignFunc, int MaxPacketSize = -1>
 struct copy_using_evaluator_traits
 {
+	using Dst = DstEvaluator::XprType;
+	using DstScalar = Dst::Scalar;
 
+	constexpr static int DstFlags = DstEvaluator::Flags;
+	constexpr static int SrcFlags = SrcEvaluator::Flags;
+
+	constexpr static int DstAlignment = DstEvaluator::Alignment;
+	constexpr static int SrcAlignment = SrcEvaluator::Alignment;
+	constexpr static bool DstHasDirectAccess = (DstFlags & DirectAccessBit) == DirectAccessBit;
+	constexpr static int JointAlignment = DstAlignment < SrcAlignment ? DstAlignment : SrcAlignment;
+
+	constexpr static int InnerSize = Dst::IsVectorAtCompile ? Dst::SizeAtCompileTime :
+									 DstFlags & RowMajorBit ? Dst::ColsAtCompileTime : Dst::RowAtCompileTime;
+	constexpr static int OuterStride = outer_stride_at_compile_time<Dst>::ret;
 };
 
 // 赋值类
@@ -30,13 +43,27 @@ void call_assignment_no_alias(Dst& dst, const Src& src, const Func& func)
 	using ActualDstType = std::conditional_t<NeedToTranspose, Transpose<Dst>, Dst&>;
 	ActualDstType actualDst(dst);
 
+	static_assert(is_lvalue(Dst), "The expression is not a left value.");
+
 	Assignment<ActualDstTypeCleaned, Src, Func>::run(actualDst, src, func);
 }
 
 template<typename Dst, typename Src, typename Func>
-void call_assignment(Dst& dst, const Src& src, const Func& func, std::enable_if_t<!evaluator_assume_aliasing<Src>::value, void*> = 0)
+void call_assignment(Dst& dst, Src& src, const Func& func)
 {
-	call_assignment_no_alias(dst, src, func);
+	using type = Matrix<typename traits<Src>::Scalar,
+		traits<Src>::RowsAtCompileTime,
+		traits<Src>::ColsAtCompileTime,
+		traits<Src>::Flags & RowMajorBit ? StorageOption::RowMajor : StorageOption::ColMajor
+	>;
+
+	if constexpr (evaluator_assume_aliasing<Src>::value)
+	{
+		type tmp(src);
+		call_assignment_no_alias(dst, tmp, func);
+	}
+	else 
+		call_assignment_no_alias(dst, src, func);
 }
 
 template<typename Dst, typename Src>
