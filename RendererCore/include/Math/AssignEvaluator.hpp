@@ -78,8 +78,49 @@ struct DefaultTraversalCompleteUnrolling
 	}
 };
 
+template<typename Kernel, int Index, int Stop>
+struct LinearTraversalCompleteUnrolling
+{
+	static void Run(Kernel& kernel)
+	{
+		kernel.AssignCoeff(Index);
+		LinearTraversalCompleteUnrolling<Kernel, Index + 1, Stop>::Run(kernel);
+	}
+};
+
+template<typename Kernel, int Stop>
+struct LinearTraversalCompleteUnrolling<Kernel, Stop, Stop>
+{
+	static void Run(Kernel&) {}
+};
+
 template<typename Kernel, int Stop>
 struct DefaultTraversalCompleteUnrolling<Kernel, Stop, Stop>
+{
+	static void Run(Kernel&) {}
+};
+
+template<typename Kernel, int Index, int Stop>
+struct InnerVectorizedTraversalCompleteUnrolling
+{
+	using DstXprType = Kernel::DstXprType;
+	using PacketType = Kernel::PacketType;
+
+	constexpr static int outer = Index / DstXprType::InnerSizeAtCompileTime;
+	constexpr static int inner = Index % DstXprType::InnerSizeAtCompileTime;
+	constexpr static int SrcAlignment = Kernel::AssignmentTraits::SrcAlignment;
+	constexpr static int DstAlignment = Kernel::AssignmentTraits::DstAlignment;
+
+	static void Run(Kernel& kernel)
+	{
+		kernel.template AssignPacketByOuterInner<DstAlignment, SrcAlignment, PacketType>(outer, inner);
+		constexpr static int NextIndex = Index + unpacket_traits<PacketType>::Size;
+		InnerVectorizedTraversalCompleteUnrolling<Kernel, NextIndex, Stop>::Run(kernel);
+	}
+};
+
+template<typename Kernel, int Stop>
+struct InnerVectorizedTraversalCompleteUnrolling<Kernel, Stop, Stop>
 {
 	static void Run(Kernel&) {}
 };
