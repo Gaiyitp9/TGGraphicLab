@@ -78,6 +78,12 @@ struct DefaultTraversalCompleteUnrolling
 	}
 };
 
+template<typename Kernel, int Stop>
+struct DefaultTraversalCompleteUnrolling<Kernel, Stop, Stop>
+{
+	static void Run(Kernel&) {}
+};
+
 template<typename Kernel, int Index, int Stop>
 struct LinearTraversalCompleteUnrolling
 {
@@ -90,12 +96,6 @@ struct LinearTraversalCompleteUnrolling
 
 template<typename Kernel, int Stop>
 struct LinearTraversalCompleteUnrolling<Kernel, Stop, Stop>
-{
-	static void Run(Kernel&) {}
-};
-
-template<typename Kernel, int Stop>
-struct DefaultTraversalCompleteUnrolling<Kernel, Stop, Stop>
 {
 	static void Run(Kernel&) {}
 };
