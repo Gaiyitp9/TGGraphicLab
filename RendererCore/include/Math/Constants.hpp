@@ -41,7 +41,6 @@ enum TranversalType : char
 	LinearTraversal,
 	InnerVectorizedTraversal,
 	LinearVectorizedTraversal,
-	SliceVectorizedTraversal,
 	InvalidTraversal,
 	AllAtOnceTraversal,
 };
