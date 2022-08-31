@@ -38,25 +38,26 @@ namespace LCH::Math
 		using Base::IsVectorAtCompileTime;
 
 	public:
-		int rows() const { return m_storage.rows(); }
-		int cols() const { return m_storage.cols(); }
-
-		const Scalar& operator[](size_t index) const { return m_storage[index]; }
-		Scalar& operator[](size_t index) { return m_storage[index]; }
+		constexpr int rows() const { return m_storage.rows(); }
+		constexpr int cols() const { return m_storage.cols(); }
 
 		template<typename OtherDerived>
 		Matrix& operator=(const MatrixBase<OtherDerived>& other)
 		{
-			for (int i = 0; i < SizeAtCompileTime; ++i)
-			{
-				m_storage[i] = other.derived()[i];
-			}
-			return *this;
+			call_assignment(this->derived(), other.derived());
+			return this->derived();
 		}
+
+		const Scalar* data() const { return m_storage.data(); }
+		Scalar* data() { return m_storage.data(); }
+
+		constexpr int innerStride() const noexcept { return 1; }
+		constexpr int outerStride() const { return this->innerSize(); }
 
 	private:
 		Storage<Scalar, SizeAtCompileTime, RowsAtCompileTime, ColsAtCompileTime> m_storage;
 	};
 
-	using Vectorm3f = Matrix<float, 1, 3>;
+	using Vector4f = Matrix<float, 1, 4>;
+	using Vector2i = Matrix<int, 1, 2>;
 }

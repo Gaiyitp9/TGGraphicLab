@@ -77,6 +77,8 @@ struct packet_traits<float>
 	constexpr static int  Size = 8;
 	constexpr static bool AlignedOnScalar = true;
 	constexpr static bool HasHalfPacket = true;
+
+	constexpr static bool HasAdd = true;
 };
 
 template<>
@@ -88,6 +90,8 @@ struct packet_traits<double>
 	constexpr static int  Size = 4;
 	constexpr static bool AlignedOnScalar = true;
 	constexpr static bool HasHalfPacket = true;
+
+	constexpr static bool HasAdd = true;
 };
 
 template<>
@@ -99,6 +103,8 @@ struct packet_traits<int>
 	constexpr static int  Size = 8;
 	constexpr static bool AlignedOnScalar = true;
 	constexpr static bool HasHalfPacket = true;
+
+	constexpr static bool HasAdd = true;
 };
 
 template<>
@@ -160,6 +166,53 @@ struct unpacket_traits<Packet4i>
 	constexpr static int Size = 4;
 	constexpr static int Alignment = 16;
 };
+
+template<typename Packet>
+inline Packet pload(const typename unpacket_traits<Packet>::type* from) { return *from; }
+template<typename Packet>
+inline Packet ploadu(const typename unpacket_traits<Packet>::type* from) { return *from; }
+
+template<> inline Packet4f pload(const float* from) { return _mm_load_ps(from); }
+template<> inline Packet2d pload(const double* from) { return _mm_load_pd(from); }
+template<> inline Packet4i pload(const int* from) { return _mm_load_si128(reinterpret_cast<const __m128i*>(from)); }
+template<> inline Packet4f ploadu(const float* from) { return _mm_loadu_ps(from); }
+template<> inline Packet2d ploadu(const double* from) { return _mm_loadu_pd(from); }
+template<> inline Packet4i ploadu(const int* from) { return _mm_loadu_si128(reinterpret_cast<const __m128i*>(from)); }
+
+template<typename Scalar, typename Packet>
+inline void pstore(Scalar* to, const Packet& from) { (*to) = from; }
+template<typename Scalar, typename Packet>
+inline void pstoreu(Scalar* to, const Packet& from) { (*to) = from; }
+
+template<> inline void pstore(float* to, const Packet4f& from) { _mm_store_ps(to, from); }
+template<> inline void pstore(double* to, const Packet2d& from) { _mm_store_pd(to, from); }
+
+template<> inline void pstoreu(float* to, const Packet4f& from) { _mm_storeu_ps(to, from); }
+template<> inline void pstoreu(double* to, const Packet2d& from) { _mm_storeu_pd(to, from); }
+
+template<typename Packet, int Alignment>
+inline Packet ploadt(const typename unpacket_traits<Packet>::type* from)
+{
+	if (Alignment >= unpacket_traits<Packet>::Alignment)
+		return pload<Packet>(from);
+	else
+		return ploadu<Packet>(from);
+}
+
+template<typename Scalar, typename Packet, int Alignment>
+inline void pstoret(Scalar* to, const Packet& from)
+{
+	if (Alignment >= unpacket_traits<Packet>::Alignment)
+		pstore(to, from);
+	else
+		pstoreu(to, from);
+}
+
+template<typename Packet> inline Packet padd(const Packet& a, const Packet& b) { return a + b; }
+template<> inline bool padd(const bool& a, const bool& b) { return a || b; }
+template<> inline Packet4f padd(const Packet4f& a, const Packet4f& b) { return _mm_add_ps(a, b); }
+template<> inline Packet2d padd(const Packet2d& a, const Packet2d& b) { return _mm_add_pd(a, b); }
+template<> inline Packet4i padd(const Packet4i& a, const Packet4i& b) { return _mm_add_epi32(a, b); }
 
 }
 

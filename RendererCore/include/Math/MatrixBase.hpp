@@ -7,30 +7,65 @@
 
 namespace LCH::Math
 {
-	// 矩阵和所有矩阵表达式的基类
-	template<typename Derived>
-	class MatrixBase : public CoeffsBase<Derived, accessors_level<Derived>::value>
+
+// 矩阵和所有矩阵表达式的基类
+template<typename Derived>
+class MatrixBase : public CoeffsBase<Derived, accessors_level<Derived>::value>
+{
+public:
+	using Scalar = traits<Derived>::Scalar;
+	using Base = CoeffsBase<Derived, accessors_level<Derived>::value>;
+	using Base::derived;
+	using Base::const_cast_derived;
+	using Base::rows;
+	using Base::cols;
+	using Base::size;
+	using Base::rowIndexByOuterInner;
+	using Base::colIndexByOuterInner;
+	using Base::coeff;
+	using Base::coeffByOuterInner;
+	using Base::operator();
+	using Base::operator[];
+	using Base::x;
+	using Base::y;
+	using Base::z;
+	using Base::w;
+	using Base::innerStride;
+	using Base::outerStride;
+	using Base::rowStride;
+	using Base::colStride;
+	using typename Base::CoeffReturnType;
+
+	static constexpr int RowsAtCompileTime = traits<Derived>::RowsAtCompileTime;
+	static constexpr int ColsAtCompileTime = traits<Derived>::ColsAtCompileTime;
+	static constexpr int SizeAtCompileTime = size_at_compile_time(traits<Derived>::RowsAtCompileTime, traits<Derived>::ColsAtCompileTime);
+	static constexpr bool IsVectorAtCompileTime = traits<Derived>::RowsAtCompileTime == 1 ||
+												  traits<Derived>::ColsAtCompileTime == 1;
+	static constexpr int Flags = traits<Derived>::Flags;
+	static constexpr bool IsRowMajor = bool(traits<Derived>::Flags & RowMajorBit);
+	static constexpr int InnerSizeAtCompileTime = IsVectorAtCompileTime ? SizeAtCompileTime
+												: IsRowMajor ? ColsAtCompileTime : RowsAtCompileTime;
+	static constexpr int InnerStrideAtCompileTime = inner_stride_at_compile_time<Derived>::value;
+	static constexpr int OuterStrideAtCompileTime = outer_stride_at_compile_time<Derived>::value;
+
+public:
+	constexpr int outerSize() const
 	{
-	public:
-		using Scalar = traits<Derived>::Scalar;
-		static constexpr int RowsAtCompileTime = traits<Derived>::RowsAtCompileTime;
-		static constexpr int ColsAtCompileTime = traits<Derived>::ColsAtCompileTime;
-		static constexpr int SizeAtCompileTime = size_at_compile_time(traits<Derived>::RowsAtCompileTime, traits<Derived>::ColsAtCompileTime);
-		static constexpr bool IsVectorAtCompileTime = traits<Derived>::RowsAtCompileTime == 1 ||
-													  traits<Derived>::ColsAtCompileTime == 1;
-		static constexpr bool IsRowMajor = bool(traits<Derived>::Flags & RowMajorBit);
+		return IsVectorAtCompileTime ? 1 : IsRowMajor ? rows() : cols();
+	}
+	constexpr int innerSize() const
+	{
+		return IsVectorAtCompileTime ? size() : IsRowMajor ? cols() : rows();
+	}
 
-	public:
-		Derived& derived() { return *static_cast<Derived*>(this); }
-		const Derived& derived() const { return *static_cast<const Derived*>(this); }
+public:
+	template<typename OtherDerived>
+	CwiseBinaryOp<scalar_sum_op<Scalar, typename traits<OtherDerived>::Scalar>, 
+		Derived, OtherDerived> operator+(const MatrixBase<OtherDerived>& other)
+	{
+		return CwiseBinaryOp<scalar_sum_op<Scalar, typename traits<OtherDerived>::Scalar>, 
+			Derived, OtherDerived>(derived(), other.derived());
+	}
+};
 
-	public:
-		template<typename OtherDerived>
-		CwiseBinaryOp<scalar_sum_op<Scalar, typename traits<OtherDerived>::Scalar>, 
-			Derived, OtherDerived> operator+(const MatrixBase<OtherDerived>& other)
-		{
-			return CwiseBinaryOp<scalar_sum_op<Scalar, typename traits<OtherDerived>::Scalar>, 
-				Derived, OtherDerived>(derived(), other.derived());
-		}
-	};
 }

@@ -16,7 +16,7 @@ struct assign_op
 	template<int Alignment, typename Packet>
 	void AssignPacket(DstScalar* a, const Packet& b) const
 	{
-
+		pstoret<DstScalar, Packet, Alignment>(a, b);
 	}
 };
 

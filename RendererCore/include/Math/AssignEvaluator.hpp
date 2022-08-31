@@ -19,13 +19,13 @@ struct copy_using_evaluator_traits
 
 	constexpr static int DstAlignment = DstEvaluator::Alignment;
 	constexpr static int SrcAlignment = SrcEvaluator::Alignment;
-	constexpr static bool DstHasDirectAccess = (DstFlags & DirectAccessBit) == DirectAccessBit;
+	constexpr static bool DstHasDirectAccess = bool(DstFlags & DirectAccessBit);
 	constexpr static int JointAlignment = DstAlignment < SrcAlignment ? DstAlignment : SrcAlignment;
 
-	constexpr static int InnerSize = Dst::IsVectorAtCompile ? Dst::SizeAtCompileTime :
-									 DstFlags & RowMajorBit ? Dst::ColsAtCompileTime : Dst::RowAtCompileTime;
+	constexpr static int InnerSize = Dst::IsVectorAtCompileTime ? Dst::SizeAtCompileTime :
+									 DstFlags & RowMajorBit ? Dst::ColsAtCompileTime : Dst::RowsAtCompileTime;
 	constexpr static int LinearSize = Dst::SizeAtCompileTime;
-	constexpr static int OuterStride = outer_stride_at_compile_time<Dst>::ret;
+	constexpr static int OuterStride = outer_stride_at_compile_time<Dst>::value;
 
 	using LinearPacketType = find_best_packet<DstScalar, LinearSize>::type;
 	using InnerPacketType = find_best_packet<DstScalar, InnerSize>::type;
@@ -69,7 +69,7 @@ struct DefaultTraversalCompleteUnrolling
 {
 	using DstXprType = Kernel::DstXprType;
 	constexpr static int outer = Index / DstXprType::InnerSizeAtCompileTime;
-	constexpr static int inner = Index % DstXprType::OuterSizeAtCompileTime;
+	constexpr static int inner = Index % DstXprType::InnerSizeAtCompileTime;
 
 	static void Run(Kernel& kernel)
 	{
@@ -161,12 +161,114 @@ struct assignment_loop<Kernel, DefaultTraversal, CompleteUnrolling>
 	}
 };
 
+template<bool IsAligned = false>
+struct unaligned_assignment_loop
+{
+	template<typename Kernel>
+	static void Run(Kernel&, int, int) {}
+};
+
+template<>
+struct unaligned_assignment_loop<false>
+{
+	template<typename Kernel>
+	static void Run(Kernel& kernel, int start, int end)
+	{
+		for (int index = start; index < end; ++index)
+			kernel.AssignCoeff(index);
+	}
+};
+
 template<typename Kernel>
 struct assignment_loop<Kernel, LinearVectorizedTraversal, NoUnrolling>
 {
 	static void Run(Kernel& kernel)
 	{
+		const int size = kernel.size();
+		using Scalar = Kernel::Scalar;
+		using PacketType = Kernel::PacketType;
+		constexpr static bool requestedAlignment = Kernel::AssignmentTraits::LinearRequiredAlignment;
+		constexpr static int packetSize = unpacket_traits<PacketType>::Size;
+		constexpr static bool dstIsAligned = Kernel::AssignmentTraits::DstAlignment >= requestedAlignment;
+		constexpr static int dstAlignment = packet_traits<Scalar>::AlignedOnScalar ? requestedAlignment
+																				   : Kernel::Assignment::DstAlignment;
+		constexpr static int srcAlignment = Kernel::Assignment::JointAlignment;
 
+		const int alignedStart = dstIsAligned ? 0 : first_aligned<requestedAlignment>(kernel.dstDataPtr(), size);
+		const int alignedEnd = alignedStart + ((size - alignedStart) / packetSize) * packetSize;
+
+		unaligned_assignment_loop<dstIsAligned>::Run(kernel, 0, alignedStart);
+
+		for (int index = alignedStart; index < alignedEnd; index += packetSize)
+			kernel.template AssignPacket<dstAlignment, srcAlignment, PacketType>(index);
+
+		unaligned_assignment_loop<>::Run(kernel, alignedEnd, size);
+	}
+};
+
+template<typename Kernel>
+struct assignment_loop<Kernel, LinearVectorizedTraversal, CompleteUnrolling>
+{
+	static void Run(Kernel& kernel)
+	{
+		using DstXprType = Kernel::DstXprType;
+		using PacketType = Kernel::PacketType;
+
+		constexpr static int size = DstXprType::SizeAtCompileTime;
+		constexpr static int packetSize = unpacket_traits<PacketType>::Size;
+		constexpr static int alignedSize = (size / packetSize) * packetSize;
+
+		InnerVectorizedTraversalCompleteUnrolling<Kernel, 0, alignedSize>::Run(kernel);
+		DefaultTraversalCompleteUnrolling<Kernel, alignedSize, size>::Run(kernel);
+	}
+};
+
+template<typename Kernel>
+struct assignment_loop<Kernel, InnerVectorizedTraversal, NoUnrolling>
+{
+	using PacketType = Kernel::PacketType;
+	constexpr static int SrcAlignment = Kernel::AssignmentTraits::SrcAlignment;
+	constexpr static int DstAlignment = Kernel::AssignmentTraits::DstAlignment;
+
+	static void Run(Kernel& kernel)
+	{
+		const int innerSize = kernel.innerSize();
+		const int outerSize = kernel.outerSize();
+		const int packetSize = unpacket_traits<PacketType>::size;
+		for (int outer = 0; outer < outerSize; ++outer)
+			for (int inner = 0; inner < innerSize; inner += packetSize)
+				kernel.template assignPacketByOuterInner<DstAlignment, SrcAlignment, PacketType>(outer, inner);
+	}
+};
+
+template<typename Kernel>
+struct assignment_loop<Kernel, InnerVectorizedTraversal, CompleteUnrolling>
+{
+	static void Run(Kernel& kernel)
+	{
+		using DstXprType = Kernel::DstXprType;
+		InnerVectorizedTraversalCompleteUnrolling<Kernel, 0, DstXprType::SizeAtCompileTime>::Run(kernel);
+	}
+};
+
+template<typename Kernel>
+struct assignment_loop<Kernel, LinearTraversal, NoUnrolling>
+{
+	static void run(Kernel& kernel)
+	{
+		const int size = kernel.size();
+		for (int i = 0; i < size; ++i)
+			kernel.AssignCoeff(i);
+	}
+};
+
+template<typename Kernel>
+struct assignment_loop<Kernel, LinearTraversal, CompleteUnrolling>
+{
+	static void run(Kernel& kernel)
+	{
+		using DstXprType = Kernel::DstXprType;
+		LinearTraversalCompleteUnrolling<Kernel, 0, DstXprType::SizeAtCompileTime>::Run(kernel);
 	}
 };
 
@@ -250,6 +352,11 @@ public:
 			DstEvaluatorType::Flags & RowMajorBit ? inner : outer;
 	}
 
+	const Scalar* dstDataPtr() const
+	{
+		return m_dstExpr.data();
+	}
+
 protected:
 	DstEvaluatorType& m_dst;
 	const SrcEvaluatorType& m_src;
@@ -287,7 +394,7 @@ void call_assignment_no_alias(Dst& dst, const Src& src, const Func& func)
 	using ActualDstType = std::conditional_t<NeedToTranspose, Transpose<Dst>, Dst&>;
 	ActualDstType actualDst(dst);
 
-	static_assert(is_lvalue(Dst), "The expression is not a left value.");
+	static_assert(is_lvalue<Dst>::value, "The expression is not a left value.");
 
 	Assignment<ActualDstTypeCleaned, Src, Func>::Run(actualDst, src, func);
 }

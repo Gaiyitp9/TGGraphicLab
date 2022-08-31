@@ -81,9 +81,6 @@
     <ClInclude Include="include\Input\Mouse.hpp">
       <Filter>头文件\Input</Filter>
     </ClInclude>
-    <ClInclude Include="include\Math\Vector.hpp">
-      <Filter>头文件\Math</Filter>
-    </ClInclude>
     <ClInclude Include="include\Math\Simd.hpp">
       <Filter>头文件\Math</Filter>
     </ClInclude>
@@ -211,9 +208,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="include\Math\Implementation\Vector.inl">
-      <Filter>头文件\Math\Implementation</Filter>
-    </None>
     <None Include="include\Math\Implementation\Quaternion.inl">
       <Filter>头文件\Math\Implementation</Filter>
     </None>

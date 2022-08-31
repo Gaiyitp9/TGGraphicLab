@@ -189,7 +189,6 @@
     <ClInclude Include="include\Math\Simd.hpp" />
     <ClInclude Include="include\Math\Storage.hpp" />
     <ClInclude Include="include\Math\Transpose.hpp" />
-    <ClInclude Include="include\Math\Vector.hpp" />
     <ClInclude Include="include\Chronometer.hpp" />
     <ClInclude Include="include\Math\CommonFunction.hpp" />
     <ClInclude Include="include\Math\XprHelper.hpp" />
@@ -218,7 +217,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="include\Math\Implementation\Quaternion.inl" />
-    <None Include="include\Math\Implementation\Vector.inl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

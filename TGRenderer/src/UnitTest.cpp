@@ -6,7 +6,7 @@
 
 #include "UnitTest.hpp"
 #include "Utility.hpp"
-#include "Math/Vector.hpp"
+#include "Math/CommonFunction.hpp"
 #include "Math/Core.hpp"
 #include "Input/InputEvent.hpp"
 #include "Diagnostics/Debug.hpp"
@@ -125,13 +125,14 @@ namespace LCH
 		Math::Vector3f vf2{ -0.2f, 6.1f, 1.0f };
 		Math::Vector3f vcross = vf1.Cross(vf2);
 		std::cout << "cross: " << vcross.x() << " " << vcross.y() << " " << vcross.z() << std::endl;*/
-		Math::Vectorm3f v1, v2, v3;
-		v1[0] = 0; v1[1] = 1; v1[2] = 2;
-		v2[0] = 0; v2[1] = 2; v2[2] = 2;
-		v3[0] = 0; v3[1] = 1; v3[2] = 2;
-		Math::Vectorm3f result;
-		result = v1 + v2 + (v3 + v3);
-		std::cout << "result: " << result[0] << " " << result[1] << " " << result[2] << std::endl;
+		Math::Vector4f v1, v2, v3;
+		v1[0] = 0; v1[1] = 1; v1[2] = 2; v1[3] = 3;
+		v2[0] = 0; v2[1] = 2; v2[2] = 2; v2[3] = 3;
+		v3[0] = 0; v3[1] = 1; v3[2] = 2; v3[3] = 3;
+		Math::Vector4f result;
+		result = v1 + v2 + v3;
+		std::cout << "result: " << result.x() << " " << result.y() << " " 
+			<< result.z() << " " << result.w() << std::endl;
 	}
 
 	void UnitTest::SIMDTest()
