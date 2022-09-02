@@ -9,8 +9,8 @@
 #include <type_traits>
 #include "Constants.hpp"
 #include "ForwardDeclarations.hpp"
-#include "XprHelper.hpp"
 #include "Simd.hpp"
+#include "XprHelper.hpp"
 #include "BinaryFunctors.hpp"
 #include "AssignmentFunctors.hpp"
 #include "CwiseBinaryOp.hpp"

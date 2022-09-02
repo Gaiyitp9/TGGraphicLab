@@ -98,10 +98,6 @@ constexpr inline int size_at_compile_time(int rows, int cols)
 	return (rows == Dynamic || cols == Dynamic) ? Dynamic : rows * cols;
 }
 
-#define MIN_ALIGN_BYTES 16
-#define MAX_ALIGN_BYTES 32
-#define DEFAULT_ALIGN_BYTES MAX_ALIGN_BYTES
-
 constexpr inline int compute_default_alignment_helper(int arrayBytes, int alignmentBytes)
 {
 	if ((arrayBytes % alignmentBytes) == 0)

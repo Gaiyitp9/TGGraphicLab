@@ -36,6 +36,10 @@ namespace LCH::Math
 #if defined(__AVX2__) || defined(__AVX__)
 #include <immintrin.h>
 
+#define MIN_ALIGN_BYTES 16
+#define MAX_ALIGN_BYTES 32
+#define DEFAULT_ALIGN_BYTES MAX_ALIGN_BYTES
+
 namespace LCH::Math
 {
 
@@ -48,6 +52,8 @@ struct packet_traits
 	constexpr static int  Size = 1;						// 包尺寸
 	constexpr static bool AlignedOnScalar = false;		// 是否对齐
 	constexpr static bool HasHalfPacket = false;		// 是否有半包
+
+	constexpr static bool HasAdd = false;				// 是否可以做加法运算
 };
 template<typename T> struct packet_traits<const T> : packet_traits<T> {};
 
