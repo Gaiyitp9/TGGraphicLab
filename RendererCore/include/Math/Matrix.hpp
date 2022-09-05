@@ -36,7 +36,6 @@ public:
 	using Base::RowsAtCompileTime;
 	using Base::ColsAtCompileTime;
 	using Base::SizeAtCompileTime;
-	using Base::IsVectorAtCompileTime;
 
 public:
 	constexpr int rows() const { return m_storage.rows(); }

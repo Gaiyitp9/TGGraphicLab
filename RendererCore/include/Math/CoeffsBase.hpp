@@ -114,20 +114,6 @@ public:
 		static_assert(evaluator<Derived>::Flags & LinearAccessBit);
 		return evaluator<Derived>(derived()).template packet<LoadMode, PacketScalar>(index);
 	}
-
-protected:
-	void coeffRef();
-	void coeffRefByOuterInner();
-	void writePacket();
-	void writePacketByOuterInner();
-	void copyCoeff();
-	void copyCoeffByOuterInner();
-	void copyPacket();
-	void copyPacketByOuterInner();
-	void innerStride();
-	void outerStride();
-	void rowStride();
-	void colStride();
 };
 
 template<typename Derived>

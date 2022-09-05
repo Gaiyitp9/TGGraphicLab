@@ -16,25 +16,9 @@ public:
 	using Scalar = traits<Derived>::Scalar;
 	using Base = CoeffsBase<Derived, accessors_level<Derived>::value>;
 	using Base::derived;
-	using Base::const_cast_derived;
 	using Base::rows;
 	using Base::cols;
 	using Base::size;
-	using Base::rowIndexByOuterInner;
-	using Base::colIndexByOuterInner;
-	using Base::coeff;
-	using Base::coeffByOuterInner;
-	using Base::operator();
-	using Base::operator[];
-	using Base::x;
-	using Base::y;
-	using Base::z;
-	using Base::w;
-	using Base::innerStride;
-	using Base::outerStride;
-	using Base::rowStride;
-	using Base::colStride;
-	using typename Base::CoeffReturnType;
 
 	static constexpr int RowsAtCompileTime = traits<Derived>::RowsAtCompileTime;
 	static constexpr int ColsAtCompileTime = traits<Derived>::ColsAtCompileTime;

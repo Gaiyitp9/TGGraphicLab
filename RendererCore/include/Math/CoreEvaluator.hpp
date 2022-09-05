@@ -33,9 +33,7 @@ struct evaluator<Matrix<Scalar_, Rows, Cols, Options>>
 	constexpr static int ColsAtCompileTime = XprType::ColsAtCompileTime;
 	constexpr static int Flags = traits<XprType>::EvaluatorFlags;
 	constexpr static int Alignment = traits<XprType>::Alignment;
-	constexpr static int OuterStrideAtCompileTime = IsVectorAtCompileTime ? 0 
-													: int(IsRowMajor) ? ColsAtCompileTime
-													: RowsAtCompileTime;
+	constexpr static int OuterStrideAtCompileTime = XprType::OuterStrideAtCompileTime;
 
 	evaluator() : m_data(nullptr), m_outerStride(OuterStrideAtCompileTime) {}
 	explicit evaluator(const XprType& m) : m_data(m.data()), m_outerStride(m.outerStride()) {}

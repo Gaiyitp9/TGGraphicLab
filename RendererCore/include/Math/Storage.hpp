@@ -96,7 +96,6 @@ class Storage
 {
 public:
 	const T& operator[](size_t index) const { return m_data.array[index]; }
-	T& operator[](size_t index) { return m_data.array[index]; }
 	T const* data() const { return m_data.array; }
 	T* data() { return m_data.array; }
 	constexpr static int rows() noexcept { return Rows; }
