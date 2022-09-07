@@ -87,10 +87,7 @@ struct find_best_packet_helper<Size, PacketType, false>
 };
 
 template<typename T, int Size>
-struct find_best_packet
-{
-	using type = find_best_packet_helper<Size, typename packet_traits<T>::type>::type;
-};
+using best_packet = find_best_packet_helper<Size, typename packet_traits<T>::type>::type;
 
 // 编译期计算矩阵尺寸
 constexpr inline int size_at_compile_time(int rows, int cols)

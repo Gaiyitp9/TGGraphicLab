@@ -27,8 +27,8 @@ struct copy_using_evaluator_traits
 	constexpr static int LinearSize = Dst::SizeAtCompileTime;
 	constexpr static int OuterStride = outer_stride_at_compile_time<Dst>::value;
 
-	using LinearPacketType = find_best_packet<DstScalar, LinearSize>::type;
-	using InnerPacketType = find_best_packet<DstScalar, InnerSize>::type;
+	using LinearPacketType = best_packet<DstScalar, LinearSize>;
+	using InnerPacketType = best_packet<DstScalar, InnerSize>;
 	constexpr static int LinearPacketSize = unpacket_traits<LinearPacketType>::Size;
 	constexpr static int InnerPacketSize = unpacket_traits<InnerPacketType>::Size;
 	constexpr static int LinearRequiredAlignment = unpacket_traits<LinearPacketType>::Alignment;

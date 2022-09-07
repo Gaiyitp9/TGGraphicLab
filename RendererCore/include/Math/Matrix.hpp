@@ -17,7 +17,7 @@ private:
 	constexpr static int packet_access_bit = packet_traits<Scalar_>::Vectorizable ? PacketAccessBit : 0;
 public:
 	using Scalar = Scalar_;
-	using PacketScalar = find_best_packet<Scalar_, size>::type;
+	using PacketScalar = best_packet<Scalar_, size>;
 	constexpr static int RowsAtCompileTime = Rows;
 	constexpr static int ColsAtCompileTime = Cols;
 	constexpr static int Flags = DirectAccessBit | LvalueBit | NestByRefBit | row_major_bit;
