@@ -385,7 +385,7 @@ struct Assignment
 template<typename Dst, typename Src, typename Func>
 void call_assignment_no_alias(Dst& dst, const Src& src, const Func& func)
 {
-	constexpr static int NeedToTranspose =
+	constexpr static bool NeedToTranspose =
 		(Dst::RowsAtCompileTime == 1 && Src::ColsAtCompileTime == 1) ||
 		(Dst::ColsAtCompileTime == 1 && Src::RowsAtCompileTime == 1) &&
 		Dst::SizeAtCompileTime != 1;
@@ -394,7 +394,7 @@ void call_assignment_no_alias(Dst& dst, const Src& src, const Func& func)
 	using ActualDstType = std::conditional_t<NeedToTranspose, Transpose<Dst>, Dst&>;
 	ActualDstType actualDst(dst);
 
-	static_assert(is_lvalue<Dst>::value, "The expression is not a left value.");
+	static_assert(is_lvalue<Dst>, "The expression is not a left value.");
 
 	Assignment<ActualDstTypeCleaned, Src, Func>::Run(actualDst, src, func);
 }

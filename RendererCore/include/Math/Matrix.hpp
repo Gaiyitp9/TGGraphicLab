@@ -24,7 +24,7 @@ public:
 	constexpr static int InnerStrideAtCompileTime = 1;
 	constexpr static int OuterStrideAtCompileTime = (Options_ == StorageOption::RowMajor) ? ColsAtCompileTime : RowsAtCompileTime;
 	constexpr static int EvaluatorFlags = LinearAccessBit | DirectAccessBit | packet_access_bit | row_major_bit;
-	constexpr static int Alignment = compute_default_alignment<Scalar_, size>::value;
+	constexpr static int Alignment = default_alignment<Scalar_, size>;
 };
 
 template<typename Scalar_, int Rows, int Cols, StorageOption Options_>
@@ -48,17 +48,17 @@ public:
 		return this->derived();
 	}
 
-	const Scalar* data() const { return m_storage.data(); }
-	Scalar* data() { return m_storage.data(); }
-
 	constexpr int innerStride() const noexcept { return 1; }
 	constexpr int outerStride() const { return this->innerSize(); }
 
 private:
 	Storage<Scalar, SizeAtCompileTime, RowsAtCompileTime, ColsAtCompileTime> m_storage;
+
+	friend struct evaluator<Matrix>;
 };
 
-using Vector4f = Matrix<float, 1, 4>;
-using Vector2i = Matrix<int, 1, 2>;
+using Vector4f = Matrix<float, 4, 1>;
+using Vector2i = Matrix<int, 2, 1>;
+using RowVector4f = Matrix<float, 1, 4>;
 
 }

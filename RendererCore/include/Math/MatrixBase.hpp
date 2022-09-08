@@ -50,6 +50,11 @@ public:
 		return CwiseBinaryOp<scalar_sum_op<Scalar, typename traits<OtherDerived>::Scalar>, 
 			Derived, OtherDerived>(derived(), other.derived());
 	}
+
+	Transpose<Derived> transpose()
+	{
+		return Transpose<Derived>(derived());
+	}
 };
 
 }

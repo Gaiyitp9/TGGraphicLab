@@ -10,14 +10,26 @@ namespace LCH::Math
 
 // 二元运算求值器
 template<typename T, 
-		 typename LhsScalar = typename traits<typename T::Lhs>::Scalar,
-		 typename RhsScalar = typename traits<typename T::Rhs>::Scalar>
+		 typename LhsScalar = typename traits<typename T::LhsPlain>::Scalar,
+		 typename RhsScalar = typename traits<typename T::RhsPlain>::Scalar>
 struct binary_evaluator;
+
+// 一元运算求值器
+template<typename T, 
+		 typename Scalar = typename T::Scalar>
+struct unary_evaluator;
 
 template<typename T>
 struct evaluator_assume_aliasing
 {
 	constexpr static bool value = false;
+};
+
+template<typename T>
+struct evaluator : public unary_evaluator<T>
+{
+	using Base = unary_evaluator<T>;
+	explicit evaluator(const T& xpr) : Base(xpr) {}
 };
 
 template<typename Scalar_, int Rows, int Cols, StorageOption Options>
@@ -36,7 +48,7 @@ struct evaluator<Matrix<Scalar_, Rows, Cols, Options>>
 	constexpr static int OuterStrideAtCompileTime = XprType::OuterStrideAtCompileTime;
 
 	evaluator() : m_data(nullptr), m_outerStride(OuterStrideAtCompileTime) {}
-	explicit evaluator(const XprType& m) : m_data(m.data()), m_outerStride(m.outerStride()) {}
+	explicit evaluator(const XprType& m) : m_data(m.m_storage.data()), m_outerStride(m.outerStride()) {}
 
 	CoeffReturnType coeff(int row, int col) const
 	{
@@ -82,6 +94,55 @@ struct evaluator<Matrix<Scalar_, Rows, Cols, Options>>
 protected:
 	const Scalar* m_data;
 	int m_outerStride;
+};
+
+template<typename ArgType>
+struct unary_evaluator<Transpose<ArgType>>
+{
+	using XprType = Transpose<ArgType>;
+	using Scalar = XprType::Scalar;
+	using CoeffReturnType = XprType::CoeffReturnType;
+	constexpr static int RowsAtCompileTime = XprType::RowsAtCompileTime;
+	constexpr static int ColsAtCompileTime = XprType::ColsAtCompileTime;
+	constexpr static int Flags = evaluator<ArgType>::Flags ^ RowMajorBit;
+	constexpr static int Alignment = evaluator<ArgType>::Alignment;
+
+	explicit unary_evaluator(const XprType& t) : m_argImpl(t.nestedExpression()) {}
+
+	CoeffReturnType coeff(int row, int col) const
+	{
+		return m_argImpl.coeff(col, row);
+	}
+
+	CoeffReturnType coeff(int index) const
+	{
+		return m_argImpl.coeff(index);
+	}
+
+	Scalar& coeffRef(int row, int col)
+	{
+		return m_argImpl.coeffRef(col, row);
+	}
+
+	Scalar& coeffRef(int index)
+	{
+		return m_argImpl.coeffRef(index);
+	}
+
+	template<int LoadMode, typename PacketType>
+	PacketType packet(int row, int col) const
+	{
+		return m_argImpl.template packet<LoadMode, PacketType>(col, row);
+	}
+
+	template<int LoadMode, typename PacketType>
+	PacketType packet(int index) const
+	{
+		return m_argImpl.template packet<LoadMode, PacketType>(index);
+	}
+
+private:
+	evaluator<ArgType> m_argImpl;
 };
 
 template<typename BinaryOp, typename Lhs, typename Rhs>

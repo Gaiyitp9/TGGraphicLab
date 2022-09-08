@@ -126,11 +126,13 @@ namespace LCH
 		Math::Vector3f vcross = vf1.Cross(vf2);
 		std::cout << "cross: " << vcross.x() << " " << vcross.y() << " " << vcross.z() << std::endl;*/
 		Math::Vector4f v1, v2, v3;
+		Math::RowVector4f v4;
 		v1[0] = 0; v1[1] = 1; v1[2] = 2; v1[3] = 3;
 		v2[0] = 0; v2[1] = 2; v2[2] = 2; v2[3] = 3;
 		v3[0] = 0; v3[1] = 1; v3[2] = 2; v3[3] = 3;
+		v4[0] = 2; v4[1] = 4; v4[2] = 2; v4[3] = 3;
 		Math::Vector4f result;
-		result = v1 + v2 + v3;
+		result = v1 + v2 + v3 + v4.transpose();
 		std::cout << "result: " << result.x() << " " << result.y() << " " 
 			<< result.z() << " " << result.w() << std::endl;
 	}

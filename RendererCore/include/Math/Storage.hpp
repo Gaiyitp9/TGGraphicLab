@@ -11,7 +11,7 @@ namespace LCH::Math
 {
 
 // 对齐数组
-template<typename T, int Size, int Alignment = compute_default_alignment<T, Size>::value>
+template<typename T, int Size, int Alignment = default_alignment<T, Size>>
 struct PlainArray
 {
 	alignas(Alignment) T array[Size];

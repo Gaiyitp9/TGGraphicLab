@@ -90,12 +90,12 @@ template<typename T, int Size>
 using best_packet = find_best_packet_helper<Size, typename packet_traits<T>::type>::type;
 
 // 编译期计算矩阵尺寸
-constexpr inline int size_at_compile_time(int rows, int cols)
+inline constexpr int size_at_compile_time(int rows, int cols)
 {
 	return (rows == Dynamic || cols == Dynamic) ? Dynamic : rows * cols;
 }
 
-constexpr inline int compute_default_alignment_helper(int arrayBytes, int alignmentBytes)
+inline constexpr int compute_default_alignment_helper(int arrayBytes, int alignmentBytes)
 {
 	if ((arrayBytes % alignmentBytes) == 0)
 		return alignmentBytes;
@@ -107,17 +107,10 @@ constexpr inline int compute_default_alignment_helper(int arrayBytes, int alignm
 
 // 计算默认对齐
 template<typename T, int Size>
-struct compute_default_alignment
-{
-	constexpr static int value = compute_default_alignment_helper(Size * sizeof(T), MAX_ALIGN_BYTES);
-};
+inline constexpr int default_alignment = compute_default_alignment_helper(Size * sizeof(T), MAX_ALIGN_BYTES);
 
 // 判断是否是左值
 template<typename ExpressionType>
-struct is_lvalue
-{
-	constexpr static bool value = (!static_cast<bool>(std::is_const<ExpressionType>::value)) &&
-									static_cast<bool>(traits<ExpressionType>::Flags & LvalueBit);
-};
+inline constexpr bool is_lvalue = (!std::is_const_v<ExpressionType>) && static_cast<bool>(traits<ExpressionType>::Flags & LvalueBit);
 
 }

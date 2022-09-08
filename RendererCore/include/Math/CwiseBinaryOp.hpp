@@ -24,31 +24,29 @@ class CwiseBinaryOp : public MatrixBase<CwiseBinaryOp<BinaryOp, LhsType, RhsType
 {
 public:
 	using Functor	= remove_all_t<BinaryOp>;
-	using Lhs		= remove_all_t<LhsType>;
-	using Rhs		= remove_all_t<RhsType>;
-	using LhsNested = ref_selector<Lhs>::type;
-	using RhsNested = ref_selector<Rhs>::type;
+	using LhsPlain	= remove_all_t<LhsType>;
+	using RhsPlain	= remove_all_t<RhsType>;
+	using LhsNested = ref_selector<LhsPlain>::type;
+	using RhsNested = ref_selector<RhsPlain>::type;
 	using result_type = Functor::result_type;
 
 public:
-	CwiseBinaryOp(const Lhs& lhs, const Rhs& rhs, const Functor& functor = Functor())
+	CwiseBinaryOp(const LhsPlain& lhs, const RhsPlain& rhs, const Functor& functor = Functor())
 			: m_lhs(lhs), m_rhs(rhs), m_functor(functor)
-	{
-
-	}
+	{}
 
 	CwiseBinaryOp(const CwiseBinaryOp<BinaryOp, LhsType, RhsType>&) = default;
 
 	constexpr int rows() const
 	{
-		return traits<Lhs>::RowsAtCompileTime == Dynamic ? m_rhs.rows() : m_lhs.rows();
+		return traits<LhsPlain>::RowsAtCompileTime == Dynamic ? m_rhs.rows() : m_lhs.rows();
 	}
 	constexpr int cols() const
 	{
-		return traits<Lhs>::ColsAtCompileTime == Dynamic ? m_rhs.cols() : m_lhs.cols();
+		return traits<LhsPlain>::ColsAtCompileTime == Dynamic ? m_rhs.cols() : m_lhs.cols();
 	}
-	const LhsNested& lhs() const { return m_lhs; }
-	const RhsNested& rhs() const { return m_rhs; }
+	const LhsPlain& lhs() const { return m_lhs; }
+	const RhsPlain& rhs() const { return m_rhs; }
 	const Functor& functor() const { return m_functor; }
 
 private:

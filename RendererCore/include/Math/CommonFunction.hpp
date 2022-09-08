@@ -10,9 +10,9 @@
 namespace LCH::Math
 {
 
-const double PI = 3.14159265358979;
-const double Rad2Deg = 57.2957795130823;
-const double Deg2Rad = 0.0174532925199433;
+inline constexpr double PI = 3.14159265358979;
+inline constexpr double Rad2Deg = 57.2957795130823;
+inline constexpr double Deg2Rad = 0.0174532925199433;
 
 // 地址是否满足对齐条件
 template<typename T>
