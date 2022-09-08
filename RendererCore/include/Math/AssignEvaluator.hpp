@@ -395,7 +395,7 @@ void call_assignment_no_alias(Dst& dst, const Src& src, const Func& func)
 	ActualDstType actualDst(dst);
 
 	static_assert(is_lvalue<Dst>, "The expression is not a left value.");
-
+	static_assert(have_same_matrix_size<ActualDstTypeCleaned, Src>, "You mixed matrices of different sizes.");
 	Assignment<ActualDstTypeCleaned, Src, Func>::Run(actualDst, src, func);
 }
 

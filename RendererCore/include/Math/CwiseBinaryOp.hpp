@@ -30,6 +30,8 @@ public:
 	using RhsNested = ref_selector<RhsPlain>::type;
 	using result_type = Functor::result_type;
 
+	static_assert(have_same_matrix_size<LhsPlain, RhsPlain>, "You mixed matrices of different sizes.");
+
 public:
 	CwiseBinaryOp(const LhsPlain& lhs, const RhsPlain& rhs, const Functor& functor = Functor())
 			: m_lhs(lhs), m_rhs(rhs), m_functor(functor)

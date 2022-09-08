@@ -111,6 +111,17 @@ inline constexpr int default_alignment = compute_default_alignment_helper(Size *
 
 // 判断是否是左值
 template<typename ExpressionType>
-inline constexpr bool is_lvalue = (!std::is_const_v<ExpressionType>) && static_cast<bool>(traits<ExpressionType>::Flags & LvalueBit);
+inline constexpr bool is_lvalue = (!std::is_const_v<ExpressionType>) 
+								&& static_cast<bool>(traits<ExpressionType>::Flags & LvalueBit);
+
+// 两个矩阵表达式的尺寸是否一致
+template<typename Type0, typename Type1>
+inline constexpr bool have_same_matrix_size = (Type0::SizeAtCompileTime == 0 && Type1::SizeAtCompileTime == 0)
+											|| ((Type0::RowsAtCompileTime == Dynamic ||
+												Type1::RowsAtCompileTime == Dynamic ||
+												Type0::RowsAtCompileTime == Type1::RowsAtCompileTime) 
+												&& (Type0::ColsAtCompileTime == Dynamic ||
+													Type1::ColsAtCompileTime == Dynamic ||
+													Type0::ColsAtCompileTime == Type1::ColsAtCompileTime));
 
 }
