@@ -57,8 +57,18 @@ private:
 	friend struct evaluator<Matrix>;
 };
 
-using Vector4f = Matrix<float, 4, 1>;
-using Vector2i = Matrix<int, 2, 1>;
-using RowVector4f = Matrix<float, 1, 4>;
+#define MATRIX_TYPEDEF(Type, TypeSuffix, Size, SizeSuffix)			\
+using Vector##SizeSuffix##TypeSuffix	= Matrix<Type, Size, 1>;	\
+using RowVector##SizeSuffix##TypeSuffix = Matrix<Type, 1, Size>;	\
+using Matrix##SizeSuffix##TypeSuffix	= Matrix<Type, Size, Size>;
 
+#define MATRIX_ALLSIZE_TYPEDEF(Type, TypeSuffix)	\
+MATRIX_TYPEDEF(Type, TypeSuffix, 2, 2)				\
+MATRIX_TYPEDEF(Type, TypeSuffix, 3, 3)				\
+MATRIX_TYPEDEF(Type, TypeSuffix, 4, 4)				\
+MATRIX_TYPEDEF(Type, TypeSuffix, Dynamic, X)		
+
+MATRIX_ALLSIZE_TYPEDEF(float, f)
+MATRIX_ALLSIZE_TYPEDEF(double, d)
+MATRIX_ALLSIZE_TYPEDEF(int, i)
 }

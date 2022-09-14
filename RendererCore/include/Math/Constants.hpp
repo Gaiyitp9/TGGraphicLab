@@ -51,4 +51,25 @@ enum UnrollingType : char
 	CompleteUnrolling,
 };
 
+template<typename Enum> requires std::is_enum_v<Enum>
+constexpr auto underlying_type_cast(Enum e) { return static_cast<std::underlying_type_t<Enum>>(e); }
+
+template<typename Enum> requires std::is_enum_v<Enum>
+constexpr Enum operator|(const Enum& left, const Enum& right)
+{
+	return static_cast<Enum>(underlying_type_cast(left) | underlying_type_cast(right));
+}
+
+template<typename Enum> requires std::is_enum_v<Enum>
+constexpr Enum operator^(const Enum& left, const Enum& right)
+{
+	return static_cast<Enum>(underlying_type_cast(left) ^ underlying_type_cast(right));
+}
+
+template<typename Enum> requires std::is_enum_v<Enum>
+constexpr Enum operator&(const Enum& left, const Enum& right)
+{
+	return static_cast<Enum>(underlying_type_cast(left) & underlying_type_cast(right));
+}
+
 }
