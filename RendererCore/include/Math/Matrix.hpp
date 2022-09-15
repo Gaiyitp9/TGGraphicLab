@@ -71,4 +71,5 @@ MATRIX_TYPEDEF(Type, TypeSuffix, Dynamic, X)
 MATRIX_ALLSIZE_TYPEDEF(float, f)
 MATRIX_ALLSIZE_TYPEDEF(double, d)
 MATRIX_ALLSIZE_TYPEDEF(int, i)
+
 }

@@ -51,6 +51,14 @@ public:
 			Derived, OtherDerived>(derived(), other.derived());
 	}
 
+	template<typename OtherDerived>
+	CwiseBinaryOp<scalar_sub_op<Scalar, typename traits<OtherDerived>::Scalar>,
+		Derived, OtherDerived> operator-(const MatrixBase<OtherDerived>& other)
+	{
+		return CwiseBinaryOp<scalar_sub_op<Scalar, typename traits<OtherDerived>::Scalar>,
+			Derived, OtherDerived>(derived(), other.derived());
+	}
+
 	Transpose<Derived> transpose()
 	{
 		return Transpose<Derived>(derived());

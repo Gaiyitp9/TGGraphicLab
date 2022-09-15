@@ -132,7 +132,7 @@ namespace LCH
 		v3[0] = 0; v3[1] = 1; v3[2] = 2; v3[3] = 3;
 		v4[0] = 2; v4[1] = 4; v4[2] = 2; v4[3] = 3;
 		Math::Vector4f result;
-		result = v1 + v2 + v3 + v4.transpose();
+		result = v1 + v2 + v3 - v4.transpose();
 		std::cout << "result: " << result.x() << " " << result.y() << " " 
 			<< result.z() << " " << result.w() << std::endl;
 	}

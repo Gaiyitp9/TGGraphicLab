@@ -54,6 +54,7 @@ struct packet_traits
 	constexpr static bool HasHalfPacket = false;		// 是否有半包
 
 	constexpr static bool HasAdd = false;				// 是否可以做加法运算
+	constexpr static bool HasSub = false;				// 是否可以做减法运算
 };
 template<typename T> struct packet_traits<const T> : packet_traits<T> {};
 
@@ -85,6 +86,7 @@ struct packet_traits<float>
 	constexpr static bool HasHalfPacket = true;
 
 	constexpr static bool HasAdd = true;
+	constexpr static bool HasSub = true;
 };
 
 template<>
@@ -98,6 +100,7 @@ struct packet_traits<double>
 	constexpr static bool HasHalfPacket = true;
 
 	constexpr static bool HasAdd = true;
+	constexpr static bool HasSub = true;
 };
 
 template<>
@@ -111,6 +114,7 @@ struct packet_traits<int>
 	constexpr static bool HasHalfPacket = true;
 
 	constexpr static bool HasAdd = true;
+	constexpr static bool HasSub = true;
 };
 
 template<>
@@ -220,6 +224,10 @@ template<> inline Packet4f padd(const Packet4f& a, const Packet4f& b) { return _
 template<> inline Packet2d padd(const Packet2d& a, const Packet2d& b) { return _mm_add_pd(a, b); }
 template<> inline Packet4i padd(const Packet4i& a, const Packet4i& b) { return _mm_add_epi32(a, b); }
 
+template<typename Packet> inline Packet psub(const Packet& a, const Packet& b) { return a - b; }
+template<> inline Packet4f psub(const Packet4f& a, const Packet4f& b) { return _mm_sub_ps(a, b); }
+template<> inline Packet2d psub(const Packet2d& a, const Packet2d& b) { return _mm_sub_pd(a, b); }
+template<> inline Packet4i psub(const Packet4i& a, const Packet4i& b) { return _mm_sub_epi32(a, b); }
 }
 
 namespace LCH::Math

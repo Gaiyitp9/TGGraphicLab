@@ -8,7 +8,7 @@
 namespace LCH::Math
 {
 
-template<typename DstEvaluator, typename SrcEvaluator, typename AssignFunc, int MaxPacketSize = -1>
+template<typename DstEvaluator, typename SrcEvaluator, typename AssignFunc>
 struct copy_using_evaluator_traits
 {
 	using Dst = DstEvaluator::XprType;
@@ -20,12 +20,10 @@ struct copy_using_evaluator_traits
 	constexpr static int DstAlignment = DstEvaluator::Alignment;
 	constexpr static int SrcAlignment = SrcEvaluator::Alignment;
 	constexpr static bool DstHasDirectAccess = not_none(DstFlags & Flag::DirectAccess);
-	constexpr static int JointAlignment = DstAlignment < SrcAlignment ? DstAlignment : SrcAlignment;
 
 	constexpr static int InnerSize = Dst::IsVectorAtCompileTime ? Dst::SizeAtCompileTime :
 									 not_none(DstFlags & Flag::RowMajor) ? Dst::ColsAtCompileTime : Dst::RowsAtCompileTime;
 	constexpr static int LinearSize = Dst::SizeAtCompileTime;
-	constexpr static int OuterStride = outer_stride_at_compile_time<Dst>::value;
 
 	using LinearPacketType = best_packet<DstScalar, LinearSize>;
 	using InnerPacketType = best_packet<DstScalar, InnerSize>;
@@ -40,18 +38,15 @@ struct copy_using_evaluator_traits
 	constexpr static bool MayVectorize = StorageOrdersAgree && not_none(DstFlags & SrcFlags & Flag::PacketAccess)
 											&& functor_traits<AssignFunc>::PacketAccess;
 	constexpr static bool MayLinearize = StorageOrdersAgree && not_none(DstFlags & SrcFlags & Flag::LinearAccess);
-	constexpr static bool MayInnerVectorize = MayVectorize && InnerSize != Dynamic 
-											&& InnerSize % InnerPacketSize == 0
-											&& JointAlignment >= InnerRequiredAlignment;
-	constexpr static bool MayLinearVectorize = MayVectorize && MayLinearize && DstHasDirectAccess 
-												&& (DstAlignment >= LinearRequiredAlignment);
+	constexpr static bool MayInnerVectorize = MayVectorize && InnerSize != Dynamic && InnerSize % InnerPacketSize == 0;
+	constexpr static bool MayLinearVectorize = MayVectorize && MayLinearize && DstHasDirectAccess;
 
 	constexpr static TraversalType Traversal = Dst::SizeAtCompileTime == 0 ? TraversalType::AllAtOnce 
-									: MayLinearVectorize && (LinearPacketSize > InnerPacketSize) ? TraversalType::LinearVectorized
+									: MayLinearVectorize && (LinearPacketSize >= InnerPacketSize) ? TraversalType::LinearVectorized
 									: MayInnerVectorize ? TraversalType::InnerVectorized
 									: MayLinearVectorize ? TraversalType::LinearVectorized
 									: MayLinearize ? TraversalType::Linear : TraversalType::Default;
-	constexpr static int Vectorized = Traversal == TraversalType::InnerVectorized ||
+	constexpr static bool Vectorized = Traversal == TraversalType::InnerVectorized ||
 									Traversal == TraversalType::LinearVectorized;
 
 	using PacketType = std::conditional_t<Traversal == TraversalType::LinearVectorized, LinearPacketType, InnerPacketType>;
