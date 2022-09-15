@@ -15,22 +15,22 @@ template<typename T> struct traits<const T> : traits<T> {};
 template<typename Derived> 
 struct has_direct_access
 {
-	constexpr static bool value = static_cast<bool>(traits<Derived>::Flags & DirectAccessBit);
+	constexpr static bool value = (traits<Derived>::Flags & Flag::DirectAccess) != Flag::None;
 };
 // 访问级别
 template<typename Derived> 
 struct accessors_level
 {
-	constexpr static bool has_direct_access = static_cast<bool>(traits<Derived>::Flags & DirectAccessBit);
-	constexpr static bool has_write_access = static_cast<bool>(traits<Derived>::Flags & LvalueBit);
-	constexpr static int value = has_direct_access ? (has_write_access ? DirectWriteAccessors : DirectAccessors)
-						  : (has_write_access ? WriteAccessors : ReadOnlyAccessors);
+	constexpr static bool has_direct_access = (traits<Derived>::Flags & Flag::DirectAccess) != Flag::None;
+	constexpr static bool has_write_access = (traits<Derived>::Flags & Flag::Lvalue) != Flag::None;
+	constexpr static AccessorLevel value = has_direct_access ? (has_write_access ? AccessorLevel::DirectWrite : AccessorLevel::Direct)
+						  : (has_write_access ? AccessorLevel::Write : AccessorLevel::ReadOnly);
 };
 
 // 最高层基类
 template<typename Derived> struct Base;
 // 矩阵系数访问类
-template<typename Derived, int Level> class CoeffsBase;
+template<typename Derived, AccessorLevel Level> class CoeffsBase;
 // 矩阵及矩阵表达式基类
 template<typename Derived> class MatrixBase;
 // 矩阵类

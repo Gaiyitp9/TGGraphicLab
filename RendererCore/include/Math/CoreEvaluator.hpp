@@ -43,7 +43,7 @@ struct evaluator<Matrix<Scalar_, Rows, Cols, Options>>
 	constexpr static bool IsVectorAtCompileTime = XprType::IsVectorAtCompileTime;
 	constexpr static int RowsAtCompileTime = XprType::RowsAtCompileTime;
 	constexpr static int ColsAtCompileTime = XprType::ColsAtCompileTime;
-	constexpr static int Flags = traits<XprType>::EvaluatorFlags;
+	constexpr static Flag Flags = traits<XprType>::EvaluatorFlags;
 	constexpr static int Alignment = traits<XprType>::Alignment;
 	constexpr static int OuterStrideAtCompileTime = XprType::OuterStrideAtCompileTime;
 
@@ -104,7 +104,7 @@ struct unary_evaluator<Transpose<ArgType>>
 	using CoeffReturnType = XprType::CoeffReturnType;
 	constexpr static int RowsAtCompileTime = XprType::RowsAtCompileTime;
 	constexpr static int ColsAtCompileTime = XprType::ColsAtCompileTime;
-	constexpr static int Flags = evaluator<ArgType>::Flags ^ RowMajorBit;
+	constexpr static Flag Flags = evaluator<ArgType>::Flags ^ Flag::RowMajor;
 	constexpr static int Alignment = evaluator<ArgType>::Alignment;
 
 	explicit unary_evaluator(const XprType& t) : m_argImpl(t.nestedExpression()) {}
@@ -161,21 +161,20 @@ struct binary_evaluator<CwiseBinaryOp<BinaryOp, Lhs, Rhs>>
 	using XprType = CwiseBinaryOp<BinaryOp, Lhs, Rhs>;
 	using CoeffReturnType = XprType::CoeffReturnType;
 
-	constexpr static int LhsFlags = evaluator<Lhs>::Flags;
-	constexpr static int RhsFlags = evaluator<Rhs>::Flags;
+	constexpr static Flag LhsFlags = evaluator<Lhs>::Flags;
+	constexpr static Flag RhsFlags = evaluator<Rhs>::Flags;
 	constexpr static bool SameType = std::is_same_v<typename Lhs::Scalar, typename Rhs::Scalar>;
-	constexpr static bool StorageOrdersAgree = (LhsFlags & RowMajorBit) == (RhsFlags & RowMajorBit);
+	constexpr static bool StorageOrdersAgree = (LhsFlags & Flag::RowMajor) == (RhsFlags & Flag::RowMajor);
 	constexpr static int Alignment = evaluator<Lhs>::Alignment < evaluator<Rhs>::Alignment ? evaluator<Lhs>::Alignment
 									: evaluator<Rhs>::Alignment;
 	// 判断是否要开启LinearAccessBit和PacketAccessBit位
-	constexpr static int Flags0 = (int(LhsFlags) | int(RhsFlags)) & (
-		(int(LhsFlags) & int(RhsFlags) &
-			((StorageOrdersAgree ? LinearAccessBit : 0)
-				| (functor_traits<BinaryOp>::PacketAccess && StorageOrdersAgree && SameType ? PacketAccessBit : 0)
-				)
-			)
+	constexpr static Flag Flags0 = (LhsFlags | RhsFlags) & 
+		(
+			(LhsFlags & RhsFlags) &
+			((StorageOrdersAgree ? Flag::LinearAccess : Flag::None) | 
+				(functor_traits<BinaryOp>::PacketAccess && StorageOrdersAgree && SameType ? Flag::PacketAccess : Flag::None))
 		);
-	constexpr static int Flags = (Flags0 & ~RowMajorBit) | (LhsFlags & RowMajorBit);	// 取Lhs的RowMajorBit标志位
+	constexpr static Flag Flags = (Flags0 & ~Flag::RowMajor) | (LhsFlags & Flag::RowMajor);	// 取Lhs的RowMajorBit标志位
 
 	explicit binary_evaluator(const XprType& xpr) : m_d(xpr) {}
 

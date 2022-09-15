@@ -25,8 +25,8 @@ public:
 	static constexpr int SizeAtCompileTime = size_at_compile_time(traits<Derived>::RowsAtCompileTime, traits<Derived>::ColsAtCompileTime);
 	static constexpr bool IsVectorAtCompileTime = traits<Derived>::RowsAtCompileTime == 1 ||
 												  traits<Derived>::ColsAtCompileTime == 1;
-	static constexpr int Flags = traits<Derived>::Flags;
-	static constexpr bool IsRowMajor = bool(traits<Derived>::Flags & RowMajorBit);
+	static constexpr Flag Flags = traits<Derived>::Flags;
+	static constexpr bool IsRowMajor = not_none(traits<Derived>::Flags & Flag::RowMajor);
 	static constexpr int InnerSizeAtCompileTime = IsVectorAtCompileTime ? SizeAtCompileTime
 												: IsRowMajor ? ColsAtCompileTime : RowsAtCompileTime;
 	static constexpr int InnerStrideAtCompileTime = inner_stride_at_compile_time<Derived>::value;

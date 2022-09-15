@@ -16,39 +16,40 @@ enum class StorageOption : char
 const StorageOption DefaultMatrixStorageOrderOption = StorageOption::RowMajor;
 const int Dynamic = -1;
 
-enum Flags : unsigned int
+enum class Flag : unsigned int
 {
-	RowMajorBit = 0x1,
-	EvalBeforeNestingBit = 0x2,
-	PacketAccessBit = 0x4,
-	LinearAccessBit = 0x10,
-	LvalueBit = 0x20,
-	DirectAccessBit = 0x40,
-	NestByRefBit = 0x100,
+	None				= 0,
+	RowMajor			= 0x1,
+	EvalBeforeNesting	= 0x2,
+	PacketAccess		= 0x4,
+	LinearAccess		= 0x10,
+	Lvalue				= 0x20,
+	DirectAccess		= 0x40,
+	NestByRef			= 0x100,
 };
 
-enum AccessorLevels : char
+enum class AccessorLevel : char
 {
-	ReadOnlyAccessors,
-	WriteAccessors,
-	DirectAccessors,
-	DirectWriteAccessors,
+	ReadOnly,
+	Write,
+	Direct,
+	DirectWrite,
 };
 
-enum TranversalType : char
+enum class TraversalType : char
 {
-	DefaultTraversal,
-	LinearTraversal,
-	InnerVectorizedTraversal,
-	LinearVectorizedTraversal,
-	InvalidTraversal,
-	AllAtOnceTraversal,
+	Default,
+	Linear,
+	InnerVectorized,
+	LinearVectorized,
+	Invalid,
+	AllAtOnce,
 };
 
-enum UnrollingType : char
+enum class UnrollingType : char
 {
-	NoUnrolling,
-	CompleteUnrolling,
+	None,
+	Complete,
 };
 
 template<typename Enum> requires std::is_enum_v<Enum>
@@ -71,5 +72,23 @@ constexpr Enum operator&(const Enum& left, const Enum& right)
 {
 	return static_cast<Enum>(underlying_type_cast(left) & underlying_type_cast(right));
 }
+
+template<typename Enum> requires std::is_enum_v<Enum>
+constexpr Enum operator~(const Enum& e)
+{
+	return static_cast<Enum>(~underlying_type_cast(e));
+}
+
+template<typename Enum> struct enum_traits { constexpr static bool has_none = false; };
+template<>struct enum_traits<Flag> { constexpr static bool has_none = true; };
+
+template<typename Enum> requires std::is_enum_v<Enum> && enum_traits<Enum>::has_none
+constexpr bool operator!(const Enum& e)
+{
+	return e == Enum::None;
+}
+
+template<typename Enum> requires std::is_enum_v<Enum> && enum_traits<Enum>::has_none
+constexpr bool not_none(const Enum& e) { return e != Enum::None; }
 
 }

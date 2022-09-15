@@ -13,17 +13,17 @@ struct traits<Matrix<Scalar_, Rows, Cols, Options_>>
 {
 private:
 	constexpr static int size = size_at_compile_time(Rows, Cols);
-	constexpr static int row_major_bit = (Options_ == StorageOption::RowMajor) ? RowMajorBit : 0;
-	constexpr static int packet_access_bit = packet_traits<Scalar_>::Vectorizable ? PacketAccessBit : 0;
+	constexpr static Flag rowMajor = (Options_ == StorageOption::RowMajor) ? Flag::RowMajor : Flag::None;
+	constexpr static Flag packetAccess = packet_traits<Scalar_>::Vectorizable ? Flag::PacketAccess : Flag::None;
 public:
 	using Scalar = Scalar_;
 	using PacketScalar = best_packet<Scalar_, size>;
 	constexpr static int RowsAtCompileTime = Rows;
 	constexpr static int ColsAtCompileTime = Cols;
-	constexpr static int Flags = DirectAccessBit | LvalueBit | NestByRefBit | row_major_bit;
+	constexpr static Flag Flags = Flag::DirectAccess | Flag::Lvalue | Flag::NestByRef | rowMajor;
 	constexpr static int InnerStrideAtCompileTime = 1;
 	constexpr static int OuterStrideAtCompileTime = (Options_ == StorageOption::RowMajor) ? ColsAtCompileTime : RowsAtCompileTime;
-	constexpr static int EvaluatorFlags = LinearAccessBit | DirectAccessBit | packet_access_bit | row_major_bit;
+	constexpr static Flag EvaluatorFlags = Flag::LinearAccess | Flag::DirectAccess | packetAccess | rowMajor;
 	constexpr static int Alignment = default_alignment<Scalar_, size>;
 };
 

@@ -9,13 +9,13 @@ namespace LCH::Math
 {
 
 template<typename Derived>
-class CoeffsBase<Derived, ReadOnlyAccessors> : public Base<Derived>
+class CoeffsBase<Derived, AccessorLevel::ReadOnly> : public Base<Derived>
 {
 public:
 	using Scalar = traits<Derived>::Scalar;
 	using PacketScalar = packet_traits<Scalar>::type;
 
-	using CoeffReturnType = std::conditional_t<bool(traits<Derived>::Flags&LvalueBit), 
+	using CoeffReturnType = std::conditional_t<not_none(traits<Derived>::Flags & Flag::Lvalue), 
 												const Scalar&, const Scalar>;
 	using PacketReturnType = add_const_on_value_type_t<PacketScalar>;
 
@@ -29,14 +29,14 @@ public:
 	{
 		return Derived::RowsAtCompileTime == 1 ? 0 :
 			Derived::ColsAtCompileTime == 1 ? inner :
-			Derived::Flags & RowMajorBit ? outer : inner;
+			not_none(Derived::Flags & Flag::RowMajor) ? outer : inner;
 	}
 
 	int colIndexByOuterInner(int outer, int inner) const
 	{
 		return Derived::ColsAtCompileTime == 1 ? 0 :
 			Derived::RowsAtCompileTime == 1 ? inner :
-			Derived::Flags & RowMajorBit ? inner : outer;
+			not_none(Derived::Flags & Flag::RowMajor) ? inner : outer;
 	}
 
 	CoeffReturnType coeff(int row, int col) const
@@ -57,7 +57,7 @@ public:
 
 	CoeffReturnType coeff(int index) const
 	{
-		static_assert(evaluator<Derived>::Flags & LinearAccessBit);
+		static_assert(not_none(evaluator<Derived>::Flags & Flag::LinearAccess));
 		return evaluator<Derived>(derived()).Coeff(index);
 	}
 
@@ -111,16 +111,16 @@ public:
 	template<int LoadMode>
 	PacketReturnType packet(int index) const
 	{
-		static_assert(evaluator<Derived>::Flags & LinearAccessBit);
+		static_assert(not_none(evaluator<Derived>::Flags & Flag::LinearAccess));
 		return evaluator<Derived>(derived()).template packet<LoadMode, PacketScalar>(index);
 	}
 };
 
 template<typename Derived>
-class CoeffsBase<Derived, WriteAccessors> : public CoeffsBase<Derived, ReadOnlyAccessors>
+class CoeffsBase<Derived, AccessorLevel::Write> : public CoeffsBase<Derived, AccessorLevel::ReadOnly>
 {
 public:
-	using Base = CoeffsBase<Derived, ReadOnlyAccessors>;
+	using Base = CoeffsBase<Derived, AccessorLevel::ReadOnly>;
 	using Scalar = traits<Derived>::Scalar;
 	using PacketScalar = packet_traits<Scalar>::type;
 
@@ -156,7 +156,7 @@ public:
 
 	Scalar& coeffRef(int index)
 	{
-		static_assert(evaluator<Derived>::Flags & LinearAccessBit);
+		static_assert(not_none(evaluator<Derived>::Flags & Flag::LinearAccess));
 		return evaluator<Derived>(derived()).coeffRef(index);
 	}
 
@@ -196,10 +196,10 @@ public:
 };
 
 template<typename Derived>
-class CoeffsBase<Derived, DirectAccessors> : public CoeffsBase<Derived, ReadOnlyAccessors>
+class CoeffsBase<Derived, AccessorLevel::Direct> : public CoeffsBase<Derived, AccessorLevel::ReadOnly>
 {
 public:
-	using Base = CoeffsBase<Derived, ReadOnlyAccessors>;
+	using Base = CoeffsBase<Derived, AccessorLevel::ReadOnly>;
 	using Scalar = traits<Derived>::Scalar;
 
 	using Base::rows;
@@ -229,10 +229,10 @@ public:
 };
 
 template<typename Derived>
-class CoeffsBase<Derived, DirectWriteAccessors> : public CoeffsBase<Derived, WriteAccessors>
+class CoeffsBase<Derived, AccessorLevel::DirectWrite> : public CoeffsBase<Derived, AccessorLevel::Write>
 {
 public:
-	using Base = CoeffsBase<Derived, WriteAccessors>;
+	using Base = CoeffsBase<Derived, AccessorLevel::Write>;
 	using Scalar = traits<Derived>::Scalar;
 
 	using Base::rows;

@@ -14,16 +14,16 @@ struct copy_using_evaluator_traits
 	using Dst = DstEvaluator::XprType;
 	using DstScalar = Dst::Scalar;
 
-	constexpr static int DstFlags = DstEvaluator::Flags;
-	constexpr static int SrcFlags = SrcEvaluator::Flags;
+	constexpr static Flag DstFlags = DstEvaluator::Flags;
+	constexpr static Flag SrcFlags = SrcEvaluator::Flags;
 
 	constexpr static int DstAlignment = DstEvaluator::Alignment;
 	constexpr static int SrcAlignment = SrcEvaluator::Alignment;
-	constexpr static bool DstHasDirectAccess = bool(DstFlags & DirectAccessBit);
+	constexpr static bool DstHasDirectAccess = not_none(DstFlags & Flag::DirectAccess);
 	constexpr static int JointAlignment = DstAlignment < SrcAlignment ? DstAlignment : SrcAlignment;
 
 	constexpr static int InnerSize = Dst::IsVectorAtCompileTime ? Dst::SizeAtCompileTime :
-									 DstFlags & RowMajorBit ? Dst::ColsAtCompileTime : Dst::RowsAtCompileTime;
+									 not_none(DstFlags & Flag::RowMajor) ? Dst::ColsAtCompileTime : Dst::RowsAtCompileTime;
 	constexpr static int LinearSize = Dst::SizeAtCompileTime;
 	constexpr static int OuterStride = outer_stride_at_compile_time<Dst>::value;
 
@@ -34,34 +34,34 @@ struct copy_using_evaluator_traits
 	constexpr static int LinearRequiredAlignment = unpacket_traits<LinearPacketType>::Alignment;
 	constexpr static int InnerRequiredAlignment = unpacket_traits<InnerPacketType>::Alignment;
 
-	constexpr static bool DstIsRowMajor = bool(DstFlags & RowMajorBit);
-	constexpr static bool SrcIsRowMajor = bool(SrcFlags & RowMajorBit);
+	constexpr static bool DstIsRowMajor = not_none(DstFlags & Flag::RowMajor);
+	constexpr static bool SrcIsRowMajor = not_none(SrcFlags & Flag::RowMajor);
 	constexpr static bool StorageOrdersAgree = DstIsRowMajor == SrcIsRowMajor;
-	constexpr static bool MayVectorize = StorageOrdersAgree && (DstFlags & SrcFlags & PacketAccessBit)
+	constexpr static bool MayVectorize = StorageOrdersAgree && not_none(DstFlags & SrcFlags & Flag::PacketAccess)
 											&& functor_traits<AssignFunc>::PacketAccess;
-	constexpr static bool MayLinearize = StorageOrdersAgree && (DstFlags & SrcFlags & LinearAccessBit);
+	constexpr static bool MayLinearize = StorageOrdersAgree && not_none(DstFlags & SrcFlags & Flag::LinearAccess);
 	constexpr static bool MayInnerVectorize = MayVectorize && InnerSize != Dynamic 
 											&& InnerSize % InnerPacketSize == 0
 											&& JointAlignment >= InnerRequiredAlignment;
 	constexpr static bool MayLinearVectorize = MayVectorize && MayLinearize && DstHasDirectAccess 
 												&& (DstAlignment >= LinearRequiredAlignment);
 
-	constexpr static int Traversal = Dst::SizeAtCompileTime == 0 ? AllAtOnceTraversal 
-									: MayLinearVectorize && (LinearPacketSize > InnerPacketSize) ? LinearVectorizedTraversal
-									: MayInnerVectorize ? InnerVectorizedTraversal
-									: MayLinearVectorize ? LinearVectorizedTraversal
-									: MayLinearize ? LinearTraversal : DefaultTraversal;
-	constexpr static int Vectorized = Traversal == InnerVectorizedTraversal ||
-									Traversal == LinearVectorizedTraversal;
+	constexpr static TraversalType Traversal = Dst::SizeAtCompileTime == 0 ? TraversalType::AllAtOnce 
+									: MayLinearVectorize && (LinearPacketSize > InnerPacketSize) ? TraversalType::LinearVectorized
+									: MayInnerVectorize ? TraversalType::InnerVectorized
+									: MayLinearVectorize ? TraversalType::LinearVectorized
+									: MayLinearize ? TraversalType::Linear : TraversalType::Default;
+	constexpr static int Vectorized = Traversal == TraversalType::InnerVectorized ||
+									Traversal == TraversalType::LinearVectorized;
 
-	using PacketType = std::conditional_t<Traversal == LinearVectorizedTraversal, LinearPacketType, InnerPacketType>;
+	using PacketType = std::conditional_t<Traversal == TraversalType::LinearVectorized, LinearPacketType, InnerPacketType>;
 
-	constexpr static int ActualPacketSize = Traversal == LinearVectorizedTraversal ? LinearPacketSize
+	constexpr static int ActualPacketSize = Traversal == TraversalType::LinearVectorized ? LinearPacketSize
 									: Vectorized ? InnerPacketSize : 1;
 	constexpr static bool MayUnrollCompletely = LinearSize != Dynamic;
 	constexpr static bool MayUnrollInner = InnerSize != Dynamic;
 
-	constexpr static int Unrolling = MayUnrollCompletely ? CompleteUnrolling : NoUnrolling;
+	constexpr static UnrollingType Unrolling = MayUnrollCompletely ? UnrollingType::Complete : UnrollingType::None;
 };
 
 template<typename Kernel, int Index, int Stop>
@@ -126,18 +126,18 @@ struct InnerVectorizedTraversalCompleteUnrolling<Kernel, Stop, Stop>
 };
 
 template<typename Kernel,
-	int Traversal = Kernel::AssignmentTraits::Traversal,
-	int Unrolling = Kernel::AssignmentTraits::Unrolling>
+	TraversalType Traversal = Kernel::AssignmentTraits::Traversal,
+	UnrollingType Unrolling = Kernel::AssignmentTraits::Unrolling>
 struct assignment_loop;
 
-template<typename Kernel, int Unrolling>
-struct assignment_loop<Kernel, AllAtOnceTraversal, Unrolling>
+template<typename Kernel, UnrollingType Unrolling>
+struct assignment_loop<Kernel, TraversalType::AllAtOnce, Unrolling>
 {
 	static void Run(Kernel&) {}
 };
 
 template<typename Kernel>
-struct assignment_loop<Kernel, DefaultTraversal, NoUnrolling>
+struct assignment_loop<Kernel, TraversalType::Default, UnrollingType::None>
 {
 	static void Run(Kernel& kernel)
 	{
@@ -152,7 +152,7 @@ struct assignment_loop<Kernel, DefaultTraversal, NoUnrolling>
 };
 
 template<typename Kernel>
-struct assignment_loop<Kernel, DefaultTraversal, CompleteUnrolling>
+struct assignment_loop<Kernel, TraversalType::Default, UnrollingType::Complete>
 {
 	static void Run(Kernel& kernel)
 	{
@@ -180,7 +180,7 @@ struct unaligned_assignment_loop<false>
 };
 
 template<typename Kernel>
-struct assignment_loop<Kernel, LinearVectorizedTraversal, NoUnrolling>
+struct assignment_loop<Kernel, TraversalType::LinearVectorized, UnrollingType::None>
 {
 	static void Run(Kernel& kernel)
 	{
@@ -207,7 +207,7 @@ struct assignment_loop<Kernel, LinearVectorizedTraversal, NoUnrolling>
 };
 
 template<typename Kernel>
-struct assignment_loop<Kernel, LinearVectorizedTraversal, CompleteUnrolling>
+struct assignment_loop<Kernel, TraversalType::LinearVectorized, UnrollingType::Complete>
 {
 	static void Run(Kernel& kernel)
 	{
@@ -224,7 +224,7 @@ struct assignment_loop<Kernel, LinearVectorizedTraversal, CompleteUnrolling>
 };
 
 template<typename Kernel>
-struct assignment_loop<Kernel, InnerVectorizedTraversal, NoUnrolling>
+struct assignment_loop<Kernel, TraversalType::InnerVectorized, UnrollingType::None>
 {
 	using PacketType = Kernel::PacketType;
 	constexpr static int SrcAlignment = Kernel::AssignmentTraits::SrcAlignment;
@@ -242,7 +242,7 @@ struct assignment_loop<Kernel, InnerVectorizedTraversal, NoUnrolling>
 };
 
 template<typename Kernel>
-struct assignment_loop<Kernel, InnerVectorizedTraversal, CompleteUnrolling>
+struct assignment_loop<Kernel, TraversalType::InnerVectorized, UnrollingType::Complete>
 {
 	static void Run(Kernel& kernel)
 	{
@@ -252,7 +252,7 @@ struct assignment_loop<Kernel, InnerVectorizedTraversal, CompleteUnrolling>
 };
 
 template<typename Kernel>
-struct assignment_loop<Kernel, LinearTraversal, NoUnrolling>
+struct assignment_loop<Kernel, TraversalType::Linear, UnrollingType::None>
 {
 	static void run(Kernel& kernel)
 	{
@@ -263,7 +263,7 @@ struct assignment_loop<Kernel, LinearTraversal, NoUnrolling>
 };
 
 template<typename Kernel>
-struct assignment_loop<Kernel, LinearTraversal, CompleteUnrolling>
+struct assignment_loop<Kernel, TraversalType::Linear, UnrollingType::Complete>
 {
 	static void run(Kernel& kernel)
 	{
@@ -342,14 +342,14 @@ public:
 	{
 		return DstEvaluatorType::RowsAtCompileTime == 1 ? 0 :
 			DstEvaluatorType::ColsAtCompileTime == 1 ? inner :
-			DstEvaluatorType::Flags & RowMajorBit ? outer : inner;
+			not_none(DstEvaluatorType::Flags & Flag::RowMajor) ? outer : inner;
 	}
 
 	static int colIndexByOuterInner(int outer, int inner)
 	{
 		return DstEvaluatorType::ColsAtCompileTime == 1 ? 0 :
 			DstEvaluatorType::RowsAtCompileTime == 1 ? inner :
-			DstEvaluatorType::Flags & RowMajorBit ? inner : outer;
+			not_none(DstEvaluatorType::Flags & Flag::RowMajor) ? inner : outer;
 	}
 
 	const Scalar* dstDataPtr() const
@@ -405,7 +405,7 @@ void call_assignment(Dst& dst, Src& src, const Func& func)
 	using type = Matrix<typename traits<Src>::Scalar,
 		traits<Src>::RowsAtCompileTime,
 		traits<Src>::ColsAtCompileTime,
-		traits<Src>::Flags& RowMajorBit ? StorageOption::RowMajor : StorageOption::ColMajor
+		not_none(traits<Src>::Flags & Flag::RowMajor) ? StorageOption::RowMajor : StorageOption::ColMajor
 	>;
 
 	if constexpr (evaluator_assume_aliasing<Src>::value)

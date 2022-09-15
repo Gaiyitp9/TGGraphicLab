@@ -13,9 +13,9 @@ struct traits<Transpose<MatrixType>>
 {
 private:
 	using MatrixTypePlain = remove_all_t<MatrixType>;
-	constexpr static int FlagsLvalueBit = is_lvalue<MatrixTypePlain> ? LvalueBit : 0;
-	constexpr static int Flags0 = traits<MatrixTypePlain>::Flags & ~(LvalueBit | NestByRefBit);				// 移除LvalueBit和NestByRefBit标志位
-	constexpr static int Flags1 = Flags0 | FlagsLvalueBit;
+	constexpr static Flag FlagsLvalueBit = is_lvalue<MatrixTypePlain> ? Flag::Lvalue : Flag::None;
+	constexpr static Flag Flags0 = traits<MatrixTypePlain>::Flags & ~(Flag::Lvalue | Flag::NestByRef);	// 移除LvalueBit和NestByRefBit标志位
+	constexpr static Flag Flags1 = Flags0 | FlagsLvalueBit;
 
 public:
 	using Scalar = MatrixTypePlain::Scalar;
@@ -23,7 +23,7 @@ public:
 	constexpr static int ColsAtCompileTime = MatrixTypePlain::RowsAtCompileTime;
 	constexpr static int InnerStrideAtCompileTime = inner_stride_at_compile_time<MatrixTypePlain>::value;
 	constexpr static int OuterStrideAtCompileTime = outer_stride_at_compile_time<MatrixTypePlain>::value;
-	constexpr static int Flags = Flags1 ^ RowMajorBit;		// RowMajorBit位翻转											// RowMajorBit取反
+	constexpr static Flag Flags = Flags1 ^ Flag::RowMajor;		// RowMajorBit位翻转											// RowMajorBit取反
 };
 
 template<typename MatrixType>

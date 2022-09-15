@@ -15,7 +15,7 @@ struct traits<CwiseBinaryOp<BinaryOp, Lhs, Rhs>>
 	using Scalar = invoke_result_of<BinaryOp, const typename Lhs::Scalar&, const typename Rhs::Scalar&>::type;
 	constexpr static int RowsAtCompileTime = traits<Ancestor>::RowsAtCompileTime;
 	constexpr static int ColsAtCompileTime = traits<Ancestor>::ColsAtCompileTime;
-	constexpr static int Flags = traits<Ancestor>::Flags & RowMajorBit;
+	constexpr static Flag Flags = traits<Ancestor>::Flags & Flag::RowMajor;
 };
 
 // 二元运算表达式
