@@ -15,11 +15,11 @@
 namespace LCH
 {
 	BaseException::BaseException(const std::wstring& description)
-		: description(description)
+		: m_description(description)
 	{
 		// 初始化符号处理器，用于堆栈信息追踪
-		hProcess = GetCurrentProcess();
-		SymInitialize(hProcess, nullptr, true);
+		m_hProcess = GetCurrentProcess();
+		SymInitialize(m_hProcess, nullptr, true);
 
 		// 记录栈帧信息
 		StackTrace();
@@ -28,23 +28,23 @@ namespace LCH
 	BaseException::~BaseException()
 	{
 		// 释放符号处理器资源
-		SymCleanup(hProcess);
+		SymCleanup(m_hProcess);
 	}
 
 	char const* BaseException::what() const
 	{
 		// 记录异常信息
 		std::wstring wWhatBuffer = std::format(L"Exception type: {}\n", GetType());
-		wWhatBuffer += description;
+		wWhatBuffer += m_description;
 		wWhatBuffer += SEPARATOR;
-		for (const auto& info : stackFrameInfo)
+		for (const auto& info : m_stackFrameInfo)
 		{
 			wWhatBuffer += std::format(L"Frame: {}\nFile: {}\nFunction: {}\nLine: {}",
 				info.index, info.file, info.function, info.line);
 			wWhatBuffer += SEPARATOR;
 		}
-		whatBuffer = Utility::WideStringToAnsi(wWhatBuffer);
-		return whatBuffer.c_str();
+		m_whatBuffer = Utility::WideStringToAnsi(wWhatBuffer);
+		return m_whatBuffer.c_str();
 	}
 
 	wchar_t const* BaseException::GetType() const noexcept
@@ -67,11 +67,11 @@ namespace LCH
 		DWORD displacement;
 		for (USHORT i = 0; i < frameCount; ++i)
 		{
-			SymFromAddrW(hProcess, (DWORD64)stackFrames[i], nullptr, symbol);
-			SymGetLineFromAddrW64(hProcess, (DWORD64)stackFrames[i], &displacement, &imageLine);
+			SymFromAddrW(m_hProcess, (DWORD64)stackFrames[i], nullptr, symbol);
+			SymGetLineFromAddrW64(m_hProcess, (DWORD64)stackFrames[i], &displacement, &imageLine);
 			StackFrame frame{ static_cast<unsigned int>(frameCount - i - 1), imageLine.FileName,
 				symbol->Name, static_cast<unsigned int>(imageLine.LineNumber) };
-			stackFrameInfo.push_back(frame);
+			m_stackFrameInfo.push_back(frame);
 		}
 
 		free(symbol);

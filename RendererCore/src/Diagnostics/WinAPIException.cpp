@@ -27,16 +27,16 @@ namespace LCH
 		// 记录异常信息
 		std::wstring wWhatBuffer = std::format(L"Exception type: {}\n", GetType());
 		wWhatBuffer += std::format(L"HRESULT: {:#010x}\nError Message: {}", errorCode, errorMsg);
-		wWhatBuffer += description;
+		wWhatBuffer += m_description;
 		wWhatBuffer += SEPARATOR;
-		for (const auto& info : stackFrameInfo)
+		for (const auto& info : m_stackFrameInfo)
 		{
 			wWhatBuffer += std::format(L"Frame: {}\nFile: {}\nFunction: {}\nLine: {}",
 				info.index, info.file, info.function, info.line);
 			wWhatBuffer += SEPARATOR;
 		}
-		whatBuffer = Utility::WideStringToAnsi(wWhatBuffer);
-		return whatBuffer.c_str();
+		m_whatBuffer = Utility::WideStringToAnsi(wWhatBuffer);
+		return m_whatBuffer.c_str();
 	}
 
 	wchar_t const* WinAPIException::GetType() const noexcept

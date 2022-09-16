@@ -74,8 +74,6 @@ namespace LCH
 	template<typename CharT, size_t N> struct text_trait<const CharT(&)[N]> : text_trait<CharT*> {};
 	template<typename CharT> struct text_trait<std::basic_string<CharT>> : text_trait<CharT*> {};
 
-	// 字符串常量
-	
 	class Debug
 	{
 		Debug() = delete;
