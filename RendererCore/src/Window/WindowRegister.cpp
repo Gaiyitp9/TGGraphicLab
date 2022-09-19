@@ -14,7 +14,7 @@
 namespace LCH
 {
 	WindowRegister::WindowRegister()
-		: windowMessage({
+		: m_windowMessage({
 			REGISTER_MESSAGE(WM_NULL),
 			REGISTER_MESSAGE(WM_CREATE),
 			REGISTER_MESSAGE(WM_DESTROY),
@@ -189,7 +189,7 @@ namespace LCH
 			REGISTER_MESSAGE(WM_ENTERSIZEMOVE),
 			})
 	{
-		if (hInstance = GetModuleHandleW(nullptr))
+		if (m_hInstance = GetModuleHandleW(nullptr))
 			ThrowLastError();
 
 		WNDCLASSEX wc = {};
@@ -198,7 +198,7 @@ namespace LCH
 		wc.lpfnWndProc = WindowProcSetup;
 		wc.cbClsExtra = 0;
 		wc.cbWndExtra = 0;
-		wc.hInstance = hInstance;
+		wc.hInstance = m_hInstance;
 		wc.hIcon = nullptr;
 		wc.hCursor = nullptr;
 		wc.hbrBackground = nullptr;
@@ -209,13 +209,13 @@ namespace LCH
 		if (RegisterClassExW(&wc))
 			ThrowLastError();
 
-		windowClassName[WindowType::Default] = L"Default";
+		m_windowClassName[WindowType::Default] = L"Default";
 	}
 
 	WindowRegister::~WindowRegister()
 	{
-		for (auto& pair : windowClassName)
-			UnregisterClassW(pair.second.c_str(), hInstance);
+		for (auto& pair : m_windowClassName)
+			UnregisterClassW(pair.second.c_str(), m_hInstance);
 	}
 
 	LRESULT WindowRegister::WindowProcSetup(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
@@ -249,28 +249,22 @@ namespace LCH
 		return pWnd->WindowProc(hwnd, msg, wParam, lParam);
 	}
 
-	WindowRegister& WindowRegister::GetInstance()
+	HINSTANCE WindowRegister::hInstance() const noexcept
 	{
-		static WindowRegister s;
-		return s;
-	}
-
-	HINSTANCE WindowRegister::GetHInstance() const noexcept
-	{
-		return hInstance;
+		return m_hInstance;
 	}
 
 	const std::wstring& WindowRegister::GetWindowClassName(const WindowType& type) const
 	{
-		return windowClassName.at(type);
+		return m_windowClassName.at(type);
 	}
 
 	std::wstring WindowRegister::GetWindowMesssageInfo(const std::wstring& window, UINT msg, WPARAM wp, LPARAM lp) const
 	{
 		std::wstring msgInfo;
 		msgInfo += std::format(L"{:<10}", window);
-		const auto it = windowMessage.find(msg);
-		if (it == windowMessage.end())
+		const auto it = m_windowMessage.find(msg);
+		if (it == m_windowMessage.end())
 		{
 			msgInfo += std::format(L"	{:<25}", std::format(L"Unknown message: {:#x}", msg));
 		}

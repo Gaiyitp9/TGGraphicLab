@@ -192,6 +192,7 @@
     <ClInclude Include="include\Chronometer.hpp" />
     <ClInclude Include="include\Math\CommonFunction.hpp" />
     <ClInclude Include="include\Math\XprHelper.hpp" />
+    <ClInclude Include="include\Singleton.hpp" />
     <ClInclude Include="include\SlimWindows.h" />
     <ClInclude Include="include\Utility.hpp" />
     <ClInclude Include="include\Window\MainWindow.hpp" />

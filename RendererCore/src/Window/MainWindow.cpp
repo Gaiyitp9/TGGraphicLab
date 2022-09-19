@@ -66,7 +66,7 @@ namespace LCH
 	void MainWindow::Initialize()
 	{
 		// 获取窗口类名称
-		WindowRegister& windowRegister = WindowRegister::GetInstance();
+		WindowRegister& windowRegister = WindowRegister::instance();
 		const std::wstring& wndClassName = windowRegister.GetWindowClassName(WindowType::Default);
 
 		// 客户端区域大小
@@ -81,7 +81,7 @@ namespace LCH
 		// 创建窗口
 		hwnd = CreateWindowW(wndClassName.c_str(), name.c_str(), WS_OVERLAPPEDWINDOW,
 			posX, posY, rect.right - rect.left, rect.bottom - rect.top,
-			parentHwnd, nullptr, windowRegister.GetHInstance(), this);
+			parentHwnd, nullptr, windowRegister.hInstance(), this);
 
 		if (hwnd == nullptr)
 			ThrowLastError();
@@ -93,7 +93,7 @@ namespace LCH
 	{
 		// 是否监控窗口消息
 		if (spyMessage)
-			Debug::LogLine(WindowRegister::GetInstance().GetWindowMesssageInfo(name, msg, wParam, lParam));
+			Debug::LogLine(WindowRegister::instance().GetWindowMesssageInfo(name, msg, wParam, lParam));
 
 		switch (msg)
 		{

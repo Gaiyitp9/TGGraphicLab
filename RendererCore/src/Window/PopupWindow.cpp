@@ -28,7 +28,7 @@ namespace LCH
 	void PopupWindow::Initialize()
 	{
 		// 获取窗口类名称
-		WindowRegister& windowRegister = WindowRegister::GetInstance();
+		WindowRegister& windowRegister = WindowRegister::instance();
 		const std::wstring& wndClassName = windowRegister.GetWindowClassName(WindowType::Default);
 
 		// 客户端区域大小
@@ -43,7 +43,7 @@ namespace LCH
 		// 创建窗口
 		hwnd = CreateWindowW(wndClassName.c_str(), L"Popup", WS_POPUP,
 			posX, posY, rect.right - rect.left, rect.bottom - rect.top,
-			parentHwnd, nullptr, windowRegister.GetHInstance(), this);
+			parentHwnd, nullptr, windowRegister.hInstance(), this);
 
 		if (hwnd == nullptr)
 			ThrowLastError();
