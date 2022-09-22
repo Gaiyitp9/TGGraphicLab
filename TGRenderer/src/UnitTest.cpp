@@ -77,54 +77,6 @@ namespace LCH
 
 	void UnitTest::MathLibTest()
 	{
-		/*Math::Vector4d vvv;
-		Math::Vector4f v;
-		std::cout << "Vector<float, 4> value address = " << &v << std::boolalpha << Math::IsAligned(&v, 16) << std::endl;
-		std::cout << v.x() << " " << v.y() << " " << v.z() << " " << v.w() << std::endl;
-		v.x() = 2.3f;
-		v.y() = 1.2f;
-		v.z() = 3.6f;
-		v.w() = 1.0f;
-		std::cout << v.x() << " " << v.y() << " " << v.z() << " " << v.w() << std::endl;
-		std::cout << "v magnitude: " << v.magnitude() << std::endl;
-		Math::Vector4f vn = v.normalized();
-		std::cout << "v normalized: " << vn.x() << " " << vn.y() << " " << vn.z() << " " << vn.w() << std::endl;
-
-		Math::Vector4f v1;
-		std::cout << v1[0] << " " << v1[1] << " " << v1[2] << " " << v1[3] << std::endl;
-		v1[0] = 2.2f;
-		v1[1] = 5.3f;
-		v1[2] = 8.2f;
-		v1[3] = 1.2f;
-		std::cout << v1[0] << " " << v1[1] << " " << v1[2] << " " << v1[3] << std::endl;
-		std::cout << "v1 magnitude: " << v1.magnitude() << std::endl;
-		std::cout << "v dot v1: " << v.Dot(v1) << std::endl;
-		Math::Vector4f v1d = 2 * v1;
-		std::cout << v1d[0] << " " << v1d[1] << " " << v1d[2] << " " << v1d[3] << std::endl;
-
-		Math::Vector<float, 15> v2;
-		Math::Vector<float, 15> v3;
-		for (size_t i = 0; i < 8; ++i)
-		{
-			v2[i] = 1;
-			v3[i] = 2;
-		}
-		for (size_t i = 8; i < 15; ++i)
-		{
-			v2[i] = 1.2f;
-			v3[i] = 2.3f;
-		}
-		Math::Vector<float, 15> v4 = v2 + v3;
-		for (size_t i = 0; i < 15; ++i)
-		{
-			std::cout << v4[i] << " ";
-		}
-		std::cout << std::endl;
-
-		Math::Vector3f vf1{ 3.2f, 2.1f, 5.0f };
-		Math::Vector3f vf2{ -0.2f, 6.1f, 1.0f };
-		Math::Vector3f vcross = vf1.Cross(vf2);
-		std::cout << "cross: " << vcross.x() << " " << vcross.y() << " " << vcross.z() << std::endl;*/
 		Math::Vector4f v1, v2, v3;
 		Math::RowVector4f v4;
 		v1[0] = 0; v1[1] = 1; v1[2] = 2; v1[3] = 3;

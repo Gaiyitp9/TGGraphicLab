@@ -228,6 +228,13 @@ template<typename Packet> inline Packet psub(const Packet& a, const Packet& b) {
 template<> inline Packet4f psub(const Packet4f& a, const Packet4f& b) { return _mm_sub_ps(a, b); }
 template<> inline Packet2d psub(const Packet2d& a, const Packet2d& b) { return _mm_sub_pd(a, b); }
 template<> inline Packet4i psub(const Packet4i& a, const Packet4i& b) { return _mm_sub_epi32(a, b); }
+
+template<typename Packet> inline Packet pmul(const Packet& a, const Packet& b) { return a * b; }
+template<> inline bool pmul(const bool& a, const bool& b) { return a && b; }
+template<> inline Packet4f pmul(const Packet4f& a, const Packet4f& b) { return _mm_mul_ps(a, b); }
+template<> inline Packet2d pmul(const Packet2d& a, const Packet2d& b) { return _mm_mul_pd(a, b); }
+template<> inline Packet4i pmul(const Packet4i& a, const Packet4i& b) { return _mm_mul_epi32(a, b); }
+
 }
 
 namespace LCH::Math

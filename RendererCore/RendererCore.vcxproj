@@ -182,10 +182,12 @@
     <ClInclude Include="include\Math\Core.hpp" />
     <ClInclude Include="include\Math\CoreEvaluator.hpp" />
     <ClInclude Include="include\Math\CwiseBinaryOp.hpp" />
+    <ClInclude Include="include\Math\Dot.hpp" />
     <ClInclude Include="include\Math\ForwardDeclarations.hpp" />
     <ClInclude Include="include\Math\Matrix.hpp" />
     <ClInclude Include="include\Math\MatrixBase.hpp" />
     <ClInclude Include="include\Math\Quaternion.hpp" />
+    <ClInclude Include="include\Math\Redux.hpp" />
     <ClInclude Include="include\Math\Simd.hpp" />
     <ClInclude Include="include\Math\Storage.hpp" />
     <ClInclude Include="include\Math\Transpose.hpp" />

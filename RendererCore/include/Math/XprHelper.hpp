@@ -124,4 +124,22 @@ inline constexpr bool have_same_matrix_size = (Type0::SizeAtCompileTime == 0 && 
 													Type1::ColsAtCompileTime == Dynamic ||
 													Type0::ColsAtCompileTime == Type1::ColsAtCompileTime));
 
+// 两个向量表达式的尺寸是否一致
+template<typename Type0, typename Type1>
+inline constexpr bool have_same_vector_size = (Type0::SizeAtCompileTime == Dynamic || 
+												Type1::SizeAtCompileTime == Dynamic ||
+												Type0::SizeAtCompileTime == Type1::SizeAtCompileTime);	
+
+struct meta_yes { char a[1]; };
+struct meta_no { char a[2]; };
+// 类型T是否包含return_type成员
+template<typename T>
+struct has_return_type
+{
+	template<typename C> static meta_yes TestFunctor(C const*, C::return_type const* = 0);
+	template<typename C> static meta_no TestFunctor(...);
+
+	static constexpr bool value = sizeof(TestFunctor<T>(static_cast<T*>(0))) == sizeof(meta_yes);
+};
+
 }

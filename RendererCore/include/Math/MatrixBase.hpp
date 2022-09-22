@@ -63,6 +63,21 @@ public:
 	{
 		return Transpose<Derived>(derived());
 	}
+
+	template<typename BinaryOp, typename OtherDerived>
+	CwiseBinaryOp<BinaryOp, Derived, OtherDerived> binaryExpr(const MatrixBase<OtherDerived>& other)
+	{
+		return CwiseBinaryOp<BinaryOp, Derived, OtherDerived>(derived(), other.derived());
+	}
+
+	Scalar sum() const;
+
+	template<typename BinaryOp>
+	Scalar redux(const BinaryOp& func) const;
+
+	template<typename OtherDerived>
+	typename scalar_binaryop_traits<typename traits<Derived>::Scalar, typename traits<OtherDerived>::Scalar>::return_type
+	Dot(const MatrixBase<OtherDerived>& other) const;
 };
 
 }

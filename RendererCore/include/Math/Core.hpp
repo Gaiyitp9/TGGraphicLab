@@ -22,3 +22,5 @@
 #include "MatrixBase.hpp"
 #include "Matrix.hpp"
 #include "Transpose.hpp"
+#include "Dot.hpp"
+#include "Redux.hpp"
