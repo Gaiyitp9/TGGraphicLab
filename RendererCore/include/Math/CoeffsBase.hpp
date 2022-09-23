@@ -13,12 +13,8 @@ class CoeffsBase<Derived, AccessorLevel::ReadOnly> : public Base<Derived>
 {
 public:
 	using Scalar = traits<Derived>::Scalar;
-	using PacketScalar = packet_traits<Scalar>::type;
-
 	using CoeffReturnType = std::conditional_t<not_none(traits<Derived>::Flags & Flag::Lvalue), 
 												const Scalar&, const Scalar>;
-	using PacketReturnType = add_const_on_value_type_t<PacketScalar>;
-
 	using Base = Base<Derived>;
 	using Base::rows;
 	using Base::cols;
@@ -69,50 +65,8 @@ public:
 
 	CoeffReturnType operator()(int index) const
 	{
+		static_assert(Derived::IsVectorAtCompileTime);
 		return coeff(index);
-	}
-
-	CoeffReturnType x() const
-	{
-		return (*this)[0];
-	}
-
-	CoeffReturnType y() const
-	{
-		static_assert(Derived::SizeAtCompileTime == -1 || Derived::SizeAtCompileTime >= 2);
-		return (*this)[1];
-	}
-
-	CoeffReturnType z() const
-	{
-		static_assert(Derived::SizeAtCompileTime == -1 || Derived::SizeAtCompileTime >= 3);
-		return (*this)[2];
-	}
-
-	CoeffReturnType w() const
-	{
-		static_assert(Derived::SizeAtCompileTime == -1 || Derived::SizeAtCompileTime >= 4);
-		return (*this)[3];
-	}
-
-	template<int LoadMode>
-	PacketReturnType packet(int row, int col) const
-	{
-		return evaluator<Derived>(derived()).template packet<LoadMode, PacketScalar>(row, col);
-	}
-
-	template<int LoadMode>
-	PacketReturnType packetByOuterInner(int outer, int inner) const
-	{
-		return packet<LoadMode>(rowIndexByOuterInner(outer, inner),
-								colIndexByOuterInner(outer, inner));
-	}
-
-	template<int LoadMode>
-	PacketReturnType packet(int index) const
-	{
-		static_assert(not_none(evaluator<Derived>::Flags & Flag::LinearAccess));
-		return evaluator<Derived>(derived()).template packet<LoadMode, PacketScalar>(index);
 	}
 };
 
@@ -122,7 +76,6 @@ class CoeffsBase<Derived, AccessorLevel::Write> : public CoeffsBase<Derived, Acc
 public:
 	using Base = CoeffsBase<Derived, AccessorLevel::ReadOnly>;
 	using Scalar = traits<Derived>::Scalar;
-	using PacketScalar = packet_traits<Scalar>::type;
 
 	using Base::coeff;
 	using Base::rows;
@@ -133,10 +86,6 @@ public:
 	using Base::colIndexByOuterInner;
 	using Base::operator[];
 	using Base::operator();
-	using Base::x;
-	using Base::y;
-	using Base::z;
-	using Base::w;
 
 	Scalar& coeffRef(int row, int col)
 	{
@@ -169,29 +118,6 @@ public:
 	Scalar& operator()(int index)
 	{
 		return coeffRef(index);
-	}
-
-	Scalar& x()
-	{
-		return (*this)[0];
-	}
-
-	Scalar& y()
-	{
-		static_assert(Derived::SizeAtCompileTime == -1 || Derived::SizeAtCompileTime >= 2);
-		return (*this)[1];
-	}
-
-	Scalar& z()
-	{
-		static_assert(Derived::SizeAtCompileTime == -1 || Derived::SizeAtCompileTime >= 3);
-		return (*this)[2];
-	}
-
-	Scalar& w()
-	{
-		static_assert(Derived::SizeAtCompileTime == -1 || Derived::SizeAtCompileTime >= 4);
-		return (*this)[3];
 	}
 };
 

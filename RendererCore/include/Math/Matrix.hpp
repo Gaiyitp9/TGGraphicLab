@@ -15,16 +15,16 @@ private:
 	constexpr static int size = size_at_compile_time(Rows, Cols);
 	constexpr static Flag rowMajor = (Options_ == StorageOption::RowMajor) ? Flag::RowMajor : Flag::None;
 	constexpr static Flag packetAccess = packet_traits<Scalar_>::Vectorizable ? Flag::PacketAccess : Flag::None;
+	constexpr static bool is_dynamic_size_storage = Rows == Dynamic || Cols == Dynamic;
 public:
 	using Scalar = Scalar_;
-	using PacketScalar = best_packet<Scalar_, size>;
 	constexpr static int RowsAtCompileTime = Rows;
 	constexpr static int ColsAtCompileTime = Cols;
 	constexpr static Flag Flags = Flag::DirectAccess | Flag::Lvalue | Flag::NestByRef | rowMajor;
 	constexpr static int InnerStrideAtCompileTime = 1;
 	constexpr static int OuterStrideAtCompileTime = (Options_ == StorageOption::RowMajor) ? ColsAtCompileTime : RowsAtCompileTime;
 	constexpr static Flag EvaluatorFlags = Flag::LinearAccess | Flag::DirectAccess | packetAccess | rowMajor;
-	constexpr static int Alignment = default_alignment<Scalar_, size>;
+	constexpr static int Alignment = is_dynamic_size_storage ? DEFAULT_ALIGN_BYTES : default_alignment<Scalar_, size>;
 };
 
 template<typename Scalar_, int Rows, int Cols, StorageOption Options_>
@@ -36,6 +36,8 @@ public:
 	using Base::RowsAtCompileTime;
 	using Base::ColsAtCompileTime;
 	using Base::SizeAtCompileTime;
+	using Base::IsRowMajor;
+	using Base::IsVectorAtCompileTime;
 
 public:
 	constexpr int rows() const { return m_storage.rows(); }
@@ -50,6 +52,103 @@ public:
 
 	constexpr int innerStride() const noexcept { return 1; }
 	constexpr int outerStride() const { return this->innerSize(); }
+
+	const Scalar& coeff(int row, int col) const
+	{
+		if constexpr (IsRowMajor)
+			return m_storage[col + row * m_storage.cols()];
+		else
+			return m_storage[row + col * m_storage.rows()];
+	}
+
+	const Scalar& coeff(int index) const
+	{
+		return m_storage[index];
+	}
+
+	Scalar& coeffRef(int row, int col)
+	{
+		if constexpr (IsRowMajor)
+			return m_storage[col + row * m_storage.cols()];
+		else
+			return m_storage[row + col * m_storage.rows()];
+	}
+
+	Scalar& coeffRef(int index)
+	{
+		return m_storage[index];
+	}
+
+	const Scalar& operator[](int index) const
+	{
+		static_assert(IsVectorAtCompileTime);
+		return coeff(index);
+	}
+
+	const Scalar& operator()(int index) const
+	{
+		static_assert(IsVectorAtCompileTime);
+		return coeff(index);
+	}
+
+	Scalar& operator[](int index)
+	{
+		static_assert(IsVectorAtCompileTime);
+		return coeffRef(index);
+	}
+
+	Scalar& operator()(int index)
+	{
+		static_assert(IsVectorAtCompileTime);
+		return coeffRef(index);
+	}
+
+	const Scalar& x() const
+	{
+		return (*this)[0];
+	}
+
+	const Scalar& y() const
+	{
+		static_assert(SizeAtCompileTime == -1 || SizeAtCompileTime >= 2);
+		return (*this)[1];
+	}
+
+	const Scalar& z() const
+	{
+		static_assert(SizeAtCompileTime == -1 || SizeAtCompileTime >= 3);
+		return (*this)[2];
+	}
+
+	const Scalar& w() const
+	{
+		static_assert(SizeAtCompileTime == -1 || SizeAtCompileTime >= 4);
+		return (*this)[3];
+	}
+
+
+	Scalar& x()
+	{
+		return (*this)[0];
+	}
+
+	Scalar& y()
+	{
+		static_assert(SizeAtCompileTime == -1 || SizeAtCompileTime >= 2);
+		return (*this)[1];
+	}
+
+	Scalar& z()
+	{
+		static_assert(SizeAtCompileTime == -1 || SizeAtCompileTime >= 3);
+		return (*this)[2];
+	}
+
+	Scalar& w()
+	{
+		static_assert(SizeAtCompileTime == -1 || SizeAtCompileTime >= 4);
+		return (*this)[3];
+	}
 
 private:
 	Storage<Scalar, SizeAtCompileTime, RowsAtCompileTime, ColsAtCompileTime> m_storage;

@@ -25,6 +25,11 @@ struct PlainArray<T, Size, 0>
 };
 
 // 分配对齐内存
+// 手动分配对齐内存的原理: 分配size+alignment的内存空间，分为两部分，后一部分的起始地址与alignment对齐，
+// 该地址也是返回的地址；前一部分记录内存地址，用来释放内存块。
+// 注: c++标准明确要求动态分配的内存必须满足一定的对齐要求，一般是16字节对齐
+// https://stackoverflow.com/questions/59098246/why-is-dynamically-allocated-memory-always-16-bytes-aligned
+// 而对齐要求是16或32，所以内存块的前一部分的大小一定大于一个指针的大小
 inline void* handmade_aligned_malloc(std::size_t size, std::size_t alignment)
 {
 	assert(alignment >= sizeof(void*) && (alignment & (alignment - 1)) == 0 && "Alignment must be at least sizeof(void*) and a power of 2");
@@ -96,6 +101,7 @@ class Storage
 {
 public:
 	const T& operator[](size_t index) const { return m_data.array[index]; }
+	T& operator[](size_t index) { return m_data.array[index]; }
 	T const* data() const { return m_data.array; }
 	T* data() { return m_data.array; }
 	constexpr static int rows() noexcept { return Rows; }
@@ -118,7 +124,7 @@ public:
 		{
 			conditional_aligned_free<true>(m_data);
 			if (size > 0)
-				m_data = reinterpret_cast<T*>(conditional_aligned_alloc<true>(sizeof(T) * size));
+				m_data = reinterpret_cast<T*>(conditional_aligned_alloc(sizeof(T) * size));
 			else
 				m_data = nullptr;
 		}

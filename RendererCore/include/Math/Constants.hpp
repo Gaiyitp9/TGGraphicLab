@@ -13,7 +13,7 @@ enum class StorageOption : char
 	RowMajor = 0x1,
 	ColMajor = 0x2,
 };
-const StorageOption DefaultMatrixStorageOrderOption = StorageOption::RowMajor;
+const StorageOption DefaultMatrixStorageOrderOption = StorageOption::ColMajor;
 const int Dynamic = -1;
 
 enum class Flag : unsigned int

@@ -106,6 +106,10 @@ inline constexpr int compute_default_alignment_helper(int arrayBytes, int alignm
 }
 
 // 计算默认对齐
+// 为什么要根据矩阵尺寸(字节数)来计算默认对齐？我的理解是这样：如果矩阵尺寸不是16或32的整数倍，
+// 分配对齐内存会产生浪费。另外，在evaluator中进行计算时，会单独处理不对齐的矩阵系数(参考evaluator<Matrix>)。
+// 所以对于矩阵尺寸不是16或32的整数倍的情况，即使分配了对齐内存，evaluator仍然需要单独处理不对齐的系数。综上,
+// 默认对齐需要根据矩阵尺寸来计算。注意：只有固定尺寸的矩阵需要用这个来计算，动态矩阵的默认对齐一直为0。
 template<typename T, int Size>
 inline constexpr int default_alignment = compute_default_alignment_helper(Size * sizeof(T), MAX_ALIGN_BYTES);
 
