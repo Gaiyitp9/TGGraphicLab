@@ -76,7 +76,7 @@ inline void conditional_aligned_free<true>(void* ptr)
 }
 
 // 返回第一个与Alignment对齐的数组索引
-template<int Alignment, typename Scalar, typename Index>
+template<int Alignment, typename Scalar>
 inline int first_aligned(const Scalar* array, int size)
 {
 	const int ScalarSize = sizeof(Scalar);

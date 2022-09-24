@@ -182,12 +182,11 @@ struct assignment_loop<Kernel, TraversalType::LinearVectorized, UnrollingType::N
 		const int size = kernel.size();
 		using Scalar = Kernel::Scalar;
 		using PacketType = Kernel::PacketType;
-		constexpr static bool requestedAlignment = Kernel::AssignmentTraits::LinearRequiredAlignment;
+		constexpr static int requestedAlignment = Kernel::AssignmentTraits::LinearRequiredAlignment;
 		constexpr static int packetSize = unpacket_traits<PacketType>::Size;
 		constexpr static bool dstIsAligned = Kernel::AssignmentTraits::DstAlignment >= requestedAlignment;
-		constexpr static int dstAlignment = packet_traits<Scalar>::AlignedOnScalar ? requestedAlignment
-																				   : Kernel::Assignment::DstAlignment;
-		constexpr static int srcAlignment = Kernel::Assignment::JointAlignment;
+		constexpr static int dstAlignment = Kernel::AssignmentTraits::DstAlignment;
+		constexpr static int srcAlignment = Kernel::AssignmentTraits::SrcAlignment;
 
 		const int alignedStart = dstIsAligned ? 0 : first_aligned<requestedAlignment>(kernel.dstDataPtr(), size);
 		const int alignedEnd = alignedStart + ((size - alignedStart) / packetSize) * packetSize;

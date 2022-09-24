@@ -43,6 +43,16 @@ public:
 	constexpr int rows() const { return m_storage.rows(); }
 	constexpr int cols() const { return m_storage.cols(); }
 
+	const Scalar* data() const
+	{
+		return m_storage.data();
+	}
+
+	Scalar* data()
+	{
+		return m_storage.data();
+	}
+
 	template<typename OtherDerived>
 	Matrix& operator=(const MatrixBase<OtherDerived>& other)
 	{
