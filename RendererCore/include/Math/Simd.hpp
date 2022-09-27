@@ -50,7 +50,7 @@ struct packet_traits
 	using half = T;
 	constexpr static bool Vectorizable = false;			// 是否向量化
 	constexpr static int  Size = 1;						// 包尺寸
-	constexpr static bool AlignedOnScalar = false;		// 是否对齐
+	constexpr static bool AlignedOnScalar = false;		// 对齐量alignment是否是标量sizeof(scalar)的整数倍
 	constexpr static bool HasHalfPacket = false;		// 是否有半包
 
 	constexpr static bool HasAdd = false;				// 是否可以做加法运算

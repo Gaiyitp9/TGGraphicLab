@@ -231,6 +231,8 @@ struct evaluator<Block<ArgType, BlockRows, BlockCols>> : block_evaluator<ArgType
 	using Scalar = XprType::Scalar;
 
 	constexpr static int RowsAtCompileTime = traits<XprType>::RowsAtCompileTime;
+	constexpr static int ColsAtCompileTime = traits<XprType>::ColsAtCompileTime;
+	constexpr static int Alignment = XprType::Alignment;
 };
 
 }

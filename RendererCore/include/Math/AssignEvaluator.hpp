@@ -24,6 +24,7 @@ struct copy_using_evaluator_traits
 
 	constexpr static int DstAlignment = DstEvaluator::Alignment;
 	constexpr static int SrcAlignment = SrcEvaluator::Alignment;
+	constexpr static int JointAlignment = DstAlignment <= SrcAlignment ? DstAlignment : SrcAlignment;
 
 	constexpr static int InnerSize = Dst::IsVectorAtCompileTime ? Dst::SizeAtCompileTime :
 									 not_none(DstFlags & Flag::RowMajor) ? Dst::ColsAtCompileTime : Dst::RowsAtCompileTime;
@@ -188,9 +189,14 @@ struct assignment_loop<Kernel, TraversalType::LinearVectorized, UnrollingType::N
 		using PacketType = Kernel::PacketType;
 		constexpr static int requestedAlignment = Kernel::AssignmentTraits::LinearRequiredAlignment;
 		constexpr static int packetSize = unpacket_traits<PacketType>::Size;
+		// 下面三行代码用来计算Dst和Src的对齐，一般情况下Dst和Src的对齐是相同的，下面的计算相当于把DstAlignment
+		// 和SrcAlignment分别设置为Kernel::AssignmentTraits::DstAlignment和Kernel::AssignmentTraits::SrcAlignment;
+		// 考虑Block这种特殊情况，Dst和Src的对齐可能不相同，所以，如果DstAlignment可以根据下面的first_aligned推导出，
+		// SrcAlignment要取上面两个对齐的最小值，Dst或者Src是Block都可能造成不对齐，所以取最小值
 		constexpr static bool dstIsAligned = Kernel::AssignmentTraits::DstAlignment >= requestedAlignment;
-		constexpr static int dstAlignment = Kernel::AssignmentTraits::DstAlignment;
-		constexpr static int srcAlignment = Kernel::AssignmentTraits::SrcAlignment;
+		constexpr static int dstAlignment = packet_traits<Scalar>::AlignedOnScalar ? requestedAlignment 
+																				   : Kernel::AssignmentTraits::DstAlignment;
+		constexpr static int srcAlignment = Kernel::AssignmentTraits::JointAlignment;
 
 		const int alignedStart = dstIsAligned ? 0 : first_aligned<requestedAlignment>(kernel.dstDataPtr(), size);
 		const int alignedEnd = alignedStart + ((size - alignedStart) / packetSize) * packetSize;
