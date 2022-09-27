@@ -1,8 +1,13 @@
-/****************************************************************
-* TianGong RenderLab											*
-* Copyright (c) Gaiyitp9. All rights reserved.					*
-* This code is licensed under the MIT License (MIT).			*
-*****************************************************************/
+/********************************************************************
+* TianGong RenderLab												*
+* Copyright (c) Gaiyitp9. All rights reserved.						*
+* This code is licensed under the MIT License (MIT).				*
+*																	*
+* Noted:															*
+* This file is part of Eigen, a lightweight C++ template library	*
+* for linear algebra which is subject to the terms of the			*
+* Mozilla Public License v.2.0. And I made some simplifications.	*
+*********************************************************************/
 #pragma once
 
 namespace LCH::Math
@@ -13,8 +18,8 @@ template<typename Derived>
 class MatrixBase : public CoeffsBase<Derived, accessors_level<Derived>::value>
 {
 public:
-	using Scalar = traits<Derived>::Scalar;
 	using Base = CoeffsBase<Derived, accessors_level<Derived>::value>;
+	using typename Base::Scalar;
 	using Base::derived;
 	using Base::rows;
 	using Base::cols;

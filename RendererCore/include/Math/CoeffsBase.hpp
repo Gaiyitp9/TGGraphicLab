@@ -1,8 +1,13 @@
-/****************************************************************
-* TianGong RenderLab											*
-* Copyright (c) Gaiyitp9. All rights reserved.					*
-* This code is licensed under the MIT License (MIT).			*
-*****************************************************************/
+/********************************************************************
+* TianGong RenderLab												*
+* Copyright (c) Gaiyitp9. All rights reserved.						*
+* This code is licensed under the MIT License (MIT).				*
+*																	*
+* Noted:															*
+* This file is part of Eigen, a lightweight C++ template library	*
+* for linear algebra which is subject to the terms of the			*
+* Mozilla Public License v.2.0. And I made some simplifications.	*
+*********************************************************************/
 #pragma once
 
 namespace LCH::Math
@@ -68,6 +73,29 @@ public:
 		static_assert(Derived::IsVectorAtCompileTime);
 		return coeff(index);
 	}
+
+	CoeffReturnType x() const
+	{
+		return (*this)[0];
+	}
+
+	CoeffReturnType y() const
+	{
+		static_assert(Derived::SizeAtCompileTime == -1 || Derived::SizeAtCompileTime >= 2);
+		return (*this)[1];
+	}
+
+	CoeffReturnType z() const
+	{
+		static_assert(Derived::SizeAtCompileTime == -1 || Derived::SizeAtCompileTime >= 3);
+		return (*this)[2];
+	}
+
+	CoeffReturnType w() const
+	{
+		static_assert(Derived::SizeAtCompileTime == -1 || Derived::SizeAtCompileTime >= 4);
+		return (*this)[3];
+	}
 };
 
 template<typename Derived>
@@ -118,6 +146,29 @@ public:
 	Scalar& operator()(int index)
 	{
 		return coeffRef(index);
+	}
+
+	Scalar& x()
+	{
+		return (*this)[0];
+	}
+
+	Scalar& y()
+	{
+		static_assert(Derived::SizeAtCompileTime == -1 || Derived::SizeAtCompileTime >= 2);
+		return (*this)[1];
+	}
+
+	Scalar& z()
+	{
+		static_assert(Derived::SizeAtCompileTime == -1 || Derived::SizeAtCompileTime >= 3);
+		return (*this)[2];
+	}
+
+	Scalar& w()
+	{
+		static_assert(Derived::SizeAtCompileTime == -1 || Derived::SizeAtCompileTime >= 4);
+		return (*this)[3];
 	}
 };
 

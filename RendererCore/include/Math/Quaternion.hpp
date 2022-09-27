@@ -5,7 +5,7 @@
 *****************************************************************/
 #pragma once
 
-#include "Vector.hpp"
+#include "Core.hpp"
 
 namespace LCH::Math
 {

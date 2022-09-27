@@ -1,8 +1,13 @@
-/****************************************************************
-* TianGong RenderLab											*
-* Copyright (c) Gaiyitp9. All rights reserved.					*
-* This code is licensed under the MIT License (MIT).			*
-*****************************************************************/
+/********************************************************************
+* TianGong RenderLab												*
+* Copyright (c) Gaiyitp9. All rights reserved.						*
+* This code is licensed under the MIT License (MIT).				*
+*																	*
+* Noted:															*
+* This file is part of Eigen, a lightweight C++ template library	*
+* for linear algebra which is subject to the terms of the			*
+* Mozilla Public License v.2.0. And I made some simplifications.	*
+*********************************************************************/
 #pragma once
 
 namespace LCH::Math
@@ -48,7 +53,7 @@ struct evaluator<Matrix<Scalar_, Rows, Cols, Options>>
 	constexpr static int OuterStrideAtCompileTime = XprType::OuterStrideAtCompileTime;
 
 	evaluator() : m_data(nullptr), m_outerStride(OuterStrideAtCompileTime) {}
-	explicit evaluator(const XprType& m) : m_data(m.m_storage.data()), m_outerStride(m.outerStride()) {}
+	explicit evaluator(const XprType& m) : m_data(m.data()), m_outerStride(m.outerStride()) {}
 
 	CoeffReturnType coeff(int row, int col) const
 	{
@@ -214,6 +219,18 @@ protected:
 	};
 
 	Data m_d;
+};
+
+template<typename ArgType, int BlockRows, int BlockCols, bool HasDirectAccess = has_direct_access<ArgType>::value>
+struct block_evaluator;
+
+template<typename ArgType, int BlockRows, int BlockCols>
+struct evaluator<Block<ArgType, BlockRows, BlockCols>> : block_evaluator<ArgType, BlockRows, BlockCols>
+{
+	using XprType = Block<ArgType, BlockRows, BlockCols>;
+	using Scalar = XprType::Scalar;
+
+	constexpr static int RowsAtCompileTime = traits<XprType>::RowsAtCompileTime;
 };
 
 }

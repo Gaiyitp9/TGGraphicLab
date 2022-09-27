@@ -1,8 +1,13 @@
-/****************************************************************
-* TianGong RenderLab											*
-* Copyright (c) Gaiyitp9. All rights reserved.					*
-* This code is licensed under the MIT License (MIT).			*
-*****************************************************************/
+/********************************************************************
+* TianGong RenderLab												*
+* Copyright (c) Gaiyitp9. All rights reserved.						*
+* This code is licensed under the MIT License (MIT).				*
+*																	*
+* Noted:															*
+* This file is part of Eigen, a lightweight C++ template library	*
+* for linear algebra which is subject to the terms of the			*
+* Mozilla Public License v.2.0. And I made some simplifications.	*
+*********************************************************************/
 #pragma once
 
 namespace LCH::Math
@@ -19,7 +24,6 @@ struct copy_using_evaluator_traits
 
 	constexpr static int DstAlignment = DstEvaluator::Alignment;
 	constexpr static int SrcAlignment = SrcEvaluator::Alignment;
-	constexpr static bool DstHasDirectAccess = not_none(DstFlags & Flag::DirectAccess);
 
 	constexpr static int InnerSize = Dst::IsVectorAtCompileTime ? Dst::SizeAtCompileTime :
 									 not_none(DstFlags & Flag::RowMajor) ? Dst::ColsAtCompileTime : Dst::RowsAtCompileTime;
@@ -39,7 +43,7 @@ struct copy_using_evaluator_traits
 											&& functor_traits<AssignFunc>::PacketAccess;
 	constexpr static bool MayLinearize = StorageOrdersAgree && not_none(DstFlags & SrcFlags & Flag::LinearAccess);
 	constexpr static bool MayInnerVectorize = MayVectorize && InnerSize != Dynamic && InnerSize % InnerPacketSize == 0;
-	constexpr static bool MayLinearVectorize = MayVectorize && MayLinearize && DstHasDirectAccess;
+	constexpr static bool MayLinearVectorize = MayVectorize && MayLinearize;
 
 	constexpr static TraversalType Traversal = Dst::SizeAtCompileTime == 0 ? TraversalType::AllAtOnce 
 									: MayLinearVectorize && (LinearPacketSize >= InnerPacketSize) ? TraversalType::LinearVectorized

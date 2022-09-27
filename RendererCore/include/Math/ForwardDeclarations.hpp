@@ -1,8 +1,13 @@
-/****************************************************************
-* TianGong RenderLab											*
-* Copyright (c) Gaiyitp9. All rights reserved.					*
-* This code is licensed under the MIT License (MIT).			*
-*****************************************************************/
+/********************************************************************
+* TianGong RenderLab												*
+* Copyright (c) Gaiyitp9. All rights reserved.						*
+* This code is licensed under the MIT License (MIT).				*
+*																	*
+* Noted:															*
+* This file is part of Eigen, a lightweight C++ template library	*
+* for linear algebra which is subject to the terms of the			*
+* Mozilla Public License v.2.0. And I made some simplifications.	*
+*********************************************************************/
 #pragma once
 
 namespace LCH::Math
@@ -15,14 +20,14 @@ template<typename T> struct traits<const T> : traits<T> {};
 template<typename Derived> 
 struct has_direct_access
 {
-	constexpr static bool value = (traits<Derived>::Flags & Flag::DirectAccess) != Flag::None;
+	constexpr static bool value = not_none(traits<Derived>::Flags & Flag::DirectAccess);
 };
 // 访问级别
 template<typename Derived> 
 struct accessors_level
 {
-	constexpr static bool has_direct_access = (traits<Derived>::Flags & Flag::DirectAccess) != Flag::None;
-	constexpr static bool has_write_access = (traits<Derived>::Flags & Flag::Lvalue) != Flag::None;
+	constexpr static bool has_direct_access = not_none(traits<Derived>::Flags & Flag::DirectAccess);
+	constexpr static bool has_write_access = not_none(traits<Derived>::Flags & Flag::Lvalue);
 	constexpr static AccessorLevel value = has_direct_access ? (has_write_access ? AccessorLevel::DirectWrite : AccessorLevel::Direct)
 						  : (has_write_access ? AccessorLevel::Write : AccessorLevel::ReadOnly);
 };
@@ -43,6 +48,8 @@ template<typename ScalarT, int Rows, int Cols,
 template<typename T, int Size, int Rows, int Cols> class Storage;
 // 转置
 template<typename MatrixType> class Transpose;
+// 块
+template<typename Xpr, int BlockRows = Dynamic, int BlockCols = Dynamic> class Block;
 
 // 二元运算
 template<typename BinaryOp, typename Lhs, typename Rhs> class CwiseBinaryOp;

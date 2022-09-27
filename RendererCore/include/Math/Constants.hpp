@@ -1,8 +1,13 @@
-/****************************************************************
-* TianGong RenderLab											*
-* Copyright (c) Gaiyitp9. All rights reserved.					*
-* This code is licensed under the MIT License (MIT).			*
-*****************************************************************/
+/********************************************************************
+* TianGong RenderLab												*
+* Copyright (c) Gaiyitp9. All rights reserved.						*
+* This code is licensed under the MIT License (MIT).				*
+*																	*
+* Noted:															*
+* This file is part of Eigen, a lightweight C++ template library	*
+* for linear algebra which is subject to the terms of the			*
+* Mozilla Public License v.2.0. And I made some simplifications.	*
+*********************************************************************/
 #pragma once
 
 namespace LCH::Math
@@ -24,7 +29,7 @@ enum class Flag : unsigned int
 	PacketAccess		= 0x4,
 	LinearAccess		= 0x10,
 	Lvalue				= 0x20,
-	DirectAccess		= 0x40,
+	DirectAccess		= 0x40,		// 表示可以直接访问底层数组，包含data()函数
 	NestByRef			= 0x100,
 };
 
