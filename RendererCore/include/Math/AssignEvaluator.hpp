@@ -58,9 +58,8 @@ struct copy_using_evaluator_traits
 
 	constexpr static int ActualPacketSize = Traversal == TraversalType::LinearVectorized ? LinearPacketSize
 									: Vectorized ? InnerPacketSize : 1;
-	constexpr static bool MayUnrollCompletely = LinearSize != Dynamic;
-	constexpr static bool MayUnrollInner = InnerSize != Dynamic;
 
+	constexpr static bool MayUnrollCompletely = LinearSize != Dynamic;
 	constexpr static UnrollingType Unrolling = MayUnrollCompletely ? UnrollingType::Complete : UnrollingType::None;
 };
 
