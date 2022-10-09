@@ -59,6 +59,12 @@ struct evaluator<Matrix<Scalar_, Rows, Cols, Options>>
 	evaluator() : m_data(nullptr), m_outerStride(OuterStrideAtCompileTime) {}
 	explicit evaluator(const XprType& m) : m_data(m.data()), m_outerStride(m.outerStride()) {}
 
+	template<int Alignment>
+	int aligned_index(int end)
+	{
+		return first_aligned<Alignment>(m_data, end);
+	}
+
 	CoeffReturnType coeff(int row, int col) const
 	{
 		if constexpr (IsRowMajor)
@@ -233,10 +239,22 @@ struct evaluator<Block<ArgType, BlockRows, BlockCols>> : block_evaluator<ArgType
 {
 	using XprType = Block<ArgType, BlockRows, BlockCols>;
 	using Scalar = XprType::Scalar;
+	using PacketScalar = best_packet<Scalar, XprType::SizeAtCompileTime>;
 
-	constexpr static int RowsAtCompileTime = traits<XprType>::RowsAtCompileTime;
-	constexpr static int ColsAtCompileTime = traits<XprType>::ColsAtCompileTime;
-	constexpr static int Alignment = XprType::Alignment;
+	constexpr static int RowsAtCompileTime = XprType::RowsAtCompileTime;
+	constexpr static int ColsAtCompileTime = XprType::ColsAtCompileTime;
+	constexpr static bool XprIsRowMajor = not_none(evaluator<XprType>::Flags & Flag::RowMajor);
+	constexpr static bool IsRowMajor = (BlockRows == 1 && BlockCols != 1) ? true
+									: (BlockCols == 1 && BlockRows != 1) ? false
+									: XprIsRowMajor;
+	constexpr static bool HasSameStorageOrderAsXprType = XprIsRowMajor == IsRowMajor;
+	constexpr static int InnerStrideAtCompileTime = HasSameStorageOrderAsXprType  
+													? inner_stride_at_compile_time<XprType>::value
+													: outer_stride_at_compile_time<XprType>::value;
+	constexpr static int OuterStrideAtCompileTime = HasSameStorageOrderAsXprType  
+													? outer_stride_at_compile_time<XprType>::value
+													: inner_stride_at_compile_time<XprType>::value;
+	constexpr static int Alignment = traits<XprType>::Alignment;
 	constexpr static Flag Flags = XprType::Flags;
 };
 

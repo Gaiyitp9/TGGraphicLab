@@ -30,8 +30,6 @@ public:
 	using Scalar = MatrixTypePlain::Scalar;
 	constexpr static int RowsAtCompileTime = MatrixTypePlain::ColsAtCompileTime;
 	constexpr static int ColsAtCompileTime = MatrixTypePlain::RowsAtCompileTime;
-	constexpr static int InnerStrideAtCompileTime = inner_stride_at_compile_time<MatrixTypePlain>::value;
-	constexpr static int OuterStrideAtCompileTime = outer_stride_at_compile_time<MatrixTypePlain>::value;
 	constexpr static Flag Flags = Flags1 ^ Flag::RowMajor;		// RowMajorBit位翻转											// RowMajorBit取反
 };
 
@@ -39,13 +37,18 @@ template<typename MatrixType>
 class Transpose : public MatrixBase<Transpose<MatrixType>>
 {
 public:
+	using Base = MatrixBase<Transpose<MatrixType>>;
 	using MatrixTypePlain = remove_all_t<MatrixType>;
 	using MatrixTypeNested = ref_selector<MatrixTypePlain>::non_const_type;
+	using typename Base::Scalar;
+	using ScalarWithConstIfNotLvalue = std::conditional_t<is_lvalue<MatrixType>, Scalar, const Scalar>;
 
 	explicit Transpose(MatrixTypePlain& matrix) : m_matrix(matrix) {}
 
 	constexpr int rows() const { return m_matrix.cols(); }
 	constexpr int cols() const { return m_matrix.rows(); }
+	ScalarWithConstIfNotLvalue* data() { return m_matrix.data(); }
+	const Scalar* data() const { return m_matrix.data(); }
 	const MatrixTypePlain& nestedExpression() const { return m_matrix; }
 	MatrixTypePlain& nestedExpression() { return m_matrix; }
 

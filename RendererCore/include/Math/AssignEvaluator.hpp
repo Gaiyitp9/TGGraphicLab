@@ -50,8 +50,7 @@ struct copy_using_evaluator_traits
 	constexpr static bool MayInnerVectorize = MayVectorize && InnerSize != Dynamic && InnerSize % InnerPacketSize == 0;
 	constexpr static bool MayLinearVectorize = MayVectorize && MayLinearize;
 
-	constexpr static TraversalType Traversal = Dst::SizeAtCompileTime == 0 ? TraversalType::AllAtOnce 
-									: MayLinearVectorize && (LinearPacketSize >= InnerPacketSize) ? TraversalType::LinearVectorized
+	constexpr static TraversalType Traversal = MayLinearVectorize && (LinearPacketSize >= InnerPacketSize) ? TraversalType::LinearVectorized
 									: MayInnerVectorize ? TraversalType::InnerVectorized
 									: MayLinearVectorize ? TraversalType::LinearVectorized
 									: MayLinearize ? TraversalType::Linear : TraversalType::Default;
@@ -132,12 +131,6 @@ template<typename Kernel,
 	TraversalType Traversal = Kernel::AssignmentTraits::Traversal,
 	UnrollingType Unrolling = Kernel::AssignmentTraits::Unrolling>
 struct assignment_loop;
-
-template<typename Kernel, UnrollingType Unrolling>
-struct assignment_loop<Kernel, TraversalType::AllAtOnce, Unrolling>
-{
-	static void Run(Kernel&) {}
-};
 
 template<typename Kernel>
 struct assignment_loop<Kernel, TraversalType::Default, UnrollingType::None>
@@ -279,10 +272,6 @@ struct assignment_loop<Kernel, TraversalType::Linear, UnrollingType::Complete>
 	}
 };
 
-// 赋值类
-template<typename DstXprType, typename SrcXprType, typename Functor>
-struct Assignment;
-
 template<typename DstEvaluatorTypeT, typename SrcEvaluatorTypeT, typename Functor>
 class generic_assignment_kernel
 {
@@ -294,19 +283,15 @@ public:
 	using AssignmentTraits = copy_using_evaluator_traits<DstEvaluatorType, SrcEvaluatorType, Functor>;
 	using PacketType = AssignmentTraits::PacketType;
 
-	generic_assignment_kernel(DstEvaluatorType& dst, const SrcEvaluatorType& src, const Functor& func, DstXprType& dstExpr)
-		: m_dst(dst), m_src(src), m_functor(func), m_dstExpr(dstExpr)
+	generic_assignment_kernel(DstEvaluatorType& dst, const SrcEvaluatorType& src, int size, int rows,
+		int cols, const Functor& func)
+		: m_dst(dst), m_src(src), m_size(size), m_rows(rows), m_cols(cols), m_functor(func)
 	{}
 
-	constexpr int size() const { return m_dstExpr.size(); }
-	constexpr int innerSize() const { return m_dstExpr.innerSize(); }
-	constexpr int outerSize() const { return m_dstExpr.outerSize(); }
-	constexpr int rows() const { return m_dstExpr.rows(); }
-	constexpr int cols() const { return m_dstExpr.cols(); }
-	constexpr int outerStride() const { return m_dstExpr.outerStride(); }
-
-	DstEvaluatorType& dstEvaluator() noexcept { return m_dst; }
-	const SrcEvaluatorType& srcEvaluator() noexcept { return m_src; }
+	constexpr int size() const { return m_size; }
+	constexpr int rows() const { return m_rows; }
+	constexpr int cols() const { return m_cols; }
+	const Scalar* dstDataPtr() const { return m_dstExpr.data(); }
 
 	void AssignCoeff(int row, int col)
 	{
@@ -316,13 +301,6 @@ public:
 	void AssignCoeff(int index)
 	{
 		m_functor.AssignCoeff(m_dst.coeffRef(index), m_src.coeff(index));
-	}
-
-	void AssignCoeffByOuterInner(int outer, int inner)
-	{
-		int row = rowIndexByOuterInner(outer, inner);
-		int col = colIndexByOuterInner(outer, inner);
-		AssignCoeff(row, col);
 	}
 
 	template<int StoreMode, int LoadMode, typename PacketType>
@@ -337,77 +315,45 @@ public:
 		m_functor.template AssignPacket<StoreMode>(&m_dst.coeffRef(index), m_src.template packet<LoadMode, PacketType>(index));
 	}
 
-	template<int StoreMode, int LoadMode, typename PacketType>
-	void AssignPacketByOuterInner(int outer, int inner)
-	{
-		int row = rowIndexByOuterInner(outer, inner);
-		int col = colIndexByOuterInner(outer, inner);
-		AssignPacket<StoreMode, LoadMode, PacketType>(row, col);
-	}
-
-	static int rowIndexByOuterInner(int outer, int inner)
-	{
-		return DstEvaluatorType::RowsAtCompileTime == 1 ? 0 :
-			DstEvaluatorType::ColsAtCompileTime == 1 ? inner :
-			not_none(DstEvaluatorType::Flags & Flag::RowMajor) ? outer : inner;
-	}
-
-	static int colIndexByOuterInner(int outer, int inner)
-	{
-		return DstEvaluatorType::ColsAtCompileTime == 1 ? 0 :
-			DstEvaluatorType::RowsAtCompileTime == 1 ? inner :
-			not_none(DstEvaluatorType::Flags & Flag::RowMajor) ? inner : outer;
-	}
-
-	const Scalar* dstDataPtr() const
-	{
-		return m_dstExpr.data();
-	}
-
 protected:
 	DstEvaluatorType& m_dst;
 	const SrcEvaluatorType& m_src;
 	const Functor& m_functor;
-	DstXprType& m_dstExpr;
+	int m_size;
+	int m_rows;
+	int m_cols;
+	Scalar const* m_dstData;
 };
 
-template<typename DstXprType, typename SrcXprType, typename Functor>
-struct Assignment
-{
-	static void Run(DstXprType& dst, const SrcXprType& src, const Functor& func)
-	{
-		using DstEvaluatorType = evaluator<DstXprType>;
-		using SrcEvaluatorType = evaluator<SrcXprType>;
-		SrcEvaluatorType srcEvaluator(src);
-		DstEvaluatorType dstEvaluator(dst);
-
-		using Kernel = generic_assignment_kernel<DstEvaluatorType, SrcEvaluatorType, Functor>;
-		Kernel kernel(dstEvaluator, srcEvaluator, func, dst.const_cast_derived());
-
-		assignment_loop<Kernel>::Run(kernel);
-	}
-};
-
-
-template<typename Dst, typename Src, typename Func>
-void call_assignment_no_alias(Dst& dst, const Src& src, const Func& func)
+template<typename Dst, typename Src>
+void call_assignment_no_alias(Dst& dst, const Src& src)
 {
 	constexpr static bool NeedToTranspose =
 		(Dst::RowsAtCompileTime == 1 && Src::ColsAtCompileTime == 1) ||
 		(Dst::ColsAtCompileTime == 1 && Src::RowsAtCompileTime == 1) &&
 		Dst::SizeAtCompileTime != 1;
-
-	using ActualDstTypeCleaned = std::conditional_t<NeedToTranspose, Transpose<Dst>, Dst>;
+	using Functor = assign_op<typename Dst::Scalar, typename Src::Scalar>;
+	using ActualDstTypePlain = std::conditional_t<NeedToTranspose, Transpose<Dst>, Dst>;
 	using ActualDstType = std::conditional_t<NeedToTranspose, Transpose<Dst>, Dst&>;
-	ActualDstType actualDst(dst);
+	using DstEvaluatorType = evaluator<ActualDstTypePlain>;
+	using SrcEvaluatorType = evaluator<Src>;
 
-	static_assert(is_lvalue<Dst>, "The expression is not a left value.");
-	static_assert(have_same_matrix_size<ActualDstTypeCleaned, Src>, "You mixed matrices of different sizes.");
-	Assignment<ActualDstTypeCleaned, Src, Func>::Run(actualDst, src, func);
+	static_assert(is_lvalue<Dst>, "The destination expression is not a left value.");
+	static_assert(have_same_matrix_size<ActualDstTypePlain, Src>, "You mix matrices of different sizes.");
+
+	Functor func;
+	ActualDstType actualDst(dst);
+	SrcEvaluatorType srcEvaluator(src);
+	DstEvaluatorType dstEvaluator(actualDst);
+
+	using Kernel = generic_assignment_kernel<DstEvaluatorType, SrcEvaluatorType, Functor>;
+	Kernel kernel(dstEvaluator, srcEvaluator, func, dst.derived());
+
+	assignment_loop<Kernel>::Run(kernel);
 }
 
-template<typename Dst, typename Src, typename Func>
-void call_assignment(Dst& dst, Src& src, const Func& func)
+template<typename Dst, typename Src>
+void call_assignment(Dst& dst, Src& src)
 {
 	using type = Matrix<typename traits<Src>::Scalar,
 		traits<Src>::RowsAtCompileTime,
@@ -418,16 +364,10 @@ void call_assignment(Dst& dst, Src& src, const Func& func)
 	if constexpr (evaluator_assume_aliasing<Src>::value)
 	{
 		type tmp(src);
-		call_assignment_no_alias(dst, tmp, func);
+		call_assignment_no_alias(dst, tmp);
 	}
 	else
-		call_assignment_no_alias(dst, src, func);
-}
-
-template<typename Dst, typename Src>
-void call_assignment(Dst& dst, const Src& src)
-{
-	call_assignment(dst, src, assign_op<typename Dst::Scalar, typename Src::Scalar>());
+		call_assignment_no_alias(dst, src);
 }
 
 }

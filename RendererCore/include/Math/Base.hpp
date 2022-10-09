@@ -22,8 +22,6 @@ struct Base
 {
 	Derived& derived() { return *static_cast<Derived*>(this); }
 	const Derived& derived() const { return *static_cast<Derived const*>(this); }
-	const Derived& const_derived() const { return *static_cast<Derived const*>(this); }
-	Derived& const_cast_derived() const { return *static_cast<Derived*>(const_cast<Base*>(this)); }
 
 	int rows() const { return derived().rows(); }
 	int cols() const { return derived().cols(); }

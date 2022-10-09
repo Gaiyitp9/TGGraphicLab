@@ -109,6 +109,14 @@ template<typename T, int Size, int Rows, int Cols>
 class Storage
 {
 public:
+	Storage() = default;
+	Storage(const Storage& other)
+	{
+		std::memcpy(m_data.array, other.m_data.array, Size * sizeof(T));
+	}
+	~Storage() = default;
+
+public:
 	const T& operator[](size_t index) const { return m_data.array[index]; }
 	T& operator[](size_t index) { return m_data.array[index]; }
 	T const* data() const { return m_data.array; }
@@ -125,6 +133,10 @@ class Storage<T, Dynamic, Dynamic, Dynamic>
 {
 public:
 	Storage() : m_data(nullptr), m_rows(0), m_cols(0) {}
+	Storage(const Storage& other)
+	{
+		std::memcpy(m_data, other.m_data, m_size * sizeof(T));
+	}
 	~Storage() { conditional_aligned_free<true>(m_data); }
 
 	void resize(int size, int rows, int cols)

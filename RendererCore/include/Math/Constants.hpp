@@ -51,8 +51,6 @@ enum class TraversalType : char
 	Linear,
 	InnerVectorized,
 	LinearVectorized,
-	Invalid,
-	AllAtOnce,
 };
 
 enum class UnrollingType : char
