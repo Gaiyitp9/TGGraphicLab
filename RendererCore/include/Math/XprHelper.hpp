@@ -155,25 +155,4 @@ struct has_return_type
 	static constexpr bool value = sizeof(TestFunctor<T>(static_cast<T*>(0))) == sizeof(meta_yes);
 };
 
-template<typename T, int Value> 
-class variable_if_dynamic
-{
-public:
-	explicit variable_if_dynamic(T value = 0) {}
-	constexpr T value() const { return T(Value); }
-	constexpr operator T() const { return T(Value); }
-	void SetValue(T v) const {}
-};
-
-template<typename T>
-class variable_if_dynamic<T, Dynamic>
-{
-	T m_value;
-public:
-	explicit variable_if_dynamic(T value = 0) : m_value(value) {}
-	T value() const { return m_value; }
-	operator T() const { return m_value; }
-	void SetValue(T value) { m_value = value; }
-};
-
 }

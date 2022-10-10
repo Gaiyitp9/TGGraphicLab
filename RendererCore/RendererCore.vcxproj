@@ -185,6 +185,7 @@
     <ClInclude Include="include\Math\CwiseBinaryOp.hpp" />
     <ClInclude Include="include\Math\Dot.hpp" />
     <ClInclude Include="include\Math\ForwardDeclarations.hpp" />
+    <ClInclude Include="include\Math\MapBase.hpp" />
     <ClInclude Include="include\Math\Matrix.hpp" />
     <ClInclude Include="include\Math\MatrixBase.hpp" />
     <ClInclude Include="include\Math\Quaternion.hpp" />

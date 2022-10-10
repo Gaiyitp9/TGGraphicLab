@@ -13,25 +13,14 @@
 * Noted: I made some modifications in this file.						*
 *************************************************************************/
 #pragma once
-#define MATH_CORE_H
 
-#include <type_traits>
-#include "Simd.hpp"
-#include "Constants.hpp"
-#include "ForwardDeclarations.hpp"
-#include "XprHelper.hpp"
-#include "BinaryFunctors.hpp"
-#include "AssignmentFunctors.hpp"
-#include "CwiseBinaryOp.hpp"
-#include "CoreEvaluator.hpp"
-#include "AssignEvaluator.hpp"
-#include "Base.hpp"
-#include "CoeffsBase.hpp"
-#include "Storage.hpp"
-#include "MatrixBase.hpp"
-#include "Matrix.hpp"
-#include "Transpose.hpp"
-#include "MapBase.hpp"
-#include "Block.hpp"
-#include "Dot.hpp"
-#include "Redux.hpp"
+namespace LCH::Math
+{
+
+template<typename Derived>
+class MapBase<Derived, AccessorLevel::Write> : public MatrixBase<Derived>
+{
+
+};
+
+}

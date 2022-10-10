@@ -37,8 +37,6 @@ enum class Flag : unsigned int
 	NestByRef			= 0x100,
 };
 
-#define VECTORIZED
-
 #ifdef VECTORIZED
 inline constexpr Flag ActualPacketAccess = Flag::PacketAccess;
 #else

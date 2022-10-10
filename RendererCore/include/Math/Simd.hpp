@@ -40,6 +40,8 @@ namespace LCH::Math
 #define MAX_ALIGN_BYTES 32
 #define DEFAULT_ALIGN_BYTES MAX_ALIGN_BYTES
 
+#define VECTORIZED
+
 namespace LCH::Math
 {
 
@@ -48,9 +50,7 @@ struct packet_traits
 {
 	using type = T;
 	using half = T;
-	constexpr static bool Vectorizable = false;			// 是否向量化
 	constexpr static int  Size = 1;						// 包尺寸
-	constexpr static bool AlignedOnScalar = false;		// 对齐量alignment是否是标量sizeof(scalar)的整数倍
 	constexpr static bool HasHalfPacket = false;		// 是否有半包
 
 	constexpr static bool HasAdd = false;				// 是否可以做加法运算
@@ -62,7 +62,6 @@ template<typename T> struct unpacket_traits
 {
 	using type = T;
 	using half = T;
-	constexpr static bool Vectorizable = false;
 	constexpr static int  Size = 1;
 	constexpr static int  Alignment = 1;
 };

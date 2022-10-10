@@ -20,6 +20,7 @@ namespace LCH::Math
 template<typename XprType, int BlockRows, int BlockCols>
 struct traits<Block<XprType, BlockRows, BlockCols>> : traits<XprType>
 {
+	using Scalar = traits<XprType>::Scalar;
 	constexpr static int RowsAtCompileTime = BlockRows;
 	constexpr static int ColsAtCompileTime = BlockCols;
 	constexpr static bool XprIsRowMajor = not_none(traits<XprType>::Flags & Flag::RowMajor);
@@ -33,14 +34,14 @@ struct traits<Block<XprType, BlockRows, BlockCols>> : traits<XprType>
 	constexpr static int OuterStrideAtCompileTime = HasSameStorageOrderAsXprType  
 													? outer_stride_at_compile_time<XprType>::value
 													: inner_stride_at_compile_time<XprType>::value;
-	constexpr static Flag FlagLvalue = is_lvalue<XprType>::value ? Flag::Lvalue : Flag::None;
+	constexpr static Flag FlagLvalue = is_lvalue<XprType> ? Flag::Lvalue : Flag::None;
 	constexpr static Flag FlagRowMajor = IsRowMajor ? Flag::RowMajor : Flag::None;
 	constexpr static Flag Flags = FlagLvalue | FlagRowMajor;
 	constexpr static int Alignment = 0;
 };
 
-template<typename XprType, int BlockRows, int BlockCols>
-class Block : public MatrixBase<Block<XprType, BlockRows, BlockCols>>
+template<typename XprType, int BlockRows, int BlockCols, bool HasDirectAccess>
+class Block : public MatrixBase<Block<XprType, BlockRows, BlockCols, HasDirectAccess>>
 {
 public:
 	using Base = MatrixBase<Block>;
@@ -58,9 +59,7 @@ public:
 		m_startCol((BlockCols == 1) && (BlockRows == XprType::RowsAtCompileTime) ? index : 0),
 		m_blockRows(BlockRows == 1 ? 1 : xpr.rows()),
 		m_blockCols(BlockCols == 1 ? 1 : xpr.cols())
-	{
-
-	}
+	{}
 
 	Block(XprType& xpr, int startRow, int startCol)
 		: m_xpr(xpr), m_startRow(startRow), m_startCol(startCol)
@@ -79,18 +78,18 @@ public:
 			&& startCol >= 0 && blockCols >= 0 && startCol <= xpr.cols() - blockCols);
 	}
 
-	int rows() const { return m_blockRows.value(); }
-	int cols() const { return m_blockCols.value(); }
+	int rows() const { return m_blockRows; }
+	int cols() const { return m_blockCols; }
 
 	CoeffReturnType coeff(int row, int col) const
 	{
-		return m_xpr.coeff(m_startRow.value() + row, m_startCol.value() + col);
+		return m_xpr.coeff(m_startRow + row, m_startCol + col);
 	}
 
 	Scalar& coeffRef(int row, int col)
 	{
 		static_assert(is_lvalue<XprType>::value, "The expression is not a lvalue. It is read only.");
-		return m_xpr.coeffRef(m_startRow.value() + row, m_startCol.value() + col);
+		return m_xpr.coeffRef(m_startRow + row, m_startCol + col);
 	}
 
 	const XprTypePlain& nestedExpression() const { return m_xpr; }
@@ -98,10 +97,17 @@ public:
 
 private:
 	XprTypeNested m_xpr;
-	variable_if_dynamic<int, (XprType::RowsAtCompileTime == 1 && BlockRows == 1) ? 0 : Dynamic> m_startRow;
-	variable_if_dynamic<int, (XprType::ColsAtCompileTime == 1 && BlockCols == 1) ? 0 : Dynamic> m_startCol;
-	variable_if_dynamic<int, RowsAtCompileTime> m_blockRows;
-	variable_if_dynamic<int, ColsAtCompileTime> m_blockCols;
+	int m_startRow;
+	int m_startCol;
+	int m_blockRows;
+	int m_blockCols;
+};
+
+template<typename XprType, int BlockRows, int BlockCols>
+class Block<XprType, BlockRows, BlockCols, true>
+	: public MapBase<Block<XprType, BlockRows, BlockCols, true>>
+{
+
 };
 
 }

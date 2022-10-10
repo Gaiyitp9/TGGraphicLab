@@ -53,7 +53,12 @@ template<typename T, int Size, int Rows, int Cols> class Storage;
 // 转置
 template<typename MatrixType> class Transpose;
 // 块
-template<typename Xpr, int BlockRows = Dynamic, int BlockCols = Dynamic> class Block;
+template<typename XprType, int BlockRows = Dynamic, int BlockCols = Dynamic, 
+	bool HasDirectAccess = has_direct_access<XprType>::value> class Block;
+// 映射基类
+template<typename Derived, AccessorLevel Level = 
+	accessors_level<Derived>::has_write_access ? AccessorLevel::Write : AccessorLevel::ReadOnly>
+class MapBase;
 
 // 二元运算
 template<typename BinaryOp, typename Lhs, typename Rhs> class CwiseBinaryOp;

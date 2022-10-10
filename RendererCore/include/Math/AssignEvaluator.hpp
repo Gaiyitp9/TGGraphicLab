@@ -39,7 +39,7 @@ struct copy_using_evaluator_traits
 	constexpr static int LinearPacketSize = unpacket_traits<LinearPacketType>::Size;
 	constexpr static int InnerPacketSize = unpacket_traits<InnerPacketType>::Size;
 
-	constexpr static bool MayVectorize = StorageOrdersAgree && not_none(DstFlags & SrcFlags & Flag::PacketAccess);
+	constexpr static bool MayVectorize = StorageOrdersAgree && not_none(DstFlags & SrcFlags & ActualPacketAccess);
 	constexpr static bool MayLinearize = StorageOrdersAgree && not_none(DstFlags & SrcFlags & Flag::LinearAccess);
 	constexpr static bool MayInnerVectorize = MayVectorize && InnerSize != Dynamic && InnerSize % InnerPacketSize == 0;
 	constexpr static bool MayLinearVectorize = MayVectorize && MayLinearize;
