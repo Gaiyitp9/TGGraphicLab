@@ -80,9 +80,7 @@ struct packet_traits<float>
 {
 	using type = Packet8f;
 	using half = Packet4f;
-	constexpr static bool Vectorizable = true;	
 	constexpr static int  Size = 8;
-	constexpr static bool AlignedOnScalar = true;
 	constexpr static bool HasHalfPacket = true;
 
 	constexpr static bool HasAdd = true;
@@ -94,9 +92,7 @@ struct packet_traits<double>
 {
 	using type = Packet4d;
 	using half = Packet2d;
-	constexpr static bool Vectorizable = true;
 	constexpr static int  Size = 4;
-	constexpr static bool AlignedOnScalar = true;
 	constexpr static bool HasHalfPacket = true;
 
 	constexpr static bool HasAdd = true;
@@ -108,9 +104,7 @@ struct packet_traits<int>
 {
 	using type = Packet8i;
 	using half = Packet4i;
-	constexpr static bool Vectorizable = true;
 	constexpr static int  Size = 8;
-	constexpr static bool AlignedOnScalar = true;
 	constexpr static bool HasHalfPacket = true;
 
 	constexpr static bool HasAdd = true;
@@ -122,7 +116,6 @@ struct unpacket_traits<Packet8f>
 {
 	using type = float;
 	using half = Packet4f;
-	constexpr static bool Vectorizable = true;
 	constexpr static int  Size = 8;
 	constexpr static int  Alignment = 32;
 };
@@ -132,7 +125,6 @@ struct unpacket_traits<Packet4f>
 {
 	using type = float;
 	using half = Packet4f;
-	constexpr static bool Vectorizable = true;
 	constexpr static int  Size = 4;
 	constexpr static int  Alignment = 16;
 };
@@ -142,7 +134,6 @@ struct unpacket_traits<Packet4d>
 {
 	using type = double;
 	using half = Packet2d;
-	constexpr static bool Vectorizable = true;
 	constexpr static int  Size = 4;
 	constexpr static int  Alignment = 32;
 };
@@ -152,7 +143,6 @@ struct unpacket_traits<Packet2d>
 {
 	using type = double;
 	using half = Packet2d;
-	constexpr static bool Vectorizable = true;
 	constexpr static int  Size = 2;
 	constexpr static int  Alignment = 16;
 };
@@ -162,7 +152,6 @@ struct unpacket_traits<Packet8i>
 {
 	using type = int;
 	using half = Packet4i;
-	constexpr static bool Vectorizable = true;
 	constexpr static int Size = 8;
 	constexpr static int Alignment = 32;
 };
@@ -172,7 +161,6 @@ struct unpacket_traits<Packet4i>
 {
 	using type = int;
 	using half = Packet4i;
-	constexpr static bool Vectorizable = true;
 	constexpr static int Size = 4;
 	constexpr static int Alignment = 16;
 };

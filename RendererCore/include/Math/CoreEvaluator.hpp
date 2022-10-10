@@ -52,18 +52,12 @@ struct evaluator<Matrix<Scalar_, Rows, Cols, Options>>
 	constexpr static bool IsVectorAtCompileTime = XprType::IsVectorAtCompileTime;
 	constexpr static int RowsAtCompileTime = XprType::RowsAtCompileTime;
 	constexpr static int ColsAtCompileTime = XprType::ColsAtCompileTime;
-	constexpr static Flag Flags = traits<XprType>::EvaluatorFlags;
+	constexpr static Flag Flags = traits<XprType>::Flags;
 	constexpr static int Alignment = traits<XprType>::Alignment;
 	constexpr static int OuterStrideAtCompileTime = XprType::OuterStrideAtCompileTime;
 
 	evaluator() : m_data(nullptr), m_outerStride(OuterStrideAtCompileTime) {}
 	explicit evaluator(const XprType& m) : m_data(m.data()), m_outerStride(m.outerStride()) {}
-
-	template<int Alignment>
-	int aligned_index(int end)
-	{
-		return first_aligned<Alignment>(m_data, end);
-	}
 
 	CoeffReturnType coeff(int row, int col) const
 	{
@@ -191,44 +185,37 @@ struct binary_evaluator<CwiseBinaryOp<BinaryOp, Lhs, Rhs>>
 		);
 	constexpr static Flag Flags = (Flags0 & ~Flag::RowMajor) | (LhsFlags & Flag::RowMajor);	// 取Lhs的RowMajorBit标志位
 
-	explicit binary_evaluator(const XprType& xpr) : m_d(xpr) {}
+	explicit binary_evaluator(const XprType& xpr) : m_op(xpr.functor()), m_lhsImpl(xpr.lhs()), 
+		m_rhsImpl(xpr.rhs()) {}
 
 	CoeffReturnType coeff(int row, int col) const
 	{
-		return m_d.func()(m_d.lhsImpl.coeff(row, col), m_d.rhsImpl.coeff(row, col));
+		return m_op(m_lhsImpl.coeff(row, col), m_rhsImpl.coeff(row, col));
 	}
 
 	CoeffReturnType coeff(int index) const
 	{
-		return m_d.func()(m_d.lhsImpl.coeff(index), m_d.rhsImpl.coeff(index));
+		return m_op(m_lhsImpl.coeff(index), m_rhsImpl.coeff(index));
 	}
 
 	template<int LoadMode, typename PacketType>
 	PacketType packet(int row, int col) const
 	{
-		return m_d.func().packetOp(m_d.lhsImpl.template packet<LoadMode, PacketType>(row, col),
-			m_d.rhsImpl.template packet<LoadMode, PacketType>(row, col));
+		return m_op.packetOp(m_lhsImpl.template packet<LoadMode, PacketType>(row, col),
+			m_rhsImpl.template packet<LoadMode, PacketType>(row, col));
 	}
 
 	template<int LoadMode, typename PacketType>
 	PacketType packet(int index) const
 	{
-		return m_d.func().packetOp(m_d.lhsImpl.template packet<LoadMode, PacketType>(index),
-			m_d.rhsImpl.template packet<LoadMode, PacketType>(index));
+		return m_op.packetOp(m_lhsImpl.template packet<LoadMode, PacketType>(index),
+			m_rhsImpl.template packet<LoadMode, PacketType>(index));
 	}
 
-protected:
-	// this helper permits to completely eliminate the functor if it is empty
-	struct Data
-	{
-		Data(const XprType& xpr) : op(xpr.functor()), lhsImpl(xpr.lhs()), rhsImpl(xpr.rhs()) {}
-		const BinaryOp& func() const { return op; }
-		BinaryOp op;
-		evaluator<Lhs> lhsImpl;
-		evaluator<Rhs> rhsImpl;
-	};
-
-	Data m_d;
+private:
+	BinaryOp m_op;
+	evaluator<Lhs> m_lhsImpl;
+	evaluator<Rhs> m_rhsImpl;
 };
 
 template<typename ArgType, int BlockRows, int BlockCols, bool HasDirectAccess = has_direct_access<ArgType>::value>

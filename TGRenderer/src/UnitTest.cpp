@@ -87,6 +87,14 @@ namespace LCH
 		result = v1 + v2 + v3 - v4.transpose();
 		std::cout << "result: " << result.x() << " " << result.y() << " " 
 			<< result.z() << " " << result.w() << std::endl;
+
+		Math::Matrix<float, 5, 1> v5, v6;
+		v5[0] = 0; v5[1] = 1; v5[2] = 2; v5[3] = 3; v5[4] = 5;
+		v6[0] = 0; v6[1] = 6; v6[2] = 2; v6[3] = 3; v6[4] = -2;
+		Math::Matrix<float, 5, 1> result1;
+		result1 = v5 + v6;
+		std::cout << "result: " << result1[0] << " " << result1[1] << " "
+			<< result1[2] << " " << result1[3] << " " << result1[4] << std::endl;
 	}
 
 	void UnitTest::SIMDTest()

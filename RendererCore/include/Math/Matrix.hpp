@@ -28,8 +28,11 @@ public:
 	using Scalar = Scalar_;
 	constexpr static int RowsAtCompileTime = Rows;
 	constexpr static int ColsAtCompileTime = Cols;
-	constexpr static Flag Flags = Flag::DirectAccess | Flag::Lvalue | Flag::NestByRef | rowMajor;
-	constexpr static int Alignment = is_dynamic_size_storage ? DEFAULT_ALIGN_BYTES : default_alignment<Scalar_, size>;
+	constexpr static Flag Flags = Flag::DirectAccess | Flag::LinearAccess | Flag::PacketAccess | 
+		Flag::Lvalue | Flag::NestByRef | rowMajor;
+	constexpr static int InnerStrideAtCompileTime = 1;
+	constexpr static int OuterStrideAtCompileTime = (Options_ == StorageOption::RowMajor) ? ColsAtCompileTime : RowsAtCompileTime;
+	constexpr static int Alignment = is_dynamic_size_storage ? DEFAULT_ALIGN_BYTES : default_alignment<Scalar, size>;
 };
 
 template<typename Scalar_, int Rows, int Cols, StorageOption Options_>
@@ -57,11 +60,10 @@ public:
 
 	constexpr int rows() const { return m_storage.rows(); }
 	constexpr int cols() const { return m_storage.cols(); }
-	const Scalar* data() const { return m_storage.data(); }
-	Scalar* data() { return m_storage.data(); }
-
 	constexpr int innerStride() const noexcept { return 1; }
 	constexpr int outerStride() const { return this->innerSize(); }
+	const Scalar* data() const { return m_storage.data(); }
+	Scalar* data() { return m_storage.data(); }
 
 	const Scalar& coeff(int row, int col) const
 	{

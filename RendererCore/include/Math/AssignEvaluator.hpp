@@ -28,24 +28,18 @@ struct copy_using_evaluator_traits
 
 	constexpr static int DstAlignment = DstEvaluator::Alignment;
 	constexpr static int SrcAlignment = SrcEvaluator::Alignment;
-	constexpr static int JointAlignment = DstAlignment <= SrcAlignment ? DstAlignment : SrcAlignment;
+	constexpr static bool DstIsRowMajor = not_none(DstFlags & Flag::RowMajor);
+	constexpr static bool SrcIsRowMajor = not_none(SrcFlags & Flag::RowMajor);
+	constexpr static bool StorageOrdersAgree = DstIsRowMajor == SrcIsRowMajor;
 
-	constexpr static int InnerSize = Dst::IsVectorAtCompileTime ? Dst::SizeAtCompileTime :
-									 not_none(DstFlags & Flag::RowMajor) ? Dst::ColsAtCompileTime : Dst::RowsAtCompileTime;
+	constexpr static int InnerSize = DstIsRowMajor ? Dst::ColsAtCompileTime : Dst::RowsAtCompileTime;
 	constexpr static int LinearSize = Dst::SizeAtCompileTime;
-
 	using LinearPacketType = best_packet<DstScalar, LinearSize>;
 	using InnerPacketType = best_packet<DstScalar, InnerSize>;
 	constexpr static int LinearPacketSize = unpacket_traits<LinearPacketType>::Size;
 	constexpr static int InnerPacketSize = unpacket_traits<InnerPacketType>::Size;
-	constexpr static int LinearRequiredAlignment = unpacket_traits<LinearPacketType>::Alignment;
-	constexpr static int InnerRequiredAlignment = unpacket_traits<InnerPacketType>::Alignment;
 
-	constexpr static bool DstIsRowMajor = not_none(DstFlags & Flag::RowMajor);
-	constexpr static bool SrcIsRowMajor = not_none(SrcFlags & Flag::RowMajor);
-	constexpr static bool StorageOrdersAgree = DstIsRowMajor == SrcIsRowMajor;
-	constexpr static bool MayVectorize = StorageOrdersAgree && not_none(DstFlags & SrcFlags & Flag::PacketAccess)
-											&& functor_traits<AssignFunc>::PacketAccess;
+	constexpr static bool MayVectorize = StorageOrdersAgree && not_none(DstFlags & SrcFlags & Flag::PacketAccess);
 	constexpr static bool MayLinearize = StorageOrdersAgree && not_none(DstFlags & SrcFlags & Flag::LinearAccess);
 	constexpr static bool MayInnerVectorize = MayVectorize && InnerSize != Dynamic && InnerSize % InnerPacketSize == 0;
 	constexpr static bool MayLinearVectorize = MayVectorize && MayLinearize;
@@ -103,7 +97,7 @@ struct LinearTraversalCompleteUnrolling<Kernel, Stop, Stop>
 };
 
 template<typename Kernel, int Index, int Stop>
-struct InnerVectorizedTraversalCompleteUnrolling
+struct VectorizedTraversalCompleteUnrolling
 {
 	using DstXprType = Kernel::DstXprType;
 	using PacketType = Kernel::PacketType;
@@ -117,12 +111,12 @@ struct InnerVectorizedTraversalCompleteUnrolling
 	{
 		kernel.template AssignPacketByOuterInner<DstAlignment, SrcAlignment, PacketType>(outer, inner);
 		constexpr static int NextIndex = Index + unpacket_traits<PacketType>::Size;
-		InnerVectorizedTraversalCompleteUnrolling<Kernel, NextIndex, Stop>::Run(kernel);
+		VectorizedTraversalCompleteUnrolling<Kernel, NextIndex, Stop>::Run(kernel);
 	}
 };
 
 template<typename Kernel, int Stop>
-struct InnerVectorizedTraversalCompleteUnrolling<Kernel, Stop, Stop>
+struct VectorizedTraversalCompleteUnrolling<Kernel, Stop, Stop>
 {
 	static void Run(Kernel&) {}
 };
@@ -157,52 +151,25 @@ struct assignment_loop<Kernel, TraversalType::Default, UnrollingType::Complete>
 	}
 };
 
-template<bool IsAligned = false>
-struct unaligned_assignment_loop
-{
-	template<typename Kernel>
-	static void Run(Kernel&, int, int) {}
-};
-
-template<>
-struct unaligned_assignment_loop<false>
-{
-	template<typename Kernel>
-	static void Run(Kernel& kernel, int start, int end)
-	{
-		for (int index = start; index < end; ++index)
-			kernel.AssignCoeff(index);
-	}
-};
-
 template<typename Kernel>
 struct assignment_loop<Kernel, TraversalType::LinearVectorized, UnrollingType::None>
 {
 	static void Run(Kernel& kernel)
 	{
-		const int size = kernel.size();
-		using Scalar = Kernel::Scalar;
 		using PacketType = Kernel::PacketType;
 		constexpr static int requestedAlignment = Kernel::AssignmentTraits::LinearRequiredAlignment;
 		constexpr static int packetSize = unpacket_traits<PacketType>::Size;
-		// 下面三行代码用来计算Dst和Src的对齐，一般情况下Dst和Src的对齐是相同的，下面的计算相当于把DstAlignment
-		// 和SrcAlignment分别设置为Kernel::AssignmentTraits::DstAlignment和Kernel::AssignmentTraits::SrcAlignment;
-		// 考虑Block这种特殊情况，Dst和Src的对齐可能不相同，所以，如果DstAlignment可以根据下面的first_aligned推导出，
-		// SrcAlignment要取上面两个对齐的最小值，Dst或者Src是Block都可能造成不对齐，所以取最小值
-		constexpr static bool dstIsAligned = Kernel::AssignmentTraits::DstAlignment >= requestedAlignment;
-		constexpr static int dstAlignment = packet_traits<Scalar>::AlignedOnScalar ? requestedAlignment 
-																				   : Kernel::AssignmentTraits::DstAlignment;
-		constexpr static int srcAlignment = Kernel::AssignmentTraits::JointAlignment;
+		constexpr static int dstAlignment = Kernel::AssignmentTraits::DstAlignment;
+		constexpr static int srcAlignment = Kernel::AssignmentTraits::SrcAlignment;
 
-		const int alignedStart = dstIsAligned ? 0 : first_aligned<requestedAlignment>(kernel.dstDataPtr(), size);
-		const int alignedEnd = alignedStart + ((size - alignedStart) / packetSize) * packetSize;
+		const int size = kernel.size();
+		const int alignedSize = (size / packetSize) * packetSize;
 
-		unaligned_assignment_loop<dstIsAligned>::Run(kernel, 0, alignedStart);
-
-		for (int index = alignedStart; index < alignedEnd; index += packetSize)
+		for (int index = 0; index < alignedSize; index += packetSize)
 			kernel.template AssignPacket<dstAlignment, srcAlignment, PacketType>(index);
 
-		unaligned_assignment_loop<>::Run(kernel, alignedEnd, size);
+		for (int index = alignedSize; index < size; ++index)
+			kernel.AssignCoeff(index);
 	}
 };
 
@@ -218,7 +185,7 @@ struct assignment_loop<Kernel, TraversalType::LinearVectorized, UnrollingType::C
 		constexpr static int packetSize = unpacket_traits<PacketType>::Size;
 		constexpr static int alignedSize = (size / packetSize) * packetSize;
 
-		InnerVectorizedTraversalCompleteUnrolling<Kernel, 0, alignedSize>::Run(kernel);
+		VectorizedTraversalCompleteUnrolling<Kernel, 0, alignedSize>::Run(kernel);
 		DefaultTraversalCompleteUnrolling<Kernel, alignedSize, size>::Run(kernel);
 	}
 };
@@ -247,14 +214,14 @@ struct assignment_loop<Kernel, TraversalType::InnerVectorized, UnrollingType::Co
 	static void Run(Kernel& kernel)
 	{
 		using DstXprType = Kernel::DstXprType;
-		InnerVectorizedTraversalCompleteUnrolling<Kernel, 0, DstXprType::SizeAtCompileTime>::Run(kernel);
+		VectorizedTraversalCompleteUnrolling<Kernel, 0, DstXprType::SizeAtCompileTime>::Run(kernel);
 	}
 };
 
 template<typename Kernel>
 struct assignment_loop<Kernel, TraversalType::Linear, UnrollingType::None>
 {
-	static void run(Kernel& kernel)
+	static void Run(Kernel& kernel)
 	{
 		const int size = kernel.size();
 		for (int i = 0; i < size; ++i)
@@ -265,7 +232,7 @@ struct assignment_loop<Kernel, TraversalType::Linear, UnrollingType::None>
 template<typename Kernel>
 struct assignment_loop<Kernel, TraversalType::Linear, UnrollingType::Complete>
 {
-	static void run(Kernel& kernel)
+	static void Run(Kernel& kernel)
 	{
 		using DstXprType = Kernel::DstXprType;
 		LinearTraversalCompleteUnrolling<Kernel, 0, DstXprType::SizeAtCompileTime>::Run(kernel);
@@ -283,15 +250,14 @@ public:
 	using AssignmentTraits = copy_using_evaluator_traits<DstEvaluatorType, SrcEvaluatorType, Functor>;
 	using PacketType = AssignmentTraits::PacketType;
 
-	generic_assignment_kernel(DstEvaluatorType& dst, const SrcEvaluatorType& src, int size, int rows,
-		int cols, const Functor& func)
-		: m_dst(dst), m_src(src), m_size(size), m_rows(rows), m_cols(cols), m_functor(func)
+	generic_assignment_kernel(DstEvaluatorType& dst, const SrcEvaluatorType& src, int size, int outerSize,
+		int innerSize, const Functor& func) : m_dst(dst), m_src(src), m_size(size), 
+		m_outerSize(outerSize), m_innerSize(innerSize), m_functor(func)
 	{}
 
 	constexpr int size() const { return m_size; }
-	constexpr int rows() const { return m_rows; }
-	constexpr int cols() const { return m_cols; }
-	const Scalar* dstDataPtr() const { return m_dstExpr.data(); }
+	constexpr int outerSize() const { return m_outerSize; }
+	constexpr int innerSize() const { return m_innerSize; }
 
 	void AssignCoeff(int row, int col)
 	{
@@ -301,6 +267,13 @@ public:
 	void AssignCoeff(int index)
 	{
 		m_functor.AssignCoeff(m_dst.coeffRef(index), m_src.coeff(index));
+	}
+
+	void AssignCoeffByOuterInner(int outer, int inner)
+	{
+		int row = RowIndexByOuterInner(outer, inner);
+		int col = ColIndexByOuterInner(outer, inner);
+		AssignCoeff(row, col);
 	}
 
 	template<int StoreMode, int LoadMode, typename PacketType>
@@ -315,14 +288,38 @@ public:
 		m_functor.template AssignPacket<StoreMode>(&m_dst.coeffRef(index), m_src.template packet<LoadMode, PacketType>(index));
 	}
 
-protected:
+	template<int StoreMode, int LoadMode, typename PacketType>
+	void AssignPacketByOuterInner(int outer, int inner)
+	{
+		int row = RowIndexByOuterInner(outer, inner);
+		int col = RowIndexByOuterInner(outer, inner);
+		AssignPacket<StoreMode, LoadMode, PacketType>(row, col);
+	}
+
+private:
+	int RowIndexByOuterInner(int outer, int inner)
+	{
+		if constexpr (AssignmentTraits::DstIsRowMajor)
+			return outer;
+		else
+			return inner;
+	}
+
+	int ColIndexByOuterInner(int outer, int inner)
+	{
+		if constexpr (AssignmentTraits::DstIsRowMajor)
+			return inner;
+		else
+			return outer;
+	}
+
+private:
 	DstEvaluatorType& m_dst;
 	const SrcEvaluatorType& m_src;
 	const Functor& m_functor;
 	int m_size;
-	int m_rows;
-	int m_cols;
-	Scalar const* m_dstData;
+	int m_outerSize;
+	int m_innerSize;
 };
 
 template<typename Dst, typename Src>
@@ -347,7 +344,7 @@ void call_assignment_no_alias(Dst& dst, const Src& src)
 	DstEvaluatorType dstEvaluator(actualDst);
 
 	using Kernel = generic_assignment_kernel<DstEvaluatorType, SrcEvaluatorType, Functor>;
-	Kernel kernel(dstEvaluator, srcEvaluator, func, dst.derived());
+	Kernel kernel(dstEvaluator, srcEvaluator, dst.size(), dst.outerSize(), dst.innerSize(), func);
 
 	assignment_loop<Kernel>::Run(kernel);
 }

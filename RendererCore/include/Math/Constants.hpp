@@ -22,8 +22,8 @@ enum class StorageOption : char
 	RowMajor = 0x1,
 	ColMajor = 0x2,
 };
-const StorageOption DefaultMatrixStorageOrderOption = StorageOption::ColMajor;
-const int Dynamic = -1;
+inline constexpr StorageOption DefaultMatrixStorageOrderOption = StorageOption::ColMajor;
+inline constexpr int Dynamic = -1;
 
 enum class Flag : unsigned int
 {
@@ -36,6 +36,14 @@ enum class Flag : unsigned int
 	DirectAccess		= 0x40,		// 表示可以直接访问底层数组，包含data()函数
 	NestByRef			= 0x100,
 };
+
+#define VECTORIZED
+
+#ifdef VECTORIZED
+inline constexpr Flag ActualPacketAccess = Flag::PacketAccess;
+#else
+inline constexpr Flag ActualPacketAccess = Flag::None;
+#endif
 
 enum class AccessorLevel : char
 {
