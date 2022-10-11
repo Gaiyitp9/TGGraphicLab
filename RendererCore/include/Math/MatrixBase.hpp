@@ -82,9 +82,8 @@ public:
 	typename scalar_binaryop_traits<typename traits<Derived>::Scalar, typename traits<OtherDerived>::Scalar>::return_type
 	Dot(const MatrixBase<OtherDerived>& other) const;
 
-private:
 	template<typename BinaryOp, typename OtherDerived>
-	CwiseBinaryOp<BinaryOp, Derived, OtherDerived> binaryExpr(const MatrixBase<OtherDerived>& other)
+	CwiseBinaryOp<BinaryOp, Derived, OtherDerived> BinaryExpr(const MatrixBase<OtherDerived>& other)
 	{
 		return CwiseBinaryOp<BinaryOp, Derived, OtherDerived>(derived(), other.derived());
 	}

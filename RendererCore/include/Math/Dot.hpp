@@ -27,7 +27,7 @@ struct dot_nocheck
 
 	static result_type Run(const Lhs& a, const Rhs& b)
 	{
-		return a.template binaryExpr<product>(b).sum();
+		return a.template BinaryExpr<product>(b).sum();
 	}
 };
 
@@ -39,7 +39,7 @@ struct dot_nocheck<Lhs, Rhs, true>
 
 	static result_type Run(const Lhs& a, const Rhs& b)
 	{
-		return a.transpose().template binaryExpr<product>(b).sum();
+		return a.transpose().template BinaryExpr<product>(b).sum();
 	}
 };
 
@@ -54,7 +54,7 @@ MatrixBase<Derived>::Dot(const MatrixBase<OtherDerived>& other) const
 	static_assert(has_return_type<scalar_binaryop_traits<Scalar, typename OtherDerived::Scalar>>::value, "You mix different numeric types.");
 	assert(size() == other.size());
 
-	return dot_nocheck<Derived, OtherDerived>::Run(*this, other);
+	return dot_nocheck<Derived, OtherDerived>::Run(derived(), other.derived());
 }
 
 }
