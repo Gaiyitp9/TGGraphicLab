@@ -93,25 +93,23 @@ public:
 
 	const Scalar& operator[](int index) const
 	{
-		static_assert(IsVectorAtCompileTime);
+		static_assert(IsVectorAtCompileTime, "The bracket operator is only for vectors.");
 		return coeff(index);
 	}
 
 	const Scalar& operator()(int index) const
 	{
-		static_assert(IsVectorAtCompileTime);
 		return coeff(index);
 	}
 
 	Scalar& operator[](int index)
 	{
-		static_assert(IsVectorAtCompileTime);
+		static_assert(IsVectorAtCompileTime, "The bracket operator is only for vectors.");
 		return coeffRef(index);
 	}
 
 	Scalar& operator()(int index)
 	{
-		static_assert(IsVectorAtCompileTime);
 		return coeffRef(index);
 	}
 
@@ -122,19 +120,19 @@ public:
 
 	const Scalar& y() const
 	{
-		static_assert(SizeAtCompileTime == -1 || SizeAtCompileTime >= 2);
+		static_assert(SizeAtCompileTime == -1 || SizeAtCompileTime >= 2, "Out of range");
 		return (*this)[1];
 	}
 
 	const Scalar& z() const
 	{
-		static_assert(SizeAtCompileTime == -1 || SizeAtCompileTime >= 3);
+		static_assert(SizeAtCompileTime == -1 || SizeAtCompileTime >= 3, "Out of range");
 		return (*this)[2];
 	}
 
 	const Scalar& w() const
 	{
-		static_assert(SizeAtCompileTime == -1 || SizeAtCompileTime >= 4);
+		static_assert(SizeAtCompileTime == -1 || SizeAtCompileTime >= 4, "Out of range");
 		return (*this)[3];
 	}
 
@@ -146,19 +144,19 @@ public:
 
 	Scalar& y()
 	{
-		static_assert(SizeAtCompileTime == -1 || SizeAtCompileTime >= 2);
+		static_assert(SizeAtCompileTime == -1 || SizeAtCompileTime >= 2, "Out of range");
 		return (*this)[1];
 	}
 
 	Scalar& z()
 	{
-		static_assert(SizeAtCompileTime == -1 || SizeAtCompileTime >= 3);
+		static_assert(SizeAtCompileTime == -1 || SizeAtCompileTime >= 3, "Out of range");
 		return (*this)[2];
 	}
 
 	Scalar& w()
 	{
-		static_assert(SizeAtCompileTime == -1 || SizeAtCompileTime >= 4);
+		static_assert(SizeAtCompileTime == -1 || SizeAtCompileTime >= 4, "Out of range");
 		return (*this)[3];
 	}
 

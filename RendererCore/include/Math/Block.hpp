@@ -49,8 +49,6 @@ public:
 	using typename Base::CoeffReturnType;
 	using Base::RowsAtCompileTime;
 	using Base::ColsAtCompileTime;
-	using Base::SizeAtCompileTime;
-	using Base::IsRowMajor;
 	using XprTypePlain = remove_all_t<XprType>;
 	using XprTypeNested = ref_selector<XprTypePlain>::non_const_type;
 
@@ -88,7 +86,7 @@ public:
 
 	Scalar& coeffRef(int row, int col)
 	{
-		static_assert(is_lvalue<XprType>::value, "The expression is not a lvalue. It is read only.");
+		static_assert(is_lvalue<XprType>, "The expression is not a lvalue. It is read only.");
 		return m_xpr.coeffRef(m_startRow + row, m_startCol + col);
 	}
 
@@ -107,7 +105,70 @@ template<typename XprType, int BlockRows, int BlockCols>
 class Block<XprType, BlockRows, BlockCols, true>
 	: public MapBase<Block<XprType, BlockRows, BlockCols, true>>
 {
+	using Base = MapBase<Block<XprType, BlockRows, BlockCols, true>>;
+	using XprTypePlain = remove_all_t<XprType>;
+	using XprTypeNested = ref_selector<XprTypePlain>::non_const_type;
+	using Base::RowsAtCompileTime;
+	using Base::ColsAtCompileTime;
 
+public:
+	// 构建行或者列
+	Block(XprType& xpr, int index) 
+		: Base(xpr.data() + index * ((BlockRows == 1 && !XprType::IsRowMajor) ||
+								(BlockCols == 1 && XprType::IsRowMajor) 
+								? xpr.innerStride() : xpr.outerStride()),
+			BlockRows == 1 ? 1 : xpr.rows(),
+			BlockCols == 1 ? 1 : xpr.cols()),
+		m_xpr(xpr),
+		m_startRow(BlockRows == 1 ? index : 0),
+		m_startCol(BlockCols == 1 ? index : 0)
+	{
+		static_assert((BlockRows == 1 && BlockCols == XprType::ColsAtCompileTime) ||
+			(BlockRows == XprType::RowsAtCompileTime && BlockCols == 1), 
+			"The Block rows should be same as XprType for column vector"
+			"or Block cols should be same as XprType for row vector.");
+	}
+
+	Block(XprType& xpr, int startRow, int startCol)
+		: Base(xpr.data() + xpr.innerStride() * (XprType::IsRowMajor ? startCol : startRow) + 
+		xpr.outerStride() * (XprType::IsRowMajor ? startRow : startRow)),
+		m_xpr(xpr), m_startRow(startRow), m_startCol(startCol)
+	{
+		assert(startRow >= 0 && BlockRows >= 0 && startRow + BlockRows <= xpr.rows()
+			&& startCol >= 0 && BlockCols >= 0 && startCol + BlockCols <= xpr.cols());
+	}
+
+	Block(XprType& xpr, int startRow, int startCol, int blockRows, int blockCols)
+		: Base(xpr.data() + xpr.innerStride() * (XprType::IsRowMajor ? startCol : startRow) +
+			xpr.outerStride() * (XprType::IsRowMajor ? startRow : startRow), blockRows, blockCols),
+		m_xpr(xpr), m_startRow(startRow), m_startCol(startCol)
+	{
+
+	}
+
+	int innerStride()
+	{
+		if constexpr (traits<Block>::HasSameStorageOrderAsXprType)
+			return m_xpr.innerStride();
+		else
+			return m_xpr.outerStride();
+	}
+
+	int outerStride()
+	{
+		if constexpr (traits<Block>::HasSameStorageOrderAsXprType)
+			return m_xpr.outerStride();
+		else
+			return m_xpr.innerStride();
+	}
+
+	const XprTypePlain& nestedExpression() const { return m_xpr; }
+	XprTypePlain& nestedExpression() { return m_xpr; }
+
+private:
+	XprTypeNested m_xpr;
+	int m_startRow;
+	int m_startCol;
 };
 
 }
