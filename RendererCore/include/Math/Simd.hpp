@@ -52,9 +52,6 @@ struct packet_traits
 	using half = T;
 	constexpr static int  Size = 1;						// 包尺寸
 	constexpr static bool HasHalfPacket = false;		// 是否有半包
-
-	constexpr static bool HasAdd = false;				// 是否可以做加法运算
-	constexpr static bool HasSub = false;				// 是否可以做减法运算
 };
 template<typename T> struct packet_traits<const T> : packet_traits<T> {};
 
@@ -62,8 +59,8 @@ template<typename T> struct unpacket_traits
 {
 	using type = T;
 	using half = T;
-	constexpr static int  Size = 1;
-	constexpr static int  Alignment = 1;
+	constexpr static int Size = 1;
+	constexpr static int Alignment = 1;
 };
 template<typename T> struct unpacket_traits<const T> : unpacket_traits<T> { };
 
@@ -81,9 +78,6 @@ struct packet_traits<float>
 	using half = Packet4f;
 	constexpr static int  Size = 8;
 	constexpr static bool HasHalfPacket = true;
-
-	constexpr static bool HasAdd = true;
-	constexpr static bool HasSub = true;
 };
 
 template<>
@@ -93,9 +87,6 @@ struct packet_traits<double>
 	using half = Packet2d;
 	constexpr static int  Size = 4;
 	constexpr static bool HasHalfPacket = true;
-
-	constexpr static bool HasAdd = true;
-	constexpr static bool HasSub = true;
 };
 
 template<>
@@ -105,9 +96,6 @@ struct packet_traits<int>
 	using half = Packet4i;
 	constexpr static int  Size = 8;
 	constexpr static bool HasHalfPacket = true;
-
-	constexpr static bool HasAdd = true;
-	constexpr static bool HasSub = true;
 };
 
 template<>
@@ -115,8 +103,8 @@ struct unpacket_traits<Packet8f>
 {
 	using type = float;
 	using half = Packet4f;
-	constexpr static int  Size = 8;
-	constexpr static int  Alignment = 32;
+	constexpr static int Size = 8;
+	constexpr static int Alignment = 32;
 };
 
 template<>
@@ -124,8 +112,8 @@ struct unpacket_traits<Packet4f>
 {
 	using type = float;
 	using half = Packet4f;
-	constexpr static int  Size = 4;
-	constexpr static int  Alignment = 16;
+	constexpr static int Size = 4;
+	constexpr static int Alignment = 16;
 };
 
 template<>
@@ -133,8 +121,8 @@ struct unpacket_traits<Packet4d>
 {
 	using type = double;
 	using half = Packet2d;
-	constexpr static int  Size = 4;
-	constexpr static int  Alignment = 32;
+	constexpr static int Size = 4;
+	constexpr static int Alignment = 32;
 };
 
 template<>
@@ -142,8 +130,8 @@ struct unpacket_traits<Packet2d>
 {
 	using type = double;
 	using half = Packet2d;
-	constexpr static int  Size = 2;
-	constexpr static int  Alignment = 16;
+	constexpr static int Size = 2;
+	constexpr static int Alignment = 16;
 };
 
 template<>

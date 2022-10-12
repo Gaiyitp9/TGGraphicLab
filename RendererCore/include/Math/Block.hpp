@@ -108,8 +108,6 @@ class Block<XprType, BlockRows, BlockCols, true>
 	using Base = MapBase<Block<XprType, BlockRows, BlockCols, true>>;
 	using XprTypePlain = remove_all_t<XprType>;
 	using XprTypeNested = ref_selector<XprTypePlain>::non_const_type;
-	using Base::RowsAtCompileTime;
-	using Base::ColsAtCompileTime;
 
 public:
 	// 构建行或者列
