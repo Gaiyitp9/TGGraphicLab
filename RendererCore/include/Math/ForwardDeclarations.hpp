@@ -21,20 +21,18 @@ template<typename T> struct traits;
 template<typename T> struct traits<const T> : traits<T> {};
 
 // 是否可以直接访问底层数据
-template<typename Derived> 
-struct has_direct_access
-{
-	constexpr static bool value = not_none(traits<Derived>::Flags & Flag::DirectAccess);
-};
+template<typename XprType>
+inline constexpr bool has_direct_access = not_none(traits<XprType>::Flags & Flag::DirectAccess);
+
+// 是否可以写入数据
+template<typename XprType>
+inline constexpr bool has_write_access = not_none(traits<XprType>::Flags & Flag::Lvalue);
+
 // 访问级别
 template<typename Derived> 
-struct accessors_level
-{
-	constexpr static bool has_direct_access = not_none(traits<Derived>::Flags & Flag::DirectAccess);
-	constexpr static bool has_write_access = not_none(traits<Derived>::Flags & Flag::Lvalue);
-	constexpr static AccessorLevel value = has_direct_access ? (has_write_access ? AccessorLevel::DirectWrite : AccessorLevel::Direct)
-						  : (has_write_access ? AccessorLevel::Write : AccessorLevel::ReadOnly);
-};
+inline constexpr AccessorLevel accessors_level = has_direct_access<Derived> 
+	? (has_write_access<Derived> ? AccessorLevel::DirectWrite : AccessorLevel::Direct)
+	: (has_write_access<Derived> ? AccessorLevel::Write : AccessorLevel::ReadOnly);
 
 // 最高层基类
 template<typename Derived> struct Base;
@@ -51,19 +49,23 @@ template<typename ScalarT, int Rows, int Cols,
 // 矩阵底层存储类
 template<typename T, int Size, int Rows, int Cols> class Storage;
 // 转置
-template<typename MatrixType> class Transpose;
+template<typename XprType> class Transpose;
 // 块
 template<typename XprType, int BlockRows = Dynamic, int BlockCols = Dynamic, 
-	bool HasDirectAccess = has_direct_access<XprType>::value> class Block;
+	bool HasDirectAccess = has_direct_access<XprType>> class Block;
 // 映射基类
-template<typename Derived, AccessorLevel Level = 
-	accessors_level<Derived>::has_write_access ? AccessorLevel::Write : AccessorLevel::ReadOnly>
+template<typename Derived, 
+	AccessorLevel Level = has_write_access<Derived> ? AccessorLevel::Write : AccessorLevel::ReadOnly>
 class MapBase;
 
 // 二元运算
 template<typename BinaryOp, typename Lhs, typename Rhs> class CwiseBinaryOp;
 // 加法运算
-template<typename LhsScalar, typename RhsScalar> struct scalar_sum_op;
+template<typename Scalar> struct scalar_sum_op;
+// 减法运算
+template<typename Scalar> struct scalar_sub_op;
+// 乘法运算
+template<typename Scalar> struct scalar_product_op;
 
 // 表达式求值器
 template<typename T> struct evaluator;

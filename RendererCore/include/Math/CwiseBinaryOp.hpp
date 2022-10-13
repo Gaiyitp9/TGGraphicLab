@@ -20,11 +20,14 @@ namespace LCH::Math
 template<typename BinaryOp, typename Lhs, typename Rhs>
 struct traits<CwiseBinaryOp<BinaryOp, Lhs, Rhs>>
 {
-	using Ancestor = remove_all_t<Lhs>;
-	using Scalar = invoke_result_of<BinaryOp, const typename Lhs::Scalar&, const typename Rhs::Scalar&>::type;
-	constexpr static int RowsAtCompileTime = traits<Ancestor>::RowsAtCompileTime;
-	constexpr static int ColsAtCompileTime = traits<Ancestor>::ColsAtCompileTime;
-	constexpr static Flag Flags = traits<Ancestor>::Flags & Flag::RowMajor;
+	using LhsPlain = remove_all_t<Lhs>;
+	using RhsPlain = remove_all_t<Lhs>;
+	using Scalar = traits<LhsPlain>::Scalar;
+	constexpr static int RowsAtCompileTime = traits<LhsPlain>::RowsAtCompileTime;
+	constexpr static int ColsAtCompileTime = traits<LhsPlain>::ColsAtCompileTime;
+	constexpr static Flag Flags = traits<LhsPlain>::Flags & Flag::RowMajor;
+	constexpr static int Alignment = traits<LhsPlain>::Alignment < traits<RhsPlain>::Alignment ? 
+		traits<LhsPlain>::Alignment : traits<RhsPlain>::Alignment;
 };
 
 // 二元运算表达式
@@ -37,9 +40,8 @@ public:
 	using RhsPlain	= remove_all_t<RhsType>;
 	using LhsNested = ref_selector<LhsPlain>::type;
 	using RhsNested = ref_selector<RhsPlain>::type;
-	using result_type = Functor::result_type;
 
-	static_assert(have_same_matrix_size<LhsPlain, RhsPlain>, "You mixed matrices of different sizes.");
+	static_assert(have_same_matrix_size<LhsPlain, RhsPlain>, "You mix matrices of different sizes.");
 
 public:
 	CwiseBinaryOp(const LhsPlain& lhs, const RhsPlain& rhs, const Functor& functor = Functor())

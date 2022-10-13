@@ -17,46 +17,62 @@
 namespace LCH::Math
 {
 
-template<typename MatrixType>
-struct traits<Transpose<MatrixType>>
+template<typename XprType>
+struct traits<Transpose<XprType>>
 {
 private:
-	using MatrixTypePlain = std::remove_reference_t<MatrixType>;
-	constexpr static Flag FlagsLvalueBit = is_lvalue<MatrixTypePlain> ? Flag::Lvalue : Flag::None;
-	constexpr static Flag Flags0 = traits<MatrixTypePlain>::Flags & ~(Flag::Lvalue | Flag::NestByRef);	// 移除LvalueBit和NestByRefBit标志位
+	using XprTypePlain = std::remove_reference_t<XprType>;
+	constexpr static Flag FlagsLvalueBit = is_lvalue<XprTypePlain> ? Flag::Lvalue : Flag::None;
+	constexpr static Flag Flags0 = traits<XprTypePlain>::Flags & ~(Flag::Lvalue | Flag::NestByRef);	// 移除LvalueBit和NestByRefBit标志位
 	constexpr static Flag Flags1 = Flags0 | FlagsLvalueBit;
 
 public:
-	using Scalar = MatrixTypePlain::Scalar;
-	constexpr static int RowsAtCompileTime = MatrixTypePlain::ColsAtCompileTime;
-	constexpr static int ColsAtCompileTime = MatrixTypePlain::RowsAtCompileTime;
+	using Scalar = XprType::Scalar;
+	constexpr static int RowsAtCompileTime = XprType::ColsAtCompileTime;
+	constexpr static int ColsAtCompileTime = XprType::RowsAtCompileTime;
 	constexpr static Flag Flags = Flags1 ^ Flag::RowMajor;		// RowMajorBit位翻转
-	constexpr static int InnerStrideAtCompileTime = inner_stride_at_compile_time<MatrixTypePlain>::value;
-	constexpr static int OuterStrideAtCompileTime = outer_stride_at_compile_time<MatrixTypePlain>::value;
-	constexpr static int Alignment = traits<MatrixTypePlain>::Alignment;
+	constexpr static int InnerStrideAtCompileTime = inner_stride_at_compile_time<XprTypePlain>;
+	constexpr static int OuterStrideAtCompileTime = outer_stride_at_compile_time<XprTypePlain>;
+	constexpr static int Alignment = traits<XprTypePlain>::Alignment;
 };
 
-template<typename MatrixType>
-class Transpose : public MatrixBase<Transpose<MatrixType>>
+template<typename XprType, bool HasDirectAccess = has_direct_access<XprType>>
+class TransposeImpl : public MatrixBase<Transpose<XprType>>
+{
+
+};
+
+template<typename XprType>
+class TransposeImpl<XprType, true> : public MatrixBase<Transpose<XprType>>
 {
 public:
-	using Base = MatrixBase<Transpose<MatrixType>>;
-	using MatrixTypePlain = remove_all_t<MatrixType>;
-	using MatrixTypeNested = ref_selector<MatrixTypePlain>::non_const_type;
+	using Base = MatrixBase<Transpose<XprType>>;
 	using typename Base::Scalar;
-	using ScalarWithConstIfNotLvalue = std::conditional_t<is_lvalue<MatrixType>, Scalar, const Scalar>;
+	using ScalarWithConstIfNotLvalue = std::conditional_t<is_lvalue<XprType>, Scalar, const Scalar>;
+	using Base::derived;
 
-	explicit Transpose(MatrixTypePlain& matrix) : m_matrix(matrix) {}
+	int innerStride() { return derived().nestedExpression().innerStride(); }
+	int outerStride() { return derived().nestedExpression().outerStride(); }
+	ScalarWithConstIfNotLvalue* data() { return derived().nestedExpression().data(); }
+	const Scalar* data() const { return derived().nestedExpression().data(); }
+};
+
+template<typename XprType>
+class Transpose : public TransposeImpl<XprType>
+{
+public:
+	using XprTypePlain = remove_all_t<XprType>;
+	using XprTypeNested = ref_selector<XprTypePlain>::non_const_type;
+	
+	explicit Transpose(XprTypePlain& matrix) : m_matrix(matrix) {}
 
 	constexpr int rows() const { return m_matrix.cols(); }
 	constexpr int cols() const { return m_matrix.rows(); }
-	ScalarWithConstIfNotLvalue* data() { return m_matrix.data(); }
-	const Scalar* data() const { return m_matrix.data(); }
-	const MatrixTypePlain& nestedExpression() const { return m_matrix; }
-	MatrixTypePlain& nestedExpression() { return m_matrix; }
+	const XprTypePlain& nestedExpression() const { return m_matrix; }
+	XprTypePlain& nestedExpression() { return m_matrix; }
 
 private:
-	MatrixTypeNested m_matrix;
+	XprTypeNested m_matrix;
 };
 
 }

@@ -46,30 +46,6 @@ struct ref_selector
 	using non_const_type = std::conditional_t<not_none(traits<T>::Flags & Flag::NestByRef), T&, T>;
 };
 
-// 二元运算符操作数的特性
-template<typename ScalarA, typename ScalarB, typename BinaryOp = scalar_sum_op<ScalarA, ScalarB>>
-struct scalar_binaryop_traits;
-
-template<typename T, typename BinaryOp>
-struct scalar_binaryop_traits<T, T, BinaryOp>
-{
-	using return_type = T;
-};
-
-// 获取可调用变量(比如函数或者lambada表达式)的返回值
-template<typename Callable, typename... ArgTypes>
-struct invoke_result_of
-{
-	typedef typename std::invoke_result<Callable, ArgTypes...>::type type1;
-	typedef remove_all_t<type1> type;
-};
-
-template<typename T> 
-struct functor_traits
-{
-	constexpr static bool PacketAccess = false;
-};
-
 // 变量对应的包特性(包中有多个变量，表示SIMD中使用的变量，比如__m128)
 template<typename T> struct packet_traits;
 // 包的特性(通过包获得特性，上面是通过变量获得)
@@ -123,9 +99,9 @@ template<typename T, int Size>
 inline constexpr int default_alignment = compute_default_alignment_helper(Size * sizeof(T), MAX_ALIGN_BYTES);
 
 // 判断是否是左值
-template<typename ExpressionType>
-inline constexpr bool is_lvalue = (!std::is_const_v<ExpressionType>) 
-								&& not_none(traits<ExpressionType>::Flags & Flag::Lvalue);
+template<typename XprType>
+inline constexpr bool is_lvalue = (!std::is_const_v<XprType>)
+								&& not_none(traits<XprType>::Flags & Flag::Lvalue);
 
 // 两个矩阵表达式的尺寸是否一致
 template<typename Type0, typename Type1>
@@ -143,16 +119,16 @@ inline constexpr bool have_same_vector_size = (Type0::SizeAtCompileTime == Dynam
 												Type1::SizeAtCompileTime == Dynamic ||
 												Type0::SizeAtCompileTime == Type1::SizeAtCompileTime);	
 
-struct meta_yes { char a[1]; };
-struct meta_no { char a[2]; };
-// 类型T是否包含return_type成员
-template<typename T>
-struct has_return_type
-{
-	template<typename C> static meta_yes TestFunctor(C const*, C::return_type const* = 0);
-	template<typename C> static meta_no TestFunctor(...);
+// 矩阵表达式步长
+template<typename Derived, bool HasDirectAccess = has_direct_access<Derived>>
+inline constexpr int inner_stride_at_compile_time = traits<Derived>::InnerStrideAtCompileTime;
 
-	static constexpr bool value = sizeof(TestFunctor<T>(static_cast<T*>(0))) == sizeof(meta_yes);
-};
+template<typename Derived>
+inline constexpr int inner_stride_at_compile_time<Derived, false> = 0;
 
+template<typename Derived, bool HasDirectAccess = has_direct_access<Derived>>
+inline constexpr int outer_stride_at_compile_time = traits<Derived>::OuterStrideAtCompileTime;
+
+template<typename Derived>
+inline constexpr int outer_stride_at_compile_time<Derived, false> = 0;
 }

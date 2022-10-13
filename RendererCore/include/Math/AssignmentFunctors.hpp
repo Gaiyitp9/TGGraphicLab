@@ -29,12 +29,4 @@ struct assign_op
 	}
 };
 
-template<typename DstScalar, typename SrcScalar>
-struct functor_traits<assign_op<DstScalar, SrcScalar>>
-{
-	constexpr static bool PacketAccess = std::is_same_v<DstScalar, SrcScalar> 
-										&& packet_traits<DstScalar>::Vectorizable 
-										&& packet_traits<SrcScalar>::Vectorizable;
-};
-
 }

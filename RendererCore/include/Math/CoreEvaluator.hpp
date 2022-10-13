@@ -17,22 +17,19 @@
 namespace LCH::Math
 {
 
+// 一元运算求值器
+template<typename T, 
+		 typename Scalar = typename T::Scalar>
+
+struct unary_evaluator;
 // 二元运算求值器
 template<typename T, 
 		 typename LhsScalar = typename traits<typename T::LhsPlain>::Scalar,
 		 typename RhsScalar = typename traits<typename T::RhsPlain>::Scalar>
 struct binary_evaluator;
 
-// 一元运算求值器
-template<typename T, 
-		 typename Scalar = typename T::Scalar>
-struct unary_evaluator;
-
 template<typename T>
-struct evaluator_assume_aliasing
-{
-	constexpr static bool value = false;
-};
+inline constexpr bool evaluator_assume_aliasing = false;
 
 template<typename T>
 struct evaluator : public unary_evaluator<T>
@@ -41,6 +38,7 @@ struct evaluator : public unary_evaluator<T>
 	explicit evaluator(const T& xpr) : Base(xpr) {}
 };
 
+// 矩阵
 template<typename Scalar_, int Rows, int Cols, StorageOption Options>
 struct evaluator<Matrix<Scalar_, Rows, Cols, Options>>
 {
@@ -105,6 +103,7 @@ protected:
 	int m_outerStride;
 };
 
+// 转置
 template<typename ArgType>
 struct unary_evaluator<Transpose<ArgType>>
 {
@@ -154,6 +153,7 @@ private:
 	evaluator<ArgType> m_argImpl;
 };
 
+// 二元运算
 template<typename BinaryOp, typename Lhs, typename Rhs>
 struct evaluator<CwiseBinaryOp<BinaryOp, Lhs, Rhs>>
 	: public binary_evaluator<CwiseBinaryOp<BinaryOp, Lhs, Rhs>>
@@ -181,7 +181,7 @@ struct binary_evaluator<CwiseBinaryOp<BinaryOp, Lhs, Rhs>>
 		(
 			(LhsFlags & RhsFlags) &
 			((StorageOrdersAgree ? Flag::LinearAccess : Flag::None) | 
-				(functor_traits<BinaryOp>::PacketAccess && StorageOrdersAgree && SameType ? Flag::PacketAccess : Flag::None))
+				(StorageOrdersAgree && SameType ? Flag::PacketAccess : Flag::None))
 		);
 	constexpr static Flag Flags = (Flags0 & ~Flag::RowMajor) | (LhsFlags & Flag::RowMajor);	// 取Lhs的RowMajorBit标志位
 
@@ -218,7 +218,8 @@ private:
 	evaluator<Rhs> m_rhsImpl;
 };
 
-template<typename ArgType, int BlockRows, int BlockCols, bool HasDirectAccess = has_direct_access<ArgType>::value>
+// 块
+template<typename ArgType, int BlockRows, int BlockCols, bool HasDirectAccess = has_direct_access<ArgType>>
 struct block_evaluator;
 
 template<typename ArgType, int BlockRows, int BlockCols>
@@ -236,13 +237,32 @@ struct evaluator<Block<ArgType, BlockRows, BlockCols>> : block_evaluator<ArgType
 									: XprIsRowMajor;
 	constexpr static bool HasSameStorageOrderAsXprType = XprIsRowMajor == IsRowMajor;
 	constexpr static int InnerStrideAtCompileTime = HasSameStorageOrderAsXprType  
-													? inner_stride_at_compile_time<XprType>::value
-													: outer_stride_at_compile_time<XprType>::value;
+													? inner_stride_at_compile_time<XprType>
+													: outer_stride_at_compile_time<XprType>;
 	constexpr static int OuterStrideAtCompileTime = HasSameStorageOrderAsXprType  
-													? outer_stride_at_compile_time<XprType>::value
-													: inner_stride_at_compile_time<XprType>::value;
+													? outer_stride_at_compile_time<XprType>
+													: inner_stride_at_compile_time<XprType>;
 	constexpr static int Alignment = traits<XprType>::Alignment;
 	constexpr static Flag Flags = XprType::Flags;
+};
+
+template<typename ArgType, int BlockRows, int BlockCols>
+struct block_evaluator<ArgType, BlockRows, BlockCols, false>
+{
+	/*using XprType = 
+	explicit block_evaluator(const XprType& xpr) : m_op(xpr.functor()), m_lhsImpl(xpr.lhs()),
+		m_rhsImpl(xpr.rhs()) {}
+
+	CoeffReturnType coeff(int row, int col) const
+	{
+		return m_xpr.coeff(m_startRow + row, m_startCol + col);
+	}
+
+	Scalar& coeffRef(int row, int col)
+	{
+		static_assert(is_lvalue<XprType>, "The expression is not a lvalue. It is read only.");
+		return m_xpr.coeffRef(m_startRow + row, m_startCol + col);
+	}*/
 };
 
 }

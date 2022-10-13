@@ -242,28 +242,4 @@ public:
 	}
 };
 
-template<typename Derived, bool HasDirectAccess = has_direct_access<Derived>::value>
-struct inner_stride_at_compile_time
-{
-	constexpr static int value = traits<Derived>::InnerStrideAtCompileTime;
-};
-
-template<typename Derived>
-struct inner_stride_at_compile_time<Derived, false>
-{
-	constexpr static int value = 0;
-};
-
-template<typename Derived, bool HasDirectAccess = has_direct_access<Derived>::value>
-struct outer_stride_at_compile_time
-{
-	constexpr static int value = traits<Derived>::OuterStrideAtCompileTime;
-};
-
-template<typename Derived>
-struct outer_stride_at_compile_time<Derived, false>
-{
-	constexpr static int value = 0;
-};
-
 }

@@ -20,13 +20,18 @@ namespace LCH::Math
 template<typename XprType, int BlockRows, int BlockCols>
 struct traits<Block<XprType, BlockRows, BlockCols>> : traits<XprType>
 {
-	using Scalar = traits<XprType>::Scalar;
-	constexpr static int RowsAtCompileTime = BlockRows;
-	constexpr static int ColsAtCompileTime = BlockCols;
+private:
 	constexpr static bool XprIsRowMajor = not_none(traits<XprType>::Flags & Flag::RowMajor);
 	constexpr static bool IsRowMajor = (BlockRows == 1 && BlockCols != 1) ? true
 										: (BlockCols == 1 && BlockRows != 1) ? false 
 										: XprIsRowMajor;
+	constexpr static Flag FlagLvalue = is_lvalue<XprType> ? Flag::Lvalue : Flag::None;
+	constexpr static Flag FlagRowMajor = IsRowMajor ? Flag::RowMajor : Flag::None;
+
+public:
+	using Scalar = traits<XprType>::Scalar;
+	constexpr static int RowsAtCompileTime = BlockRows;
+	constexpr static int ColsAtCompileTime = BlockCols;
 	constexpr static bool HasSameStorageOrderAsXprType = XprIsRowMajor == IsRowMajor;
 	constexpr static int InnerStrideAtCompileTime = HasSameStorageOrderAsXprType  
 													? inner_stride_at_compile_time<XprType>::value
@@ -34,8 +39,6 @@ struct traits<Block<XprType, BlockRows, BlockCols>> : traits<XprType>
 	constexpr static int OuterStrideAtCompileTime = HasSameStorageOrderAsXprType  
 													? outer_stride_at_compile_time<XprType>::value
 													: inner_stride_at_compile_time<XprType>::value;
-	constexpr static Flag FlagLvalue = is_lvalue<XprType> ? Flag::Lvalue : Flag::None;
-	constexpr static Flag FlagRowMajor = IsRowMajor ? Flag::RowMajor : Flag::None;
 	constexpr static Flag Flags = FlagLvalue | FlagRowMajor;
 	constexpr static int Alignment = 0;
 };

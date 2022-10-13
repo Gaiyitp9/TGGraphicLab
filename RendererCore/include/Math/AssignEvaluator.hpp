@@ -358,7 +358,7 @@ void call_assignment(Dst& dst, Src& src)
 		not_none(traits<Src>::Flags & Flag::RowMajor) ? StorageOption::RowMajor : StorageOption::ColMajor
 	>;
 
-	if constexpr (evaluator_assume_aliasing<Src>::value)
+	if constexpr (evaluator_assume_aliasing<Src>)
 	{
 		type tmp(src);
 		call_assignment_no_alias(dst, tmp);
