@@ -22,7 +22,7 @@ class CoeffsBase<Derived, AccessorLevel::ReadOnly> : public Base<Derived>
 {
 public:
 	using Scalar = traits<Derived>::Scalar;
-	using CoeffReturnType = std::conditional_t<not_none(traits<Derived>::Flags & Flag::Lvalue), 
+	using CoeffReturnType = std::conditional_t<NotNone(traits<Derived>::Flags & Flag::Lvalue), 
 												const Scalar&, const Scalar>;
 	using Base = Base<Derived>;
 	using Base::rows;
@@ -34,19 +34,19 @@ public:
 	{
 		return Derived::RowsAtCompileTime == 1 ? 0 :
 			Derived::ColsAtCompileTime == 1 ? inner :
-			not_none(Derived::Flags & Flag::RowMajor) ? outer : inner;
+			NotNone(Derived::Flags & Flag::RowMajor) ? outer : inner;
 	}
 
 	int colIndexByOuterInner(int outer, int inner) const
 	{
 		return Derived::ColsAtCompileTime == 1 ? 0 :
 			Derived::RowsAtCompileTime == 1 ? inner :
-			not_none(Derived::Flags & Flag::RowMajor) ? inner : outer;
+			NotNone(Derived::Flags & Flag::RowMajor) ? inner : outer;
 	}
 
 	CoeffReturnType coeff(int row, int col) const
 	{
-		return evaluator<Derived>(derived()).Coeff(row, col);
+		return Evaluator<Derived>(derived()).Coeff(row, col);
 	}
 
 	CoeffReturnType coeffByOuterInner(int outer, int inner) const
@@ -62,8 +62,8 @@ public:
 
 	CoeffReturnType coeff(int index) const
 	{
-		static_assert(not_none(evaluator<Derived>::Flags & Flag::LinearAccess));
-		return evaluator<Derived>(derived()).Coeff(index);
+		static_assert(NotNone(Evaluator<Derived>::Flags & Flag::LinearAccess));
+		return Evaluator<Derived>(derived()).Coeff(index);
 	}
 
 	CoeffReturnType operator[](int index) const
@@ -121,7 +121,7 @@ public:
 
 	Scalar& coeffRef(int row, int col)
 	{
-		return evaluator<Derived>(derived()).coeffRef(row, col);
+		return Evaluator<Derived>(derived()).coeffRef(row, col);
 	}
 
 	Scalar& coeffRefByOuterInner(int outer, int inner)
@@ -137,8 +137,8 @@ public:
 
 	Scalar& coeffRef(int index)
 	{
-		static_assert(not_none(evaluator<Derived>::Flags & Flag::LinearAccess));
-		return evaluator<Derived>(derived()).coeffRef(index);
+		static_assert(NotNone(Evaluator<Derived>::Flags & Flag::LinearAccess));
+		return Evaluator<Derived>(derived()).coeffRef(index);
 	}
 
 	Scalar& operator[](int index)

@@ -20,28 +20,29 @@ namespace LCH::Math
 // 一元运算求值器
 template<typename T, 
 		 typename Scalar = typename T::Scalar>
-
-struct unary_evaluator;
+class UnaryEvaluator;
 // 二元运算求值器
 template<typename T, 
 		 typename LhsScalar = typename traits<typename T::LhsPlain>::Scalar,
 		 typename RhsScalar = typename traits<typename T::RhsPlain>::Scalar>
-struct binary_evaluator;
+class BinaryEvaluator;
 
 template<typename T>
 inline constexpr bool evaluator_assume_aliasing = false;
 
 template<typename T>
-struct evaluator : public unary_evaluator<T>
+class Evaluator : public UnaryEvaluator<T>
 {
-	using Base = unary_evaluator<T>;
-	explicit evaluator(const T& xpr) : Base(xpr) {}
+public:
+	using Base = UnaryEvaluator<T>;
+	explicit Evaluator(const T& xpr) : Base(xpr) {}
 };
 
 // 矩阵
 template<typename Scalar_, int Rows, int Cols, StorageOption Options>
-struct evaluator<Matrix<Scalar_, Rows, Cols, Options>>
+class Evaluator<Matrix<Scalar_, Rows, Cols, Options>>
 {
+public:
 	using XprType = Matrix<Scalar_, Rows, Cols, Options>;
 	using Scalar = XprType::Scalar;
 	using CoeffReturnType = XprType::CoeffReturnType;
@@ -54,8 +55,8 @@ struct evaluator<Matrix<Scalar_, Rows, Cols, Options>>
 	constexpr static int Alignment = traits<XprType>::Alignment;
 	constexpr static int OuterStrideAtCompileTime = XprType::OuterStrideAtCompileTime;
 
-	evaluator() : m_data(nullptr), m_outerStride(OuterStrideAtCompileTime) {}
-	explicit evaluator(const XprType& m) : m_data(m.data()), m_outerStride(m.outerStride()) {}
+	Evaluator() : m_data(nullptr), m_outerStride(OuterStrideAtCompileTime) {}
+	explicit Evaluator(const XprType& m) : m_data(m.data()), m_outerStride(m.outerStride()) {}
 
 	CoeffReturnType coeff(int row, int col) const
 	{
@@ -98,24 +99,25 @@ struct evaluator<Matrix<Scalar_, Rows, Cols, Options>>
 		return ploadt<PacketType, LoadMode>(m_data + index);
 	}
 
-protected:
+private:
 	const Scalar* m_data;
 	int m_outerStride;
 };
 
 // 转置
 template<typename ArgType>
-struct unary_evaluator<Transpose<ArgType>>
+class UnaryEvaluator<Transpose<ArgType>>
 {
+public:
 	using XprType = Transpose<ArgType>;
 	using Scalar = XprType::Scalar;
 	using CoeffReturnType = XprType::CoeffReturnType;
 	constexpr static int RowsAtCompileTime = XprType::RowsAtCompileTime;
 	constexpr static int ColsAtCompileTime = XprType::ColsAtCompileTime;
-	constexpr static Flag Flags = evaluator<ArgType>::Flags ^ Flag::RowMajor;
-	constexpr static int Alignment = evaluator<ArgType>::Alignment;
+	constexpr static Flag Flags = traits<XprType>::Flags;
+	constexpr static int Alignment = traits<XprType>::Alignment;
 
-	explicit unary_evaluator(const XprType& t) : m_argImpl(t.nestedExpression()) {}
+	explicit UnaryEvaluator(const XprType& t) : m_argImpl(t.nestedExpression()) {}
 
 	CoeffReturnType coeff(int row, int col) const
 	{
@@ -150,42 +152,31 @@ struct unary_evaluator<Transpose<ArgType>>
 	}
 
 private:
-	evaluator<ArgType> m_argImpl;
+	Evaluator<ArgType> m_argImpl;
 };
 
 // 二元运算
 template<typename BinaryOp, typename Lhs, typename Rhs>
-struct evaluator<CwiseBinaryOp<BinaryOp, Lhs, Rhs>>
-	: public binary_evaluator<CwiseBinaryOp<BinaryOp, Lhs, Rhs>>
+class Evaluator<CwiseBinaryOp<BinaryOp, Lhs, Rhs>>
+	: public BinaryEvaluator<CwiseBinaryOp<BinaryOp, Lhs, Rhs>>
 {
-	using Base = binary_evaluator<CwiseBinaryOp<BinaryOp, Lhs, Rhs>>;
+	using Base = BinaryEvaluator<CwiseBinaryOp<BinaryOp, Lhs, Rhs>>;
 	using typename Base::XprType;
-
-	explicit evaluator(const XprType& xpr) : Base(xpr) {}
+public:
+	explicit Evaluator(const XprType& xpr) : Base(xpr) {}
 };
 
 template<typename BinaryOp, typename Lhs, typename Rhs>
-struct binary_evaluator<CwiseBinaryOp<BinaryOp, Lhs, Rhs>>
+class BinaryEvaluator<CwiseBinaryOp<BinaryOp, Lhs, Rhs>>
 {
+public:
 	using XprType = CwiseBinaryOp<BinaryOp, Lhs, Rhs>;
 	using CoeffReturnType = XprType::CoeffReturnType;
 
-	constexpr static Flag LhsFlags = evaluator<Lhs>::Flags;
-	constexpr static Flag RhsFlags = evaluator<Rhs>::Flags;
-	constexpr static bool SameType = std::is_same_v<typename Lhs::Scalar, typename Rhs::Scalar>;
-	constexpr static bool StorageOrdersAgree = (LhsFlags & Flag::RowMajor) == (RhsFlags & Flag::RowMajor);
-	constexpr static int Alignment = evaluator<Lhs>::Alignment < evaluator<Rhs>::Alignment ? evaluator<Lhs>::Alignment
-									: evaluator<Rhs>::Alignment;
-	// 判断是否要开启LinearAccessBit和PacketAccessBit位
-	constexpr static Flag Flags0 = (LhsFlags | RhsFlags) & 
-		(
-			(LhsFlags & RhsFlags) &
-			((StorageOrdersAgree ? Flag::LinearAccess : Flag::None) | 
-				(StorageOrdersAgree && SameType ? Flag::PacketAccess : Flag::None))
-		);
-	constexpr static Flag Flags = (Flags0 & ~Flag::RowMajor) | (LhsFlags & Flag::RowMajor);	// 取Lhs的RowMajorBit标志位
+	constexpr static int Alignment = traits<XprType>::Alignment;
+	constexpr static Flag Flags = traits<XprType>::Flags;
 
-	explicit binary_evaluator(const XprType& xpr) : m_op(xpr.functor()), m_lhsImpl(xpr.lhs()), 
+	explicit BinaryEvaluator(const XprType& xpr) : m_op(xpr.functor()), m_lhsImpl(xpr.lhs()), 
 		m_rhsImpl(xpr.rhs()) {}
 
 	CoeffReturnType coeff(int row, int col) const
@@ -201,68 +192,99 @@ struct binary_evaluator<CwiseBinaryOp<BinaryOp, Lhs, Rhs>>
 	template<int LoadMode, typename PacketType>
 	PacketType packet(int row, int col) const
 	{
-		return m_op.packetOp(m_lhsImpl.template packet<LoadMode, PacketType>(row, col),
+		return m_op.PacketOp(m_lhsImpl.template packet<LoadMode, PacketType>(row, col),
 			m_rhsImpl.template packet<LoadMode, PacketType>(row, col));
 	}
 
 	template<int LoadMode, typename PacketType>
 	PacketType packet(int index) const
 	{
-		return m_op.packetOp(m_lhsImpl.template packet<LoadMode, PacketType>(index),
+		return m_op.PacketOp(m_lhsImpl.template packet<LoadMode, PacketType>(index),
 			m_rhsImpl.template packet<LoadMode, PacketType>(index));
 	}
 
 private:
 	BinaryOp m_op;
-	evaluator<Lhs> m_lhsImpl;
-	evaluator<Rhs> m_rhsImpl;
+	Evaluator<Lhs> m_lhsImpl;
+	Evaluator<Rhs> m_rhsImpl;
 };
 
 // 块
 template<typename ArgType, int BlockRows, int BlockCols, bool HasDirectAccess = has_direct_access<ArgType>>
-struct block_evaluator;
+class BlockEvaluator;
 
 template<typename ArgType, int BlockRows, int BlockCols>
-struct evaluator<Block<ArgType, BlockRows, BlockCols>> : block_evaluator<ArgType, BlockRows, BlockCols>
+class Evaluator<Block<ArgType, BlockRows, BlockCols>> : public BlockEvaluator<ArgType, BlockRows, BlockCols>
 {
+public:
 	using XprType = Block<ArgType, BlockRows, BlockCols>;
 	using Scalar = XprType::Scalar;
 	using PacketScalar = best_packet<Scalar, XprType::SizeAtCompileTime>;
 
 	constexpr static int RowsAtCompileTime = XprType::RowsAtCompileTime;
 	constexpr static int ColsAtCompileTime = XprType::ColsAtCompileTime;
-	constexpr static bool XprIsRowMajor = not_none(evaluator<XprType>::Flags & Flag::RowMajor);
-	constexpr static bool IsRowMajor = (BlockRows == 1 && BlockCols != 1) ? true
-									: (BlockCols == 1 && BlockRows != 1) ? false
-									: XprIsRowMajor;
-	constexpr static bool HasSameStorageOrderAsXprType = XprIsRowMajor == IsRowMajor;
-	constexpr static int InnerStrideAtCompileTime = HasSameStorageOrderAsXprType  
-													? inner_stride_at_compile_time<XprType>
-													: outer_stride_at_compile_time<XprType>;
-	constexpr static int OuterStrideAtCompileTime = HasSameStorageOrderAsXprType  
-													? outer_stride_at_compile_time<XprType>
-													: inner_stride_at_compile_time<XprType>;
 	constexpr static int Alignment = traits<XprType>::Alignment;
-	constexpr static Flag Flags = XprType::Flags;
+	constexpr static Flag Flags = traits<XprType>::Flags;
 };
 
 template<typename ArgType, int BlockRows, int BlockCols>
-struct block_evaluator<ArgType, BlockRows, BlockCols, false>
+class BlockEvaluator<ArgType, BlockRows, BlockCols, false> 
+	: public UnaryEvaluator<Block<ArgType, BlockRows, BlockCols>>
 {
-	/*using XprType = 
-	explicit block_evaluator(const XprType& xpr) : m_op(xpr.functor()), m_lhsImpl(xpr.lhs()),
-		m_rhsImpl(xpr.rhs()) {}
+	using Base = UnaryEvaluator<Block<ArgType, BlockRows, BlockCols>>;
+	using XprType = Block<ArgType, BlockRows, BlockCols>;
+public:
+	explicit BlockEvaluator(const XprType& xpr) : Base(xpr) {}
+};
+
+template<typename ArgType, int BlockRows, int BlockCols>
+class UnaryEvaluator<Block<ArgType, BlockRows, BlockCols>>
+{
+	using XprType = Block<ArgType, BlockRows, BlockCols>;
+	using Scalar = XprType::Scalar;
+	using CoeffReturnType = XprType::CoeffReturnType;
+
+public:
+	UnaryEvaluator(const XprType& block) 
+		: m_argImpl(block), m_startRow(block.startRow()), m_startCol(block.startCol())
+	{}
 
 	CoeffReturnType coeff(int row, int col) const
 	{
-		return m_xpr.coeff(m_startRow + row, m_startCol + col);
+		return m_argImpl.coeff(m_startRow + row, m_startCol + col);
+	}
+
+	CoeffReturnType coeff(int index) const
+	{
+		if constexpr (XprType::RowsAtCompileTime == 1)
+			return coeff(m_startRow, m_startCol + index);
+		else
+			return coeff(m_startRow + index, m_startCol);
 	}
 
 	Scalar& coeffRef(int row, int col)
 	{
-		static_assert(is_lvalue<XprType>, "The expression is not a lvalue. It is read only.");
-		return m_xpr.coeffRef(m_startRow + row, m_startCol + col);
-	}*/
+		return m_argImpl.coeffRef(m_startRow + row, m_startCol + col);
+	}
+
+	Scalar& coeffRef(int index)
+	{
+		if constexpr (XprType::RowsAtCompileTime == 1)
+			return coeff(m_startRow, m_startCol + index);
+		else
+			return coeff(m_startRow + index, m_startCol);
+	}
+
+	template<int LoadMode, typename PacketType>
+	PacketType packet(int row, int col) const
+	{
+		return m_argImpl.packet<LoadMode, PacketType>(m_startRow + row, m_startCol + col);
+	}
+
+private:
+	Evaluator<XprType> m_argImpl;
+	int m_startRow;
+	int m_startCol;
 };
 
 }

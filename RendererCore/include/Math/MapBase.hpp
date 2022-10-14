@@ -57,7 +57,7 @@ public:
 
 	CoeffReturnType coeff(int index) const
 	{
-		static_assert(not_none(traist<Derived>::Flags & Flag::LinearAccess) ||
+		static_assert(NotNone(traits<Derived>::Flags & Flag::LinearAccess) ||
 			IsVectorAtCompileTime);
 		return m_data[index * innerStride()];
 	}
@@ -103,7 +103,7 @@ public:
 
 	ScalarWithConstIfNotLvalue& coeffRef(int index)
 	{
-		static_assert(not_none(traist<Derived>::Flags & Flag::LinearAccess) ||
+		static_assert(NotNone(traits<Derived>::Flags & Flag::LinearAccess) ||
 			IsVectorAtCompileTime);
 		return this->data[index * innerStride()];
 	}

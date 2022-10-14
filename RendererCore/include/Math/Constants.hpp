@@ -31,10 +31,10 @@ enum class Flag : unsigned int
 	RowMajor			= 0x1,
 	EvalBeforeNesting	= 0x2,
 	PacketAccess		= 0x4,
-	LinearAccess		= 0x10,
-	Lvalue				= 0x20,
-	DirectAccess		= 0x40,		// 表示可以直接访问底层数组，包含data()函数
-	NestByRef			= 0x100,
+	LinearAccess		= 0x8,
+	Lvalue				= 0x10,
+	DirectAccess		= 0x20,		// 表示可以直接访问底层数组，包含data()函数
+	NestByRef			= 0x40,
 };
 
 #ifdef VECTORIZED
@@ -102,6 +102,6 @@ constexpr bool operator!(const Enum& e)
 }
 
 template<typename Enum> requires std::is_enum_v<Enum> && enum_traits<Enum>::has_none
-constexpr bool not_none(const Enum& e) { return e != Enum::None; }
+constexpr bool NotNone(const Enum& e) { return e != Enum::None; }
 
 }

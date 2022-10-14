@@ -23,7 +23,7 @@ template<typename Lhs, typename Rhs,
 struct dot_nocheck
 {
 	using Scalar = traits<Lhs>::Scalar;
-	using product = scalar_product_op<Scalar>;
+	using product = ScalarProductOp<Scalar>;
 
 	static Scalar Run(const Lhs& a, const Rhs& b)
 	{
@@ -35,7 +35,7 @@ template<typename Lhs, typename Rhs>
 struct dot_nocheck<Lhs, Rhs, true>
 {
 	using Scalar = traits<Lhs>::Scalar;
-	using product = scalar_product_op<Scalar>;
+	using product = ScalarProductOp<Scalar>;
 
 	static Scalar Run(const Lhs& a, const Rhs& b)
 	{

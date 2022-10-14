@@ -20,12 +20,23 @@ namespace LCH::Math
 template<typename BinaryOp, typename Lhs, typename Rhs>
 struct traits<CwiseBinaryOp<BinaryOp, Lhs, Rhs>>
 {
+private:
 	using LhsPlain = remove_all_t<Lhs>;
 	using RhsPlain = remove_all_t<Lhs>;
+	constexpr static Flag LhsFlags = traits<LhsPlain>::Flags;
+	constexpr static Flag RhsFlags = traits<RhsPlain>::Flags;
+	constexpr static bool SameType = std::is_same_v<typename Lhs::Scalar, typename Rhs::Scalar>;
+	constexpr static bool StorageOrdersAgree = (LhsFlags & Flag::RowMajor) == (RhsFlags & Flag::RowMajor);
+	// 判断是否要开启LinearAccessBit和PacketAccessBit位
+	constexpr static Flag Flags0 = (LhsFlags & RhsFlags) &
+			((StorageOrdersAgree ? Flag::LinearAccess : Flag::None) |
+				(StorageOrdersAgree && SameType ? Flag::PacketAccess : Flag::None));
+
+public:
 	using Scalar = traits<LhsPlain>::Scalar;
 	constexpr static int RowsAtCompileTime = traits<LhsPlain>::RowsAtCompileTime;
 	constexpr static int ColsAtCompileTime = traits<LhsPlain>::ColsAtCompileTime;
-	constexpr static Flag Flags = traits<LhsPlain>::Flags & Flag::RowMajor;
+	constexpr static Flag Flags = Flags0 | (LhsFlags & Flag::RowMajor);	// 取Lhs的RowMajorBit标志位
 	constexpr static int Alignment = traits<LhsPlain>::Alignment < traits<RhsPlain>::Alignment ? 
 		traits<LhsPlain>::Alignment : traits<RhsPlain>::Alignment;
 };

@@ -35,7 +35,7 @@ public:
 	static constexpr bool IsVectorAtCompileTime = traits<Derived>::RowsAtCompileTime == 1 ||
 												  traits<Derived>::ColsAtCompileTime == 1;
 	static constexpr Flag Flags = traits<Derived>::Flags;
-	static constexpr bool IsRowMajor = not_none(traits<Derived>::Flags & Flag::RowMajor);
+	static constexpr bool IsRowMajor = NotNone(traits<Derived>::Flags & Flag::RowMajor);
 	static constexpr int InnerSizeAtCompileTime = IsVectorAtCompileTime ? SizeAtCompileTime
 												: IsRowMajor ? ColsAtCompileTime : RowsAtCompileTime;
 	static constexpr int InnerStrideAtCompileTime = inner_stride_at_compile_time<Derived>;
@@ -51,21 +51,6 @@ public:
 		return IsVectorAtCompileTime ? size() : IsRowMajor ? cols() : rows();
 	}
 
-public:
-	template<typename OtherDerived>
-	CwiseBinaryOp<scalar_sum_op<Scalar>, Derived, OtherDerived> operator+(const MatrixBase<OtherDerived>& other)
-	{
-		static_assert(std::is_same_v<Scalar, traits<OtherDerived>::Scalar>, "You mix operands of different types.");
-		return CwiseBinaryOp<scalar_sum_op<Scalar>, Derived, OtherDerived>(derived(), other.derived());
-	}
-
-	template<typename OtherDerived>
-	CwiseBinaryOp<scalar_sub_op<Scalar>, Derived, OtherDerived> operator-(const MatrixBase<OtherDerived>& other)
-	{
-		static_assert(std::is_same_v<Scalar, traits<OtherDerived>::Scalar>, "You mix operands of different types.");
-		return CwiseBinaryOp<scalar_sub_op<Scalar>, Derived, OtherDerived>(derived(), other.derived());
-	}
-
 	Transpose<Derived> transpose()
 	{
 		return Transpose<Derived>(derived());
@@ -75,6 +60,21 @@ public:
 
 	template<typename BinaryOp>
 	Scalar redux(const BinaryOp& func) const;
+
+public:
+	template<typename OtherDerived>
+	CwiseBinaryOp<ScalarSumOp<Scalar>, Derived, OtherDerived> operator+(const MatrixBase<OtherDerived>& other)
+	{
+		static_assert(std::is_same_v<Scalar, traits<OtherDerived>::Scalar>, "You mix operands of different types.");
+		return CwiseBinaryOp<ScalarSumOp<Scalar>, Derived, OtherDerived>(derived(), other.derived());
+	}
+
+	template<typename OtherDerived>
+	CwiseBinaryOp<ScalarSubOp<Scalar>, Derived, OtherDerived> operator-(const MatrixBase<OtherDerived>& other)
+	{
+		static_assert(std::is_same_v<Scalar, traits<OtherDerived>::Scalar>, "You mix operands of different types.");
+		return CwiseBinaryOp<ScalarSubOp<Scalar>, Derived, OtherDerived>(derived(), other.derived());
+	}
 
 	template<typename OtherDerived>
 	Scalar Dot(const MatrixBase<OtherDerived>& other) const;

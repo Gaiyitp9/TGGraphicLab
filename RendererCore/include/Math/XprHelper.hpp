@@ -42,8 +42,8 @@ using add_const_on_value_type_t = typename add_const_on_value_type<T>::type;
 template<typename T>
 struct ref_selector
 {
-	using type = std::conditional_t<not_none(traits<T>::Flags & Flag::NestByRef), const T&, const T>;
-	using non_const_type = std::conditional_t<not_none(traits<T>::Flags & Flag::NestByRef), T&, T>;
+	using type = std::conditional_t<NotNone(traits<T>::Flags & Flag::NestByRef), const T&, const T>;
+	using non_const_type = std::conditional_t<NotNone(traits<T>::Flags & Flag::NestByRef), T&, T>;
 };
 
 // 变量对应的包特性(包中有多个变量，表示SIMD中使用的变量，比如__m128)
@@ -101,7 +101,7 @@ inline constexpr int default_alignment = compute_default_alignment_helper(Size *
 // 判断是否是左值
 template<typename XprType>
 inline constexpr bool is_lvalue = (!std::is_const_v<XprType>)
-								&& not_none(traits<XprType>::Flags & Flag::Lvalue);
+								&& NotNone(traits<XprType>::Flags & Flag::Lvalue);
 
 // 两个矩阵表达式的尺寸是否一致
 template<typename Type0, typename Type1>

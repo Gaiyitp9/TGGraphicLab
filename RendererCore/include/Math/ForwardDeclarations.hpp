@@ -22,11 +22,11 @@ template<typename T> struct traits<const T> : traits<T> {};
 
 // 是否可以直接访问底层数据
 template<typename XprType>
-inline constexpr bool has_direct_access = not_none(traits<XprType>::Flags & Flag::DirectAccess);
+inline constexpr bool has_direct_access = NotNone(traits<XprType>::Flags & Flag::DirectAccess);
 
 // 是否可以写入数据
 template<typename XprType>
-inline constexpr bool has_write_access = not_none(traits<XprType>::Flags & Flag::Lvalue);
+inline constexpr bool has_write_access = NotNone(traits<XprType>::Flags & Flag::Lvalue);
 
 // 访问级别
 template<typename Derived> 
@@ -51,8 +51,7 @@ template<typename T, int Size, int Rows, int Cols> class Storage;
 // 转置
 template<typename XprType> class Transpose;
 // 块
-template<typename XprType, int BlockRows = Dynamic, int BlockCols = Dynamic, 
-	bool HasDirectAccess = has_direct_access<XprType>> class Block;
+template<typename XprType, int BlockRows = Dynamic, int BlockCols = Dynamic> class Block;
 // 映射基类
 template<typename Derived, 
 	AccessorLevel Level = has_write_access<Derived> ? AccessorLevel::Write : AccessorLevel::ReadOnly>
@@ -61,14 +60,14 @@ class MapBase;
 // 二元运算
 template<typename BinaryOp, typename Lhs, typename Rhs> class CwiseBinaryOp;
 // 加法运算
-template<typename Scalar> struct scalar_sum_op;
+template<typename Scalar> class ScalarSumOp;
 // 减法运算
-template<typename Scalar> struct scalar_sub_op;
+template<typename Scalar> class ScalarSubOp;
 // 乘法运算
-template<typename Scalar> struct scalar_product_op;
+template<typename Scalar> class ScalarProductOp;
 
 // 表达式求值器
-template<typename T> struct evaluator;
-template<typename T> struct evaluator<const T> : evaluator<T> {};
+template<typename T> class Evaluator;
+template<typename T> class Evaluator<const T> : Evaluator<T> {};
 
 }

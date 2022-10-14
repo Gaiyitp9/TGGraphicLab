@@ -54,7 +54,7 @@ public:
 	template<typename OtherDerived>
 	Matrix& operator=(const MatrixBase<OtherDerived>& other)
 	{
-		call_assignment(this->derived(), other.derived());
+		CallAssignment(this->derived(), other.derived());
 		return this->derived();
 	}
 

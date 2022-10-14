@@ -17,15 +17,15 @@
 namespace LCH::Math
 {
 
-template<typename DstScalar, typename SrcScalar>
-struct assign_op
+template<typename Scalar>
+struct AssignOp
 {
-	void AssignCoeff(DstScalar& a, const SrcScalar& b) const { a = b; }
+	void AssignCoeff(Scalar& dst, const Scalar& src) const { dst = src; }
 
 	template<int Alignment, typename Packet>
-	void AssignPacket(DstScalar* a, const Packet& b) const
+	void AssignPacket(Scalar* dst, const Packet& src) const
 	{
-		pstoret<DstScalar, Packet, Alignment>(a, b);
+		pstoret<Scalar, Packet, Alignment>(dst, src);
 	}
 };
 

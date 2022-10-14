@@ -18,30 +18,33 @@ namespace LCH::Math
 {
 
 template<typename Scalar>
-struct scalar_sum_op
+class ScalarSumOp
 {
+public:
 	Scalar operator()(const Scalar& a, const Scalar& b) const { return a + b; }
 
 	template<typename Packet>
-	Packet packetOp(const Packet& a, const Packet& b) const { return padd(a, b); }
+	Packet PacketOp(const Packet& a, const Packet& b) const { return padd(a, b); }
 };
 
 template<typename Scalar>
-struct scalar_sub_op
+class ScalarSubOp
 {
+public:
 	Scalar operator()(const Scalar& a, const Scalar& b) const { return a - b; }
 
 	template<typename Packet>
-	Packet packetOp(const Packet& a, const Packet& b) const { return psub(a, b); }
+	Packet PacketOp(const Packet& a, const Packet& b) const { return psub(a, b); }
 };
 
 template<typename Scalar>
-struct scalar_product_op
+class ScalarProductOp
 {
+public:
 	Scalar operator()(const Scalar& a, const Scalar& b) const { return a * b; }
 
 	template<typename Packet>
-	Packet packetOp(const Packet& a, const Packet& b) const { return pmul(a, b); }
+	Packet PacketOp(const Packet& a, const Packet& b) const { return pmul(a, b); }
 };
 
 }

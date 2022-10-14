@@ -23,7 +23,7 @@ typename MatrixBase<Derived>::Scalar MatrixBase<Derived>::sum() const
 	if (SizeAtCompileTime == 0 || (SizeAtCompileTime == Dynamic && size() == 0))
 		return Scalar(0);
 
-	return derived().redux(scalar_sum_op<Scalar, Scalar>());
+	return derived().redux(ScalarSumOp<Scalar, Scalar>());
 }
 
 template<typename Derived>

@@ -28,8 +28,8 @@ struct copy_using_evaluator_traits
 
 	constexpr static int DstAlignment = DstEvaluator::Alignment;
 	constexpr static int SrcAlignment = SrcEvaluator::Alignment;
-	constexpr static bool DstIsRowMajor = not_none(DstFlags & Flag::RowMajor);
-	constexpr static bool SrcIsRowMajor = not_none(SrcFlags & Flag::RowMajor);
+	constexpr static bool DstIsRowMajor = NotNone(DstFlags & Flag::RowMajor);
+	constexpr static bool SrcIsRowMajor = NotNone(SrcFlags & Flag::RowMajor);
 	constexpr static bool StorageOrdersAgree = DstIsRowMajor == SrcIsRowMajor;
 
 	constexpr static int InnerSize = DstIsRowMajor ? Dst::ColsAtCompileTime : Dst::RowsAtCompileTime;
@@ -39,8 +39,8 @@ struct copy_using_evaluator_traits
 	constexpr static int LinearPacketSize = unpacket_traits<LinearPacketType>::Size;
 	constexpr static int InnerPacketSize = unpacket_traits<InnerPacketType>::Size;
 
-	constexpr static bool MayVectorize = StorageOrdersAgree && not_none(DstFlags & SrcFlags & ActualPacketAccess);
-	constexpr static bool MayLinearize = StorageOrdersAgree && not_none(DstFlags & SrcFlags & Flag::LinearAccess);
+	constexpr static bool MayVectorize = StorageOrdersAgree && NotNone(DstFlags & SrcFlags & ActualPacketAccess);
+	constexpr static bool MayLinearize = StorageOrdersAgree && NotNone(DstFlags & SrcFlags & Flag::LinearAccess);
 	constexpr static bool MayInnerVectorize = MayVectorize && InnerSize != Dynamic && InnerSize % InnerPacketSize == 0;
 	constexpr static bool MayLinearVectorize = MayVectorize && MayLinearize;
 
@@ -61,8 +61,9 @@ struct copy_using_evaluator_traits
 };
 
 template<typename Kernel, int Index, int Stop>
-struct DefaultTraversalCompleteUnrolling
+class DefaultTraversalCompleteUnrolling
 {
+public:
 	using DstXprType = Kernel::DstXprType;
 	constexpr static int outer = Index / DstXprType::InnerSizeAtCompileTime;
 	constexpr static int inner = Index % DstXprType::InnerSizeAtCompileTime;
@@ -75,14 +76,16 @@ struct DefaultTraversalCompleteUnrolling
 };
 
 template<typename Kernel, int Stop>
-struct DefaultTraversalCompleteUnrolling<Kernel, Stop, Stop>
+class DefaultTraversalCompleteUnrolling<Kernel, Stop, Stop>
 {
+public:
 	static void Run(Kernel&) {}
 };
 
 template<typename Kernel, int Index, int Stop>
-struct LinearTraversalCompleteUnrolling
+class LinearTraversalCompleteUnrolling
 {
+public:
 	static void Run(Kernel& kernel)
 	{
 		kernel.AssignCoeff(Index);
@@ -91,14 +94,16 @@ struct LinearTraversalCompleteUnrolling
 };
 
 template<typename Kernel, int Stop>
-struct LinearTraversalCompleteUnrolling<Kernel, Stop, Stop>
+class LinearTraversalCompleteUnrolling<Kernel, Stop, Stop>
 {
+public:
 	static void Run(Kernel&) {}
 };
 
 template<typename Kernel, int Index, int Stop>
-struct VectorizedTraversalCompleteUnrolling
+class VectorizedTraversalCompleteUnrolling
 {
+public:
 	using DstXprType = Kernel::DstXprType;
 	using PacketType = Kernel::PacketType;
 
@@ -116,19 +121,21 @@ struct VectorizedTraversalCompleteUnrolling
 };
 
 template<typename Kernel, int Stop>
-struct VectorizedTraversalCompleteUnrolling<Kernel, Stop, Stop>
+class VectorizedTraversalCompleteUnrolling<Kernel, Stop, Stop>
 {
+public:
 	static void Run(Kernel&) {}
 };
 
 template<typename Kernel,
 	TraversalType Traversal = Kernel::AssignmentTraits::Traversal,
 	UnrollingType Unrolling = Kernel::AssignmentTraits::Unrolling>
-struct assignment_loop;
+class AssignmentLoop;
 
 template<typename Kernel>
-struct assignment_loop<Kernel, TraversalType::Default, UnrollingType::None>
+class AssignmentLoop<Kernel, TraversalType::Default, UnrollingType::None>
 {
+public:
 	static void Run(Kernel& kernel)
 	{
 		for (int outer = 0; outer < kernel.outerSize(); ++outer)
@@ -142,8 +149,9 @@ struct assignment_loop<Kernel, TraversalType::Default, UnrollingType::None>
 };
 
 template<typename Kernel>
-struct assignment_loop<Kernel, TraversalType::Default, UnrollingType::Complete>
+class AssignmentLoop<Kernel, TraversalType::Default, UnrollingType::Complete>
 {
+public:
 	static void Run(Kernel& kernel)
 	{
 		using DstXprType = Kernel::DstEvaluatorType::XprType;
@@ -152,8 +160,9 @@ struct assignment_loop<Kernel, TraversalType::Default, UnrollingType::Complete>
 };
 
 template<typename Kernel>
-struct assignment_loop<Kernel, TraversalType::LinearVectorized, UnrollingType::None>
+class AssignmentLoop<Kernel, TraversalType::LinearVectorized, UnrollingType::None>
 {
+public:
 	static void Run(Kernel& kernel)
 	{
 		using PacketType = Kernel::PacketType;
@@ -174,8 +183,9 @@ struct assignment_loop<Kernel, TraversalType::LinearVectorized, UnrollingType::N
 };
 
 template<typename Kernel>
-struct assignment_loop<Kernel, TraversalType::LinearVectorized, UnrollingType::Complete>
+class AssignmentLoop<Kernel, TraversalType::LinearVectorized, UnrollingType::Complete>
 {
+public:
 	static void Run(Kernel& kernel)
 	{
 		using DstXprType = Kernel::DstXprType;
@@ -191,8 +201,9 @@ struct assignment_loop<Kernel, TraversalType::LinearVectorized, UnrollingType::C
 };
 
 template<typename Kernel>
-struct assignment_loop<Kernel, TraversalType::InnerVectorized, UnrollingType::None>
+class AssignmentLoop<Kernel, TraversalType::InnerVectorized, UnrollingType::None>
 {
+public:
 	using PacketType = Kernel::PacketType;
 	constexpr static int SrcAlignment = Kernel::AssignmentTraits::SrcAlignment;
 	constexpr static int DstAlignment = Kernel::AssignmentTraits::DstAlignment;
@@ -204,13 +215,14 @@ struct assignment_loop<Kernel, TraversalType::InnerVectorized, UnrollingType::No
 		const int packetSize = unpacket_traits<PacketType>::size;
 		for (int outer = 0; outer < outerSize; ++outer)
 			for (int inner = 0; inner < innerSize; inner += packetSize)
-				kernel.template assignPacketByOuterInner<DstAlignment, SrcAlignment, PacketType>(outer, inner);
+				kernel.template AssignPacketByOuterInner<DstAlignment, SrcAlignment, PacketType>(outer, inner);
 	}
 };
 
 template<typename Kernel>
-struct assignment_loop<Kernel, TraversalType::InnerVectorized, UnrollingType::Complete>
+class AssignmentLoop<Kernel, TraversalType::InnerVectorized, UnrollingType::Complete>
 {
+public:
 	static void Run(Kernel& kernel)
 	{
 		using DstXprType = Kernel::DstXprType;
@@ -219,8 +231,9 @@ struct assignment_loop<Kernel, TraversalType::InnerVectorized, UnrollingType::Co
 };
 
 template<typename Kernel>
-struct assignment_loop<Kernel, TraversalType::Linear, UnrollingType::None>
+class AssignmentLoop<Kernel, TraversalType::Linear, UnrollingType::None>
 {
+public:
 	static void Run(Kernel& kernel)
 	{
 		const int size = kernel.size();
@@ -230,8 +243,9 @@ struct assignment_loop<Kernel, TraversalType::Linear, UnrollingType::None>
 };
 
 template<typename Kernel>
-struct assignment_loop<Kernel, TraversalType::Linear, UnrollingType::Complete>
+class AssignmentLoop<Kernel, TraversalType::Linear, UnrollingType::Complete>
 {
+public:
 	static void Run(Kernel& kernel)
 	{
 		using DstXprType = Kernel::DstXprType;
@@ -240,7 +254,7 @@ struct assignment_loop<Kernel, TraversalType::Linear, UnrollingType::Complete>
 };
 
 template<typename DstEvaluatorTypeT, typename SrcEvaluatorTypeT, typename Functor>
-class generic_assignment_kernel
+class GenericAssignmentKernel
 {
 public:
 	using DstXprType = DstEvaluatorTypeT::XprType;
@@ -250,7 +264,7 @@ public:
 	using AssignmentTraits = copy_using_evaluator_traits<DstEvaluatorType, SrcEvaluatorType, Functor>;
 	using PacketType = AssignmentTraits::PacketType;
 
-	generic_assignment_kernel(DstEvaluatorType& dst, const SrcEvaluatorType& src, int size, int outerSize,
+	GenericAssignmentKernel(DstEvaluatorType& dst, const SrcEvaluatorType& src, int size, int outerSize,
 		int innerSize, const Functor& func) : m_dst(dst), m_src(src), m_size(size), 
 		m_outerSize(outerSize), m_innerSize(innerSize), m_functor(func)
 	{}
@@ -323,48 +337,49 @@ private:
 };
 
 template<typename Dst, typename Src>
-void call_assignment_no_alias(Dst& dst, const Src& src)
+void CallAssignmentNoAlias(Dst& dst, const Src& src)
 {
 	constexpr static bool NeedToTranspose =
 		(Dst::RowsAtCompileTime == 1 && Src::ColsAtCompileTime == 1) ||
 		(Dst::ColsAtCompileTime == 1 && Src::RowsAtCompileTime == 1) &&
 		Dst::SizeAtCompileTime != 1;
-	using Functor = assign_op<typename Dst::Scalar, typename Src::Scalar>;
+	using Functor = AssignOp<typename Dst::Scalar>;
 	using ActualDstTypePlain = std::conditional_t<NeedToTranspose, Transpose<Dst>, Dst>;
 	using ActualDstType = std::conditional_t<NeedToTranspose, Transpose<Dst>, Dst&>;
-	using DstEvaluatorType = evaluator<ActualDstTypePlain>;
-	using SrcEvaluatorType = evaluator<Src>;
+	using DstEvaluatorType = Evaluator<ActualDstTypePlain>;
+	using SrcEvaluatorType = Evaluator<Src>;
 
 	static_assert(is_lvalue<Dst>, "The destination expression is not a left value.");
 	static_assert(have_same_matrix_size<ActualDstTypePlain, Src>, "You mix matrices of different sizes.");
+	static_assert(std::is_same_v<typename Dst::Scalar, typename Src::Scalar>, "You mix matrices of different types.");
 
 	Functor func;
 	ActualDstType actualDst(dst);
 	SrcEvaluatorType srcEvaluator(src);
 	DstEvaluatorType dstEvaluator(actualDst);
 
-	using Kernel = generic_assignment_kernel<DstEvaluatorType, SrcEvaluatorType, Functor>;
+	using Kernel = GenericAssignmentKernel<DstEvaluatorType, SrcEvaluatorType, Functor>;
 	Kernel kernel(dstEvaluator, srcEvaluator, dst.size(), dst.outerSize(), dst.innerSize(), func);
 
-	assignment_loop<Kernel>::Run(kernel);
+	AssignmentLoop<Kernel>::Run(kernel);
 }
 
 template<typename Dst, typename Src>
-void call_assignment(Dst& dst, Src& src)
+void CallAssignment(Dst& dst, Src& src)
 {
 	using type = Matrix<typename traits<Src>::Scalar,
 		traits<Src>::RowsAtCompileTime,
 		traits<Src>::ColsAtCompileTime,
-		not_none(traits<Src>::Flags & Flag::RowMajor) ? StorageOption::RowMajor : StorageOption::ColMajor
+		NotNone(traits<Src>::Flags & Flag::RowMajor) ? StorageOption::RowMajor : StorageOption::ColMajor
 	>;
 
 	if constexpr (evaluator_assume_aliasing<Src>)
 	{
 		type tmp(src);
-		call_assignment_no_alias(dst, tmp);
+		CallAssignmentNoAlias(dst, tmp);
 	}
 	else
-		call_assignment_no_alias(dst, src);
+		CallAssignmentNoAlias(dst, src);
 }
 
 }
