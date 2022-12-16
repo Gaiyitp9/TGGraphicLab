@@ -8,6 +8,7 @@
 #include "SlimWindows.h"
 #include "../Singleton.hpp"
 #include <unordered_map>
+#include <string>
 
 namespace LCH
 {

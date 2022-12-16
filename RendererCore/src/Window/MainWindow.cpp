@@ -31,10 +31,8 @@ namespace LCH
 		if (icon == nullptr)
 			ThrowLastErrorWithDesc(L"Invalid icon source");
 
-		if (SetClassLongPtrW(hwnd, GCLP_HICON, reinterpret_cast<LONG_PTR>(icon)) == 0)
-			ThrowLastError();
-		if (SetClassLongPtrW(hwnd, GCLP_HICONSM, reinterpret_cast<LONG_PTR>(icon)) == 0)
-			ThrowLastError();
+		SendMessageW(hwnd, WM_SETICON, ICON_BIG, reinterpret_cast<LPARAM>(icon));
+		SendMessageW(hwnd, WM_SETICON, ICON_SMALL, reinterpret_cast<LPARAM>(icon));
 	}
 
 	const std::wstring& MainWindow::Name() const noexcept
