@@ -2,9 +2,12 @@
 .vscode/
 x64/
 Win32/
-*.aps
 Debug/
 Release/
 out/
-*.sln
 CMakeUserPresets.json
+*.sln
+*.vcxproj
+*.filters
+*.user
+*.aps
