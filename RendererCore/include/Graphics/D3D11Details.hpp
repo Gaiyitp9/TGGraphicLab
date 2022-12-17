@@ -10,12 +10,8 @@
 #include <wrl/client.h>
 using Microsoft::WRL::ComPtr;
 
-#pragma comment(lib, "dxgi.lib")
-#pragma comment(lib, "d3d11.lib")
-
 #ifdef _DEBUG
 #include <dxgidebug.h>
-#pragma comment(lib, "dxguid.lib")
 #endif
 
 namespace LCH::Graphics
