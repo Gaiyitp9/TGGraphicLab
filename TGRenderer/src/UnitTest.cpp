@@ -46,14 +46,14 @@ namespace LCH
 
 	void UnitTest::ArrayAlignmentTest()
 	{
-		std::array<bool, 10> a;
+		/*std::array<bool, 10> a;
 		std::array<char, 10> b;
 		std::array<int, 10> c;
 		std::array<long long, 10> d;
 		std::array<float, 10> e;
-		std::array<double, 10> f;
+		std::array<double, 10> f;*/
 
-		Math::aligned_array<bool, 10, 8> a1;
+		/*Math::aligned_array<bool, 10, 8> a1;
 		Math::aligned_array<char, 10> b1;
 		Math::aligned_array<int, 10> c1;
 		Math::aligned_array<long long, 10> d1;
@@ -72,7 +72,7 @@ namespace LCH
 		std::cout << "aligned_array<int,10>.data()        = " << c1.data() << Math::IsAligned(c1.data(), 16) << std::endl;
 		std::cout << "aligned_array<long long, 10>.data() = " << d1.data() << Math::IsAligned(d1.data(), 16) << std::endl;
 		std::cout << "aligned_array<float, 10>.data()     = " << e1.data() << Math::IsAligned(e1.data(), 16) << std::endl;
-		std::cout << "aligned_array<double, 10>.data()    = " << f1.data() << Math::IsAligned(f1.data(), 16) << std::endl;
+		std::cout << "aligned_array<double, 10>.data()    = " << f1.data() << Math::IsAligned(f1.data(), 16) << std::endl;*/
 	}
 
 	void UnitTest::MathLibTest()
@@ -84,7 +84,7 @@ namespace LCH
 		v3[0] = 0; v3[1] = 1; v3[2] = 2; v3[3] = 3;
 		v4[0] = 2; v4[1] = 4; v4[2] = 2; v4[3] = 3;
 		Math::Vector4f result;
-		result = v1 + v2 + v3 - v4.transpose();
+		result = v1 + v2 + v3;
 		std::cout << "result: " << result.x() << " " << result.y() << " " 
 			<< result.z() << " " << result.w() << std::endl;
 

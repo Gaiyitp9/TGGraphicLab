@@ -5,49 +5,50 @@
 *****************************************************************/
 #pragma once
 
-#include "Simd.hpp"
+#include "Core.hpp"
 
 namespace LCH::Math
 {
 	class Color
 	{
-		using simd = simd_trait<float, SimdInstruction<float, 4>::type>;
 	public:
-		Color(float c = {}) { elements.fill(c); elements[3] = 1.0f; }
+		Color(float c = {}) { m_channels[0] = m_channels[1] = m_channels[2] = c; m_channels[3] = 1.0f; }
 		Color(float r, float g, float b, float a)
 		{
-			elements[0] = r;
-			elements[1] = g;
-			elements[2] = b;
-			elements[3] = a;
+			m_channels[0] = r;
+			m_channels[1] = g;
+			m_channels[2] = b;
+			m_channels[3] = a;
 		}
 
-		const float& r() const { return elements[0]; }
-		const float& g() const { return elements[1]; }
-		const float& b() const { return elements[2]; }
-		const float& a() const { return elements[3]; }
-		float& r() { return elements[0]; }
-		float& g() { return elements[1]; }
-		float& b() { return elements[2]; }
-		float& a() { return elements[3]; }
+		const float& r() const { return m_channels[0]; }
+		const float& g() const { return m_channels[1]; }
+		const float& b() const { return m_channels[2]; }
+		const float& a() const { return m_channels[3]; }
+		float& r() { return m_channels[0]; }
+		float& g() { return m_channels[1]; }
+		float& b() { return m_channels[2]; }
+		float& a() { return m_channels[3]; }
 
-		float const* RGBA() const { return elements.data(); }
+		float const* RGBA() const { return m_channels.data(); }
 
 		Color operator*(const Color& color) const
 		{
 			Color result;
-			simd::elementwise_product(elements.data(), color.elements.data(), result.elements.data());
 			return result;
 		}
 		Color operator*(float c) const
 		{
 			Color result(c);
-			simd::elementwise_product(elements.data(), result.elements.data(), result.elements.data());
+			result.m_channels[0] *= m_channels[0];
+			result.m_channels[1] *= m_channels[1];
+			result.m_channels[2] *= m_channels[2];
+			result.m_channels[3] *= m_channels[3];
 			return result;
 		}
 
 	private:
-		aligned_array<float, 4, simd::Alignment> elements;
+		Vector4f m_channels;
 
 	public:
 		static Color AliceBlue;				// 爱丽丝蓝

@@ -1,82 +1,102 @@
-/************************************************************************
-* This file is part of Eigen, a lightweight C++ template library		*
-* for linear algebra.													*
-*																		*
-* Copyright (C) 2011 Benoit Jacob <jacob.benoit.1@gmail.com>			*
-* Copyright (C) 2011-2014 Gael Guennebaud <gael.guennebaud@inria.fr>	*
-* Copyright (C) 2011-2012 Jitse Niesen <jitse@maths.leeds.ac.uk>		*
-*																		*
-* This Source Code Form is subject to the terms of the Mozilla			*
-* Public License v. 2.0. If a copy of the MPL was not distributed		*
-* with this file, You can obtain one at http://mozilla.org/MPL/2.0/.	*
-*																		*
-* Noted: I made some modifications in this file.						*
-*************************************************************************/
+/****************************************************************
+* TianGong RenderLab											*
+* Copyright (c) Gaiyitp9. All rights reserved.					*
+* This code is licensed under the MIT License (MIT).			*
+*****************************************************************/
 #pragma once
 
 namespace LCH::Math
 {
-
-template<typename BinaryOp, typename Lhs, typename Rhs>
-struct traits<CwiseBinaryOp<BinaryOp, Lhs, Rhs>>
-{
-private:
-	using LhsPlain = remove_all_t<Lhs>;
-	using RhsPlain = remove_all_t<Lhs>;
-	constexpr static Flag LhsFlags = traits<LhsPlain>::Flags;
-	constexpr static Flag RhsFlags = traits<RhsPlain>::Flags;
-	constexpr static bool SameType = std::is_same_v<typename Lhs::Scalar, typename Rhs::Scalar>;
-	constexpr static bool StorageOrdersAgree = (LhsFlags & Flag::RowMajor) == (RhsFlags & Flag::RowMajor);
-	// 判断是否要开启LinearAccessBit和PacketAccessBit位
-	constexpr static Flag Flags0 = (LhsFlags & RhsFlags) &
-			((StorageOrdersAgree ? Flag::LinearAccess : Flag::None) |
-				(StorageOrdersAgree && SameType ? Flag::PacketAccess : Flag::None));
-
-public:
-	using Scalar = traits<LhsPlain>::Scalar;
-	constexpr static int RowsAtCompileTime = traits<LhsPlain>::RowsAtCompileTime;
-	constexpr static int ColsAtCompileTime = traits<LhsPlain>::ColsAtCompileTime;
-	constexpr static Flag Flags = Flags0 | (LhsFlags & Flag::RowMajor);	// 取Lhs的RowMajorBit标志位
-	constexpr static int Alignment = traits<LhsPlain>::Alignment < traits<RhsPlain>::Alignment ? 
-		traits<LhsPlain>::Alignment : traits<RhsPlain>::Alignment;
-};
-
-// 二元运算表达式
-template<typename BinaryOp, typename LhsType, typename RhsType>
-class CwiseBinaryOp : public MatrixBase<CwiseBinaryOp<BinaryOp, LhsType, RhsType>>
-{
-public:
-	using Functor	= remove_all_t<BinaryOp>;
-	using LhsPlain	= remove_all_t<LhsType>;
-	using RhsPlain	= remove_all_t<RhsType>;
-	using LhsNested = ref_selector<LhsPlain>::type;
-	using RhsNested = ref_selector<RhsPlain>::type;
-
-	static_assert(have_same_matrix_size<LhsPlain, RhsPlain>, "You mix matrices of different sizes.");
-
-public:
-	CwiseBinaryOp(const LhsPlain& lhs, const RhsPlain& rhs, const Functor& functor = Functor())
-			: m_lhs(lhs), m_rhs(rhs), m_functor(functor)
-	{}
-
-	CwiseBinaryOp(const CwiseBinaryOp<BinaryOp, LhsType, RhsType>&) = default;
-
-	constexpr int rows() const
+	// 加法函数
+	template<typename Scalar>
+	class ScalarSumOp
 	{
-		return traits<LhsPlain>::RowsAtCompileTime == Dynamic ? m_rhs.rows() : m_lhs.rows();
-	}
-	constexpr int cols() const
+	public:
+		Scalar operator()(const Scalar& a, const Scalar& b) const { return a + b; }
+
+		template<typename Packet>
+		Packet PacketOp(const Packet& a, const Packet& b) const { return padd(a, b); }
+	};
+	// 减法函数
+	template<typename Scalar>
+	class ScalarSubOp
 	{
-		return traits<LhsPlain>::ColsAtCompileTime == Dynamic ? m_rhs.cols() : m_lhs.cols();
-	}
-	const LhsPlain& lhs() const { return m_lhs; }
-	const RhsPlain& rhs() const { return m_rhs; }
-	const Functor& functor() const { return m_functor; }
+	public:
+		Scalar operator()(const Scalar& a, const Scalar& b) const { return a - b; }
 
-private:
-	const Functor m_functor;
-	LhsNested m_lhs;
-	RhsNested m_rhs;
-};
+		template<typename Packet>
+		Packet PacketOp(const Packet& a, const Packet& b) const { return psub(a, b); }
+	};
+	// 乘法函数
+	template<typename Scalar>
+	class ScalarProductOp
+	{
+	public:
+		Scalar operator()(const Scalar& a, const Scalar& b) const { return a * b; }
 
+		template<typename Packet>
+		Packet PacketOp(const Packet& a, const Packet& b) const { return pmul(a, b); }
+	};
+
+	// 直接展开计算
+	template<typename Matrix, typename Functor, int Index, int Stop>
+	struct DefaultBinaryOp
+	{
+		static void Run(Matrix& dst, const Matrix& left, const Matrix& right, const Functor& functor)
+		{
+			dst[Index] = functor(left[Index], right[Index]);
+			DefaultBinaryOp<Matrix, Functor, Index + 1, Stop>::Run(dst, left, right, functor);
+		}
+	};
+	template<typename Matrix, typename Functor, int Stop>
+	struct DefaultBinaryOp<Matrix, Functor, Stop, Stop>
+	{
+		static void Run(Matrix&, const Matrix&, const Matrix&, const Functor&) {}
+	};
+
+	// 向量化计算
+	template<typename Matrix, typename Functor, int Index, int Stop>
+	struct VectorizedBinaryOp
+	{
+		static void Run(Matrix& dst, const Matrix& left, const Matrix& right, const Functor& functor)
+		{
+			// 根据矩阵是否对齐来选择函数版本
+			pstoret<Matrix::PacketType, Matrix::IsAligned>(
+				dst.data() + Index,
+				functor.template PacketOp<Matrix::PacketType>(
+					ploadt<Matrix::PacketType, Matrix::IsAligned>(left.data() + Index),
+					ploadt<Matrix::PacketType, Matrix::IsAligned>(right.data() + Index))
+			);
+			constexpr static int NextIndex = Index + unpacket_traits<Matrix::PacketType>::Size;
+			VectorizedBinaryOp<Matrix, Functor, NextIndex, Stop>::Run(dst, left, right, functor);
+		}
+	};
+
+	template<typename Matrix, typename Functor, int Stop>
+	struct VectorizedBinaryOp<Matrix, Functor, Stop, Stop>
+	{
+		static void Run(Matrix&, const Matrix&, const Matrix&, const Functor&) {}
+	};
+
+	template<typename Matrix, typename Functor>
+	struct CwiseBinaryOp
+	{
+		static Matrix Run(const Matrix& left, const Matrix& right)
+		{
+			Matrix dst;
+			Functor functor;
+			if constexpr (Support_SIMD)
+			{
+				constexpr static int vectorizableSize = (Matrix::SizeAtCompileTime / unpacket_traits<Matrix::PacketType>::Size)
+					* unpacket_traits<Matrix::PacketType>::Size;
+				VectorizedBinaryOp<Matrix, Functor, 0, vectorizableSize>::Run(dst, left, right, functor);
+				DefaultBinaryOp<Matrix, Functor, vectorizableSize, Matrix::SizeAtCompileTime>::Run(dst, left, right, functor);
+			}
+			else
+			{
+				DefaultBinaryOp<Matrix, Functor, 0, Matrix::SizeAtCompileTime>::Run(dst, left, right, functor);
+			}
+			return dst;
+		}
+	};
 }
