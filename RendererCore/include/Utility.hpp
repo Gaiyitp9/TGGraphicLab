@@ -8,7 +8,7 @@
 #include "SlimWindows.h"
 #include <locale>
 
-namespace LCH
+namespace TG
 {
 	class Utility
 	{

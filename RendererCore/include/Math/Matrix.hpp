@@ -5,7 +5,7 @@
 *****************************************************************/
 #pragma once
 
-namespace LCH::Math
+namespace TG::Math
 {
 	template<typename Scalar, int Rows, int Cols, StorageOption Option>
 	class Matrix

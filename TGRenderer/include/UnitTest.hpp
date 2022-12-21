@@ -9,7 +9,7 @@
 #include <ctime>
 #include <string>
 
-namespace LCH
+namespace TG
 {
 	class UnitTest
 	{

@@ -10,7 +10,7 @@
 #include <unordered_map>
 #include <string>
 
-namespace LCH
+namespace TG
 {
 	// 窗口种类
 	enum class WindowType

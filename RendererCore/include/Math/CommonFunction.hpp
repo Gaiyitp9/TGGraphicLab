@@ -7,7 +7,7 @@
 
 #include "../Diagnostics/MemoryDbg.hpp"
 
-namespace LCH::Math
+namespace TG::Math
 {
 
 inline constexpr double PI = 3.14159265358979;

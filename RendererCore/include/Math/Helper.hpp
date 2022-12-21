@@ -5,7 +5,7 @@
 *****************************************************************/
 #pragma once
 
-namespace LCH::Math
+namespace TG::Math
 {
 	enum class StorageOption : char
 	{
@@ -21,11 +21,6 @@ namespace LCH::Math
 			Rows != 1 && Cols == 1 ? StorageOption::ColMajor :
 			DefaultMatrixStorageOrderOption)
 	> class Matrix;
-
-	// 变量对应的包特性(包中有多个变量，表示SIMD中使用的变量，比如__m128)
-	template<typename T> struct packet_traits;
-	// 包的特性(通过包获得特性，上面是通过变量获得)
-	template<typename T> struct unpacket_traits;
 
 	// 寻找最合适的包，核心思路是尽可能使用SIMD，所以根据包的尺寸要是Size的整数倍
 	// 如果不满足，就检查半包(半包指的是包尺寸一半的包，比如__m128是__m256的半包)

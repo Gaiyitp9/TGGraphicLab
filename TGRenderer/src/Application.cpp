@@ -8,7 +8,7 @@
 #include "Application.hpp"
 #include "Diagnostics/WinAPIException.hpp"
 
-namespace LCH
+namespace TG
 {
 	Application::Application()
 	{
@@ -63,7 +63,7 @@ namespace LCH
 
 		while (true)
 		{
-			if (const auto code = LCH::Window::ProcessMessage())
+			if (const auto code = Window::ProcessMessage())
 				return *code;
 
 			auto it = windows.begin();

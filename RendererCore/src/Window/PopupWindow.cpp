@@ -7,7 +7,7 @@
 #include "Diagnostics/MemoryDbg.hpp"		// 必须放在文件头部，保证malloc使用的是debug版本
 #include "Window/PopupWindow.hpp"
 
-namespace LCH
+namespace TG
 {
 	PopupWindow::PopupWindow(int x, int y, int width, int height, std::shared_ptr<Window> parent)
 		: Window(x, y, width, height, parent)

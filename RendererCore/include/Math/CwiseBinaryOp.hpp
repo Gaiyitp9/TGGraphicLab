@@ -5,7 +5,7 @@
 *****************************************************************/
 #pragma once
 
-namespace LCH::Math
+namespace TG::Math
 {
 	// 加法函数
 	template<typename Scalar>

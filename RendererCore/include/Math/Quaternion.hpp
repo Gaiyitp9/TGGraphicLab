@@ -7,7 +7,7 @@
 
 #include "Core.hpp"
 
-namespace LCH::Math
+namespace TG::Math
 {
 	template<typename T>
 	concept quaternion_type = std::is_same_v<T, double> || std::is_same_v<T, float>;

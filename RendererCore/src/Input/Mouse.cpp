@@ -7,7 +7,7 @@
 #include "Input/Mouse.hpp"
 #include "Diagnostics/Debug.hpp"
 
-namespace LCH
+namespace TG
 {
 	Mouse::Mouse()
 	{

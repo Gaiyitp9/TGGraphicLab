@@ -11,7 +11,7 @@
 #include <queue>
 #include "InputEvent.hpp"
 
-namespace LCH
+namespace TG
 {
 	class Keyboard
 	{

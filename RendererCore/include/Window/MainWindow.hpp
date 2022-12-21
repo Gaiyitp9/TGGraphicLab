@@ -9,7 +9,7 @@
 #include "Input/InputSystem.hpp"
 #include "Chronometer.hpp"
 
-namespace LCH
+namespace TG
 {
 	class MainWindow : public Window
 	{

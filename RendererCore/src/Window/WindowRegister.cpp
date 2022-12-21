@@ -11,7 +11,7 @@
 
 #define REGISTER_MESSAGE(msg) {msg, L#msg}
 
-namespace LCH
+namespace TG
 {
 	WindowRegister::WindowRegister()
 		: m_windowMessage({

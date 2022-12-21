@@ -6,7 +6,7 @@
 
 #include "Input/InputSystem.hpp"
 
-namespace LCH
+namespace TG
 {
 	InputSystem::InputSystem()
 	{

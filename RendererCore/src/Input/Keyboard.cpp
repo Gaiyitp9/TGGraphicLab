@@ -7,7 +7,7 @@
 #include "Input/Keyboard.hpp"
 #include "Diagnostics/Debug.hpp"
 
-namespace LCH
+namespace TG
 {
 	Keyboard::Keyboard()
 	{

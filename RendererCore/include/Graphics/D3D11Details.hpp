@@ -14,7 +14,7 @@ using Microsoft::WRL::ComPtr;
 #include <dxgidebug.h>
 #endif
 
-namespace LCH::Graphics
+namespace TG::Graphics
 {
 	DXGI_FORMAT DirectXFormatMapping(Format format);
 

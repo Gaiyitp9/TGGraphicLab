@@ -7,7 +7,7 @@
 #include "Diagnostics/MemoryDbg.hpp"		// 必须放在文件头部，保证malloc使用的是debug版本
 #include "Utility.hpp"
 
-namespace LCH
+namespace TG
 {
 	std::wstring Utility::AnsiToWideString(const std::string& str)
 	{

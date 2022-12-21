@@ -10,7 +10,7 @@
 #include <queue>
 #include <bitset>
 
-namespace LCH
+namespace TG
 {
 	class Mouse
 	{

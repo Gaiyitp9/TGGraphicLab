@@ -10,7 +10,7 @@
 #include <string>
 #include <vector>
 
-namespace LCH
+namespace TG
 {
 	class BaseException : public std::exception
 	{

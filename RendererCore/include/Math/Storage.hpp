@@ -7,7 +7,7 @@
 
 #include <cassert>
 
-namespace LCH::Math
+namespace TG::Math
 {
 
 	// 对齐数组

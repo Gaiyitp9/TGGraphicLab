@@ -5,30 +5,18 @@
 *****************************************************************/
 #pragma once
 
-// 使用SIMD需要支持AVX2或AVX指令集
-#if !defined(__AVX2__) && !defined(__AVX__)
-#error AVX2 required.
-#endif
-
-#include <immintrin.h>
-
-namespace LCH::Math
+namespace TG::Math
 {
-	inline constexpr int MIN_ALIGN_BYTES = 16;
-	inline constexpr int MAX_ALIGN_BYTES = 32;
-	inline constexpr int DEFAULT_ALIGN_BYTES = MAX_ALIGN_BYTES;
-	inline constexpr bool Support_SIMD = true;
-
+	// 变量对应的包特性(包中有多个变量，表示SIMD中使用的变量，比如__m128)
 	template<typename T>
 	struct packet_traits
 	{
 		using type = T;
 		using half = T;
 		constexpr static int  Size = 1;						// 包尺寸
-		constexpr static bool HasHalfPacket = false;		// 是否有半包
 	};
 	template<typename T> struct packet_traits<const T> : packet_traits<T> {};
-
+	// 包的特性(通过包获得特性，上面是通过变量获得)
 	template<typename T> struct unpacket_traits
 	{
 		using type = T;
@@ -37,6 +25,19 @@ namespace LCH::Math
 		constexpr static int Alignment = 1;
 	};
 	template<typename T> struct unpacket_traits<const T> : unpacket_traits<T> { };
+}
+
+// 使用SIMD需要支持AVX2或AVX指令集
+#if defined(__AVX2__) || defined(__AVX__)
+
+#include <immintrin.h>
+
+namespace TG::Math
+{
+	inline constexpr int MIN_ALIGN_BYTES = 16;
+	inline constexpr int MAX_ALIGN_BYTES = 32;
+	inline constexpr int DEFAULT_ALIGN_BYTES = MAX_ALIGN_BYTES;
+	inline constexpr bool Support_SIMD = true;
 
 	using Packet4f = __m128;
 	using Packet2d = __m128d;
@@ -51,7 +52,6 @@ namespace LCH::Math
 		using type = Packet8f;
 		using half = Packet4f;
 		constexpr static int  Size = 8;
-		constexpr static bool HasHalfPacket = true;
 	};
 
 	template<>
@@ -60,7 +60,6 @@ namespace LCH::Math
 		using type = Packet4d;
 		using half = Packet2d;
 		constexpr static int  Size = 4;
-		constexpr static bool HasHalfPacket = true;
 	};
 
 	template<>
@@ -69,7 +68,6 @@ namespace LCH::Math
 		using type = Packet8i;
 		using half = Packet4i;
 		constexpr static int  Size = 8;
-		constexpr static bool HasHalfPacket = true;
 	};
 
 	template<>
@@ -184,3 +182,12 @@ namespace LCH::Math
 	template<> inline Packet2d pmul(const Packet2d& a, const Packet2d& b) { return _mm_mul_pd(a, b); }
 	template<> inline Packet4i pmul(const Packet4i& a, const Packet4i& b) { return _mm_mul_epi32(a, b); }
 }
+#else
+namespace TG::Math
+{
+	inline constexpr int MIN_ALIGN_BYTES = 16;
+	inline constexpr int MAX_ALIGN_BYTES = 32;
+	inline constexpr int DEFAULT_ALIGN_BYTES = MAX_ALIGN_BYTES;
+	inline constexpr bool Support_SIMD = true;
+}
+#endif

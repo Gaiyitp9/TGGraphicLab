@@ -7,7 +7,7 @@
 
 #include <chrono>
 
-namespace LCH
+namespace TG
 {
 	// 高精度计时器
 	class Chronometer

@@ -25,18 +25,18 @@
 #endif
 
 #define ThrowBaseExcept(description)\
-			throw LCH::BaseException(description);
+			throw TG::BaseException(description);
 
 #define ThrowIfFailed(hr)\
 			if (FAILED(hr))\
 			{\
-				throw LCH::WinAPIException(hr);\
+				throw TG::WinAPIException(hr);\
 			}
 
 #define ThrowIfFailedWithDesc(hr, description)\
 			if (FAILED(hr))\
 			{\
-				throw LCH::WinAPIException(hr, description);\
+				throw TG::WinAPIException(hr, description);\
 			}
 
 #define ThrowLastError()\
@@ -44,7 +44,7 @@
 			DWORD hr = GetLastError();\
 			if (hr > 0)\
 			{\
-				throw LCH::WinAPIException(hr);\
+				throw TG::WinAPIException(hr);\
 			}\
 		}
 
@@ -53,11 +53,11 @@
 			DWORD hr = GetLastError();\
 			if (hr > 0)\
 			{\
-				throw LCH::WinAPIException(hr, description);\
+				throw TG::WinAPIException(hr, description);\
 			}\
 		}
 
-namespace LCH
+namespace TG
 {
 	template<typename Text> struct text_trait;
 	template<typename Text> struct text_trait<const Text> : text_trait<Text> {};

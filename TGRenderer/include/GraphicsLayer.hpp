@@ -7,7 +7,7 @@
 
 #include "Graphics/Graphics.hpp"
 
-namespace LCH::Graphics
+namespace TG::Graphics
 {
 	template <LowLevelAPI API>
 	class GraphicsLayer

@@ -11,7 +11,7 @@
 #include "Input/InputEvent.hpp"
 #include "Diagnostics/Debug.hpp"
 
-namespace LCH
+namespace TG
 {
 	void UnitTest::FormatTest()
 	{

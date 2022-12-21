@@ -9,7 +9,7 @@
 #include <format>
 #include <unordered_map>
 
-namespace LCH
+namespace TG
 {
 	struct InputEvent
 	{
@@ -27,13 +27,13 @@ namespace LCH
 
 	struct InputEventInfo
 	{
-		static std::unordered_map<LCH::KeyCode, wchar_t const*> keysName;
-		static std::unordered_map<LCH::InputEvent::Type, wchar_t const*> eventTypes;
+		static std::unordered_map<KeyCode, wchar_t const*> keysName;
+		static std::unordered_map<InputEvent::Type, wchar_t const*> eventTypes;
 	};
 }
 
 template<typename CharT>
-struct std::formatter<LCH::InputEvent, CharT>
+struct std::formatter<TG::InputEvent, CharT>
 {
 	constexpr auto parse(basic_format_parse_context<CharT>& ctx)
 	{
@@ -63,27 +63,27 @@ struct std::formatter<LCH::InputEvent, CharT>
 	}
 
 	template<typename FormatContext>
-	auto format(const LCH::InputEvent& e, FormatContext& ctx) const
+	auto format(const TG::InputEvent& e, FormatContext& ctx) const
 	{
 		switch (outputType)
 		{
 		case OutputType::KeyOnly:
-			if (LCH::InputEventInfo::keysName.contains(e.key))
-				return std::format_to(ctx.out(), L"Key: {}", LCH::InputEventInfo::keysName[e.key]);
+			if (TG::InputEventInfo::keysName.contains(e.key))
+				return std::format_to(ctx.out(), L"Key: {}", TG::InputEventInfo::keysName[e.key]);
 			else
 				return std::format_to(ctx.out(), L"Invalid KeyCode");
 
 		case OutputType::EventOnly:
-			if (LCH::InputEventInfo::eventTypes.contains(e.type))
-				return std::format_to(ctx.out(), L"Event: {}", LCH::InputEventInfo::eventTypes[e.type]);
+			if (TG::InputEventInfo::eventTypes.contains(e.type))
+				return std::format_to(ctx.out(), L"Event: {}", TG::InputEventInfo::eventTypes[e.type]);
 			else
 				return std::format_to(ctx.out(), L"Invalid Event");
 
 		default:
-			if (LCH::InputEventInfo::keysName.contains(e.key) &&
-				LCH::InputEventInfo::eventTypes.contains(e.type))
+			if (TG::InputEventInfo::keysName.contains(e.key) &&
+				TG::InputEventInfo::eventTypes.contains(e.type))
 				return std::format_to(ctx.out(), L"Key: {}\tEvent: {}",
-					LCH::InputEventInfo::keysName[e.key], LCH::InputEventInfo::eventTypes[e.type]);
+					TG::InputEventInfo::keysName[e.key], TG::InputEventInfo::eventTypes[e.type]);
 			else
 				return std::format_to(ctx.out(), L"Invalid Input Event");
 		}

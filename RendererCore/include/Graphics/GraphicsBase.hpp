@@ -9,7 +9,7 @@
 #include "Window/Window.hpp"
 #include "../Math/Color.hpp"
 
-namespace LCH::Graphics
+namespace TG::Graphics
 {
 	enum class LowLevelAPI : unsigned char
 	{

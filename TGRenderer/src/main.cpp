@@ -16,21 +16,21 @@ int CALLBACK _tWinMain(_In_ HINSTANCE hInstance,
 {
 	try
 	{
-		LCH::Application app;
+		TG::Application app;
 		return app.Run();
 	}
-	catch (const LCH::BaseException& e)
+	catch (const TG::BaseException& e)
 	{
-		LCH::Debug::Log(e.what());
+		TG::Debug::Log(e.what());
 	}
 	catch (const std::exception& e)
 	{
-		LCH::Debug::LogLine("Standard exception: ");
-		LCH::Debug::Log(e.what());
+		TG::Debug::LogLine("Standard exception: ");
+		TG::Debug::Log(e.what());
 	}
 	catch (...)
 	{
-		LCH::Debug::Log(L"Unknown Exception");
+		TG::Debug::Log(L"Unknown Exception");
 	}
 
 	return -1;

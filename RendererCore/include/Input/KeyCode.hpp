@@ -5,7 +5,7 @@
 *****************************************************************/
 #pragma once
 
-namespace LCH
+namespace TG
 {
 	enum class KeyCode : unsigned char
 	{

@@ -6,7 +6,7 @@
 
 #include "Math/Color.hpp"
 
-namespace LCH::Math
+namespace TG::Math
 {
 	//-----------------------------------------------------------------
 	//	颜色取自	DirectXColors.h -- C++ Color Math library

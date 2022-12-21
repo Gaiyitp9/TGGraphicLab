@@ -11,7 +11,7 @@
 #include "Chronometer.hpp"
 #include <optional>
 
-namespace LCH
+namespace TG
 {
 	// 窗口基类
 	class Window

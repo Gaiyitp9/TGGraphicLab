@@ -8,7 +8,7 @@
 #include "Keyboard.hpp"
 #include "Mouse.hpp"
 
-namespace LCH
+namespace TG
 {
 	class InputSystem
 	{

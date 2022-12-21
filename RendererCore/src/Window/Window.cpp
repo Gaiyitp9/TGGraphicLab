@@ -7,7 +7,7 @@
 #include "Diagnostics/MemoryDbg.hpp"		// 必须放在文件头部，保证malloc使用的是debug版本
 #include "Window/Window.hpp"
 
-namespace LCH
+namespace TG
 {
 	Window::Window(int x, int y, int width, int height, std::shared_ptr<Window> parent)
 		: posX(x), posY(y), width(width), height(height), hwnd(nullptr), parent(parent)

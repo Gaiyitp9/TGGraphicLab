@@ -6,7 +6,7 @@
 
 #include "Chronometer.hpp"
 
-namespace LCH
+namespace TG
 {
 	Chronometer::Chronometer()
 	{

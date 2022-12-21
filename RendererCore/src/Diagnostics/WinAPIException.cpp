@@ -8,7 +8,7 @@
 #include "Utility.hpp"
 #include <format>
 
-namespace LCH
+namespace TG
 {
 	WinAPIException::WinAPIException(HRESULT hr, const std::wstring& description)
 		: BaseException(description), errorCode(hr)

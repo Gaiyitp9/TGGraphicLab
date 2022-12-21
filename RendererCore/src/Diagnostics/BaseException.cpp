@@ -12,7 +12,7 @@
 
 #pragma comment(lib, "DbgHelp.lib")
 
-namespace LCH
+namespace TG
 {
 	BaseException::BaseException(const std::wstring& description)
 		: m_description(description)

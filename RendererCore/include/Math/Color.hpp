@@ -7,7 +7,7 @@
 
 #include "Core.hpp"
 
-namespace LCH::Math
+namespace TG::Math
 {
 	class Color
 	{
@@ -35,15 +35,13 @@ namespace LCH::Math
 		Color operator*(const Color& color) const
 		{
 			Color result;
+			result.m_channels = m_channels * color.m_channels;
 			return result;
 		}
 		Color operator*(float c) const
 		{
 			Color result(c);
-			result.m_channels[0] *= m_channels[0];
-			result.m_channels[1] *= m_channels[1];
-			result.m_channels[2] *= m_channels[2];
-			result.m_channels[3] *= m_channels[3];
+			result.m_channels = m_channels * result.m_channels;
 			return result;
 		}
 

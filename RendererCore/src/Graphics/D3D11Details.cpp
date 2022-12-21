@@ -7,7 +7,7 @@
 #include "Graphics/D3D11Details.hpp"
 #include <format>
 
-namespace LCH::Graphics
+namespace TG::Graphics
 {
 	DXGI_FORMAT DirectXFormatMapping(Format format)
 	{

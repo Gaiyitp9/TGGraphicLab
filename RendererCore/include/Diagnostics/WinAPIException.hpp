@@ -7,7 +7,7 @@
 
 #include "BaseException.hpp"
 
-namespace LCH
+namespace TG
 {
 	class WinAPIException : public BaseException
 	{

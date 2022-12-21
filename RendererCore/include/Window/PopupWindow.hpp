@@ -7,7 +7,7 @@
 
 #include "Window.hpp"
 
-namespace LCH
+namespace TG
 {
 	// 弹出窗口
 	class PopupWindow : public Window

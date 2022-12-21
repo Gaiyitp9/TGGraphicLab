@@ -13,7 +13,7 @@
 #include <unordered_map>
 #include "GraphicsLayer.hpp"
 
-namespace LCH
+namespace TG
 {
 	class Application
 	{

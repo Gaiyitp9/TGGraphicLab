@@ -5,7 +5,7 @@
 *****************************************************************/
 #pragma once
 
-namespace LCH::Math
+namespace TG::Math
 {
 	// 直接展开赋值
 	template<typename Matrix, int Index, int Stop>
