@@ -80,7 +80,10 @@ namespace TG::Math
 	class Storage
 	{
 	public:
-		Storage() = default;
+		Storage()
+		{
+			std::memset(m_data.array, 0, Size * sizeof(T));
+		}
 		Storage(const Storage& other)
 		{
 			std::memcpy(m_data.array, other.m_data.array, Size * sizeof(T));

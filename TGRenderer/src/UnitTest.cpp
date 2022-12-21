@@ -95,6 +95,11 @@ namespace TG
 		result1 = v5 + v6;
 		std::cout << "result: " << result1[0] << " " << result1[1] << " "
 			<< result1[2] << " " << result1[3] << " " << result1[4] << std::endl;
+
+		Math::Matrix<float, 1, 1> testScalar;
+		testScalar[0] = 2;
+		float s = testScalar * 3.0f;
+		std::cout << "testScalar: " << s << std::endl;
 	}
 
 	void UnitTest::SIMDTest()

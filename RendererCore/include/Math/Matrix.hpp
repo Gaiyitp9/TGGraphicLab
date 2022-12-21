@@ -12,11 +12,14 @@ namespace TG::Math
 	{
 	public:
 		constexpr static bool IsRowMajor = Option == StorageOption::RowMajor;
+		constexpr static bool IsDynamic = Rows == Dynamic || Cols == Dynamic;
 		constexpr static bool IsVectorAtCompileTime = Rows == 1 || Cols == 1;
-		constexpr static int SizeAtCompileTime = (Rows == Dynamic || Cols == Dynamic) ? Dynamic : Rows * Cols;
+		constexpr static bool IsScalarAtCompileTime = Rows == 1 && Cols == 1;
+		constexpr static bool IsSquareAtCompileTime = Rows == Cols;
+		constexpr static int SizeAtCompileTime = IsDynamic ? Dynamic : Rows * Cols;
 		constexpr static int Alignment = Rows == Dynamic || Cols == Dynamic ? DEFAULT_ALIGN_BYTES : default_alignment<Scalar, SizeAtCompileTime>;
-		using PacketType = best_packet<Scalar, SizeAtCompileTime>;
 		constexpr static bool IsAligned = Alignment > 0;
+		using PacketType = best_packet<Scalar, SizeAtCompileTime>;
 
 	public:
 		Matrix() = default;
@@ -27,6 +30,16 @@ namespace TG::Math
 		{
 			AssignmentOp<Matrix>::Run(*this, other);
 			return *this;
+		}
+
+		// 1X1矩阵隐式转为标量
+		operator Scalar()
+		{
+			if constexpr (!IsDynamic)
+				static_assert(IsScalarAtCompileTime, "Scalar implicit type cast function only works for 1X1 dimension matrix");
+			else if (rows() != 1 && cols != 1)
+				Debug::LogLine(L"The matrix rows and cols must both equal 1");
+			return m_storage[0];
 		}
 
 	public:
@@ -102,13 +115,31 @@ namespace TG::Math
 
 		Scalar magnitude() const
 		{
-			static_assert(IsVectorAtCompileTime, "Magnitude is only for vectors.");
+			if constexpr (!IsDynamic)
+				static_assert(IsVectorAtCompileTime, "Magnitude is only for vectors.");
+			else if (rows() != 1 && cols() != 1)
+				Debug::LogLine(L"magnitude is only for vectors.");
+
 			return 0;
 		}
 
 		Scalar sqrMagnitude() const
 		{
-			static_assert(IsVectorAtCompileTime, "sqrMagnitude is only for vectors.");
+			if constexpr (!IsDynamic)
+				static_assert(IsVectorAtCompileTime, "sqrMagnitude is only for vectors.");
+			else if (rows() != 1 && cols() != 1)
+				Debug::LogLine(L"sqrMagnitude is only for vectors.");
+
+			return 0;
+		}
+
+		Scalar determinant() const
+		{
+			if constexpr (!IsDynamic)
+				static_assert(IsSquareAtCompileTime, "determinant is only for square matrix.");
+			else if (rows() != cols())
+				Debug::LogLine(L"determinant is only for square matrix.");
+
 			return 0;
 		}
 
@@ -123,15 +154,35 @@ namespace TG::Math
 			return CwiseBinaryOp<Matrix, ScalarSubOp<Scalar>>::Run(*this, other);
 		}
 
+		// 矩阵乘法(包括点乘)
+		// 注意满足矩阵的列与other矩阵的行数要相等
 		Matrix operator*(const Matrix& other) const
+		{
+
+		}
+
+		// 逐元素乘法
+		Matrix CWiseMultiple(const Matrix& other) const
 		{
 			return CwiseBinaryOp<Matrix, ScalarProductOp<Scalar>>::Run(*this, other);
 		}
 
-		Scalar Dot(const Matrix& other) const
+		// 向量叉乘
+		Matrix Cross(const Matrix& other) const
 		{
-			Scalar dot = 0;
-			return dot;
+
+		}
+
+		// 矩阵转置
+		Matrix Transpose() const
+		{
+
+		}
+
+		// 矩阵的逆
+		Matrix Inverse() const
+		{
+
 		}
 
 	private:

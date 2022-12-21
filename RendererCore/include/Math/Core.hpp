@@ -8,8 +8,8 @@
 
 #include <type_traits> 
 #include "Diagnostics/Debug.hpp"
+#include "ForwardDeclarations.hpp"
 #include "Simd.hpp"
-#include "Helper.hpp"
 #include "AssignmentOp.hpp"
 #include "CwiseBinaryOp.hpp"
 #include "Storage.hpp"
