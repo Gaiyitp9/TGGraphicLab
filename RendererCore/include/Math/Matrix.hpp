@@ -11,12 +11,14 @@ namespace TG::Math
 	class Matrix
 	{
 	public:
+		constexpr static int RowsAtCompileTime = Rows;
+		constexpr static int ColsAtCompileTime = Cols;
+		constexpr static int SizeAtCompileTime = IsDynamic ? Dynamic : Rows * Cols;
 		constexpr static bool IsRowMajor = Option == StorageOption::RowMajor;
 		constexpr static bool IsDynamic = Rows == Dynamic || Cols == Dynamic;
 		constexpr static bool IsVectorAtCompileTime = Rows == 1 || Cols == 1;
 		constexpr static bool IsScalarAtCompileTime = Rows == 1 && Cols == 1;
 		constexpr static bool IsSquareAtCompileTime = Rows == Cols;
-		constexpr static int SizeAtCompileTime = IsDynamic ? Dynamic : Rows * Cols;
 		constexpr static int Alignment = Rows == Dynamic || Cols == Dynamic ? DEFAULT_ALIGN_BYTES : default_alignment<Scalar, SizeAtCompileTime>;
 		constexpr static bool IsAligned = Alignment > 0;
 		using PacketType = best_packet<Scalar, SizeAtCompileTime>;
@@ -186,7 +188,7 @@ namespace TG::Math
 		}
 
 	private:
-		Storage<Scalar, SizeAtCompileTime, Rows, Cols> m_storage;
+		Storage<Scalar, SizeAtCompileTime, RowsAtCompileTime, ColsAtCompileTime> m_storage;
 	};
 
 	#define MATRIX_TYPEDEF(Type, TypeSuffix, Size, SizeSuffix)			\

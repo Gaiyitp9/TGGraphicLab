@@ -12,5 +12,6 @@
 #include "Simd.hpp"
 #include "AssignmentOp.hpp"
 #include "CwiseBinaryOp.hpp"
+#include "Multiple.hpp"
 #include "Storage.hpp"
 #include "Matrix.hpp"
