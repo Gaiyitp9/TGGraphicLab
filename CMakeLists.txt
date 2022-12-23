@@ -7,7 +7,10 @@ if(MSVC_VERSION GREATER_EQUAL 1930)
 	# compile definitions unicode
 	add_compile_definitions(UNICODE _UNICODE)
 	# compile options utf-8 arch:avx2 fp:precise
+	# enable address sanitzier
 	add_compile_options(/utf-8 /arch:AVX2 /fp:precise)
+	#add_compile_options(/MTd /fsanitize=address)
+	#add_link_options(/INCREMENTAL:NO)
 else()
 	message(FATAL_ERROR "no proper compiler exist.")
 endif()
