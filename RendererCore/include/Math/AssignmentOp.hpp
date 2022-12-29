@@ -48,7 +48,7 @@ namespace TG::Math
 	{
 		static void Run(Matrix& dst, const Matrix& src)
 		{
-			if constexpr (Support_SIMD)
+			if constexpr (SUPPORT_SIMD)
 			{
 				constexpr static int vectorizableSize = (Matrix::SizeAtCompileTime / unpacket_traits<Matrix::PacketType>::Size) 
 					* unpacket_traits<Matrix::PacketType>::Size;

@@ -5,6 +5,8 @@
 *****************************************************************/
 #pragma once
 
+#include <type_traits>
+
 namespace TG::Math
 {
 	template<typename Enum> requires std::is_enum_v<Enum>

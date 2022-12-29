@@ -7,31 +7,12 @@
 
 namespace TG::Math
 {
-	// 变量对应的包特性(包中有多个变量，表示SIMD中使用的变量，比如__m128)
-	template<typename T>
-	struct packet_traits
-	{
-		using type = T;
-		using half = T;
-		constexpr static int  Size = 1;						// 包尺寸
-	};
-	template<typename T> struct packet_traits<const T> : packet_traits<T> {};
-	// 包的特性(通过包获得特性，上面是通过变量获得)
-	template<typename T> struct unpacket_traits
-	{
-		using type = T;
-		using half = T;
-		constexpr static int Size = 1;
-		constexpr static int Alignment = 1;
-	};
-	template<typename T> struct unpacket_traits<const T> : unpacket_traits<T> { };
-
 	// 寻找最合适的包，核心思路是尽可能使用SIMD，所以根据包的尺寸要是Size的整数倍
 	// 如果不满足，就检查半包(半包指的是包尺寸一半的包，比如__m128是__m256的半包)
 	// 所以按以下条件按顺序判断，满足就停止寻找: 
 	// 1. 动态矩阵 2. 矩阵尺寸是包尺寸的整数倍 3. 包类型与半包类型一致
 	template<int Size, typename PacketType,
-		bool Stop = Size == Dynamic || (Size% unpacket_traits<PacketType>::Size) == 0 || std::is_same<PacketType, typename unpacket_traits<PacketType>::half>::value>
+		bool Stop = Size == DYNAMIC || (Size% unpacket_traits<PacketType>::Size) == 0 || std::is_same<PacketType, typename unpacket_traits<PacketType>::half>::value>
 	struct find_best_packet_helper;
 
 	template<int Size, typename PacketType>
@@ -60,7 +41,7 @@ namespace TG::Math
 	inline constexpr int MIN_ALIGN_BYTES = 16;
 	inline constexpr int MAX_ALIGN_BYTES = 32;
 	inline constexpr int DEFAULT_ALIGN_BYTES = MAX_ALIGN_BYTES;
-	inline constexpr bool Support_SIMD = true;
+	inline constexpr bool SUPPORT_SIMD = true;
 
 	using Packet4f = __m128;
 	using Packet2d = __m128d;
@@ -73,24 +54,18 @@ namespace TG::Math
 	struct packet_traits<float>
 	{
 		using type = Packet8f;
-		using half = Packet4f;
-		constexpr static int  Size = 8;
 	};
 
 	template<>
 	struct packet_traits<double>
 	{
 		using type = Packet4d;
-		using half = Packet2d;
-		constexpr static int  Size = 4;
 	};
 
 	template<>
 	struct packet_traits<int>
 	{
 		using type = Packet8i;
-		using half = Packet4i;
-		constexpr static int  Size = 8;
 	};
 
 	template<>
@@ -208,10 +183,10 @@ namespace TG::Math
 #else
 namespace TG::Math
 {
-	inline constexpr int MIN_ALIGN_BYTES = 16;
-	inline constexpr int MAX_ALIGN_BYTES = 32;
+	inline constexpr int MIN_ALIGN_BYTES = 1;
+	inline constexpr int MAX_ALIGN_BYTES = 1;
 	inline constexpr int DEFAULT_ALIGN_BYTES = MAX_ALIGN_BYTES;
-	inline constexpr bool Support_SIMD = true;
+	inline constexpr bool SUPPORT_SIMD = false;
 }
 #endif
 

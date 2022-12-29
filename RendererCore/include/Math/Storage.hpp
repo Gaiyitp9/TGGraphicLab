@@ -113,7 +113,7 @@ namespace TG::Math
 	};
 
 	template<typename T>
-	class Storage<T, Dynamic, Dynamic, Dynamic>
+	class Storage<T, DYNAMIC, DYNAMIC, DYNAMIC>
 	{
 	public:
 		Storage() : m_data(nullptr), m_rows(0), m_cols(0) {}
@@ -121,15 +121,15 @@ namespace TG::Math
 		{
 			std::memcpy(m_data, other.m_data, m_size * sizeof(T));
 		}
-		~Storage() { conditional_aligned_free<true>(m_data); }
+		~Storage() { conditional_aligned_free<SUPPORT_SIMD>(m_data); }
 
 		void resize(int size, int rows, int cols)
 		{
 			if (size != m_rows * m_cols)
 			{
-				conditional_aligned_free<true>(m_data);
+				conditional_aligned_free<SUPPORT_SIMD>(m_data);
 				if (size > 0)
-					m_data = reinterpret_cast<T*>(conditional_aligned_alloc<true>(sizeof(T) * size));
+					m_data = reinterpret_cast<T*>(conditional_aligned_alloc<SUPPORT_SIMD>(sizeof(T) * size));
 				else
 					m_data = nullptr;
 			}
@@ -151,8 +151,8 @@ namespace TG::Math
 			return m_data.array[index];
 		}
 
-		T const* data() const { return m_data; }
-		T* data() { return m_data; }
+		T const* data() const noexcept { return m_data; }
+		T* data() noexcept { return m_data; }
 		int rows() const noexcept { return m_rows; }
 		int cols() const noexcept { return m_cols; }
 

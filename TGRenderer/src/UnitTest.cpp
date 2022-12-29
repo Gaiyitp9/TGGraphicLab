@@ -6,7 +6,7 @@
 
 #include "UnitTest.hpp"
 #include "Utility.hpp"
-#include "Math/CommonFunction.hpp"
+#include "Math/Common.hpp"
 #include "Math/Core.hpp"
 #include "Input/InputEvent.hpp"
 #include "Diagnostics/Debug.hpp"
@@ -79,30 +79,66 @@ namespace TG
 	{
 		Math::Vector4f v1, v2, v3;
 		Math::RowVector4f v4;
-		v1[0] = 0; v1[1] = 1; v1[2] = 2; v1[3] = 3;
-		v2[0] = 0; v2[1] = 2; v2[2] = 2; v2[3] = 3;
-		v3[0] = 0; v3[1] = 1; v3[2] = 2; v3[3] = 3;
-		v4[0] = 2; v4[1] = 4; v4[2] = 2; v4[3] = 3;
+		v1[0] = 0; v1[1] = 1.5f; v1[2] = 2; v1[3] = 3;
+		v2[0] = 0; v2[1] = 2.2f; v2[2] = 2; v2[3] = 3;
+		v3[0] = 0; v3[1] = 1.6f; v3[2] = 2; v3[3] = 3;
+		v4[0] = 2; v4[1] = 4.8f; v4[2] = 2; v4[3] = 3;
 		Math::Vector4f result;
 		result = v1 + v2 + v3;
 		std::cout << "result: " << result.x() << " " << result.y() << " " 
 			<< result.z() << " " << result.w() << std::endl;
 
 		Math::Matrix<float, 5, 1> v5, v6;
-		v5[0] = 0; v5[1] = 1; v5[2] = 2; v5[3] = 3; v5[4] = 5;
-		v6[0] = 0; v6[1] = 6; v6[2] = 2; v6[3] = 3; v6[4] = -2;
+		v5[0] = 0; v5[1] = 1; v5[2] = 2.6f; v5[3] = 3; v5[4] = 5;
+		v6[0] = 0; v6[1] = 6; v6[2] = 2.9f; v6[3] = 3; v6[4] = -2;
 		Math::Matrix<float, 5, 1> result1;
 		result1 = v5 + v6;
 		std::cout << "result: " << result1[0] << " " << result1[1] << " "
 			<< result1[2] << " " << result1[3] << " " << result1[4] << std::endl;
 
-		Math::Matrix<float, 1, 1> testScalar;
-		testScalar[0] = 2;
-		float s = testScalar * 3.0f;
-		std::cout << "testScalar: " << s << std::endl;
+		Math::Matrix4f vp, view, proj;
+		view(0, 0) = 1.0f; view(0, 1) = 0.0f; view(0, 2) = 3.0f; view(0, 3) = 0.0f;
+		view(1, 0) = 0.0f; view(1, 1) = 1.0f; view(1, 2) = 0.0f; view(1, 3) = 1.0f;
+		view(2, 0) = 0.0f; view(2, 1) = 0.0f; view(2, 2) = 1.0f; view(2, 3) = 0.0f;
+		view(3, 0) = 1.0f; view(3, 1) = 0.0f; view(3, 2) = 0.0f; view(3, 3) = 1.0f;
+
+		proj(0, 0) = 1.0f; proj(0, 1) = 0.0f; proj(0, 2) = 0.0f; proj(0, 3) = 0.0f;
+		proj(1, 0) = 0.0f; proj(1, 1) = 1.0f; proj(1, 2) = 0.0f; proj(1, 3) = 0.0f;
+		proj(2, 0) = 0.0f; proj(2, 1) = 0.0f; proj(2, 2) = 1.0f; proj(2, 3) = 0.0f;
+		proj(3, 0) = 1.0f; proj(3, 1) = 0.0f; proj(3, 2) = 0.0f; proj(3, 3) = 1.0f;
+
+		vp = proj * view;
+		std::cout << "vp: " << std::endl;
+		for (int i = 0; i < 4; ++i)
+		{
+			for (int j = 0; j < 4; ++j)
+				std::cout << vp(i, j) << " ";
+			std::cout << std::endl;
+		}
+
+		Math::Matrix<float, 5, 5> vp1, view1, proj1;
+		view1(0, 0) = 1.0f; view1(0, 1) = 0.0f; view1(0, 2) = 3.0f; view1(0, 3) = 0.0f; view1(0, 4) = 0.0f;
+		view1(1, 0) = 0.0f; view1(1, 1) = 1.0f; view1(1, 2) = 0.0f; view1(1, 3) = 1.0f; view1(1, 4) = 0.0f;
+		view1(2, 0) = 0.0f; view1(2, 1) = 0.0f; view1(2, 2) = 1.0f; view1(2, 3) = 0.0f; view1(2, 4) = 0.0f;
+		view1(3, 0) = 1.0f; view1(3, 1) = 0.0f; view1(3, 2) = 0.0f; view1(3, 3) = 1.0f; view1(3, 4) = 0.0f;
+		view1(4, 0) = 1.0f; view1(4, 1) = 0.0f; view1(4, 2) = 0.0f; view1(4, 3) = 1.0f; view1(4, 4) = 1.0f;
+
+		proj1(0, 0) = 1.0f; proj1(0, 1) = 0.0f; proj1(0, 2) = 0.0f; proj1(0, 3) = 0.0f; proj1(0, 4) = 0.0f;
+		proj1(1, 0) = 0.0f; proj1(1, 1) = 1.0f; proj1(1, 2) = 0.0f; proj1(1, 3) = 0.0f; proj1(1, 4) = 0.0f;
+		proj1(2, 0) = 0.0f; proj1(2, 1) = 0.0f; proj1(2, 2) = 1.0f; proj1(2, 3) = 0.0f; proj1(2, 4) = 0.0f;
+		proj1(3, 0) = 1.0f; proj1(3, 1) = 0.0f; proj1(3, 2) = 0.0f; proj1(3, 3) = 1.0f; proj1(3, 4) = 0.0f;
+		proj1(4, 0) = 1.0f; proj1(4, 1) = 0.0f; proj1(4, 2) = 0.0f; proj1(4, 3) = 1.0f; proj1(4, 4) = 1.0f;
+		vp1 = proj1 * view1;
+		std::cout << "vp: " << std::endl;
+		for (int i = 0; i < 5; ++i)
+		{
+			for (int j = 0; j < 5; ++j)
+				std::cout << vp1(i, j) << " ";
+			std::cout << std::endl;
+		}
 	}
 
-	void UnitTest::SIMDTest()
+	/*void UnitTest::SIMDTest()
 	{
 		size_t n = 10000000;
 		int* nums = static_cast<int*>(_aligned_malloc(n * sizeof(int), 32));
@@ -274,5 +310,5 @@ namespace TG
 
 		timer.Tick();
 		std::cout << "AVX2Addf: " << timer.DeltaTime() << " ms, result = " << normal_sum << std::endl;
-	}
+	}*/
 }

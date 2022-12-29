@@ -56,7 +56,7 @@ namespace TG
 		unitTest.TimeTest();
 		unitTest.MathLibTest();
 		unitTest.ArrayAlignmentTest();
-		unitTest.SIMDTest();
+		//unitTest.SIMDTest();
 
 		d3d11Layer->CreateFrameBuffer(windows[L"天工渲染器"]);
 		d3d11Layer->CreateFrameBuffer(windows[L"辅助窗口"]);

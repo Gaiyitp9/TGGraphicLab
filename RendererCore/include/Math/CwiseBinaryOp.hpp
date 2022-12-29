@@ -55,25 +55,25 @@ namespace TG::Math
 	};
 
 	// 向量化计算
-	template<typename Matrix, typename Functor, int Index, int Stop>
+	template<typename Matrix, typename Functor, typename PacketType, bool IsAligned, int Index, int Stop>
 	struct VectorizedBinaryOp
 	{
 		static void Run(Matrix& dst, const Matrix& left, const Matrix& right, const Functor& functor)
 		{
 			// 根据矩阵是否对齐来选择函数版本
-			pstoret<Matrix::PacketType, Matrix::IsAligned>(
+			pstoret<PacketType, IsAligned>(
 				dst.data() + Index,
-				functor.template PacketOp<Matrix::PacketType>(
-					ploadt<Matrix::PacketType, Matrix::IsAligned>(left.data() + Index),
-					ploadt<Matrix::PacketType, Matrix::IsAligned>(right.data() + Index))
+				functor.template PacketOp<PacketType>(
+					ploadt<PacketType, IsAligned>(left.data() + Index),
+					ploadt<PacketType, IsAligned>(right.data() + Index))
 			);
-			constexpr static int NextIndex = Index + unpacket_traits<Matrix::PacketType>::Size;
-			VectorizedBinaryOp<Matrix, Functor, NextIndex, Stop>::Run(dst, left, right, functor);
+			constexpr static int NextIndex = Index + unpacket_traits<PacketType>::Size;
+			VectorizedBinaryOp<Matrix, Functor, PacketType, IsAligned, NextIndex, Stop>::Run(dst, left, right, functor);
 		}
 	};
 
-	template<typename Matrix, typename Functor, int Stop>
-	struct VectorizedBinaryOp<Matrix, Functor, Stop, Stop>
+	template<typename Matrix, typename Functor, typename PacketType, bool IsAligned, int Stop>
+	struct VectorizedBinaryOp<Matrix, Functor, PacketType, IsAligned, Stop, Stop>
 	{
 		static void Run(Matrix&, const Matrix&, const Matrix&, const Functor&) {}
 	};
@@ -85,16 +85,23 @@ namespace TG::Math
 		{
 			Matrix dst;
 			Functor functor;
-			if constexpr (Support_SIMD)
+			if constexpr (SUPPORT_SIMD)
 			{
-				constexpr static int vectorizableSize = (Matrix::SizeAtCompileTime / unpacket_traits<Matrix::PacketType>::Size)
-					* unpacket_traits<Matrix::PacketType>::Size;
-				VectorizedBinaryOp<Matrix, Functor, 0, vectorizableSize>::Run(dst, left, right, functor);
-				DefaultBinaryOp<Matrix, Functor, vectorizableSize, Matrix::SizeAtCompileTime>::Run(dst, left, right, functor);
+				using Scalar = traits<Matrix>::Scalar;
+				constexpr static int SizeAtCompileTime = traits<Matrix>::SizeAtCompileTime;
+				using PacketType = best_packet<Scalar, SizeAtCompileTime>;
+				constexpr static int Alignment = traits<Matrix>::IsDynamic ? DEFAULT_ALIGN_BYTES 
+					: default_alignment<Scalar, SizeAtCompileTime>;
+				constexpr static bool IsAligned = Alignment >= unpacket_traits<PacketType>::Alignment;
+				constexpr static int VectorizableSize = (SizeAtCompileTime / unpacket_traits<PacketType>::Size)
+					* unpacket_traits<PacketType>::Size;
+
+				VectorizedBinaryOp<Matrix, Functor, PacketType, IsAligned, 0, VectorizableSize>::Run(dst, left, right, functor);
+				DefaultBinaryOp<Matrix, Functor, VectorizableSize, SizeAtCompileTime>::Run(dst, left, right, functor);
 			}
 			else
 			{
-				DefaultBinaryOp<Matrix, Functor, 0, Matrix::SizeAtCompileTime>::Run(dst, left, right, functor);
+				DefaultBinaryOp<Matrix, Functor, 0, traits<Matrix>::SizeAtCompileTime>::Run(dst, left, right, functor);
 			}
 			return dst;
 		}
