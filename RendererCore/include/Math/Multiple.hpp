@@ -69,30 +69,6 @@ namespace TG::Math
 		static void Run(MatrixType&, const MatrixL&, const MatrixR&) {}
 	};
 
-	template<typename Scalar, typename PacketType, bool IsAligned, int Index, int Stop>
-	struct VectorizedDot
-	{
-		static void Run(Scalar& dot, Scalar const* left, Scalar const* right)
-		{
-			Scalar temp[unpacket_traits<PacketType>::Size];
-			pstoreu(temp, 
-				pmul(ploadt<PacketType, IsAligned>(left + Index),
-				ploadt<PacketType, IsAligned>(right + Index))
-			);
-			for (int i = 0; i < unpacket_traits<PacketType>::Size; ++i)
-				dot += temp[i];
-			
-			constexpr static int NextIndex = Index + unpacket_traits<PacketType>::Size;
-			VectorizedDot<Scalar, PacketType, IsAligned, NextIndex, Stop>::Run(dot, left, right);
-		}
-	};
-
-	template<typename Scalar, typename PacketType, bool IsAligned, int Stop>
-	struct VectorizedDot<Scalar, PacketType, IsAligned, Stop, Stop>
-	{
-		static void Run(Scalar&, Scalar const*, Scalar const*) {}
-	};
-
 	template<typename MatrixL, typename MatrixR, int Index, int Stop>
 	struct VectorizedMultiple
 	{
@@ -113,6 +89,8 @@ namespace TG::Math
 				Scalar const* leftRow = left.data() + traits<MatrixL>::ColsAtCompileTime * Row;
 				VectorizedDot<Scalar, PacketType, Traits::IsAligned,
 					0, Traits::VectorizableSize>::Run(dst(Row, Col), leftRow, rightCol);
+				DefaultDot<Scalar, Traits::VectorizableSize,
+					Traits::SizeAtCompileTime>::Run(dst(Row, Col), leftRow, rightCol);
 			}
 			else
 			{
@@ -122,11 +100,9 @@ namespace TG::Math
 				Scalar const* rightCol = right.data() + traits<MatrixR>::RowsAtCompileTime * Col;
 				VectorizedDot<Scalar, PacketType, Traits::IsAligned,
 					0, Traits::VectorizableSize>::Run(dst(Row, Col), leftRow, rightCol);
-
+				DefaultDot<Scalar, Traits::VectorizableSize,
+					Traits::SizeAtCompileTime>::Run(dst(Row, Col), leftRow, rightCol);
 			}
-
-			for (int i = Traits::VectorizableSize; i < Traits::SizeAtCompileTime; ++i)
-				dst(Row, Col) += left(Row, i) * right(i, Col);
 
 			VectorizedMultiple<MatrixL, MatrixR, Index + 1, Stop>::Run(dst, left, right);
 		}

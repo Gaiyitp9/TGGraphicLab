@@ -127,12 +127,19 @@ namespace TG::Math
 	template<typename Packet>
 	inline Packet ploadu(const typename unpacket_traits<Packet>::type* from) { return *from; }
 
-	template<> inline Packet4f pload(const float* from) { return _mm_load_ps(from); }
-	template<> inline Packet2d pload(const double* from) { return _mm_load_pd(from); }
-	template<> inline Packet4i pload(const int* from) { return _mm_load_si128(reinterpret_cast<const __m128i*>(from)); }
-	template<> inline Packet4f ploadu(const float* from) { return _mm_loadu_ps(from); }
-	template<> inline Packet2d ploadu(const double* from) { return _mm_loadu_pd(from); }
-	template<> inline Packet4i ploadu(const int* from) { return _mm_loadu_si128(reinterpret_cast<const __m128i*>(from)); }
+	template<> inline Packet4f pload(float const* from) { return _mm_load_ps(from); }
+	template<> inline Packet2d pload(double const* from) { return _mm_load_pd(from); }
+	template<> inline Packet4i pload(int const* from) { return _mm_load_si128(reinterpret_cast<__m128i const*>(from)); }
+	template<> inline Packet8f pload(float const* from) { return _mm256_load_ps(from); }
+	template<> inline Packet4d pload(double const* from) { return _mm256_load_pd(from); }
+	template<> inline Packet8i pload(int const* from) { return _mm256_load_si256(reinterpret_cast<__m256i const*>(from)); }
+
+	template<> inline Packet4f ploadu(float const* from) { return _mm_loadu_ps(from); }
+	template<> inline Packet2d ploadu(double const* from) { return _mm_loadu_pd(from); }
+	template<> inline Packet4i ploadu(int const* from) { return _mm_loadu_si128(reinterpret_cast<__m128i const*>(from)); }
+	template<> inline Packet8f ploadu(float const* from) { return _mm256_loadu_ps(from); }
+	template<> inline Packet4d ploadu(double const* from) { return _mm256_loadu_pd(from); }
+	template<> inline Packet8i ploadu(int const* from) { return _mm256_loadu_si256(reinterpret_cast<__m256i const*>(from)); }
 
 	template<typename Scalar, typename Packet>
 	inline void pstore(Scalar* to, const Packet& from) { (*to) = from; }
@@ -141,9 +148,17 @@ namespace TG::Math
 
 	template<> inline void pstore(float* to, const Packet4f& from) { _mm_store_ps(to, from); }
 	template<> inline void pstore(double* to, const Packet2d& from) { _mm_store_pd(to, from); }
+	template<> inline void pstore(int* to, const Packet4i& from) { _mm_store_si128(reinterpret_cast<__m128i*>(to), from); }
+	template<> inline void pstore(float* to, const Packet8f& from) { _mm256_store_ps(to, from); }
+	template<> inline void pstore(double* to, const Packet4d& from) { _mm256_store_pd(to, from); }
+	template<> inline void pstore(int* to, const Packet8i& from) { _mm256_store_si256(reinterpret_cast<__m256i*>(to), from); }
 
 	template<> inline void pstoreu(float* to, const Packet4f& from) { _mm_storeu_ps(to, from); }
 	template<> inline void pstoreu(double* to, const Packet2d& from) { _mm_storeu_pd(to, from); }
+	template<> inline void pstoreu(int* to, const Packet4i& from) { _mm_storeu_si128(reinterpret_cast<__m128i*>(to), from); }
+	template<> inline void pstoreu(float* to, const Packet8f& from) { _mm256_storeu_ps(to, from); }
+	template<> inline void pstoreu(double* to, const Packet4d& from) { _mm256_storeu_pd(to, from); }
+	template<> inline void pstoreu(int* to, const Packet8i& from) { _mm256_storeu_si256(reinterpret_cast<__m256i*>(to), from); }
 
 	template<typename Packet, bool IsAligned>
 	inline Packet ploadt(const typename unpacket_traits<Packet>::type* from)
@@ -164,21 +179,36 @@ namespace TG::Math
 	}
 
 	template<typename Packet> inline Packet padd(const Packet& a, const Packet& b) { return a + b; }
-	template<> inline bool padd(const bool& a, const bool& b) { return a || b; }
 	template<> inline Packet4f padd(const Packet4f& a, const Packet4f& b) { return _mm_add_ps(a, b); }
 	template<> inline Packet2d padd(const Packet2d& a, const Packet2d& b) { return _mm_add_pd(a, b); }
 	template<> inline Packet4i padd(const Packet4i& a, const Packet4i& b) { return _mm_add_epi32(a, b); }
+	template<> inline Packet8f padd(const Packet8f& a, const Packet8f& b) { return _mm256_add_ps(a, b); }
+	template<> inline Packet4d padd(const Packet4d& a, const Packet4d& b) { return _mm256_add_pd(a, b); }
+	template<> inline Packet8i padd(const Packet8i& a, const Packet8i& b) { return _mm256_add_epi32(a, b); }
 
 	template<typename Packet> inline Packet psub(const Packet& a, const Packet& b) { return a - b; }
 	template<> inline Packet4f psub(const Packet4f& a, const Packet4f& b) { return _mm_sub_ps(a, b); }
 	template<> inline Packet2d psub(const Packet2d& a, const Packet2d& b) { return _mm_sub_pd(a, b); }
 	template<> inline Packet4i psub(const Packet4i& a, const Packet4i& b) { return _mm_sub_epi32(a, b); }
+	template<> inline Packet8f psub(const Packet8f& a, const Packet8f& b) { return _mm256_sub_ps(a, b); }
+	template<> inline Packet4d psub(const Packet4d& a, const Packet4d& b) { return _mm256_sub_pd(a, b); }
+	template<> inline Packet8i psub(const Packet8i& a, const Packet8i& b) { return _mm256_sub_epi32(a, b); }
 
 	template<typename Packet> inline Packet pmul(const Packet& a, const Packet& b) { return a * b; }
-	template<> inline bool pmul(const bool& a, const bool& b) { return a && b; }
 	template<> inline Packet4f pmul(const Packet4f& a, const Packet4f& b) { return _mm_mul_ps(a, b); }
 	template<> inline Packet2d pmul(const Packet2d& a, const Packet2d& b) { return _mm_mul_pd(a, b); }
 	template<> inline Packet4i pmul(const Packet4i& a, const Packet4i& b) { return _mm_mul_epi32(a, b); }
+	template<> inline Packet8f pmul(const Packet8f& a, const Packet8f& b) { return _mm256_mul_ps(a, b); }
+	template<> inline Packet4d pmul(const Packet4d& a, const Packet4d& b) { return _mm256_mul_pd(a, b); }
+	template<> inline Packet8i pmul(const Packet8i& a, const Packet8i& b) { return _mm256_mul_epi32(a, b); }
+
+	template<typename Packet> inline Packet pdiv(const Packet& a, const Packet& b) { return a / b; }
+	template<> inline Packet4f pdiv(const Packet4f& a, const Packet4f& b) { return _mm_div_ps(a, b); }
+	template<> inline Packet2d pdiv(const Packet2d& a, const Packet2d& b) { return _mm_div_pd(a, b); }
+	template<> inline Packet4i pdiv(const Packet4i& a, const Packet4i& b) { return _mm_div_epi32(a, b); }
+	template<> inline Packet8f pdiv(const Packet8f& a, const Packet8f& b) { return _mm256_div_ps(a, b); }
+	template<> inline Packet4d pdiv(const Packet4d& a, const Packet4d& b) { return _mm256_div_pd(a, b); }
+	template<> inline Packet8i pdiv(const Packet8i& a, const Packet8i& b) { return _mm256_div_epi32(a, b); }
 }
 #else
 namespace TG::Math

@@ -105,8 +105,9 @@ namespace TG::Math
 		}
 		T const* data() const { return m_data.array; }
 		T* data() { return m_data.array; }
-		constexpr static int rows() noexcept { return Rows; }
-		constexpr static int cols() noexcept { return Cols; }
+		constexpr int rows() const noexcept { return Rows; }
+		constexpr int cols() const noexcept { return Cols; }
+		constexpr int size() const noexcept { return Size; }
 
 	private:
 		PlainArray<T, Size> m_data;
@@ -155,6 +156,7 @@ namespace TG::Math
 		T* data() noexcept { return m_data; }
 		int rows() const noexcept { return m_rows; }
 		int cols() const noexcept { return m_cols; }
+		int size() const noexcept { return m_size; }
 
 	private:
 		T* m_data;

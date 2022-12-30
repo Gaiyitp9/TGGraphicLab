@@ -42,4 +42,9 @@ namespace TG::Math
 		constexpr static int Alignment = 1;
 	};
 	template<typename T> struct unpacket_traits<const T> : unpacket_traits<T> { };
+
+	// 根据数据类型选择平方根函数
+	template<typename Scalar> inline Scalar sqrt(Scalar val) { return std::sqrt(val); }
+	template<> inline float sqrt(float val) { return std::sqrtf(val); }
+	template<> inline long double sqrt(long double val) { return std::sqrtl(val); }
 }

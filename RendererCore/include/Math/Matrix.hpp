@@ -37,6 +37,7 @@ namespace TG::Math
 	public:
 		constexpr int rows() const { return m_storage.rows(); }
 		constexpr int cols() const { return m_storage.cols(); }
+		constexpr int size() const { return m_storage.size(); }
 		const Scalar* data() const { return m_storage.data(); }
 		Scalar* data() { return m_storage.data(); }
 
@@ -112,7 +113,7 @@ namespace TG::Math
 			else if (rows() != 1 && cols() != 1)
 				Debug::LogLine(L"magnitude is only for vectors.");
 
-			return 0;
+			return sqrt(Dot(*this));
 		}
 
 		Scalar sqrMagnitude() const
@@ -122,9 +123,20 @@ namespace TG::Math
 			else if (rows() != 1 && cols() != 1)
 				Debug::LogLine(L"sqrMagnitude is only for vectors.");
 
-			return 0;
+			return Dot(*this);
 		}
 
+		Matrix normalize() const
+		{
+			if constexpr (!traits<Matrix>::IsDynamic)
+				static_assert(traits<Matrix>::IsVectorAtCompileTime, "sqrMagnitude is only for vectors.");
+			else if (rows() != 1 && cols() != 1)
+				Debug::LogLine(L"sqrMagnitude is only for vectors.");
+
+			return *this / magnitude();
+		}
+
+		// TODO: n维矩阵行列式
 		Scalar determinant() const
 		{
 			if constexpr (!traits<Matrix>::IsDynamic)
@@ -133,6 +145,18 @@ namespace TG::Math
 				Debug::LogLine(L"determinant is only for square matrix.");
 
 			return 0;
+		}
+
+		// 矩阵转置
+		Matrix transpose() const
+		{
+
+		}
+
+		// 矩阵的逆
+		Matrix inverse() const
+		{
+
 		}
 
 	public:
@@ -144,6 +168,32 @@ namespace TG::Math
 		Matrix operator-(const Matrix& other) const
 		{
 			return CwiseBinaryOp<Matrix, ScalarSubOp<Scalar>>::Run(*this, other);
+		}
+
+		Matrix operator/(const Scalar& factor) const
+		{
+			Matrix factorMatrix;
+			for (int i = 0; i < rows(); ++i)
+			{
+				for (int j = 0; j < cols(); ++j)
+				{
+					factorMatrix(i, j) = factor;
+				}
+			}
+			return CwiseBinaryOp<Matrix, ScalarDivideOp<Scalar>>::Run(*this, factorMatrix);
+		}
+
+		Matrix operator*(const Scalar& factor) const
+		{
+			Matrix factorMatrix;
+			for (int i = 0; i < rows(); ++i)
+			{
+				for (int j = 0; j < cols(); ++j)
+				{
+					factorMatrix(i, j) = factor;
+				}
+			}
+			return CwiseBinaryOp<Matrix, ScalarProductOp<Scalar>>::Run(*this, factorMatrix);
 		}
 
 		// 矩阵乘法(注意满足矩阵的列与other矩阵的行数要相等)
@@ -162,25 +212,31 @@ namespace TG::Math
 
 		Scalar Dot(const Matrix& other) const
 		{
-
+			return DotOp<Matrix>::Run(*this, other);
 		}
 
 		// 向量叉乘
+		// 暂时计算三维向量叉乘。TODO: n维向量叉乘
 		Matrix Cross(const Matrix& other) const
 		{
+			if constexpr (!traits<Matrix>::IsDynamic)
+			{
+				static_assert(traits<Matrix>::IsVectorAtCompileTime 
+					&& traits<Matrix>::SizeAtCompileTime > 2, "Cross is only for 3d and above vectors.");
+			}
+			else if ((rows() != 1 && cols() != 1) || size() <= 2)
+				Debug::LogLine(L"Cross is only for 3d and above vectors.");
 
+			Matrix cross;
+			cross[0] = m_storage[1] * other[2] - m_storage[2] * other[1];
+			cross[1] = m_storage[2] * other[0] - m_storage[0] * other[2];
+			cross[2] = m_storage[0] * other[1] - m_storage[1] * other[0];
+			return cross;
 		}
 
-		// 矩阵转置
-		Matrix Transpose() const
+		void Normalize()
 		{
-
-		}
-
-		// 矩阵的逆
-		Matrix Inverse() const
-		{
-
+			*this = *this / magnitude();
 		}
 
 	private:
@@ -190,6 +246,13 @@ namespace TG::Math
 			traits<Matrix>::ColsAtCompileTime
 		> m_storage;
 	};
+
+	// 矩阵乘以一个系数
+	template<typename Scalar, int Rows, int Cols, StorageOption Option>
+	Matrix<Scalar, Rows, Cols, Option> operator*(const Scalar& factor, const Matrix<Scalar, Rows, Cols, Option>& matrix)
+	{
+		return matrix * factor;
+	}
 
 	#define MATRIX_TYPEDEF(Type, TypeSuffix, Size, SizeSuffix)			\
 	using Vector##SizeSuffix##TypeSuffix	= Matrix<Type, Size, 1>;	\

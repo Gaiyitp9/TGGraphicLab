@@ -9,9 +9,8 @@ namespace TG::Math
 {
 	// 加法函数
 	template<typename Scalar>
-	class ScalarSumOp
+	struct ScalarSumOp
 	{
-	public:
 		Scalar operator()(const Scalar& a, const Scalar& b) const { return a + b; }
 
 		template<typename Packet>
@@ -19,9 +18,8 @@ namespace TG::Math
 	};
 	// 减法函数
 	template<typename Scalar>
-	class ScalarSubOp
+	struct ScalarSubOp
 	{
-	public:
 		Scalar operator()(const Scalar& a, const Scalar& b) const { return a - b; }
 
 		template<typename Packet>
@@ -29,13 +27,21 @@ namespace TG::Math
 	};
 	// 乘法函数
 	template<typename Scalar>
-	class ScalarProductOp
+	struct ScalarProductOp
 	{
-	public:
 		Scalar operator()(const Scalar& a, const Scalar& b) const { return a * b; }
 
 		template<typename Packet>
 		Packet PacketOp(const Packet& a, const Packet& b) const { return pmul(a, b); }
+	};
+	// 除法函数
+	template<typename Scalar>
+	struct ScalarDivideOp
+	{
+		Scalar operator()(const Scalar& a, const Scalar& b) const { return a / b; }
+
+		template<typename Packet>
+		Packet PacketOp(const Packet& a, const Packet& b) const { return pdiv(a, b); }
 	};
 
 	// 直接展开计算

@@ -87,6 +87,16 @@ namespace TG
 		result = v1 + v2 + v3;
 		std::cout << "result: " << result.x() << " " << result.y() << " " 
 			<< result.z() << " " << result.w() << std::endl;
+		std::cout << "result magnitude: " << result.magnitude() << " sqrMagnitude: " << result.sqrMagnitude() << std::endl;
+		Math::Vector4f resultN = result.normalize();
+		std::cout << "result normalize: " << resultN.x() << " " << resultN.y() << " "
+			<< resultN.z() << " " << resultN.w() << std::endl;
+		result.Normalize();
+		std::cout << "result: " << result.x() << " " << result.y() << " "
+			<< result.z() << " " << result.w() << std::endl;
+
+		float dot = v1.Dot(v2);
+		std::cout << "dot: " << dot << std::endl;
 
 		Math::Matrix<float, 5, 1> v5, v6;
 		v5[0] = 0; v5[1] = 1; v5[2] = 2.6f; v5[3] = 3; v5[4] = 5;
@@ -95,6 +105,8 @@ namespace TG
 		result1 = v5 + v6;
 		std::cout << "result: " << result1[0] << " " << result1[1] << " "
 			<< result1[2] << " " << result1[3] << " " << result1[4] << std::endl;
+		dot = v5.Dot(v6);
+		std::cout << "dot: " << dot << std::endl;
 
 		Math::Matrix4f vp, view, proj;
 		view(0, 0) = 1.0f; view(0, 1) = 0.0f; view(0, 2) = 3.0f; view(0, 3) = 0.0f;
@@ -129,7 +141,31 @@ namespace TG
 		proj1(3, 0) = 1.0f; proj1(3, 1) = 0.0f; proj1(3, 2) = 0.0f; proj1(3, 3) = 1.0f; proj1(3, 4) = 0.0f;
 		proj1(4, 0) = 1.0f; proj1(4, 1) = 0.0f; proj1(4, 2) = 0.0f; proj1(4, 3) = 1.0f; proj1(4, 4) = 1.0f;
 		vp1 = proj1 * view1;
-		std::cout << "vp: " << std::endl;
+		std::cout << "vp1: " << std::endl;
+		for (int i = 0; i < 5; ++i)
+		{
+			for (int j = 0; j < 5; ++j)
+				std::cout << vp1(i, j) << " ";
+			std::cout << std::endl;
+		}
+		vp1 = vp1 * 2.0f;
+		std::cout << "vp1: " << std::endl;
+		for (int i = 0; i < 5; ++i)
+		{
+			for (int j = 0; j < 5; ++j)
+				std::cout << vp1(i, j) << " ";
+			std::cout << std::endl;
+		}
+		vp1 = 2.0f * vp1;
+		std::cout << "vp1: " << std::endl;
+		for (int i = 0; i < 5; ++i)
+		{
+			for (int j = 0; j < 5; ++j)
+				std::cout << vp1(i, j) << " ";
+			std::cout << std::endl;
+		}
+		vp1 = vp1 / 2.0f;
+		std::cout << "vp1: " << std::endl;
 		for (int i = 0; i < 5; ++i)
 		{
 			for (int j = 0; j < 5; ++j)
