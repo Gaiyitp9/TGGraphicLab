@@ -150,7 +150,15 @@ namespace TG::Math
 		// 矩阵转置
 		Matrix transpose() const
 		{
-
+			Matrix<Scalar, Cols, Rows, Option> t;
+			for (int i = 0; i < rows(); ++i)
+			{
+				for (int j = 0; j < cols(); ++i)
+				{
+					t(j, i) = (*this)(i, j);
+				}
+			}
+			return t;
 		}
 
 		// 矩阵的逆

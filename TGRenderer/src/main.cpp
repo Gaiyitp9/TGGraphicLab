@@ -8,6 +8,7 @@
 #include "Application.hpp"
 #include "Diagnostics/Debug.hpp"
 #include <tchar.h>
+#include "Graphics/RayTracing/RayTracing.h"
 
 int CALLBACK _tWinMain(_In_ HINSTANCE hInstance,
 	_In_opt_ HINSTANCE hPrevInstance,
@@ -16,8 +17,9 @@ int CALLBACK _tWinMain(_In_ HINSTANCE hInstance,
 {
 	try
 	{
-		TG::Application app;
-		return app.Run();
+		OutputPPMImage();
+		//TG::Application app;
+		//return app.Run();
 	}
 	catch (const TG::BaseException& e)
 	{
