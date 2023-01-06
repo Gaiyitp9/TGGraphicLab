@@ -5,44 +5,35 @@
 *****************************************************************/
 #pragma once
 
-#include "Core.hpp"
-
 namespace TG::Math
 {
-	template<typename T>
-	concept quaternion_type = std::is_same_v<T, double> || std::is_same_v<T, float>;
-
-	template<typename T> requires quaternion_type<T>
+	template<typename Scalar>
 	class Quaternion
 	{
-		using simd = simd_trait<T, typename SimdInstruction<T, 4>::type>;
-		static constexpr T epsilon = static_cast<T>(1e-6);
 	public:
 		Quaternion();
-		Quaternion(T x, T y, T z, T w);
-		Quaternion(T angle, Vector<T, 3> axis);
-		Quaternion(Vector<T, 3> euler);				// ≈∑¿≠Ω«ª∑»∆À≥–ÚŒ™heading-pitch-bank(yaw-pitch-roll)
-													// Y-X-Z(Object Space)ªÚZ-X-Y(World Space ªÚ Parent Space)
-		const T& x() const;
-		const T& y() const;
-		const T& z() const;
-		const T& w() const;
-		T& x();
-		T& y();
-		T& z();
-		T& w();
+		Quaternion(Scalar x, Scalar y, Scalar z, Scalar w);
+		Quaternion(Scalar angle, Vector<Scalar, 3> axis);
+		Quaternion(Vector<Scalar, 3> euler);				// Ê¨ßÊãâËßíÁéØÁªïÈ°∫Â∫è‰∏∫heading-pitch-bank(yaw-pitch-roll)
+															// Y-X-Z(Object Space)ÊàñZ-X-Y(World Space Êàñ Parent Space)
+		const Scalar& x() const;
+		const Scalar& y() const;
+		const Scalar& z() const;
+		const Scalar& w() const;
+		Scalar& x();
+		Scalar& y();
+		Scalar& z();
+		Scalar& w();
 
 		Quaternion normalized() const;
 
 	public:
-		T Dot(Quaternion q);
+		Scalar Dot(Quaternion q);
 
 	private:
-		aligned_array<T, 4, simd::Alignment> elements;
+		Vector<Scalar, 4> elements;
 	};
 
 	using Quaternionf = Quaternion<float>;
 	using Quaterniond = Quaternion<double>;
 }
-
-#include "Implementation/Quaternion.inl"

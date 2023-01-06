@@ -97,6 +97,14 @@ namespace TG
 
 		float dot = v1.Dot(v2);
 		std::cout << "dot: " << dot << std::endl;
+		Math::Matrix4f identity = Math::Matrix4f::identity();
+		std::cout << "identity: " << std::endl;
+		for (int i = 0; i < 4; ++i)
+		{
+			for (int j = 0; j < 4; ++j)
+				std::cout << identity(i, j) << " ";
+			std::cout << std::endl;
+		}
 
 		Math::Matrix<float, 5, 1> v5, v6;
 		v5[0] = 0; v5[1] = 1; v5[2] = 2.6f; v5[3] = 3; v5[4] = 5;

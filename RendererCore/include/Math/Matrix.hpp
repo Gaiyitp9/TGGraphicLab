@@ -24,7 +24,7 @@ namespace TG::Math
 	class Matrix
 	{
 	public:
-		Matrix() = default;
+		Matrix() { std::memset(m_storage.data(), 0, m_storage.size() * sizeof(Scalar)); }
 		Matrix(const Matrix& other) : m_storage(other.m_storage) {}
 
 		template<typename OtherDerived>
@@ -40,6 +40,16 @@ namespace TG::Math
 		constexpr int size() const { return m_storage.size(); }
 		const Scalar* data() const { return m_storage.data(); }
 		Scalar* data() { return m_storage.data(); }
+
+		static Matrix identity()
+		{
+			static_assert(!traits<Matrix>::IsDynamic && 
+				traits<Matrix>::IsSquareAtCompileTime, "Only static and square matrix has identity.");
+			Matrix identityMat;
+			for (int i = 0; i < traits<Matrix>::RowsAtCompileTime; ++i)
+				identityMat(i, i) = static_cast<Scalar>(1.0);
+			return identityMat;
+		}
 
 		const Scalar& x() const
 		{
@@ -133,7 +143,11 @@ namespace TG::Math
 			else if (rows() != 1 && cols() != 1)
 				Debug::LogLine(L"sqrMagnitude is only for vectors.");
 
-			return *this / magnitude();
+			Scalar mag = magnitude();
+			if (Abs(mag) < NumTraits<Scalar>::Epsilon)
+				return *this;
+			else
+				return *this / mag;
 		}
 
 		// TODO: n维矩阵行列式
@@ -180,6 +194,9 @@ namespace TG::Math
 
 		Matrix operator/(const Scalar& factor) const
 		{
+			if (Abs(factor) < NumTraits<Scalar>::Epsilon)
+				return *this;
+
 			Matrix factorMatrix;
 			for (int i = 0; i < rows(); ++i)
 			{
@@ -244,7 +261,11 @@ namespace TG::Math
 
 		void Normalize()
 		{
-			*this = *this / magnitude();
+			Scalar mag = magnitude();
+			if (Abs(mag) < NumTraits<Scalar>::Epsilon)
+				return;
+
+			*this = *this / mag;
 		}
 
 	private:
@@ -262,9 +283,14 @@ namespace TG::Math
 		return matrix * factor;
 	}
 
+	template<typename Scalar, int Size>
+	using Vector = Matrix<Scalar, Size, 1>;
+	template<typename Scalar, int Size>
+	using RowVector = Matrix<Scalar, 1, Size>;
+
 	#define MATRIX_TYPEDEF(Type, TypeSuffix, Size, SizeSuffix)			\
-	using Vector##SizeSuffix##TypeSuffix	= Matrix<Type, Size, 1>;	\
-	using RowVector##SizeSuffix##TypeSuffix = Matrix<Type, 1, Size>;	\
+	using Vector##SizeSuffix##TypeSuffix	= Vector<Type, Size>;		\
+	using RowVector##SizeSuffix##TypeSuffix = RowVector<Type, Size>;	\
 	using Matrix##SizeSuffix##TypeSuffix	= Matrix<Type, Size, Size>;
 
 	#define MATRIX_ALLSIZE_TYPEDEF(Type, TypeSuffix)	\
@@ -276,4 +302,5 @@ namespace TG::Math
 	MATRIX_ALLSIZE_TYPEDEF(float, f)
 	MATRIX_ALLSIZE_TYPEDEF(double, d)
 	MATRIX_ALLSIZE_TYPEDEF(int, i)
+
 }

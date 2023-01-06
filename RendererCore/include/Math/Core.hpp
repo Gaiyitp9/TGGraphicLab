@@ -8,6 +8,8 @@
 
 #include <type_traits> 
 #include "Diagnostics/Debug.hpp"
+#include "Common.hpp"
+#include "NumTraits.hpp"
 #include "ForwardDeclarations.hpp"
 #include "Simd.hpp"
 #include "AssignmentOp.hpp"
@@ -16,3 +18,4 @@
 #include "Multiple.hpp"
 #include "Storage.hpp"
 #include "Matrix.hpp"
+#include "Quaternion.hpp"

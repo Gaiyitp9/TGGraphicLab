@@ -17,9 +17,9 @@ int CALLBACK _tWinMain(_In_ HINSTANCE hInstance,
 {
 	try
 	{
-		OutputPPMImage();
-		//TG::Application app;
-		//return app.Run();
+		//OutputPPMImage();
+		TG::Application app;
+		return app.Run();
 	}
 	catch (const TG::BaseException& e)
 	{
