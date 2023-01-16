@@ -5,7 +5,7 @@
 *****************************************************************/
 #pragma once
 
-#include "SlimWindows.h"
+#include "PlatformHeaders.h"
 #include "KeyCode.hpp"
 #include <bitset>
 #include <queue>

@@ -5,7 +5,7 @@
 *****************************************************************/
 #pragma once
 
-#include "SlimWindows.h"
+#include "PlatformHeaders.h"
 #include "../Singleton.hpp"
 #include <unordered_map>
 #include <string>

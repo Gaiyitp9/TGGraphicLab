@@ -5,7 +5,7 @@
 *****************************************************************/
 #pragma once
 
-#include "SlimWindows.h"
+#include "PlatformHeaders.h"
 #include "Window/WindowRegister.hpp"
 #include "Diagnostics/Debug.hpp"
 #include "Chronometer.hpp"

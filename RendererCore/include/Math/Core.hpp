@@ -6,6 +6,7 @@
 #pragma once
 #define MATH_CORE_H
 
+#include "PlatformHeaders.h"
 #include <type_traits> 
 #include "Diagnostics/Debug.hpp"
 #include "Common.hpp"

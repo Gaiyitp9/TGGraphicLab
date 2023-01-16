@@ -4,7 +4,6 @@
 * This code is licensed under the MIT License (MIT).			*
 *****************************************************************/
 
-#include "Diagnostics/MemoryDbg.hpp"
 #include "../resource.h"
 #include "Application.hpp"
 #include "Diagnostics/WinAPIException.hpp"

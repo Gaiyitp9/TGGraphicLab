@@ -4,10 +4,7 @@
 * This code is licensed under the MIT License (MIT).			*
 *****************************************************************/
 
-#include "Diagnostics/MemoryDbg.hpp"
-#include "SlimWindows.h"
 #include "Application.hpp"
-#include "Diagnostics/Debug.hpp"
 #include <tchar.h>
 #include "Graphics/RayTracing/RayTracing.h"
 
