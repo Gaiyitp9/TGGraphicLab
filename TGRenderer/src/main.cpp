@@ -4,6 +4,7 @@
 * This code is licensed under the MIT License (MIT).			*
 *****************************************************************/
 
+#include "Diagnostics/MemoryDbg.hpp"
 #include "SlimWindows.h"
 #include "Application.hpp"
 #include "Diagnostics/Debug.hpp"
@@ -19,6 +20,8 @@ int CALLBACK _tWinMain(_In_ HINSTANCE hInstance,
 	{
 		//OutputPPMImage();
 		TG::Application app;
+		int* leak = static_cast<int*>(malloc(sizeof(int)));
+		int* leak2 = DBG_NEW int[2];
 		return app.Run();
 	}
 	catch (const TG::BaseException& e)

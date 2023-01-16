@@ -34,7 +34,7 @@ namespace TG::Math
 	{
 		assert(alignment >= sizeof(void*) && (alignment & (alignment - 1)) == 0 && "Alignment must be at least sizeof(void*) and a power of 2");
 
-		void* original = std::malloc(size + alignment);
+		void* original = malloc(size + alignment);
 		if (original == nullptr) 
 			return nullptr;
 		void* aligned = reinterpret_cast<void*>((reinterpret_cast<size_t>(original) & ~(size_t(alignment - 1))) + alignment);
@@ -46,14 +46,14 @@ namespace TG::Math
 	inline void handmade_aligned_free(void* ptr)
 	{
 		if (ptr)
-			std::free(*(reinterpret_cast<void**>(ptr) - 1));
+			free(*(reinterpret_cast<void**>(ptr) - 1));
 	}
 
 	// 根据条件分配动态内存(默认16字节对齐)
 	template<bool Align>
 	inline void* conditional_aligned_alloc(size_t size)
 	{
-		return std::malloc(size);
+		return malloc(size);
 	}
 
 	template<>
@@ -67,7 +67,7 @@ namespace TG::Math
 	inline void conditional_aligned_free(void* ptr)
 	{
 		if (ptr)
-			std::free(ptr);
+			free(ptr);
 	}
 
 	template<>

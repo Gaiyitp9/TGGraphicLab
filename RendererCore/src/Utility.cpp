@@ -4,7 +4,6 @@
 * This code is licensed under the MIT License (MIT).			*
 *****************************************************************/
 
-#include "Diagnostics/MemoryDbg.hpp"		// 必须放在文件头部，保证malloc使用的是debug版本
 #include "Utility.hpp"
 
 namespace TG
@@ -12,20 +11,20 @@ namespace TG
 	std::wstring Utility::AnsiToWideString(const std::string& str)
 	{
 		int length = MultiByteToWideChar(CP_UTF8, 0, str.c_str(), -1, nullptr, 0);
-		wchar_t* wide = new wchar_t[length];
+		wchar_t* wide = static_cast<wchar_t*>(malloc(length * sizeof(wchar_t)));
 		MultiByteToWideChar(CP_UTF8, 0, str.c_str(), -1, wide, length);
 		std::wstring wstr(wide);
-		delete[] wide;
+		free(wide);
 		return wstr;
 	}
 
 	std::string Utility::WideStringToAnsi(const std::wstring& wstr)
 	{
 		int length = WideCharToMultiByte(CP_UTF8, 0, wstr.c_str(), -1, nullptr, 0, nullptr, nullptr);
-		char* ansi = new char[length];
+		char* ansi = static_cast<char*>(malloc(length * sizeof(char)));
 		WideCharToMultiByte(CP_UTF8, 0, wstr.c_str(), -1, ansi, length, nullptr, nullptr);
 		std::string str(ansi);
-		delete[] ansi;
+		free(ansi);
 		return str;
 	}
 
