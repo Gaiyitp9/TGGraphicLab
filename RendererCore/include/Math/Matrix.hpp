@@ -136,7 +136,7 @@ namespace TG::Math
 			return Dot(*this);
 		}
 
-		Matrix normalize() const
+		Matrix normalized() const
 		{
 			if constexpr (!traits<Matrix>::IsDynamic)
 				static_assert(traits<Matrix>::IsVectorAtCompileTime, "sqrMagnitude is only for vectors.");

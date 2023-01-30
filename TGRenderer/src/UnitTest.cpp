@@ -88,7 +88,7 @@ namespace TG
 		std::cout << "result: " << result.x() << " " << result.y() << " " 
 			<< result.z() << " " << result.w() << std::endl;
 		std::cout << "result magnitude: " << result.magnitude() << " sqrMagnitude: " << result.sqrMagnitude() << std::endl;
-		Math::Vector4f resultN = result.normalize();
+		Math::Vector4f resultN = result.normalized();
 		std::cout << "result normalize: " << resultN.x() << " " << resultN.y() << " "
 			<< resultN.z() << " " << resultN.w() << std::endl;
 		result.Normalize();
