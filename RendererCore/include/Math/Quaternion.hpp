@@ -11,9 +11,17 @@ namespace TG::Math
 	class Quaternion
 	{
 	public:
-		Quaternion() { }
-		Quaternion(Scalar x, Scalar y, Scalar z, Scalar w);
-		Quaternion(Scalar angle, Vector<Scalar, 3> axis);
+		Quaternion() { elements[3] = static_cast<Scalar>(1.0); }
+		Quaternion(Scalar angle, Vector<Scalar, 3> axis)
+		{
+			axis.Normalize();
+			Scalar halfAngle = angle * static_cast<Scalar>(0.5);
+			Scalar sinHalfAngle = sin(halfAngle);
+			elements[0] = sinHalfAngle * axis.x();
+			elements[1] = sinHalfAngle * axis.y();
+			elements[2] = sinHalfAngle * axis.z();
+			elements[3] = cos(halfAngle);
+		}
 		Quaternion(Vector<Scalar, 3> euler);				// 欧拉角环绕顺序为heading-pitch-bank(yaw-pitch-roll)
 															// Y-X-Z(Object Space)或Z-X-Y(World Space 或 Parent Space)
 		const Scalar& x() const { return elements[0]; }

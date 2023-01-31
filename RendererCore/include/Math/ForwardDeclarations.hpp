@@ -43,8 +43,20 @@ namespace TG::Math
 	};
 	template<typename T> struct unpacket_traits<const T> : unpacket_traits<T> { };
 
-	// 根据数据类型选择平方根函数
-	template<typename Scalar> inline Scalar sqrt(Scalar val) { return std::sqrt(val); }
-	template<> inline float sqrt(float val) { return std::sqrtf(val); }
-	template<> inline long double sqrt(long double val) { return std::sqrtl(val); }
+	// 根据数据类型选择数学函数
+	template<typename Scalar> inline Scalar sqrt(Scalar x) { return std::sqrt(x); }
+	template<> inline float sqrt(float x) { return std::sqrtf(x); }
+	template<> inline long double sqrt(long double x) { return std::sqrtl(x); }
+
+	template<typename Scalar> inline Scalar sin(Scalar x) { return std::sin(x); }
+	template<> inline float sin(float x) { return std::sinf(x); }
+	template<> inline long double sin(long double x) { return std::sinl(x); }
+
+	template<typename Scalar> inline Scalar cos(Scalar x) { return std::cos(x); }
+	template<> inline float cos(float x) { return std::cosf(x); }
+	template<> inline long double cos(long double x) { return std::cosl(x); }
+
+	template<typename Scalar> inline Scalar tan(Scalar x) { return std::tan(x); }
+	template<> inline float tan(float x) { return std::tanf(x); }
+	template<> inline long double tan(long double x) { return std::tanl(x); }
 }
