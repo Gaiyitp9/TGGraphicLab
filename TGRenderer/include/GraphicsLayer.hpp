@@ -9,16 +9,16 @@
 
 namespace TG::Graphics
 {
-	template <LowLevelAPI API>
+	template <DeviceType Type>
 	class GraphicsLayer
 	{
 	public:
 		GraphicsLayer()
 		{
-			device = std::make_shared<Device<API>>();
-			context = std::make_shared<Context<API>>(device);
+			device = std::make_shared<Device<Type>>();
+			context = std::make_shared<Context<Type>>(device);
 #ifdef _DEBUG
-			dbgInfo = std::make_unique<DebugInfo<API>>();
+			dbgInfo = std::make_unique<DebugInfo<Type>>();
 #endif
 		}
 
@@ -45,7 +45,7 @@ namespace TG::Graphics
 		{
 			if (!frameBuffers.contains(window))
 			{
-				frameBuffers[window] = std::make_shared<FrameBuffer<API>>(device, window);
+				frameBuffers[window] = std::make_shared<FrameBuffer<Type>>(device, window);
 				return true;
 			}
 			return false;
@@ -58,11 +58,11 @@ namespace TG::Graphics
 		}
 
 	public:
-		std::shared_ptr<Device<API>> device;
-		std::shared_ptr<Context<API>> context;
-		std::unordered_map<std::shared_ptr<Window>, std::shared_ptr<FrameBuffer<API>>> frameBuffers;
+		std::shared_ptr<Device<Type>> device;
+		std::shared_ptr<Context<Type>> context;
+		std::unordered_map<std::shared_ptr<Window>, std::shared_ptr<FrameBuffer<Type>>> frameBuffers;
 #ifdef _DEBUG
-		std::unique_ptr<DebugInfo<API>> dbgInfo;
+		std::unique_ptr<DebugInfo<Type>> dbgInfo;
 #endif
 	};
 }

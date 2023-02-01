@@ -19,7 +19,7 @@ namespace TG::Graphics
 	DXGI_FORMAT DirectXFormatMapping(Format format);
 
 	template<>
-	class Device<LowLevelAPI::DirectX11>
+	class Device<DeviceType::DirectX11>
 	{
 	public:
 		Device();
@@ -39,19 +39,19 @@ namespace TG::Graphics
 		std::vector<ComPtr<IDXGIAdapter>> dxgiAdapters;
 		std::vector<std::vector<ComPtr<IDXGIOutput>>> dxgiOutputs;
 
-		friend class Context<LowLevelAPI::DirectX11>;
-		friend class FrameBuffer<LowLevelAPI::DirectX11>;
+		friend class Context<DeviceType::DirectX11>;
+		friend class FrameBuffer<DeviceType::DirectX11>;
 	};
 
 	template<>
-	class Context<LowLevelAPI::DirectX11>
+	class Context<DeviceType::DirectX11>
 	{
 	public:
-		Context(const std::shared_ptr<Device<LowLevelAPI::DirectX11>>& device);
+		Context(const std::shared_ptr<Device<DeviceType::DirectX11>>& device);
 		Context(const Context&) = delete;
 		Context& operator=(const Context&) = delete;
 
-		void ClearFrameBuffer(const std::shared_ptr<FrameBuffer<LowLevelAPI::DirectX11>>& buffer, 
+		void ClearFrameBuffer(const std::shared_ptr<FrameBuffer<DeviceType::DirectX11>>& buffer, 
 			const Math::Color& color);
 
 	public:
@@ -59,10 +59,10 @@ namespace TG::Graphics
 	};
 
 	template<>
-	class FrameBuffer<LowLevelAPI::DirectX11>
+	class FrameBuffer<DeviceType::DirectX11>
 	{
 	public:
-		FrameBuffer(const std::shared_ptr<Device<LowLevelAPI::DirectX11>>& device, 
+		FrameBuffer(const std::shared_ptr<Device<DeviceType::DirectX11>>& device, 
 			const std::shared_ptr<Window>& window);
 		FrameBuffer(const FrameBuffer&) = delete;
 		FrameBuffer& operator=(const FrameBuffer&) = delete;
@@ -80,12 +80,12 @@ namespace TG::Graphics
 		DXGI_RATIONAL refreshRate;
 		UINT numQualityLevels;
 
-		friend class Context<LowLevelAPI::DirectX11>;
+		friend class Context<DeviceType::DirectX11>;
 	};
 
 #ifdef _DEBUG
 	template<>
-	class DebugInfo<LowLevelAPI::DirectX11>
+	class DebugInfo<DeviceType::DirectX11>
 	{
 	public:
 		DebugInfo();

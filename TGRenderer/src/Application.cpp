@@ -26,7 +26,7 @@ namespace TG
 		locale = std::locale(".utf8");
 		std::wcout.imbue(locale);
 		timer = std::make_shared<Chronometer>();
-		d3d11Layer = std::make_unique<Graphics::GraphicsLayer<Graphics::LowLevelAPI::DirectX11>>();
+		d3d11Layer = std::make_unique<Graphics::GraphicsLayer<Graphics::DeviceType::DirectX11>>();
 
 		// 获取当前显示器的宽和高
 		screenWidth = GetSystemMetrics(SM_CXSCREEN);

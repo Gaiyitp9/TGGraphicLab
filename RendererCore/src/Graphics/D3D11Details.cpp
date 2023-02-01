@@ -18,14 +18,14 @@ namespace TG::Graphics
 		return map[format];
 	}
 
-	Device<LowLevelAPI::DirectX11>::Device()
+	Device<DeviceType::DirectX11>::Device()
 	{
 		ThrowIfFailed(CreateDXGIFactory1(IID_PPV_ARGS(&dxgiFactory)));
 		RetrieveHardwareInfo();
 		CreateDeviceAndContext();
 	}
 
-	std::vector<DXGI_MODE_DESC1> Device<LowLevelAPI::DirectX11>::GetOutputModes(DXGI_FORMAT format)
+	std::vector<DXGI_MODE_DESC1> Device<DeviceType::DirectX11>::GetOutputModes(DXGI_FORMAT format)
 	{
 		ComPtr<IDXGIOutput1> pOutput1;
 		ThrowIfFailed(dxgiOutputs[0][0].As(&pOutput1));
@@ -52,7 +52,7 @@ namespace TG::Graphics
 		return outputModes;
 	}
 
-	void Device<LowLevelAPI::DirectX11>::RetrieveHardwareInfo()
+	void Device<DeviceType::DirectX11>::RetrieveHardwareInfo()
 	{
 		// 枚举所有显示适配器及其输出
 		ComPtr<IDXGIAdapter> pAdapter;
@@ -72,7 +72,7 @@ namespace TG::Graphics
 		}
 	}
 
-	void Device<LowLevelAPI::DirectX11>::CreateDeviceAndContext()
+	void Device<DeviceType::DirectX11>::CreateDeviceAndContext()
 	{
 		UINT creationFlags = D3D11_CREATE_DEVICE_BGRA_SUPPORT;
 #ifdef _DEBUG
@@ -87,7 +87,7 @@ namespace TG::Graphics
 			featureLevels, 2, D3D11_SDK_VERSION, &d3dDevice, nullptr, &d3dContext));
 	}
 
-	Context<LowLevelAPI::DirectX11>::Context(const std::shared_ptr<Device<LowLevelAPI::DirectX11>>& device)
+	Context<DeviceType::DirectX11>::Context(const std::shared_ptr<Device<DeviceType::DirectX11>>& device)
 	{
 		if (!device)
 			ThrowBaseExcept(L"'device' can not be null");
@@ -95,14 +95,14 @@ namespace TG::Graphics
 		d3dContext.Swap(device->d3dContext);
 	}
 
-	void Context<LowLevelAPI::DirectX11>::ClearFrameBuffer(const std::shared_ptr<FrameBuffer<LowLevelAPI::DirectX11>>& frameBuffer,
+	void Context<DeviceType::DirectX11>::ClearFrameBuffer(const std::shared_ptr<FrameBuffer<DeviceType::DirectX11>>& frameBuffer,
 		const Math::Color& color)
 	{
 		if (frameBuffer)
 			d3dContext->ClearRenderTargetView(frameBuffer->renderTargetView.Get(), color.RGBA());
 	}
 
-	FrameBuffer<LowLevelAPI::DirectX11>::FrameBuffer(const std::shared_ptr<Device<LowLevelAPI::DirectX11>>& device,
+	FrameBuffer<DeviceType::DirectX11>::FrameBuffer(const std::shared_ptr<Device<DeviceType::DirectX11>>& device,
 		const std::shared_ptr<Window>& window)
 		: window(window)
 	{
@@ -140,13 +140,13 @@ namespace TG::Graphics
 		));
 	}
 
-	void FrameBuffer<LowLevelAPI::DirectX11>::Present()
+	void FrameBuffer<DeviceType::DirectX11>::Present()
 	{
 		ThrowIfFailed(swapChain->Present(1u, 0u));
 	}
 
 #ifdef _DEBUG
-	DebugInfo<LowLevelAPI::DirectX11>::DebugInfo()
+	DebugInfo<DeviceType::DirectX11>::DebugInfo()
 	{
 		module = GetModuleHandleW(L"dxgidebug.dll");
 		if (nullptr == module)
@@ -163,7 +163,7 @@ namespace TG::Graphics
 		next = 0;
 	}
 
-	DebugInfo<LowLevelAPI::DirectX11>::~DebugInfo()
+	DebugInfo<DeviceType::DirectX11>::~DebugInfo()
 	{
 		const auto end = dxgiInfoQueue->GetNumStoredMessages(DXGI_DEBUG_ALL);
 		while (next < end)
@@ -184,12 +184,12 @@ namespace TG::Graphics
 		}
 	}
 
-	void DebugInfo<LowLevelAPI::DirectX11>::ReportLiveObjects()
+	void DebugInfo<DeviceType::DirectX11>::ReportLiveObjects()
 	{
 		dxgiDebug->ReportLiveObjects(DXGI_DEBUG_ALL, DXGI_DEBUG_RLO_ALL);
 	}
 
-	void DebugInfo<LowLevelAPI::DirectX11>::OutputMessages()
+	void DebugInfo<DeviceType::DirectX11>::OutputMessages()
 	{
 		const auto end = dxgiInfoQueue->GetNumStoredMessages(DXGI_DEBUG_ALL);
 		while (next < end)

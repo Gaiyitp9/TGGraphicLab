@@ -10,7 +10,7 @@
 
 namespace TG::Graphics
 {
-	enum class LowLevelAPI : unsigned char
+	enum class DeviceType: unsigned char
 	{
 		DirectX11,
 		DirectX12,
@@ -19,15 +19,16 @@ namespace TG::Graphics
 	};
 
 	// 图形设备
-	template <LowLevelAPI API>
+	template <DeviceType T>
 	class Device;
 
+
 	// 设备上下文
-	template <LowLevelAPI API>
+	template <DeviceType T>
 	class Context;
 
 	// 帧缓存
-	template <LowLevelAPI API>
+	template <DeviceType T>
 	class FrameBuffer;
 
 	// 缓存格式
@@ -37,7 +38,7 @@ namespace TG::Graphics
 	};
 
 #ifdef _DEBUG
-	template<LowLevelAPI API>
+	template<DeviceType API>
 	class DebugInfo;
 #endif
 }
