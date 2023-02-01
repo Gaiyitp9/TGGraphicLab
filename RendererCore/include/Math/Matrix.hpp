@@ -26,6 +26,30 @@ namespace TG::Math
 	public:
 		Matrix() { std::memset(m_storage.data(), 0, m_storage.size() * sizeof(Scalar)); }
 		Matrix(const Matrix& other) : m_storage(other.m_storage) {}
+		Matrix(Scalar x, Scalar y)
+		{
+			static_assert(traits<Matrix>::IsVectorAtCompileTime &&
+				traits<Matrix>::SizeAtCompileTime == 2, "只有二维向量可以使用这个构造函数");
+			m_storage[0] = x;
+			m_storage[1] = y;
+		}
+		Matrix(Scalar x, Scalar y, Scalar z)
+		{
+			static_assert(traits<Matrix>::IsVectorAtCompileTime &&
+				traits<Matrix>::SizeAtCompileTime == 3, "只有三维向量可以使用这个构造函数");
+			m_storage[0] = x;
+			m_storage[1] = y;
+			m_storage[2] = z;
+		}
+		Matrix(Scalar x, Scalar y, Scalar z, Scalar w)
+		{
+			static_assert(traits<Matrix>::IsVectorAtCompileTime &&
+				traits<Matrix>::SizeAtCompileTime == 4, "只有四维向量可以使用这个构造函数");
+			m_storage[0] = x;
+			m_storage[1] = y;
+			m_storage[2] = z;
+			m_storage[3] = w;
+		}
 
 		template<typename OtherDerived>
 		Matrix& operator=(const Matrix& other)
@@ -302,5 +326,4 @@ namespace TG::Math
 	MATRIX_ALLSIZE_TYPEDEF(float, f)
 	MATRIX_ALLSIZE_TYPEDEF(double, d)
 	MATRIX_ALLSIZE_TYPEDEF(int, i)
-
 }
