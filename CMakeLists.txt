@@ -16,19 +16,16 @@ endif()
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# link DirectX libs
-find_library(Dxgi, dxgi.lib)
-find_library(D3D11, d3d11.lib)
-find_library(Dxguid, dxguid.lib)
-
 # RendererCore lib
-file(GLOB_RECURSE LIBSOURCES ${CMAKE_SOURCE_DIR}/RendererCore/src/*.cpp)
+file(GLOB_RECURSE LIBSOURCES ${CMAKE_SOURCE_DIR}/RendererCore/src/*.cpp
+	${CMAKE_SOURCE_DIR}/RendererCore/src/gl.c)
 add_library(RendererCore STATIC ${LIBSOURCES})
 # RendererCore include path
 target_include_directories(RendererCore PUBLIC ${CMAKE_SOURCE_DIR}/RendererCore/include)
-target_link_libraries(RendererCore PRIVATE Dxgi D3D11)
+# link DirectX libs and OpenGL libs
+target_link_libraries(RendererCore PRIVATE dxgi d3d11 opengl32)
 if (CMAKE_BUILD_TYPE MATCHES Debug)
-	target_link_libraries(RendererCore PRIVATE Dxguid)
+	target_link_libraries(RendererCore PRIVATE dxguid)
 endif()
 
 # TGRenderer exe

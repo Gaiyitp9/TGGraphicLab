@@ -22,7 +22,6 @@ namespace TG::Graphics
 	template <DeviceType T>
 	class Device;
 
-
 	// 设备上下文
 	template <DeviceType T>
 	class Context;
@@ -38,7 +37,7 @@ namespace TG::Graphics
 	};
 
 #ifdef _DEBUG
-	template<DeviceType API>
+	template<DeviceType T>
 	class DebugInfo;
 #endif
 }

@@ -5,7 +5,7 @@
 *****************************************************************/
 #pragma once
 
-#include "Graphics/Graphics.hpp"
+#include "Graphics/Core.hpp"
 
 namespace TG::Graphics
 {
