@@ -22,8 +22,8 @@ file(GLOB_RECURSE LIBSOURCES ${CMAKE_SOURCE_DIR}/RendererCore/src/*.cpp
 add_library(RendererCore STATIC ${LIBSOURCES})
 # RendererCore include path
 target_include_directories(RendererCore PUBLIC ${CMAKE_SOURCE_DIR}/RendererCore/include)
-# link DirectX libs and OpenGL libs
-target_link_libraries(RendererCore PRIVATE dxgi d3d11 opengl32)
+# link DirectX libs
+target_link_libraries(RendererCore PRIVATE dxgi d3d11)
 if (CMAKE_BUILD_TYPE MATCHES Debug)
 	target_link_libraries(RendererCore PRIVATE dxguid)
 endif()

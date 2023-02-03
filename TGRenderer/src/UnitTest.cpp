@@ -5,11 +5,6 @@
 *****************************************************************/
 
 #include "UnitTest.hpp"
-#include "Utility.hpp"
-#include "Math/Common.hpp"
-#include "Math/Core.hpp"
-#include "Input/InputEvent.hpp"
-#include "Diagnostics/Debug.hpp"
 
 namespace TG
 {
@@ -180,6 +175,50 @@ namespace TG
 				std::cout << vp1(i, j) << " ";
 			std::cout << std::endl;
 		}
+	}
+
+	UnitTest::UnitTest()
+	{
+		if (glInst == nullptr)
+			ThrowLastError();
+	}
+
+	UnitTest::~UnitTest()
+	{
+		FreeLibrary(glInst);
+	}
+
+	HMODULE UnitTest::glInst = LoadLibraryA("opengl32.dll");
+	UnitTest::PFN_wglGetProcAddress UnitTest::wglGetProcAddress = (PFN_wglGetProcAddress)GetProcAddress(glInst, "wglGetProcAddress");
+	static GLADapiproc GetGLProcAddress(const char* name)
+	{
+		GLADapiproc proc = reinterpret_cast<GLADapiproc>(UnitTest::wglGetProcAddress(name));
+		if (proc)
+			return proc;
+
+		return reinterpret_cast<GLADapiproc>(GetProcAddress(UnitTest::glInst, name));
+	}
+
+	void UnitTest::OpenGLTest(HWND hWnd)
+	{
+		HDC hdc = GetDC(hWnd);
+		HGLRC hglrc;
+
+		PIXELFORMATDESCRIPTOR pfd;
+		pfd.nSize = sizeof(PIXELFORMATDESCRIPTOR);
+		pfd.nVersion = 1;
+		pfd.dwFlags = PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL | PFD_DOUBLEBUFFER;
+		pfd.iPixelType = PFD_TYPE_RGBA;
+		pfd.cColorBits = 24;
+		pfd.cDepthBits = 8;
+		int pxfmt = ChoosePixelFormat(hdc, &pfd);
+		SetPixelFormat(hdc, pxfmt, &pfd);
+
+		hglrc = wglCreateContext(hdc);
+		wglMakeCurrent(hdc, hglrc);
+
+		gladLoadGL(GetGLProcAddress);
+		std::cout << "OpenGL version: " << glGetString(GL_VERSION) << std::endl;
 	}
 
 	/*void UnitTest::SIMDTest()
