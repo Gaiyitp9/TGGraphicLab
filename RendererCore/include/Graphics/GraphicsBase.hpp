@@ -31,7 +31,7 @@ namespace TG::Graphics
 	class FrameBuffer;
 
 	// 缓存格式
-	enum class Format
+	enum class Format : unsigned char
 	{
 		R8G8B8A8_UNORM = 28,
 	};
