@@ -5,11 +5,12 @@
 *****************************************************************/
 #pragma once
 
-#include "D3D11Details.hpp"
-#include "RenderDevice.hpp"
-#include "DeviceContext.hpp"
-#include "SwapChain.hpp"
-#include "PipelineState.hpp"
-#include "OpenGL/RenderDeviceGL.hpp"
-#include "OpenGL/GLContext.hpp"
-#include "OpenGL/DeviceContextGL.hpp"
+namespace TG::Graphics
+{
+	class DeviceContextGL final : public IDeviceContext
+	{
+	
+	private:
+		GLContext m_context;
+	};
+}
