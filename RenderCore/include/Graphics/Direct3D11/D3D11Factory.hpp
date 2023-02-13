@@ -4,12 +4,20 @@
 * This code is licensed under the MIT License (MIT).			*
 *****************************************************************/
 #pragma once
-#include "../RenderDevice.hpp"
+#include "../Factory.hpp"
+#include <winrt/base.h>
+#include <dxgi.h>
 
 namespace TG::Graphics
 {
-	class RenderDeviceGL final : public IRenderDevice
+	class D3D11Factory final : public IFactory
 	{
+	public:
+		D3D11Factory();
 
+		virtual bool EnumAdapters(unsigned int index, AdapterDesc& desc) const override;
+
+	private:
+		winrt::com_ptr<IDXGIFactory1> m_dxgiFactory;
 	};
 }

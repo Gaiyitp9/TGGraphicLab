@@ -4,12 +4,12 @@
 * This code is licensed under the MIT License (MIT).			*
 *****************************************************************/
 #pragma once
-#include "../RenderDevice.hpp"
+#include "PlatformHeaders.h"
 
 namespace TG::Graphics
 {
-	class RenderDeviceGL final : public IRenderDevice
+	struct D3D11CreateInfo
 	{
-
+		HWND hwnd;
 	};
 }

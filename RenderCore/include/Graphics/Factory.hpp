@@ -4,12 +4,12 @@
 * This code is licensed under the MIT License (MIT).			*
 *****************************************************************/
 #pragma once
-#include "../RenderDevice.hpp"
+#include "GraphicsBase.hpp"
 
 namespace TG::Graphics
 {
-	class RenderDeviceGL final : public IRenderDevice
+	struct IFactory
 	{
-
+		virtual bool EnumAdapters(unsigned int index, AdapterDesc& desc) const = 0;
 	};
 }

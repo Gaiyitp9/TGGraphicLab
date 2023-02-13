@@ -3,13 +3,12 @@
 * Copyright (c) Gaiyitp9. All rights reserved.					*
 * This code is licensed under the MIT License (MIT).			*
 *****************************************************************/
-#pragma once
-#include "../RenderDevice.hpp"
+#include "Graphics/Direct3D11/RenderDeviceD3D11.hpp"
 
 namespace TG::Graphics
 {
-	class RenderDeviceGL final : public IRenderDevice
+	RenderDeviceD3D11::RenderDeviceD3D11(const D3D11CreateInfo& info)
 	{
-
-	};
+		CreateDXGIFactory1(IID_PPV_ARGS(&m_dxgiFactory));
+	}
 }

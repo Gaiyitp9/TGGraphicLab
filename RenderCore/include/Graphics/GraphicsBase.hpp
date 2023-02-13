@@ -18,6 +18,12 @@ namespace TG::Graphics
 		Vulcan,
 	};
 
+	struct AdapterDesc
+	{
+		std::wstring description;
+		std::uint32_t videoMemory;		// 单位MB
+	};
+
 	// 图形设备
 	template <DeviceType T>
 	class Device;
