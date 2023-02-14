@@ -4,13 +4,21 @@
 * This code is licensed under the MIT License (MIT).			*
 *****************************************************************/
 #pragma once
-#include "PlatformHeaders.h"
-#include "Graphics/GraphicsBase.hpp"
+#include "../SwapChain.hpp"
+#include <winrt/base.h>
+#include <d3d11.h>
 
 namespace TG::Graphics
 {
-	struct GLCreateInfo : public ICreateInfo
+	class SwapChainD3D11 : public ISwapChain
 	{
+	public:
+		SwapChainD3D11();
 
+		virtual void Present(int syncInterval);
+		virtual void Resize(int width, int height);
+
+	private:
+		winrt::com_ptr<IDXGISwapChain> m_d3dSwapChain;
 	};
 }

@@ -50,7 +50,7 @@ namespace TG
 		windows[L"辅助窗口"] = std::make_shared<PopupWindow>((screenWidth - 400) / 2, (screenHeight - 300) / 2,
 			400, 300, windows[L"天工渲染器"]);
 
-		//throw LCH::WinAPIException(E_OUTOFMEMORY);
+		//throw TG::WinAPIException(E_OUTOFMEMORY);
 		unitTest.FormatTest();
 		unitTest.TextEncodeTest();
 		unitTest.TimeTest();

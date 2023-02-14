@@ -24,6 +24,17 @@ namespace TG::Graphics
 		std::uint32_t videoMemory;		// 单位MB
 	};
 
+	struct ICreateInfo
+	{
+		unsigned int adapterIndex;
+		HWND hwnd;
+	};
+
+	struct SwapChainDesc
+	{
+
+	};
+
 	// 图形设备
 	template <DeviceType T>
 	class Device;

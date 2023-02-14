@@ -34,7 +34,7 @@ namespace TG
 		RECT rect = { 0, 0, width, height };
 		// 根据客户区域宽和高计算整个窗口的宽和高
 		if (!AdjustWindowRect(&rect, WS_POPUP, false))
-			ThrowLastError();
+			CheckLastError();
 
 		HWND parentHwnd = nullptr;
 		if (auto observe = parent.lock())
@@ -45,7 +45,7 @@ namespace TG
 			parentHwnd, nullptr, windowRegister.hInstance(), this);
 
 		if (hwnd == nullptr)
-			ThrowLastError();
+			CheckLastError();
 
 		ShowWindow(hwnd, SW_SHOW);
 

@@ -20,7 +20,7 @@ namespace TG::Graphics
 
 	Device<DeviceType::DirectX11>::Device()
 	{
-		ThrowIfFailed(CreateDXGIFactory1(IID_PPV_ARGS(&dxgiFactory)));
+		CheckHResult(CreateDXGIFactory1(IID_PPV_ARGS(&dxgiFactory)));
 		RetrieveHardwareInfo();
 		CreateDeviceAndContext();
 	}
@@ -28,17 +28,17 @@ namespace TG::Graphics
 	std::vector<DXGI_MODE_DESC1> Device<DeviceType::DirectX11>::GetOutputModes(DXGI_FORMAT format)
 	{
 		ComPtr<IDXGIOutput1> pOutput1;
-		ThrowIfFailed(dxgiOutputs[0][0].As(&pOutput1));
+		CheckHResult(dxgiOutputs[0][0].As(&pOutput1));
 		DXGI_OUTPUT_DESC outputDesc;
-		ThrowIfFailed(pOutput1->GetDesc(&outputDesc));
+		CheckHResult(pOutput1->GetDesc(&outputDesc));
 		Debug::LogLine(std::format(L"Device name: {}", outputDesc.DeviceName));
 
 		UINT modeCount = 0;
-		ThrowIfFailed(pOutput1->GetDisplayModeList1(format, DXGI_ENUM_MODES_SCALING, &modeCount, nullptr));
+		CheckHResult(pOutput1->GetDisplayModeList1(format, DXGI_ENUM_MODES_SCALING, &modeCount, nullptr));
 		std::vector<DXGI_MODE_DESC1> outputModes(modeCount);
 		if (modeCount > 0)
 		{
-			ThrowIfFailed(pOutput1->GetDisplayModeList1(format, DXGI_ENUM_MODES_SCALING,
+			CheckHResult(pOutput1->GetDisplayModeList1(format, DXGI_ENUM_MODES_SCALING,
 				&modeCount, outputModes.data()));
 			for (UINT i = 0; i < modeCount; ++i)
 			{
@@ -83,14 +83,14 @@ namespace TG::Graphics
 			D3D_FEATURE_LEVEL_11_1,
 			D3D_FEATURE_LEVEL_11_0,
 		};
-		ThrowIfFailed(D3D11CreateDevice(dxgiAdapters[0].Get(), D3D_DRIVER_TYPE_UNKNOWN, nullptr, creationFlags,
+		CheckHResult(D3D11CreateDevice(dxgiAdapters[0].Get(), D3D_DRIVER_TYPE_UNKNOWN, nullptr, creationFlags,
 			featureLevels, 2, D3D11_SDK_VERSION, &d3dDevice, nullptr, &d3dContext));
 	}
 
 	Context<DeviceType::DirectX11>::Context(const std::shared_ptr<Device<DeviceType::DirectX11>>& device)
 	{
 		if (!device)
-			ThrowBaseExcept(L"'device' can not be null");
+			throw BaseException(L"'device' can not be null");
 
 		d3dContext.Swap(device->d3dContext);
 	}
@@ -107,9 +107,9 @@ namespace TG::Graphics
 		: window(window)
 	{
 		if (!device || !window)
-			ThrowBaseExcept(L"'device' and/or 'window' can not be null");
+			throw BaseException(L"'device' and/or 'window' can not be null");
 
-		ThrowIfFailed(device->d3dDevice->CheckMultisampleQualityLevels(backBufferFormat, sampleCount,
+		CheckHResult(device->d3dDevice->CheckMultisampleQualityLevels(backBufferFormat, sampleCount,
 			&numQualityLevels));
 
 		outputModes = device->GetOutputModes(backBufferFormat);
@@ -129,11 +129,11 @@ namespace TG::Graphics
 		swapChainDesc.OutputWindow = window->Hwnd();
 		swapChainDesc.Windowed = true;
 		swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
-		ThrowIfFailed(device->dxgiFactory->CreateSwapChain(device->d3dDevice.Get(), &swapChainDesc, &swapChain));
+		CheckHResult(device->dxgiFactory->CreateSwapChain(device->d3dDevice.Get(), &swapChainDesc, &swapChain));
 
 		ComPtr<ID3D11Resource> pBackBuffer;
-		ThrowIfFailed(swapChain->GetBuffer(0, IID_PPV_ARGS(&pBackBuffer)));
-		ThrowIfFailed(device->d3dDevice->CreateRenderTargetView(
+		CheckHResult(swapChain->GetBuffer(0, IID_PPV_ARGS(&pBackBuffer)));
+		CheckHResult(device->d3dDevice->CreateRenderTargetView(
 			pBackBuffer.Get(),
 			nullptr,
 			&renderTargetView
@@ -142,7 +142,7 @@ namespace TG::Graphics
 
 	void FrameBuffer<DeviceType::DirectX11>::Present()
 	{
-		ThrowIfFailed(swapChain->Present(1u, 0u));
+		CheckHResult(swapChain->Present(1u, 0u));
 	}
 
 #ifdef _DEBUG
@@ -150,15 +150,15 @@ namespace TG::Graphics
 	{
 		module = GetModuleHandleW(L"dxgidebug.dll");
 		if (nullptr == module)
-			ThrowLastErrorWithDesc(L"Can not load dxgidebug.dll");
+			CheckLastError(L"Can not load dxgidebug.dll");
 
 		DxgiGetDebugInterface = reinterpret_cast<DXGIGetDebugInterface>(
 			GetProcAddress(module, "DXGIGetDebugInterface"));
 		if (nullptr == DxgiGetDebugInterface)
-			ThrowLastErrorWithDesc(L"Can not find DXGIGetDebugInterface function procedure address");
+			CheckLastError(L"Can not find DXGIGetDebugInterface function procedure address");
 
-		ThrowIfFailed(DxgiGetDebugInterface(IID_PPV_ARGS(&dxgiDebug)));
-		ThrowIfFailed(DxgiGetDebugInterface(IID_PPV_ARGS(&dxgiInfoQueue)));
+		CheckHResult(DxgiGetDebugInterface(IID_PPV_ARGS(&dxgiDebug)));
+		CheckHResult(DxgiGetDebugInterface(IID_PPV_ARGS(&dxgiInfoQueue)));
 
 		next = 0;
 	}
@@ -195,9 +195,9 @@ namespace TG::Graphics
 		while (next < end)
 		{
 			SIZE_T messageLength;
-			ThrowIfFailed(dxgiInfoQueue->GetMessage(DXGI_DEBUG_ALL, next, nullptr, &messageLength));
+			CheckHResult(dxgiInfoQueue->GetMessage(DXGI_DEBUG_ALL, next, nullptr, &messageLength));
 			DXGI_INFO_QUEUE_MESSAGE* pMessage = (DXGI_INFO_QUEUE_MESSAGE*)malloc(messageLength);
-			ThrowIfFailed(dxgiInfoQueue->GetMessage(DXGI_DEBUG_ALL, next++, pMessage, &messageLength));
+			CheckHResult(dxgiInfoQueue->GetMessage(DXGI_DEBUG_ALL, next++, pMessage, &messageLength));
 			Debug::Log(std::format("{}\n", pMessage->pDescription));
 			free(pMessage);
 		}

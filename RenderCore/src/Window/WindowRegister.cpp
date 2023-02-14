@@ -190,7 +190,7 @@ namespace TG
 			})
 	{
 		if (m_hInstance = GetModuleHandleW(nullptr))
-			ThrowLastError();
+			CheckLastError();
 
 		WNDCLASSEX wc = {};
 		wc.cbSize = sizeof(WNDCLASSEX);
@@ -207,7 +207,7 @@ namespace TG
 		wc.lpszClassName = L"Default";
 
 		if (RegisterClassExW(&wc))
-			ThrowLastError();
+			CheckLastError();
 
 		m_windowClassName[WindowType::Default] = L"Default";
 	}

@@ -12,7 +12,7 @@ namespace TG
 	class WinAPIException : public BaseException
 	{
 	public:
-		WinAPIException(HRESULT hr, const std::wstring& description = L"No Description");
+		WinAPIException(HRESULT hr, const std::wstring& description = L"");
 		~WinAPIException();
 
 		virtual char const* what() const override;

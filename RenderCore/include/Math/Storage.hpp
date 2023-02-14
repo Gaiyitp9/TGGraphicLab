@@ -94,13 +94,13 @@ namespace TG::Math
 		const T& operator[](size_t index) const 
 		{
 			if (index >= Size)
-				ThrowBaseExcept(L"Index Out of Range");
+				throw BaseException(L"Index Out of Range");
 			return m_data.array[index]; 
 		}
 		T& operator[](size_t index) 
 		{ 
 			if (index >= Size)
-				ThrowBaseExcept(L"Index Out of Range");
+				throw BaseException(L"Index Out of Range");
 			return m_data.array[index]; 
 		}
 		T const* data() const { return m_data.array; }
@@ -142,13 +142,13 @@ namespace TG::Math
 		const T& operator[](size_t index) const
 		{
 			if(index >= m_size)
-				ThrowBaseExcept(L"Index Out of Range");
+				throw BaseException(L"Index Out of Range");
 			return m_data.array[index];
 		}
 		T& operator[](size_t index)
 		{
 			if (index >= m_size)
-				ThrowBaseExcept(L"Index Out of Range");
+				throw BaseException(L"Index Out of Range");
 			return m_data.array[index];
 		}
 

@@ -8,57 +8,21 @@
 #include "WinAPIException.hpp"
 #include <iostream>
 
-#ifdef ThrowIfFailed
-#undef ThrowIfFailed
-#endif
-
-#ifdef ThrowIfFailedWithDesc
-#undef ThrowIfFailedWithDesc
-#endif
-
-#ifdef ThrowLastError
-#undef ThrowLastError
-#endif
-
-#ifdef ThrowLastErrorWithDesc
-#undef ThrowLastErrorWithDesc
-#endif
-
-#define ThrowBaseExcept(description)\
-			throw TG::BaseException(description);
-
-#define ThrowIfFailed(hr)\
-			if (FAILED(hr))\
-			{\
-				throw TG::WinAPIException(hr);\
-			}
-
-#define ThrowIfFailedWithDesc(hr, description)\
-			if (FAILED(hr))\
-			{\
-				throw TG::WinAPIException(hr, description);\
-			}
-
-#define ThrowLastError()\
-		{\
-			DWORD hr = GetLastError();\
-			if (hr > 0)\
-			{\
-				throw TG::WinAPIException(hr);\
-			}\
-		}
-
-#define ThrowLastErrorWithDesc(description)\
-		{\
-			DWORD hr = GetLastError();\
-			if (hr > 0)\
-			{\
-				throw TG::WinAPIException(hr, description);\
-			}\
-		}
-
 namespace TG
 {
+	inline void CheckHResult(HRESULT hr, const std::wstring& description = L"")
+	{
+		if (hr < 0)
+			throw WinAPIException(hr, description);
+	}
+
+	inline void CheckLastError(const std::wstring& description = L"")
+	{
+		HRESULT hr = GetLastError();
+		if (hr > 0)
+			throw WinAPIException(hr, description);
+	}
+
 	template<typename Text> struct text_trait;
 	template<typename Text> struct text_trait<const Text> : text_trait<Text> {};
 

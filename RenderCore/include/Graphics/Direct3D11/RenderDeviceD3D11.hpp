@@ -14,13 +14,16 @@ namespace TG::Graphics
 	class RenderDeviceD3D11 final : public IRenderDevice
 	{
 	public:
-		RenderDeviceD3D11(const D3D11CreateInfo& info);
+		RenderDeviceD3D11(const D3D11CreateInfo& info, const winrt::com_ptr<ID3D11Device>& pDevice);
+		RenderDeviceD3D11(const RenderDeviceD3D11&) = delete;
+		RenderDeviceD3D11(const RenderDeviceD3D11&&) = delete;
+		RenderDeviceD3D11& operator=(const RenderDeviceD3D11&) = delete;
+
+		virtual void CreateBuffer() override;
+		virtual void CreateShader() override;
+		virtual void CreateTexture() override;
 
 	private:
-		void RetrieveAdaptersInfo();		// 检索所有显示适配器信息
-
-	private:
-		winrt::com_ptr<IDXGIFactory1> m_dxgiFactory;
 		winrt::com_ptr<ID3D11Device> m_d3dDevice;
 	};
 }

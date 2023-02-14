@@ -5,11 +5,12 @@
 *****************************************************************/
 #pragma once
 #include "PlatformHeaders.h"
+#include "Graphics/GraphicsBase.hpp"
 
 namespace TG::Graphics
 {
-	struct D3D11CreateInfo
+	struct D3D11CreateInfo : public ICreateInfo
 	{
-		HWND hwnd;
+
 	};
 }

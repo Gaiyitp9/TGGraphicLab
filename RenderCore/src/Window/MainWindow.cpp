@@ -28,7 +28,7 @@ namespace TG
 	{
 		HICON icon = LoadIconW(GetModuleHandleW(nullptr), MAKEINTRESOURCEW(iconSource));
 		if (icon == nullptr)
-			ThrowLastErrorWithDesc(L"Invalid icon source");
+			CheckLastError(L"Invalid icon source");
 
 		SendMessageW(hwnd, WM_SETICON, ICON_BIG, reinterpret_cast<LPARAM>(icon));
 		SendMessageW(hwnd, WM_SETICON, ICON_SMALL, reinterpret_cast<LPARAM>(icon));
@@ -70,7 +70,7 @@ namespace TG
 		RECT rect = { 0, 0, width, height };
 		// 根据客户区域宽和高计算整个窗口的宽和高
 		if (!AdjustWindowRect(&rect, WS_OVERLAPPEDWINDOW, false))
-			ThrowLastError();
+			CheckLastError();
 
 		HWND parentHwnd = nullptr;
 		if (auto observer = parent.lock())
@@ -81,7 +81,7 @@ namespace TG
 			parentHwnd, nullptr, windowRegister.hInstance(), this);
 
 		if (hwnd == nullptr)
-			ThrowLastError();
+			CheckLastError();
 
 		ShowWindow(hwnd, SW_SHOW);
 	}

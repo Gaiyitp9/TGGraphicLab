@@ -180,7 +180,7 @@ namespace TG
 	UnitTest::UnitTest()
 	{
 		if (glInst == nullptr)
-			ThrowLastError();
+			CheckLastError();
 	}
 
 	UnitTest::~UnitTest()
