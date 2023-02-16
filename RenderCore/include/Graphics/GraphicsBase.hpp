@@ -10,7 +10,7 @@
 
 namespace TG::Graphics
 {
-	enum class DeviceType: unsigned char
+	enum class DeviceType: std::uint8_t
 	{
 		DirectX11,
 		DirectX12,
@@ -26,13 +26,23 @@ namespace TG::Graphics
 
 	struct ICreateInfo
 	{
-		unsigned int adapterIndex;
+		std::uint16_t adapterIndex;
 		HWND hwnd;
+	};
+
+	enum class TextureFormat : std::uint16_t
+	{
+		UNKNOWN = 0,
+		R8G8B8A8_UNORM = 28,
 	};
 
 	struct SwapChainDesc
 	{
-
+		std::uint32_t width;
+		std::uint32_t height;
+		TextureFormat format;
+		std::uint8_t sampleCount;
+		std::uint8_t bufferCount;
 	};
 
 	// 图形设备
@@ -46,12 +56,6 @@ namespace TG::Graphics
 	// 帧缓存
 	template <DeviceType T>
 	class FrameBuffer;
-
-	// 缓存格式
-	enum class Format : unsigned char
-	{
-		R8G8B8A8_UNORM = 28,
-	};
 
 #ifdef _DEBUG
 	template<DeviceType T>

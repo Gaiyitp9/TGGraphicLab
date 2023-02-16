@@ -13,7 +13,7 @@ namespace TG::Graphics
 	class SwapChainD3D11 : public ISwapChain
 	{
 	public:
-		SwapChainD3D11();
+		SwapChainD3D11(const winrt::com_ptr<IDXGISwapChain>& swapChain);
 
 		virtual void Present(int syncInterval);
 		virtual void Resize(int width, int height);

@@ -54,4 +54,42 @@ namespace TG::Graphics
 		*ppDevice = DBG_NEW RenderDeviceD3D11(*d3dInfo, d3dDevice);
 		*ppContext = DBG_NEW DeviceContextD3D11(*d3dInfo, d3dContext);
 	}
+
+	void D3D11Factory::CreateSwapChain(IRenderDevice const* pDevice, IDeviceContext const* pContext, const SwapChainDesc& desc, ISwapChain** ppSwapChain) const
+	{
+		RenderDeviceD3D11 const* d3dDevice = dynamic_cast<RenderDeviceD3D11 const*>(pDevice);
+		if (d3dDevice == nullptr)
+			throw BaseException(L"pDevice should be RenderDeviceD3D11 type");
+		DeviceContextD3D11 const* d3dContext = dynamic_cast<DeviceContextD3D11 const*>(pContext);
+		if (d3dContext == nullptr)
+			throw BaseException(L"pContext should be DeviceContextD3D11 type");
+
+		DXGI_FORMAT format = TexFormatToDXGIFormat(desc.format);
+		UINT numQualityLevels;
+		CheckHResult(d3dDevice->device()->CheckMultisampleQualityLevels(format, desc.sampleCount,
+			&numQualityLevels));
+
+		DXGI_RATIONAL refreshRate;
+		refreshRate.Denominator = 1;
+		refreshRate.Numerator = 60;
+
+		DXGI_SWAP_CHAIN_DESC swapChainDesc = {};
+		swapChainDesc.BufferDesc.Width = desc.width;
+		swapChainDesc.BufferDesc.Height = desc.height;
+		swapChainDesc.BufferDesc.Format = format;
+		swapChainDesc.BufferDesc.RefreshRate = refreshRate;
+		swapChainDesc.BufferDesc.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
+		swapChainDesc.BufferDesc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
+		swapChainDesc.SampleDesc.Count = desc.sampleCount;
+		swapChainDesc.SampleDesc.Quality = numQualityLevels - 1;
+		swapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
+		swapChainDesc.BufferCount = 1;
+		swapChainDesc.OutputWindow = d3dContext->hwnd();
+		swapChainDesc.Windowed = true;
+		swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
+		winrt::com_ptr<IDXGISwapChain> swapChain;
+		CheckHResult(m_dxgiFactory->CreateSwapChain(d3dDevice->device(), &swapChainDesc, swapChain.put()));
+		
+		*ppSwapChain = DBG_NEW SwapChainD3D11(swapChain);
+	}
 }

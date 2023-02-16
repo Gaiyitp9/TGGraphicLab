@@ -23,6 +23,8 @@ namespace TG::Graphics
 		virtual void CreateShader() override;
 		virtual void CreateTexture() override;
 
+		ID3D11Device* device() const;
+
 	private:
 		winrt::com_ptr<ID3D11Device> m_d3dDevice;
 	};

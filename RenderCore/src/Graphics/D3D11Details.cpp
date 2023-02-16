@@ -9,11 +9,11 @@
 
 namespace TG::Graphics
 {
-	DXGI_FORMAT DirectXFormatMapping(Format format)
+	DXGI_FORMAT DirectXFormatMapping(TextureFormat format)
 	{
-		static std::unordered_map<Format, DXGI_FORMAT> map =
+		static std::unordered_map<TextureFormat, DXGI_FORMAT> map =
 		{
-			{Format::R8G8B8A8_UNORM, DXGI_FORMAT_R8G8B8A8_UNORM},
+			{TextureFormat::R8G8B8A8_UNORM, DXGI_FORMAT_R8G8B8A8_UNORM},
 		};
 		return map[format];
 	}

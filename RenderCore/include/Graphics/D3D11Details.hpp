@@ -16,7 +16,7 @@ using Microsoft::WRL::ComPtr;
 
 namespace TG::Graphics
 {
-	DXGI_FORMAT DirectXFormatMapping(Format format);
+	DXGI_FORMAT DirectXFormatMapping(TextureFormat format);
 
 	template<>
 	class Device<DeviceType::DirectX11>

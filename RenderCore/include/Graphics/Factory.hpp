@@ -7,6 +7,7 @@
 #include "GraphicsBase.hpp"
 #include "RenderDevice.hpp"
 #include "DeviceContext.hpp"
+#include "SwapChain.hpp"
 
 namespace TG::Graphics
 {
@@ -19,6 +20,6 @@ namespace TG::Graphics
 		virtual void CreateDeviceAndContext(ICreateInfo const* info, IRenderDevice** ppDevice, IDeviceContext** ppContext) const = 0;
 
 		// 创建交换链
-		virtual void CreateSwapChain() const = 0;
+		virtual void CreateSwapChain(IRenderDevice const* pDevice, IDeviceContext const* pContext, const SwapChainDesc& desc, ISwapChain** ppSwapChain) const = 0;
 	};
 }
