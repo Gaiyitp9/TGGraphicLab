@@ -22,7 +22,7 @@ namespace TG::Graphics
 
 		virtual bool EnumAdapter(unsigned int index, AdapterDesc& desc) const override;
 		virtual void CreateDeviceAndContext(ICreateInfo const* info, IRenderDevice** ppDevice, IDeviceContext** ppContext) const override;
-		virtual void CreateSwapChain(IRenderDevice const* pDevice, IDeviceContext const* pContext, const SwapChainDesc& desc, ISwapChain** ppSwapChain) const override;
+		virtual void CreateSwapChain(IRenderDevice const* pDevice,  HWND hwnd, const SwapChainDesc& desc, ISwapChain** ppSwapChain) const override;
 
 	private:
 		winrt::com_ptr<IDXGIFactory1> m_dxgiFactory;

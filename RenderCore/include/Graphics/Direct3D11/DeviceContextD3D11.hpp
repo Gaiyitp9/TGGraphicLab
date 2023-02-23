@@ -27,10 +27,7 @@ namespace TG::Graphics
 		virtual void Draw();
 		virtual void DrawIndexed();
 
-		HWND hwnd() const;
-
 	private:
 		winrt::com_ptr<ID3D11DeviceContext> m_d3dContext;
-		HWND m_hwnd;
 	};
 }

@@ -11,9 +11,4 @@ namespace TG::Graphics
 	{
 		m_d3dContext = context;
 	}
-
-	HWND DeviceContextD3D11::hwnd() const
-	{
-		return m_hwnd;
-	}
 }

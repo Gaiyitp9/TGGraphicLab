@@ -51,40 +51,49 @@ namespace TG::Graphics
 		CheckHResult(D3D11CreateDevice(pAdapter.get(), D3D_DRIVER_TYPE_UNKNOWN, nullptr, creationFlags,
 			featureLevels, 2, D3D11_SDK_VERSION, d3dDevice.put(), nullptr, d3dContext.put()));
 
-		*ppDevice = DBG_NEW RenderDeviceD3D11(*d3dInfo, d3dDevice);
+		*ppDevice = DBG_NEW RenderDeviceD3D11(*d3dInfo, d3dDevice, pAdapter);
 		*ppContext = DBG_NEW DeviceContextD3D11(*d3dInfo, d3dContext);
 	}
 
-	void D3D11Factory::CreateSwapChain(IRenderDevice const* pDevice, IDeviceContext const* pContext, const SwapChainDesc& desc, ISwapChain** ppSwapChain) const
+	void D3D11Factory::CreateSwapChain(IRenderDevice const* pDevice, HWND hwnd, const SwapChainDesc& desc, ISwapChain** ppSwapChain) const
 	{
 		RenderDeviceD3D11 const* d3dDevice = dynamic_cast<RenderDeviceD3D11 const*>(pDevice);
 		if (d3dDevice == nullptr)
 			throw BaseException(L"pDevice should be RenderDeviceD3D11 type");
-		DeviceContextD3D11 const* d3dContext = dynamic_cast<DeviceContextD3D11 const*>(pContext);
-		if (d3dContext == nullptr)
-			throw BaseException(L"pContext should be DeviceContextD3D11 type");
 
 		DXGI_FORMAT format = TexFormatToDXGIFormat(desc.format);
+
+		// 获取第一个显示输出
+		winrt::com_ptr<IDXGIOutput> pOutput;
+		if (d3dDevice->adapter()->EnumOutputs(0, pOutput.put()) == DXGI_ERROR_NOT_FOUND)
+			throw BaseException(L"No display exist");
+		// 根据格式获取显示模式
+		UINT modeCount = 0;
+		CheckHResult(pOutput->GetDisplayModeList(format, DXGI_ENUM_MODES_SCALING, &modeCount, nullptr));
+		std::vector<DXGI_MODE_DESC> outputModes(modeCount);
+		if (modeCount > 0)
+		{
+			CheckHResult(pOutput->GetDisplayModeList(format, DXGI_ENUM_MODES_SCALING,
+				&modeCount, outputModes.data()));
+		}
+
+		// 获取多重采样级别
 		UINT numQualityLevels;
 		CheckHResult(d3dDevice->device()->CheckMultisampleQualityLevels(format, desc.sampleCount,
 			&numQualityLevels));
-
-		DXGI_RATIONAL refreshRate;
-		refreshRate.Denominator = 1;
-		refreshRate.Numerator = 60;
 
 		DXGI_SWAP_CHAIN_DESC swapChainDesc = {};
 		swapChainDesc.BufferDesc.Width = desc.width;
 		swapChainDesc.BufferDesc.Height = desc.height;
 		swapChainDesc.BufferDesc.Format = format;
-		swapChainDesc.BufferDesc.RefreshRate = refreshRate;
+		swapChainDesc.BufferDesc.RefreshRate = outputModes[0].RefreshRate;
 		swapChainDesc.BufferDesc.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
 		swapChainDesc.BufferDesc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
 		swapChainDesc.SampleDesc.Count = desc.sampleCount;
 		swapChainDesc.SampleDesc.Quality = numQualityLevels - 1;
 		swapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
 		swapChainDesc.BufferCount = 1;
-		swapChainDesc.OutputWindow = d3dContext->hwnd();
+		swapChainDesc.OutputWindow = hwnd;
 		swapChainDesc.Windowed = true;
 		swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
 		winrt::com_ptr<IDXGISwapChain> swapChain;

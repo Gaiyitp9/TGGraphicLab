@@ -14,7 +14,9 @@ namespace TG::Graphics
 	class RenderDeviceD3D11 final : public IRenderDevice
 	{
 	public:
-		RenderDeviceD3D11(const D3D11CreateInfo& info, const winrt::com_ptr<ID3D11Device>& pDevice);
+		RenderDeviceD3D11(const D3D11CreateInfo& info, 
+			const winrt::com_ptr<ID3D11Device>& pDevice,
+			const winrt::com_ptr<IDXGIAdapter>& pAdapter);
 		RenderDeviceD3D11(const RenderDeviceD3D11&) = delete;
 		RenderDeviceD3D11(const RenderDeviceD3D11&&) = delete;
 		RenderDeviceD3D11& operator=(const RenderDeviceD3D11&) = delete;
@@ -24,8 +26,10 @@ namespace TG::Graphics
 		virtual void CreateTexture() override;
 
 		ID3D11Device* device() const;
+		IDXGIAdapter* adapter() const;
 
 	private:
-		winrt::com_ptr<ID3D11Device> m_d3dDevice;
+		winrt::com_ptr<ID3D11Device> m_device;
+		winrt::com_ptr<IDXGIAdapter> m_adapter;
 	};
 }

@@ -23,7 +23,7 @@ namespace TG::Graphics
 
 		// 创建交换链
 		virtual void CreateSwapChain(IRenderDevice const* pDevice, 
-								IDeviceContext const* pContext, 
+								HWND hwnd, 
 								const SwapChainDesc& desc, 
 								ISwapChain** ppSwapChain) const = 0;
 	};

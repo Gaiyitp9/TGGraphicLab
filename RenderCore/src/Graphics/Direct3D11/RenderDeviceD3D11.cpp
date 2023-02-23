@@ -7,13 +7,21 @@
 
 namespace TG::Graphics
 {
-	RenderDeviceD3D11::RenderDeviceD3D11(const D3D11CreateInfo& info, const winrt::com_ptr<ID3D11Device>& device)
+	RenderDeviceD3D11::RenderDeviceD3D11(const D3D11CreateInfo& info, 
+		const winrt::com_ptr<ID3D11Device>& pDevice,
+		const winrt::com_ptr<IDXGIAdapter>& pAdapter)
 	{
-		m_d3dDevice = device;
+		m_device = pDevice;
+		m_adapter = pAdapter;
 	}
 
 	inline ID3D11Device* RenderDeviceD3D11::device() const
 	{
-		return m_d3dDevice.get();
+		return m_device.get();
+	}
+
+	inline IDXGIAdapter* RenderDeviceD3D11::adapter() const
+	{
+		return m_adapter.get();
 	}
 }
