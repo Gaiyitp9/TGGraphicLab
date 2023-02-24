@@ -3,17 +3,17 @@
 * Copyright (c) Gaiyitp9. All rights reserved.					*
 * This code is licensed under the MIT License (MIT).			*
 *****************************************************************/
-#include "Graphics/Direct3D11/D3D11Factory.hpp"
+#include "Graphics/Direct3D11/FactoryD3D11.hpp"
 #include "Diagnostics/Debug.hpp"
 
 namespace TG::Graphics
 {
-	D3D11Factory::D3D11Factory()
+	FactoryD3D11::FactoryD3D11()
 	{
 		CheckHResult(CreateDXGIFactory1(IID_PPV_ARGS(&m_dxgiFactory)));
 	}
 
-	bool D3D11Factory::EnumAdapter(unsigned int index, AdapterDesc& adapterDesc) const
+	bool FactoryD3D11::EnumAdapter(unsigned int index, AdapterDesc& adapterDesc) const
 	{
 		winrt::com_ptr<IDXGIAdapter> pAdapter;
 		if (m_dxgiFactory->EnumAdapters(index, pAdapter.put()) == DXGI_ERROR_NOT_FOUND);
@@ -26,12 +26,9 @@ namespace TG::Graphics
 		return true;
 	}
 
-	void D3D11Factory::CreateDeviceAndContext(ICreateInfo const* info, IRenderDevice** ppDevice, IDeviceContext** ppContext) const
+	void FactoryD3D11::CreateDeviceAndContext(ICreateInfo const* info, IRenderDevice** ppDevice, IDeviceContext** ppContext) const
 	{
-		if (typeid(info) != typeid(D3D11CreateInfo))
-			throw BaseException(L"Parameter info should be D3D11CreateInfo type");
-
-		D3D11CreateInfo const* d3dInfo = static_cast<D3D11CreateInfo const*>(info);
+		CreateInfoD3D11 const* d3dInfo = static_cast<CreateInfoD3D11 const*>(info);
 
 		winrt::com_ptr<ID3D11Device> d3dDevice;
 		winrt::com_ptr<ID3D11DeviceContext> d3dContext;
@@ -45,7 +42,7 @@ namespace TG::Graphics
 			D3D_FEATURE_LEVEL_11_0,
 		};
 		winrt::com_ptr<IDXGIAdapter> pAdapter;
-		if (m_dxgiFactory->EnumAdapters(d3dInfo->adapterIndex, pAdapter.put()) == DXGI_ERROR_NOT_FOUND);
+		if (m_dxgiFactory->EnumAdapters(d3dInfo->adapterIndex, pAdapter.put()) == DXGI_ERROR_NOT_FOUND)
 			throw BaseException(L"Invalid adapter index");
 
 		CheckHResult(D3D11CreateDevice(pAdapter.get(), D3D_DRIVER_TYPE_UNKNOWN, nullptr, creationFlags,
@@ -55,7 +52,7 @@ namespace TG::Graphics
 		*ppContext = DBG_NEW DeviceContextD3D11(*d3dInfo, d3dContext);
 	}
 
-	void D3D11Factory::CreateSwapChain(IRenderDevice const* pDevice, HWND hwnd, const SwapChainDesc& desc, ISwapChain** ppSwapChain) const
+	void FactoryD3D11::CreateSwapChain(IRenderDevice const* pDevice, HWND hwnd, const SwapChainDesc& desc, ISwapChain** ppSwapChain) const
 	{
 		RenderDeviceD3D11 const* d3dDevice = dynamic_cast<RenderDeviceD3D11 const*>(pDevice);
 		if (d3dDevice == nullptr)
@@ -92,13 +89,13 @@ namespace TG::Graphics
 		swapChainDesc.SampleDesc.Count = desc.sampleCount;
 		swapChainDesc.SampleDesc.Quality = numQualityLevels - 1;
 		swapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
-		swapChainDesc.BufferCount = 1;
+		swapChainDesc.BufferCount = desc.bufferCount;
 		swapChainDesc.OutputWindow = hwnd;
 		swapChainDesc.Windowed = true;
 		swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
 		winrt::com_ptr<IDXGISwapChain> swapChain;
 		CheckHResult(m_dxgiFactory->CreateSwapChain(d3dDevice->device(), &swapChainDesc, swapChain.put()));
 		
-		*ppSwapChain = DBG_NEW SwapChainD3D11(swapChain);
+		*ppSwapChain = DBG_NEW SwapChainD3D11(d3dDevice->device(), swapChain);
 	}
 }

@@ -13,12 +13,16 @@ namespace TG::Graphics
 	class SwapChainD3D11 : public ISwapChain
 	{
 	public:
-		SwapChainD3D11(const winrt::com_ptr<IDXGISwapChain>& swapChain);
+		SwapChainD3D11(ID3D11Device* device,
+			const winrt::com_ptr<IDXGISwapChain>& swapChain);
 
 		virtual void Present(int syncInterval);
-		virtual void Resize(int width, int height);
+		virtual void Resize(int width, int height) {}
+
+		ID3D11RenderTargetView* GetCurrentBackBufferRTV();
 
 	private:
-		winrt::com_ptr<IDXGISwapChain> m_d3dSwapChain;
+		winrt::com_ptr<IDXGISwapChain> m_swapChain;
+		winrt::com_ptr<ID3D11RenderTargetView> m_renderTargetView;
 	};
 }

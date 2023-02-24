@@ -9,7 +9,7 @@
 
 namespace TG::Graphics
 {
-	struct D3D11CreateInfo : public ICreateInfo
+	struct CreateInfoD3D11 : public ICreateInfo
 	{
 
 	};

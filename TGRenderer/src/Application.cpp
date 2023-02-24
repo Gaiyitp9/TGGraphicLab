@@ -26,7 +26,6 @@ namespace TG
 		locale = std::locale(".utf8");
 		std::wcout.imbue(locale);
 		timer = std::make_shared<Chronometer>();
-		d3d11Layer = std::make_unique<Graphics::GraphicsLayer<Graphics::DeviceType::DirectX11>>();
 
 		// 获取当前显示器的宽和高
 		screenWidth = GetSystemMetrics(SM_CXSCREEN);
@@ -46,9 +45,10 @@ namespace TG
 		mainWnd->SpyInputEvent(false);
 		mainWnd->SpyMessage(false);
 		mainWnd->SetIcon(IDI_ICON1);
+		d3d11Layer = std::make_unique<Graphics::GraphicsLayer>(mainWnd.get());
 
-		windows[L"辅助窗口"] = std::make_shared<PopupWindow>((screenWidth - 400) / 2, (screenHeight - 300) / 2,
-			400, 300, windows[L"天工渲染器"]);
+		//windows[L"辅助窗口"] = std::make_shared<PopupWindow>((screenWidth - 400) / 2, (screenHeight - 300) / 2,
+		//	400, 300, windows[L"天工渲染器"]);
 
 		//throw TG::WinAPIException(E_OUTOFMEMORY);
 		unitTest.FormatTest();
@@ -58,9 +58,6 @@ namespace TG
 		unitTest.ArrayAlignmentTest();
 		//unitTest.SIMDTest();
 		unitTest.OpenGLTest(mainWnd->Hwnd());
-
-		d3d11Layer->CreateFrameBuffer(windows[L"天工渲染器"]);
-		d3d11Layer->CreateFrameBuffer(windows[L"辅助窗口"]);
 
 		while (true)
 		{
@@ -82,8 +79,7 @@ namespace TG
 			}
 
 			const float c = sin(timer->TotalTime() * 0.001f) / 2.0f + 0.5f;
-			d3d11Layer->ClearBackground(windows[L"天工渲染器"], Math::Color::AliceBlue * c);
-			d3d11Layer->ClearBackground(windows[L"辅助窗口"], c * Math::Color::Aquamarine);
+			d3d11Layer->ClearBackground(Math::Color::AliceBlue * c);
 			d3d11Layer->Update();
 #ifdef _DEBUG
 			if (mainWnd->Input().GetKeyDown(KeyCode::Space))

@@ -7,7 +7,7 @@
 #include <winrt/base.h>
 #include <dxgi.h>
 #include "../Factory.hpp"
-#include "D3D11CreateInfo.hpp"
+#include "CreateInfoD3D11.hpp"
 #include "RenderDeviceD3D11.hpp"
 #include "DeviceContextD3D11.hpp"
 #include "SwapChainD3D11.hpp"
@@ -15,14 +15,14 @@
 
 namespace TG::Graphics
 {
-	class D3D11Factory final : public IFactory
+	class FactoryD3D11 final : public IFactory
 	{
 	public:
-		D3D11Factory();
+		FactoryD3D11();
 
 		virtual bool EnumAdapter(unsigned int index, AdapterDesc& desc) const override;
 		virtual void CreateDeviceAndContext(ICreateInfo const* info, IRenderDevice** ppDevice, IDeviceContext** ppContext) const override;
-		virtual void CreateSwapChain(IRenderDevice const* pDevice,  HWND hwnd, const SwapChainDesc& desc, ISwapChain** ppSwapChain) const override;
+		virtual void CreateSwapChain(IRenderDevice const* pDevice, HWND hwnd, const SwapChainDesc& desc, ISwapChain** ppSwapChain) const override;
 
 	private:
 		winrt::com_ptr<IDXGIFactory1> m_dxgiFactory;

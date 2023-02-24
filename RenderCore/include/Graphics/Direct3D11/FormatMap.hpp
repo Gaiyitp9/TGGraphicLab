@@ -9,7 +9,7 @@
 
 namespace TG::Graphics
 {
-	DXGI_FORMAT TexFormatToDXGIFormat(TextureFormat fmt)
+	inline DXGI_FORMAT TexFormatToDXGIFormat(TextureFormat fmt)
 	{
 		switch (fmt)
 		{

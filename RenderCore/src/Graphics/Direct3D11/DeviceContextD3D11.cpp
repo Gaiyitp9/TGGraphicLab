@@ -7,8 +7,8 @@
 
 namespace TG::Graphics
 {
-	DeviceContextD3D11::DeviceContextD3D11(const D3D11CreateInfo& info, const winrt::com_ptr<ID3D11DeviceContext>& context)
+	DeviceContextD3D11::DeviceContextD3D11(const CreateInfoD3D11& info, const winrt::com_ptr<ID3D11DeviceContext>& context)
 	{
-		m_d3dContext = context;
+		m_context = context;
 	}
 }

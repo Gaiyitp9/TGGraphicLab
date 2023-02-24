@@ -4,6 +4,7 @@
 * This code is licensed under the MIT License (MIT).			*
 *****************************************************************/
 #pragma once
+#include "Diagnostics/Debug.hpp"
 
 namespace TG::Graphics
 {

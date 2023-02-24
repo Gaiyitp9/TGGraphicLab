@@ -6,63 +6,57 @@
 #pragma once
 
 #include "Graphics/Core.hpp"
+#include "Graphics/Direct3D11/FactoryD3D11.hpp"
 
 namespace TG::Graphics
 {
-	template <DeviceType Type>
 	class GraphicsLayer
 	{
 	public:
-		GraphicsLayer()
+		GraphicsLayer(Window const* window)
 		{
-			device = std::make_shared<Device<Type>>();
-			context = std::make_shared<Context<Type>>(device);
-#ifdef _DEBUG
-			dbgInfo = std::make_unique<DebugInfo<Type>>();
-#endif
+			factory = std::make_unique<FactoryD3D11>();
+			CreateInfoD3D11 info;
+			info.adapterIndex = 0;
+			info.hwnd = window->Hwnd();
+
+			IRenderDevice* pDevice = nullptr;
+			IDeviceContext* pContext = nullptr;
+			factory->CreateDeviceAndContext(&info, &pDevice, &pContext);
+			device.reset(pDevice);
+			context.reset(pContext);
+
+			SwapChainDesc desc;
+			desc.format = TextureFormat::R8G8B8A8_UNORM;
+			desc.bufferCount = 2;
+			desc.sampleCount = 4;
+			desc.width = window->Width();
+			desc.height = window->Height();
+			ISwapChain* pSwapChain = nullptr;
+			factory->CreateSwapChain(pDevice, window->Hwnd(), desc, &pSwapChain);
+			swapChain.reset(pSwapChain);
 		}
 
 		void Update()
 		{
-			auto it = frameBuffers.begin();
-			while (it != frameBuffers.end())
-			{
-				// 如果Windows窗口被销毁，则移除对应的帧缓存
-				if (it->first->Destroy())
-					it = frameBuffers.erase(it);
-				else
-				{
-					it->second->Present();
-					++it;
-				}
-			}
-#ifdef _DEBUG
-			dbgInfo->OutputMessages();
-#endif
+			swapChain->Present(1);
 		}
 
-		bool CreateFrameBuffer(const std::shared_ptr<Window>& window)
+		void ClearBackground(const Math::Color& color)
 		{
-			if (!frameBuffers.contains(window))
-			{
-				frameBuffers[window] = std::make_shared<FrameBuffer<Type>>(device, window);
-				return true;
-			}
-			return false;
-		}
-
-		void ClearBackground(const std::shared_ptr<Window>& window, const Math::Color& color)
-		{
-			if (frameBuffers.contains(window))
-				context->ClearFrameBuffer(frameBuffers[window], color);
+			DeviceContextD3D11* c = static_cast<DeviceContextD3D11*>(context.get());
+			SwapChainD3D11* s = static_cast<SwapChainD3D11*>(swapChain.get());
+			c->m_context->ClearRenderTargetView(s->GetCurrentBackBufferRTV(), color.RGBA());
 		}
 
 	public:
-		std::shared_ptr<Device<Type>> device;
-		std::shared_ptr<Context<Type>> context;
-		std::unordered_map<std::shared_ptr<Window>, std::shared_ptr<FrameBuffer<Type>>> frameBuffers;
+
 #ifdef _DEBUG
-		std::unique_ptr<DebugInfo<Type>> dbgInfo;
+		std::unique_ptr<DebugInfo<DeviceType::DirectX11>> dbgInfo;
 #endif
+		std::unique_ptr<IFactory> factory;
+		std::unique_ptr<IRenderDevice> device;
+		std::unique_ptr<IDeviceContext> context;
+		std::unique_ptr<ISwapChain> swapChain;
 	};
 }
