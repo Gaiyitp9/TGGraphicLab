@@ -1,13 +1,10 @@
-.vs/
-.vscode/
+.idea/
+cmake-build-debug/
+cmake-build-release/
+out/
 x64/
 Win32/
 Debug/
 Release/
-out/
 CMakeUserPresets.json
-*.sln
-*.vcxproj
-*.filters
-*.user
 *.aps
