@@ -4,7 +4,6 @@
 * This code is licensed under the MIT License (MIT).			*
 *****************************************************************/
 
-#include "../resource.h"
 #include "Application.hpp"
 #include "Diagnostics/WinAPIException.hpp"
 
@@ -44,7 +43,7 @@ namespace TG
 		mainWnd->SetTimer(timer);
 		mainWnd->SpyInputEvent(false);
 		mainWnd->SpyMessage(false);
-		mainWnd->SetIcon(IDI_ICON1);
+		mainWnd->SetIcon(L"D:\\ComputerScience\\ComputerGraphics\\Projects\\TGRenderLab\\TGRenderer\\maple-leaf.ico");
 		d3d11Layer = std::make_unique<Graphics::GraphicsLayer>(mainWnd.get());
 
 		//windows[L"辅助窗口"] = std::make_shared<PopupWindow>((screenWidth - 400) / 2, (screenHeight - 300) / 2,

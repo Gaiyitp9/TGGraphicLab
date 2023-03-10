@@ -192,7 +192,7 @@ namespace TG
 		if (m_hInstance = GetModuleHandleW(nullptr))
 			CheckLastError();
 
-		WNDCLASSEX wc = {};
+		WNDCLASSEXW wc = {};
 		wc.cbSize = sizeof(WNDCLASSEX);
 		wc.style = CS_HREDRAW | CS_VREDRAW | CS_OWNDC;
 		wc.lpfnWndProc = WindowProcSetup;

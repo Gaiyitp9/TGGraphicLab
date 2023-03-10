@@ -24,9 +24,9 @@ namespace TG
 		input.Update();
 	}
 
-	void MainWindow::SetIcon(int iconSource)
+	void MainWindow::SetIcon(wchar_t const* iconPath)
 	{
-		HICON icon = LoadIconW(GetModuleHandleW(nullptr), MAKEINTRESOURCEW(iconSource));
+        HANDLE icon = LoadImageW(nullptr, iconPath, IMAGE_ICON, 32, 32, LR_LOADFROMFILE);
 		if (icon == nullptr)
 			CheckLastError(L"Invalid icon source");
 

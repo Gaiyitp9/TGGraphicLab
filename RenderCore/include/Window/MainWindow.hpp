@@ -19,8 +19,8 @@ namespace TG
 		MainWindow& operator=(const MainWindow&) = delete;
 		~MainWindow();
 
-		void Update() override;				// 更新主窗口
-		void SetIcon(int icon);				// 设置窗口的icon
+		void Update() override;				                                // 更新主窗口
+		void SetIcon(wchar_t const* iconPath);				                // 设置窗口的icon
 
 		const std::wstring& Name() const noexcept;							// 窗口名称
 		const InputSystem& Input() const noexcept;							// 获取输入系统

@@ -1,4 +1,4 @@
-file(GLOB_RECURSE SRCS *.cpp *.c TGRenderer.rc)
+file(GLOB_RECURSE SRCS *.cpp *.c)
 file(GLOB_RECURSE INCS *.h *.hpp)
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${SRCS})
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${INCS})

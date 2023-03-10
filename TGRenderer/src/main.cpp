@@ -8,9 +8,9 @@
 #include <tchar.h>
 #include "Graphics/RayTracing/RayTracing.h"
 
-int CALLBACK _tWinMain(_In_ HINSTANCE hInstance,
+int CALLBACK wWinMain(_In_ HINSTANCE hInstance,
 	_In_opt_ HINSTANCE hPrevInstance,
-	_In_ LPTSTR     lpCmdLine,
+	_In_ LPWSTR     lpCmdLine,
 	_In_ int       nShowCmd)
 {
 	try
