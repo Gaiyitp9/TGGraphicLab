@@ -13,15 +13,12 @@ namespace TG
 	class PopupWindow : public Window
 	{
 	public:
-		PopupWindow(int x, int y, int width, int height, std::shared_ptr<Window> parent = {});
+		PopupWindow(int x, int y, int width, int height, HWND parent = nullptr);
 		PopupWindow(const PopupWindow&) = delete;
 		PopupWindow& operator=(const PopupWindow&) = delete;
 		~PopupWindow();
 
-		void Update() override;
-
 	private:
-		void Initialize();
 		LRESULT CALLBACK WindowProc(HWND, UINT, WPARAM, LPARAM) override;
 	};
 }

@@ -4,10 +4,8 @@ project(TGRenderLab)
 
 # msvc17.0以上
 if(MSVC_TOOLSET_VERSION GREATER_EQUAL 143)
-	set(TARGET_PLATFORM _WINDOWS CACHE STRING "Target Platform")
-	set_property(CACHE TARGET_PLATFORM PROPERTY STRINGS _WINDOWS _ANDROID)
 	# compile definitions unicode
-	add_compile_definitions(UNICODE _UNICODE)
+	add_compile_definitions(_WINDOWS UNICODE _UNICODE)
 	# compile options utf-8 arch:avx2 fp:precise
 	add_compile_options(/utf-8 /arch:AVX2 /fp:precise)
 else()

@@ -18,9 +18,10 @@ namespace TG
 		Chronometer& operator=(const Chronometer&) = delete;
 		~Chronometer();
 
-		float DeltaTime() const;
-		float TotalTime() const;
-		std::wstring Time() const;
+		static std::wstring Date();                             // 当前时区的日期和时间
+
+		[[nodiscard]] float DeltaTime() const;
+		[[nodiscard]] float TotalTime() const;
 
 		void Reset();
 		void Pause();
@@ -28,15 +29,12 @@ namespace TG
 		void Tick();
 
 	private:
-		double deltaTime = 0.0;		// 单位毫秒(ms)
-		bool stopped = false;
+		double m_deltaTime = 0.0;                               // 单位毫秒(ms)
+		bool m_stopped = false;
 
-		std::chrono::system_clock wallClock;
-
-		std::chrono::steady_clock timer;		
-		std::chrono::steady_clock::time_point base;			// 开始运行的时间点
-		std::chrono::steady_clock::time_point last;			// 上一帧的时间点
-		std::chrono::steady_clock::time_point stop;			// 暂停的时间点
-		std::chrono::duration<double, std::milli> paused;	// 已暂停的时间
+		std::chrono::steady_clock::time_point m_base;           // 开始运行的时间点
+		std::chrono::steady_clock::time_point m_last;           // 上一帧的时间点
+		std::chrono::steady_clock::time_point m_stop;           // 暂停的时间点
+		std::chrono::duration<double, std::milli> m_paused{};   // 已暂停的时间
 	};
 }

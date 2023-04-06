@@ -12,17 +12,29 @@ namespace TG
 	class WinAPIException : public BaseException
 	{
 	public:
-		WinAPIException(HRESULT hr, const std::wstring& description = L"");
-		~WinAPIException();
+		explicit WinAPIException(HRESULT hr, const std::wstring& description = L"");
+		~WinAPIException() override;
 
-		virtual char const* what() const override;
-		virtual wchar_t const* GetType() const noexcept override;
+		char const* what() const override;
+		wchar_t const* GetType() const noexcept override;
 
 	protected:
-		DWORD errorCode;
-		std::wstring errorMsg;
+		DWORD m_errorCode;
+		std::wstring m_errorMsg;
 
 	private:
 		void TranslateHrErrorCode();		// 根据错误码生成相应错误信息
 	};
+
+    inline void CheckHResult(HRESULT hr, const std::wstring& description = L"")
+    {
+        if (hr < 0)
+            throw WinAPIException(hr, description);
+    }
+
+    inline void CheckLastError(const std::wstring& description = L"")
+    {
+        auto hr = static_cast<HRESULT>(GetLastError());
+        throw WinAPIException(hr, description);
+    }
 }

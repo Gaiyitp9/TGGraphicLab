@@ -5,10 +5,22 @@
 *****************************************************************/
 #pragma once
 
-namespace TG::Graphics
+namespace TG::Input
 {
-	class RenderDeviceGL
-	{
+    // 鼠标数据
+    union MouseData
+    {
+        struct
+        {
+            int x;
+            int y;
+        };
+        short delta;
+    };
 
-	};
+    // 键盘数据
+    struct KeyboardData
+    {
+        char c;
+    };
 }

@@ -5,19 +5,15 @@
 *****************************************************************/
 
 #include "Diagnostics/BaseException.hpp"
-#include "Utility.hpp"
-#include <format>
-#include <DbgHelp.h>
 
 namespace TG
 {
-	BaseException::BaseException(const std::wstring& description)
-		: m_description(description)
+	BaseException::BaseException(std::wstring description)
+		: m_description(std::move(description))
 	{
 		// 初始化符号处理器，用于堆栈信息追踪
 		m_hProcess = GetCurrentProcess();
 		SymInitialize(m_hProcess, nullptr, true);
-
 		// 记录栈帧信息
 		StackTrace();
 	}
@@ -54,7 +50,7 @@ namespace TG
 		void* stackFrames[FRAMESTOCAPTURE];
 		USHORT frameCount = CaptureStackBackTrace(0, FRAMESTOCAPTURE, stackFrames, nullptr);
 
-		SYMBOL_INFOW* symbol = reinterpret_cast<SYMBOL_INFOW*>(malloc(sizeof(SYMBOL_INFOW) + MAXNAMELEN * sizeof(WCHAR)));
+		auto symbol = reinterpret_cast<SYMBOL_INFOW*>(malloc(sizeof(SYMBOL_INFOW) + MAXNAMELEN * sizeof(WCHAR)));
 		symbol->SizeOfStruct = sizeof(SYMBOL_INFOW);
 		symbol->MaxNameLen = MAXNAMELEN;
 

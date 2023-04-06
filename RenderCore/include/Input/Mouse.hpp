@@ -5,48 +5,44 @@
 *****************************************************************/
 #pragma once
 
-#include "InputEvent.hpp"
 #include "../Math/Core.hpp"
-#include <queue>
+#include "Event.hpp"
 #include <bitset>
 
-namespace TG
+namespace TG::Input
 {
-	class Mouse
+    // 鼠标
+	class Mouse : public Device
 	{
 	public:
 		Mouse();
-		~Mouse();
+		~Mouse() override;
 
-		void Update();
+		void Update() override;
+        void Receive(const Event& e) override;
+        void SpyEvent(bool enable) override;
+        bool GetKey(KeyCode k) override;
+        bool GetKeyDown(KeyCode k) override;
+        bool GetKeyUp(KeyCode k) override;
 
-		void OnMouseMove(int x, int y);
-		void OnButtonPress(KeyCode key);
-		void OnButtonRelease(KeyCode key);
-		void OnWheelRoll(KeyCode key, short delta);
-
-		const Math::Vector2i& Position() const noexcept;
-		short RawWheelDelta() const noexcept;			// 鼠标滚轮变化值是WHEEL_DELTA的整数倍
-		short WheelDelta() const noexcept;				// 两个函数分别取没有除以和除以WHEEL_DELTA后的变化值
-
-		static bool IsMouseCode(KeyCode code);
+        [[nodiscard]] const Math::Vector2i& Position() const noexcept { return m_position; }
+        // 鼠标滚轮变化值是WHEEL_DELTA的整数倍
+        [[nodiscard]] short RawWheelDelta() const noexcept { return m_wheelDelta; }
+        // 两个函数分别取没有除以和除以WHEEL_DELTA后的变化值
+        [[nodiscard]] short WheelDelta() const noexcept { return static_cast<short>(m_wheelDelta / WHEEL_DELTA); }
 
 	private:
-		void TrimEventBuffer();
-		void SpyMouseEvent(InputEvent e);
+		void SpyMouseEvent(Event e);
+        static bool Contains(KeyCode k);
 
 	public:
-		std::bitset<8> mouseStates;						// 按键状态(是否被按下)
-		std::bitset<8> mouseDown;						// 按键是否刚刚按下
-		std::bitset<8> mouseUp;							// 按键是否刚刚松开
-
-		bool spyMouse = false;							// 是否监控鼠标
+		std::bitset<8> mouseHold;       // 按键状态(是否被按下)
+		std::bitset<8> mouseDown;       // 按键是否刚刚按下
+		std::bitset<8> mouseUp;         // 按键是否刚刚松开
 
 	private:
-		Math::Vector2i position;						// 鼠标位置
-		short wheelDelta = 0;							// 滚轮变化值，正值表示向前滚动，远离使用者；负值表示向后滚动，朝向使用者
-
-		std::queue<InputEvent> eventBuffer;				// 输入事件队列
-		static constexpr unsigned int BUFSIZE = 16u;	// 队列最大长度
+		Math::Vector2i m_position;      // 鼠标位置
+		short m_wheelDelta = 0;         // 滚轮变化值，正值表示向前滚动，远离使用者；负值表示向后滚动，朝向使用者
+        bool m_spyMouse = false;
 	};
 }

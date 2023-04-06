@@ -7,8 +7,8 @@
 
 namespace TG::Graphics
 {
-	class RenderDeviceGL
-	{
+    class SwapChainGL
+    {
 
-	};
+    };
 }

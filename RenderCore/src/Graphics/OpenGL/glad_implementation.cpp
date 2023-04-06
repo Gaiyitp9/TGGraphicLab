@@ -3,16 +3,7 @@
 * Copyright (c) Gaiyitp9. All rights reserved.					*
 * This code is licensed under the MIT License (MIT).			*
 *****************************************************************/
-#pragma once
-#include "PlatformHeaders.h"
-#include "glad/gl.h"
-#include "GLCreateInfo.hpp"
 
-namespace TG::Graphics
-{
-	class GLContext
-	{
-	public:
-		GLContext(const GLCreateInfo& info);
-	};
-}
+#define GLAD_GL_IMPLEMENTATION
+#define GLAD_WGL_IMPLEMENTATION
+#include "glad/wgl.h"

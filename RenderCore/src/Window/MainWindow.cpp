@@ -8,21 +8,41 @@
 
 namespace TG
 {
-	MainWindow::MainWindow(int x, int y, int width, int height, wchar_t const* name, std::shared_ptr<Window> parent)
-		: Window(x, y, width, height, parent), name(name)
+	MainWindow::MainWindow(int x, int y, int width, int height, wchar_t const* name, HWND parent)
+		: Window(x, y, width, height, parent), m_name(name)
 	{
-		Initialize();
+        // 获取窗口类名称
+        WindowRegister& windowRegister = WindowRegister::Instance();
+
+        // 客户端区域大小
+        RECT rect = { 0, 0, m_width, m_height };
+        // 根据客户区域宽和高计算整个窗口的宽和高
+        if (!AdjustWindowRect(&rect, WS_OVERLAPPEDWINDOW, false))
+            CheckLastError();
+
+        // 创建窗口
+        m_hwnd = CreateWindowW(L"Default", m_name.c_str(), WS_OVERLAPPEDWINDOW,
+                               m_posX, m_posY, rect.right - rect.left, rect.bottom - rect.top,
+                               m_parent, nullptr, windowRegister.HInstance(), this);
+
+        if (m_hwnd == nullptr)
+            CheckLastError();
+
+        ShowWindow(m_hwnd, SW_SHOW);
 	}
 
-	MainWindow::~MainWindow()
-	{
+	MainWindow::~MainWindow() = default;
 
-	}
+    void MainWindow::SetInput(std::function<void(const Input::Event&)>&& send)
+    {
+        m_send = send;
+    }
 
-	void MainWindow::Update()
-	{
-		input.Update();
-	}
+    void MainWindow::SetTimer(std::function<void()>&& start, std::function<void()>&& pause)
+    {
+        m_start = start;
+        m_pause = pause;
+    }
 
 	void MainWindow::SetIcon(wchar_t const* iconPath)
 	{
@@ -30,67 +50,15 @@ namespace TG
 		if (icon == nullptr)
 			CheckLastError(L"Invalid icon source");
 
-		SendMessageW(hwnd, WM_SETICON, ICON_BIG, reinterpret_cast<LPARAM>(icon));
-		SendMessageW(hwnd, WM_SETICON, ICON_SMALL, reinterpret_cast<LPARAM>(icon));
-	}
-
-	const std::wstring& MainWindow::Name() const noexcept
-	{
-		return name;
-	}
-
-	const InputSystem& MainWindow::Input() const noexcept
-	{
-		return input;
-	}
-
-	void MainWindow::SetTimer(const std::shared_ptr<Chronometer>& timer) noexcept
-	{
-		this->timer = timer;
-	}
-
-	void MainWindow::SpyMessage(bool enable) noexcept
-	{
-		spyMessage = enable;
-	}
-
-	void MainWindow::SpyInputEvent(bool enable) noexcept
-	{
-		input.keyboard.spyKeyboard = enable;
-		input.mouse.spyMouse = enable;
-	}
-
-	void MainWindow::Initialize()
-	{
-		// 获取窗口类名称
-		WindowRegister& windowRegister = WindowRegister::instance();
-		const std::wstring& wndClassName = windowRegister.GetWindowClassName(WindowType::Default);
-
-		// 客户端区域大小
-		RECT rect = { 0, 0, width, height };
-		// 根据客户区域宽和高计算整个窗口的宽和高
-		if (!AdjustWindowRect(&rect, WS_OVERLAPPEDWINDOW, false))
-			CheckLastError();
-
-		HWND parentHwnd = nullptr;
-		if (auto observer = parent.lock())
-			parentHwnd = observer->Hwnd();
-		// 创建窗口
-		hwnd = CreateWindowW(wndClassName.c_str(), name.c_str(), WS_OVERLAPPEDWINDOW,
-			posX, posY, rect.right - rect.left, rect.bottom - rect.top,
-			parentHwnd, nullptr, windowRegister.hInstance(), this);
-
-		if (hwnd == nullptr)
-			CheckLastError();
-
-		ShowWindow(hwnd, SW_SHOW);
+		SendMessageW(m_hwnd, WM_SETICON, ICON_BIG, reinterpret_cast<LPARAM>(icon));
+		SendMessageW(m_hwnd, WM_SETICON, ICON_SMALL, reinterpret_cast<LPARAM>(icon));
 	}
 
 	LRESULT MainWindow::WindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	{
 		// 是否监控窗口消息
-		if (spyMessage)
-			Debug::LogLine(WindowRegister::instance().GetWindowMesssageInfo(name, msg, wParam, lParam));
+		if (m_spyMessage)
+			Debug::LogLine(WindowRegister::Instance().GetWindowMesssageInfo(m_name, msg, wParam, lParam));
 
 		switch (msg)
 		{
@@ -103,8 +71,11 @@ namespace TG
 		case WM_KEYDOWN:
 		case WM_SYSKEYDOWN:
 		{
-			WPARAM keyCode = input.keyboard.MapLeftRightKey(wParam, lParam);
-			input.keyboard.OnKeyPress(static_cast<KeyCode>(keyCode));
+            if (m_send)
+            {
+                WPARAM keyCode = Utility::MapLeftRightKey(wParam, lParam);
+                m_send({Input::DeviceType::Keyboard, static_cast<Input::KeyCode>(keyCode), Input::EventType::Press, {}});
+            }
 			return 0;
 		}
 
@@ -112,85 +83,112 @@ namespace TG
 		case WM_KEYUP:
 		case WM_SYSKEYUP:
 		{
-			WPARAM keyCode = input.keyboard.MapLeftRightKey(wParam, lParam);
-			input.keyboard.OnKeyRelease(static_cast<KeyCode>(keyCode));
+            if (m_send)
+            {
+                WPARAM keyCode = Utility::MapLeftRightKey(wParam, lParam);
+                m_send({Input::DeviceType::Keyboard, static_cast<Input::KeyCode>(keyCode), Input::EventType::Release, {}});
+            }
 			return 0;
 		}
 
 		// 按键字符
 		case WM_CHAR:
-			if (!(lParam & 0x40000000) || input.keyboard.autoRepeat)
-			{
-				input.keyboard.OnChar(static_cast<char>(wParam));
-			}
+        {
+//			if (!(lParam & 0x40000000) || m_input.m_keyboard.m_autoRepeat)
+//			{
+//				m_input.m_keyboard.OnChar(static_cast<char>(wParam));
+//			}
+            if (m_send)
+            {
+                Input::KeyboardData data{static_cast<char>(wParam)};
+                m_send({Input::DeviceType::Keyboard, Input::KeyCode::None, Input::EventType::Char, data});
+            }
 			return 0;
+        }
 
 		// 鼠标移动
 		case WM_MOUSEMOVE:
 		{
-			input.mouse.OnMouseMove(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+            if (m_send)
+            {
+                Input::MouseData data{GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam)};
+                m_send({Input::DeviceType::Mouse, Input::KeyCode::None, Input::EventType::MouseMove, data});
+            }
 			return 0;
 		}
 
 		// 按下鼠标左键
 		case WM_LBUTTONDOWN:
-			input.mouse.OnButtonPress(KeyCode::LeftMouseButton);
+            if (m_send)
+                m_send({Input::DeviceType::Mouse, Input::KeyCode::LeftMouseButton, Input::EventType::Press, {}});
 			return 0;
 
 		// 松开鼠标左键
 		case WM_LBUTTONUP:
-			input.mouse.OnButtonRelease(KeyCode::LeftMouseButton);
+            if (m_send)
+                m_send({Input::DeviceType::Mouse, Input::KeyCode::LeftMouseButton, Input::EventType::Release, {}});
 			return 0;
 
 		// 按下鼠标右键
 		case WM_RBUTTONDOWN:
-			input.mouse.OnButtonPress(KeyCode::RightMouseButton);
+            if (m_send)
+                m_send({Input::DeviceType::Mouse, Input::KeyCode::RightMouseButton, Input::EventType::Press, {}});
 			return 0;
 
 		// 松开鼠标右键
 		case WM_RBUTTONUP:
-			input.mouse.OnButtonRelease(KeyCode::RightMouseButton);
+            if (m_send)
+                m_send({Input::DeviceType::Mouse, Input::KeyCode::RightMouseButton, Input::EventType::Release, {}});
 			return 0;
 
 		// 按下鼠标中键
 		case WM_MBUTTONDOWN:
-			input.mouse.OnButtonPress(KeyCode::MidMouseButton);
+            if (m_send)
+                m_send({Input::DeviceType::Mouse, Input::KeyCode::MidMouseButton, Input::EventType::Press, {}});
 			return 0;
 
 		// 松开鼠标中键
 		case WM_MBUTTONUP:
-			input.mouse.OnButtonRelease(KeyCode::MidMouseButton);
+            if (m_send)
+                m_send({Input::DeviceType::Mouse, Input::KeyCode::MidMouseButton, Input::EventType::Release, {}});
 			return 0;
 
 		// 滚动鼠标滚轮
 		case WM_MOUSEWHEEL:
-			// 每帧只会产生一个WM_MOUSEWHEEL
-			input.mouse.OnWheelRoll(KeyCode::MidMouseButton, GET_WHEEL_DELTA_WPARAM(wParam));
+        {
+            if (m_send)
+            {
+                // 每帧只会产生一个WM_MOUSEWHEEL
+                Input::MouseData data{GET_WHEEL_DELTA_WPARAM(wParam)};
+                m_send({Input::DeviceType::Mouse, Input::KeyCode::MidMouseButton, Input::EventType::WheelRoll, data});
+            }
 			return 0;
+        }
 
 		case WM_SIZE:
-			width = LOWORD(lParam);
-			height = HIWORD(lParam);
-			if (auto observer = timer.lock())
-			{
-				if (wParam == SIZE_MINIMIZED)
-					observer->Pause();
-				else if (wParam == SIZE_RESTORED)
-					observer->Start();
-			}
+            if (m_pause && m_start)
+            {
+                m_width = LOWORD(lParam);
+                m_height = HIWORD(lParam);
+                if (wParam == SIZE_MINIMIZED)
+                    m_pause();
+                else if (wParam == SIZE_RESTORED)
+                    m_start();
+            }
 			return 0;
 
 		case WM_ENTERSIZEMOVE:
-			if (auto observer = timer.lock())
-				observer->Pause();
+            if (m_pause)
+			    m_pause();
 			return 0;
 
 		case WM_EXITSIZEMOVE:
-			if (auto observer = timer.lock())
-				observer->Start();
+            if (m_start)
+			    m_start();
 			return 0;
-		}
 
-		return Window::WindowProc(hwnd, msg, wParam, lParam);
+        default:
+		    return Window::WindowProc(hwnd, msg, wParam, lParam);
+		}
 	}
 }

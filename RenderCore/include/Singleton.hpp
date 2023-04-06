@@ -7,23 +7,22 @@
 
 namespace TG
 {
+    // Meyer单例基类
+    template<typename T>
+    class Singleton
+    {
+    public:
+        Singleton(const Singleton &) = delete;
+        Singleton &operator=(const Singleton &) = delete;
 
-// Meyer单例基类
-template<typename T>
-class Singleton
-{
-public:
-	static T& instance()
-	{
-		static T s_instance;
-		return s_instance;
-	}
+        static T &Instance()
+        {
+            static T s_instance;
+            return s_instance;
+        }
 
-protected:
-	Singleton() = default;
-	~Singleton() = default;
-	Singleton(const Singleton&) = delete;
-	Singleton& operator=(const Singleton&) = delete;
-};
-
+    protected:
+        Singleton() = default;
+        ~Singleton() = default;
+    };
 }

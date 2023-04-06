@@ -5,14 +5,16 @@
 *****************************************************************/
 #pragma once
 
-namespace TG
+namespace TG::Input
 {
 	enum class KeyCode : unsigned char
 	{
 		None				= 0x00,
+
 		LeftMouseButton		= 0x01,
 		RightMouseButton	= 0x02,
 		MidMouseButton		= 0x04,
+
 		Backspace	= 0x08,
 		Tab			= 0x09,
 		Enter		= 0x0D,

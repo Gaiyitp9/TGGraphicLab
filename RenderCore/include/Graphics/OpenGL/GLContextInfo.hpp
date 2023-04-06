@@ -5,10 +5,13 @@
 *****************************************************************/
 #pragma once
 
+#include "PlatformHeaders.h"
+
 namespace TG::Graphics
 {
-	class RenderDeviceGL
-	{
-
-	};
+    struct GLContextInfo
+    {
+        HWND hwnd{nullptr};
+        PIXELFORMATDESCRIPTOR pfd{0};
+    };
 }

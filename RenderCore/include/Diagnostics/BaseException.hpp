@@ -5,7 +5,9 @@
 *****************************************************************/
 #pragma once
 
-#include "PlatformHeaders.h"
+#include "Utility.hpp"
+#include <DbgHelp.h>
+#include <format>
 #include <exception>
 #include <string>
 #include <vector>
@@ -23,10 +25,10 @@ namespace TG
 		};
 
 	public:
-		BaseException(const std::wstring& description = L"No Description");
-		~BaseException();
+		explicit BaseException(std::wstring description = L"No Description");
+		~BaseException() override;
 
-		virtual char const* what() const override;
+		char const* what() const override;
 		virtual wchar_t const* GetType() const noexcept;
 
 	protected:

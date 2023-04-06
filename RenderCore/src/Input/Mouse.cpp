@@ -7,113 +7,100 @@
 #include "Input/Mouse.hpp"
 #include "Diagnostics/Debug.hpp"
 
-namespace TG
+namespace TG::Input
 {
-	Mouse::Mouse()
-	{
+	Mouse::Mouse() = default;
 
-	}
-
-	Mouse::~Mouse()
-	{
-
-	}
+	Mouse::~Mouse() = default;
 
 	void Mouse::Update()
 	{
 		mouseDown.reset();
 		mouseUp.reset();
-		while (!eventBuffer.empty())
-		{
-			InputEvent e = eventBuffer.front();
-			eventBuffer.pop();
-
-			// 监控鼠标
-			if (spyMouse)
-				SpyMouseEvent(e);
-
-			size_t key = static_cast<size_t>(e.key);
-			switch (e.type)
-			{
-			case InputEvent::Type::Press:
-				mouseDown[key] = true;
-				mouseStates[key] = true;
-				break;
-
-			case InputEvent::Type::Release:
-				mouseUp[key] = true;
-				mouseStates[key] = false;
-				break;
-			}
-		}
+        m_wheelDelta = 0;
 	}
 
-	void Mouse::OnMouseMove(int x, int y)
-	{
-		position.x() = x;
-		position.y() = y;
-		eventBuffer.push(InputEvent{ KeyCode::None, InputEvent::Type::MouseMove });
-		TrimEventBuffer();
-	}
+    void Mouse::Receive(const Event& e)
+    {
+        auto key = static_cast<size_t>(e.key);
+        switch (e.type)
+        {
+            case EventType::Press:
+                mouseDown[key] = true;
+                mouseHold[key] = true;
+                break;
+            case EventType::Release:
+                mouseUp[key] = true;
+                mouseHold[key] = false;
+                break;
+            case EventType::MouseMove:
+            {
+                if (std::holds_alternative<MouseData>(e.data))
+                {
+                    auto const data = std::get<MouseData>(e.data);
+                    m_position.x() = data.x;
+                    m_position.y() = data.y;
+                }
+                break;
+            }
 
-	void Mouse::OnButtonPress(KeyCode key)
-	{
-		eventBuffer.push(InputEvent{ key, InputEvent::Type::Press });
-		TrimEventBuffer();
-	}
+            case EventType::WheelRoll:
+            {
+                if (std::holds_alternative<MouseData>(e.data))
+                    m_wheelDelta = std::get<MouseData>(e.data).delta;
+                break;
+            }
+            default:
+                break;
+        }
 
-	void Mouse::OnButtonRelease(KeyCode key)
-	{
-		eventBuffer.push(InputEvent{ key, InputEvent::Type::Release });
-		TrimEventBuffer();
-	}
+        // 监控鼠标
+        if (m_spyMouse)
+            SpyMouseEvent(e);
+    }
 
-	void Mouse::OnWheelRoll(KeyCode key, short delta)
-	{
-		eventBuffer.push(InputEvent{ key, InputEvent::Type::WheelRoll });
-		TrimEventBuffer();
-		wheelDelta = delta;
-	}
+    void Mouse::SpyEvent(bool enable)
+    {
+        m_spyMouse = enable;
+    }
 
-	const Math::Vector2i& Mouse::Position() const noexcept
-	{
-		return position;
-	}
+    bool Mouse::GetKey(KeyCode k)
+    {
+        if (!Contains(k))
+            return false;
 
-	short Mouse::RawWheelDelta() const noexcept
-	{
-		return wheelDelta;
-	}
+        auto pos = static_cast<size_t>(k);
+        return mouseHold.test(pos);
+    }
 
-	short Mouse::WheelDelta() const noexcept
-	{
-		return wheelDelta / WHEEL_DELTA;
-	}
+    bool Mouse::GetKeyDown(KeyCode k)
+    {
+        if (!Contains(k))
+            return false;
 
-	bool Mouse::IsMouseCode(KeyCode code)
-	{
-		unsigned char index = static_cast<unsigned char>(code);
-		if (index >= 0x01 && index <= 0x04)
-			return true;
-		return false;
-	}
+        auto pos = static_cast<size_t>(k);
+        return mouseDown.test(pos);
+    }
 
-	void Mouse::TrimEventBuffer()
-	{
-		while (eventBuffer.size() > BUFSIZE)
-			eventBuffer.pop();
-	}
+    bool Mouse::GetKeyUp(KeyCode k)
+    {
+        if (!Contains(k))
+            return false;
 
-	void Mouse::SpyMouseEvent(InputEvent e)
+        auto pos = static_cast<size_t>(k);
+        return mouseUp.test(pos);
+    }
+
+	void Mouse::SpyMouseEvent(Event e)
 	{
 		switch (e.type)
 		{
-		case InputEvent::Type::MouseMove:
+		case EventType::MouseMove:
 			Debug::Log(std::format(L"{}\t", e));
-			Debug::LogLine(std::format(L"MouseX: {}\tMouseY: {}", position.x(), position.y()));
+			Debug::LogLine(std::format(L"MouseX: {}\tMouseY: {}", m_position.x(), m_position.y()));
 			break;
 
-		case InputEvent::Type::WheelRoll:
+		case EventType::WheelRoll:
 			Debug::Log(std::format(L"{}\t", e));
 			Debug::LogLine(std::format(L"Raw wheel delta: {}\tWheel Delta: {}", RawWheelDelta(), WheelDelta()));
 			break;
@@ -122,4 +109,12 @@ namespace TG
 			Debug::LogLine(std::format(L"{}", e));
 		}
 	}
+
+    bool Mouse::Contains(KeyCode k)
+    {
+        auto index = static_cast<unsigned char>(k);
+        if (index > 0x01 && index <= 0x04)
+            return true;
+        return false;
+    }
 }

@@ -7,34 +7,36 @@
 
 #include "PlatformHeaders.h"
 #include "../Singleton.hpp"
-#include <unordered_map>
 #include <string>
+#include <unordered_map>
 
 namespace TG
 {
 	// 窗口种类
-	enum class WindowType
+	enum class WindowType : unsigned char
 	{
 		Default
 	};
 
-	// 窗口注册器类，负责注册窗口和消息
+	// WIN32窗口注册器类，负责注册窗口和消息
 	class WindowRegister : public Singleton<WindowRegister>
 	{
-	public:
+    private:
+        friend class Singleton<WindowRegister>;
 		WindowRegister();
 		~WindowRegister();
 
-		HINSTANCE hInstance() const noexcept;
-		const std::wstring& GetWindowClassName(const WindowType& type) const;
-		std::wstring GetWindowMesssageInfo(const std::wstring& window, UINT msg, WPARAM wp, LPARAM lp) const;
+	public:
+		[[nodiscard]] HINSTANCE HInstance() const noexcept;
+		[[nodiscard]] const std::wstring& GetWindowClassName(const WindowType& type) const;
+		[[nodiscard]] std::wstring GetWindowMesssageInfo(const std::wstring& windowName, UINT msg, WPARAM wp, LPARAM lp) const;
 
 	private:
 		static LRESULT CALLBACK WindowProcSetup(HWND, UINT, WPARAM, LPARAM);
 		static LRESULT CALLBACK WindowProcThunk(HWND, UINT, WPARAM, LPARAM);
 
 	private:
-		HINSTANCE m_hInstance;											// 程序文件(.exe)句柄
+		HINSTANCE m_hInstance;                                          // 程序(.exe)句柄
 		std::unordered_map<WindowType, std::wstring> m_windowClassName;	// 记录不同类型窗口的名称
 		std::unordered_map<DWORD, std::wstring> m_windowMessage;		// 窗口消息
 	};

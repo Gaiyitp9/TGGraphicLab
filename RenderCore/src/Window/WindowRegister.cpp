@@ -189,7 +189,8 @@ namespace TG
 			REGISTER_MESSAGE(WM_ENTERSIZEMOVE),
 			})
 	{
-		if (m_hInstance = GetModuleHandleW(nullptr))
+        m_hInstance = GetModuleHandleW(nullptr);
+        if (m_hInstance == nullptr)
 			CheckLastError();
 
 		WNDCLASSEXW wc = {};
@@ -206,7 +207,7 @@ namespace TG
 		wc.lpszMenuName = nullptr;
 		wc.lpszClassName = L"Default";
 
-		if (RegisterClassExW(&wc))
+		if (RegisterClassExW(&wc) == 0)
 			CheckLastError();
 
 		m_windowClassName[WindowType::Default] = L"Default";
@@ -225,7 +226,7 @@ namespace TG
 		if (msg == WM_NCCREATE)
 		{
 			const CREATESTRUCT* const pCreate = reinterpret_cast<CREATESTRUCT*>(lParam);
-			Window* const pWnd = static_cast<Window*>(pCreate->lpCreateParams);
+			auto* const pWnd = static_cast<Window* const>(pCreate->lpCreateParams);
 
 			SetWindowLongPtrW(hwnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(pWnd));
 			SetWindowLongPtrW(hwnd, GWLP_WNDPROC, reinterpret_cast<LONG_PTR>(WindowProcThunk));
@@ -240,16 +241,16 @@ namespace TG
 	{
 		// 注：窗口处理函数不能向上传递异常，还没有想到好的解决方案。这个项目里的异常主要是为了定位，
 		// 涉及的函数是一些简单的WIN32函数和c++的STL，基本上不会出错，所以在这里不处理异常
-		Window* const pWnd = reinterpret_cast<Window*>(GetWindowLongPtrW(hwnd, GWLP_USERDATA));
+		auto* const pWnd = reinterpret_cast<Window* const>(GetWindowLongPtrW(hwnd, GWLP_USERDATA));
 
 		// 窗口被销毁后，窗口类也需要被销毁
 		if (msg == WM_DESTROY)
-			pWnd->destroy = true;
+			pWnd->m_destroy = true;
 
 		return pWnd->WindowProc(hwnd, msg, wParam, lParam);
 	}
 
-	HINSTANCE WindowRegister::hInstance() const noexcept
+	HINSTANCE WindowRegister::HInstance() const noexcept
 	{
 		return m_hInstance;
 	}
@@ -259,21 +260,12 @@ namespace TG
 		return m_windowClassName.at(type);
 	}
 
-	std::wstring WindowRegister::GetWindowMesssageInfo(const std::wstring& window, UINT msg, WPARAM wp, LPARAM lp) const
+	std::wstring WindowRegister::GetWindowMesssageInfo(const std::wstring& windowName, UINT msg, WPARAM wp, LPARAM lp) const
 	{
-		std::wstring msgInfo;
-		msgInfo += std::format(L"{:<10}", window);
 		const auto it = m_windowMessage.find(msg);
-		if (it == m_windowMessage.end())
-		{
-			msgInfo += std::format(L"	{:<25}", std::format(L"Unknown message: {:#x}", msg));
-		}
-		else
-		{
-			msgInfo += std::format(L"	{:<25}", it->second);
-		}
-		msgInfo += std::format(L"    LP: {:#018x}", lp);
-		msgInfo += std::format(L"    WP: {:#018x}", wp);
-		return msgInfo;
+        const std::wstring& msgName = it == m_windowMessage.end() ?
+                                std::format(L"Unknown message: {:#x}", msg) :
+                                it->second;
+        return std::format(L"{:<16} {:<25} LP: {:#018x}   WP: {:#018x}", windowName, msgName, lp, wp);
 	}
 }

@@ -5,12 +5,13 @@
 *****************************************************************/
 #pragma once
 #include "PlatformHeaders.h"
-#include "Graphics/GraphicsBase.hpp"
+#include <cstdint>
 
 namespace TG::Graphics
 {
-	struct GLCreateInfo : public ICreateInfo
+	struct GLCreateInfo
 	{
-
+        std::uint16_t adapterIndex{0};
+        HWND hwnd{nullptr};
 	};
 }

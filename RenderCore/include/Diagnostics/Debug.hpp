@@ -5,41 +5,31 @@
 *****************************************************************/
 #pragma once
 
-#include "WinAPIException.hpp"
 #include <iostream>
 
 namespace TG
 {
-	inline void CheckHResult(HRESULT hr, const std::wstring& description = L"")
-	{
-		if (hr < 0)
-			throw WinAPIException(hr, description);
-	}
+	template<typename Text> struct TextTrait;
+	template<typename Text> struct TextTrait<const Text> : TextTrait<Text> {};
 
-	inline void CheckLastError(const std::wstring& description = L"")
+	template<typename CharT> struct TextTrait<CharT*>
 	{
-		HRESULT hr = GetLastError();
-		if (hr > 0)
-			throw WinAPIException(hr, description);
-	}
-
-	template<typename Text> struct text_trait;
-	template<typename Text> struct text_trait<const Text> : text_trait<Text> {};
-
-	template<typename CharT> struct text_trait<CharT*> 
-	{
-		static constexpr bool WideStream = std::is_same_v<CharT, wchar_t>;
+        [[maybe_unused]] static constexpr bool wideStream = std::is_same_v<CharT, wchar_t>;
 	};
 	// charT const*必须分开写，否则识别不了wchar_t，暂时不知道原因。下同
-	template<typename CharT> struct text_trait<CharT const*> : text_trait<CharT*> {};
-	template<typename CharT, size_t N> struct text_trait<CharT[N]> : text_trait<CharT*> {};
-	template<typename CharT, size_t N> struct text_trait<const CharT[N]> : text_trait<CharT*> {};
-	template<typename CharT, size_t N> struct text_trait<CharT(&)[N]> : text_trait<CharT*> {};
-	template<typename CharT, size_t N> struct text_trait<const CharT(&)[N]> : text_trait<CharT*> {};
-	template<typename CharT> struct text_trait<std::basic_string<CharT>> : text_trait<CharT*> {};
+	template<typename CharT> struct TextTrait<CharT const*> : TextTrait<CharT*> {};
+	template<typename CharT, size_t N> struct TextTrait<CharT[N]> : TextTrait<CharT*> {};
+	template<typename CharT, size_t N> struct TextTrait<const CharT[N]> : TextTrait<CharT*> {};
+    // It's a reference to array of const char of size N.
+    // This is probably used to accept a string literal as argument.
+    // https://stackoverflow.com/questions/43435279/what-does-const-charan-mean
+	template<typename CharT, size_t N> struct TextTrait<CharT(&)[N]> : TextTrait<CharT*> {};
+	template<typename CharT, size_t N> struct TextTrait<const CharT(&)[N]> : TextTrait<CharT*> {};
+	template<typename CharT> struct TextTrait<std::basic_string<CharT>> : TextTrait<CharT*> {};
 
 	class Debug
 	{
+    public:
 		Debug() = delete;
 		Debug(const Debug&) = delete;
 		Debug& operator=(const Debug&) = delete;
@@ -47,11 +37,11 @@ namespace TG
 	public:
 		template<typename Text>
 		static void Log(const Text& log) { std::cout << log; }
-		template<typename Text> requires text_trait<Text>::WideStream
+		template<typename Text> requires TextTrait<Text>::wideStream
 		static void Log(const Text& log) { std::wcout << log; }
 		template<typename Text>
 		static void LogLine(const Text& log) { std::cout << log << std::endl; }
-		template<typename Text> requires text_trait<Text>::WideStream
+		template<typename Text> requires TextTrait<Text>::wideStream
 		static void LogLine(const Text& log) { std::wcout << log << std::endl; }
 	};
 }

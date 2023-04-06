@@ -6,13 +6,13 @@
 #pragma once
 
 #include "Chronometer.hpp"
+#include "Utility.hpp"
 #include <ctime>
 #include <string>
-#include "Utility.hpp"
-#include "Math/Common.hpp"
 #include "Math/Core.hpp"
-#include "Input/InputEvent.hpp"
+#include "Input/Event.hpp"
 #include "Diagnostics/Debug.hpp"
+#include "Diagnostics/WinAPIException.hpp"
 #include "glad/gl.h"
 
 namespace TG
@@ -46,10 +46,10 @@ namespace TG
 		void AVX2Addf(float* nums, size_t n);
 
 	public:
-		static HMODULE glInst;
-		static PFN_wglGetProcAddress wglGetProcAddress;
-		PFN_wglCreateContext wglCreateContext = (PFN_wglCreateContext)GetProcAddress(glInst, "wglCreateContext");
-		PFN_wglMakeCurrent wglMakeCurrent = (PFN_wglMakeCurrent)GetProcAddress(glInst, "wglMakeCurrent");
+//		static HMODULE glInst;
+//		static PFN_wglGetProcAddress wglGetProcAddress;
+//		PFN_wglCreateContext wglCreateContext = (PFN_wglCreateContext)GetProcAddress(glInst, "wglCreateContext");
+//		PFN_wglMakeCurrent wglMakeCurrent = (PFN_wglMakeCurrent)GetProcAddress(glInst, "wglMakeCurrent");
 	private:
 		Chronometer timer;
 	};

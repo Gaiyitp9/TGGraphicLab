@@ -4,18 +4,23 @@
 * This code is licensed under the MIT License (MIT).			*
 *****************************************************************/
 #pragma once
-#include "glad/gl.h"
-#include "../DeviceContext.hpp"
-#include "GLContext.hpp"
+
+#include "GLContextInfo.hpp"
 
 namespace TG::Graphics
 {
-	class DeviceContextGL final : public IDeviceContext
+	class DeviceContextGL
 	{
 	public:
-		DeviceContextGL(const GLCreateInfo& info);
+        DeviceContextGL() = default;
+		explicit DeviceContextGL(const GLContextInfo& info);
+        ~DeviceContextGL();
 
+        void MakeContextCurrent() const;        // 将设备上下文设置为线程当前的上下文，如果有多个设备上下文，就可以调用这个函数来切换
+
+        HDC m_hdc;
 	private:
-		GLContext m_context;
+		HWND m_hwnd;
+        HGLRC m_hglrc;
 	};
 }

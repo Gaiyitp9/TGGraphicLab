@@ -4,7 +4,7 @@
 * This code is licensed under the MIT License (MIT).			*
 *****************************************************************/
 
-#include "Application.hpp"
+#include "Renderer.hpp"
 #include <tchar.h>
 #include "Graphics/RayTracing/RayTracing.h"
 
@@ -16,15 +16,16 @@ int CALLBACK wWinMain(_In_ HINSTANCE hInstance,
 	try
 	{
 		//OutputPPMImage();
-		TG::Application app;
-		int* leak = static_cast<int*>(malloc(sizeof(int)));
-		int* leak2 = DBG_NEW int[2];
+		TG::Renderer app;
+//		int* leak = static_cast<int*>(malloc(sizeof(int)));
+//		int* leak2 = DBG_NEW int[2];
+        OutputDebugString(L"test output\n");
 		return app.Run();
 	}
-	catch (const TG::BaseException& e)
-	{
-		TG::Debug::Log(e.what());
-	}
+//	catch (const TG::BaseException& e)
+//	{
+//		TG::Debug::Log(e.what());
+//	}
 	catch (const std::exception& e)
 	{
 		TG::Debug::LogLine("Standard exception: ");

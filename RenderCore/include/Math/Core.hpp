@@ -9,6 +9,7 @@
 #include "PlatformHeaders.h"
 #include <type_traits> 
 #include "Diagnostics/Debug.hpp"
+#include "Diagnostics/BaseException.hpp"
 #include "Common.hpp"
 #include "NumTraits.hpp"
 #include "ForwardDeclarations.hpp"

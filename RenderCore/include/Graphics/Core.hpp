@@ -12,5 +12,4 @@
 #include "PipelineState.hpp"
 #include "OpenGL/GLCreateInfo.hpp"
 #include "OpenGL/RenderDeviceGL.hpp"
-#include "OpenGL/GLContext.hpp"
 #include "OpenGL/DeviceContextGL.hpp"

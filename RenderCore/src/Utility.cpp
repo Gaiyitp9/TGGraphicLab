@@ -8,10 +8,36 @@
 
 namespace TG
 {
+    WPARAM Utility::MapLeftRightKey(WPARAM wParam, LPARAM lParam)
+    {
+        WPARAM mappedVK;
+        UINT scancode = (lParam & 0x00ff0000) >> 16;
+        int extended = (lParam & 0x01000000) != 0;
+
+        switch (wParam)
+        {
+            case VK_SHIFT:
+                mappedVK = MapVirtualKeyW(scancode, MAPVK_VSC_TO_VK_EX);
+                break;
+            case VK_CONTROL:
+                mappedVK = extended ? VK_RCONTROL : VK_LCONTROL;
+                break;
+            case VK_MENU:
+                mappedVK = extended ? VK_RMENU : VK_LMENU;
+                break;
+            default:
+                // 其他按键不需要重新映射
+                mappedVK = wParam;
+                break;
+        }
+
+        return mappedVK;
+    }
+
 	std::wstring Utility::AnsiToWideString(const std::string& str)
 	{
 		int length = MultiByteToWideChar(CP_UTF8, 0, str.c_str(), -1, nullptr, 0);
-		wchar_t* wide = static_cast<wchar_t*>(malloc(length * sizeof(wchar_t)));
+		auto* wide = static_cast<wchar_t*>(malloc(length * sizeof(wchar_t)));
 		MultiByteToWideChar(CP_UTF8, 0, str.c_str(), -1, wide, length);
 		std::wstring wstr(wide);
 		free(wide);
@@ -30,20 +56,20 @@ namespace TG
 
 	std::string Utility::ToLower(const std::string& str)
 	{
-		std::string lower_case = str;
+		std::string lowerCase = str;
 		std::locale loc;
-		for (char& s : lower_case)
+		for (char& s : lowerCase)
 			s = std::tolower(s, loc);
-		return lower_case;
+		return lowerCase;
 	}
 
 	std::wstring Utility::ToLower(const std::wstring& wstr)
 	{
-		std::wstring lower_case = wstr;
+		std::wstring lowerCase = wstr;
 		std::locale loc;
-		for (wchar_t& s : lower_case)
+		for (wchar_t& s : lowerCase)
 			s = std::tolower(s, loc);
-		return lower_case;
+		return lowerCase;
 	}
 
 	std::string Utility::GetBasePath(const std::string& filePath)
@@ -51,10 +77,10 @@ namespace TG
 		size_t lastSlash;
 		if ((lastSlash = filePath.rfind('/')) != std::string::npos)
 			return filePath.substr(0, lastSlash + 1);
-		else if ((lastSlash = filePath.rfind('\\')) != std::string::npos)
+		if ((lastSlash = filePath.rfind('\\')) != std::string::npos)
 			return filePath.substr(0, lastSlash + 1);
-		else
-			return "";
+
+        return "";
 	}
 
 	std::wstring Utility::GetBasePath(const std::wstring& filePath)
@@ -62,10 +88,10 @@ namespace TG
 		size_t lastSlash;
 		if ((lastSlash = filePath.rfind(L'/')) != std::wstring::npos)
 			return filePath.substr(0, lastSlash + 1);
-		else if ((lastSlash = filePath.rfind(L'\\')) != std::wstring::npos)
+		if ((lastSlash = filePath.rfind(L'\\')) != std::wstring::npos)
 			return filePath.substr(0, lastSlash + 1);
-		else
-			return L"";
+
+		return L"";
 	}
 
 	std::string Utility::RemoveBasePath(const std::string& filePath)
@@ -73,10 +99,10 @@ namespace TG
 		size_t lastSlash;
 		if ((lastSlash = filePath.rfind('/')) != std::string::npos)
 			return filePath.substr(lastSlash + 1);
-		else if ((lastSlash = filePath.rfind('\\')) != std::string::npos)
+		if ((lastSlash = filePath.rfind('\\')) != std::string::npos)
 			return filePath.substr(lastSlash + 1);
-		else
-			return filePath;
+
+		return filePath;
 	}
 
 	std::wstring Utility::RemoveBasePath(const std::wstring& filePath)
@@ -84,10 +110,10 @@ namespace TG
 		size_t lastSlash;
 		if ((lastSlash = filePath.rfind(L'/')) != std::wstring::npos)
 			return filePath.substr(lastSlash + 1);
-		else if ((lastSlash = filePath.rfind(L'\\')) != std::wstring::npos)
+		if ((lastSlash = filePath.rfind(L'\\')) != std::wstring::npos)
 			return filePath.substr(lastSlash + 1);
-		else
-			return filePath;
+
+		return filePath;
 	}
 
 	std::string Utility::GetFileExtension(const std::string& filePath)

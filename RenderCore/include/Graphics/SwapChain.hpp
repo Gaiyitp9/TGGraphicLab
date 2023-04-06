@@ -5,6 +5,7 @@
 *****************************************************************/
 #pragma once
 #include "Diagnostics/Debug.hpp"
+#include "Diagnostics/WinAPIException.hpp"
 
 namespace TG::Graphics
 {

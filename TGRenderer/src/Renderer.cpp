@@ -1,0 +1,107 @@
+/****************************************************************
+* TianGong RenderLab											*
+* Copyright (c) Gaiyitp9. All rights reserved.					*
+* This code is licensed under the MIT License (MIT).			*
+*****************************************************************/
+
+#include "Renderer.hpp"
+#include "Diagnostics/WinAPIException.hpp"
+
+namespace TG
+{
+	Renderer::Renderer() : m_mainWindow(200, 100, 800, 600, L"天工渲染器")
+	{
+		// 开启内存泄漏检测
+		_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
+		// 设置内存泄漏消息输出到控制台
+		_CrtSetReportMode(_CRT_WARN, _CRTDBG_MODE_FILE);
+		_CrtSetReportFile(_CRT_WARN, _CRTDBG_FILE_STDOUT);
+
+		// 为了能在控制台查看日志，需要把控制台的代码页(code page)设置为UTF-8
+		SetConsoleCP(65001);
+		SetConsoleOutputCP(65001);
+
+		// 编码设置为UTF-8
+		m_locale = std::locale(".utf8");
+		std::wcout.imbue(m_locale);
+
+		// 获取当前显示器的宽和高
+		m_screenWidth = GetSystemMetrics(SM_CXSCREEN);
+        m_screenHeight = GetSystemMetrics(SM_CYSCREEN);
+
+        // windows平台上使用鼠标和键盘输入
+        m_input.AddDevice(Input::DeviceType::Mouse);
+        m_input.AddDevice(Input::DeviceType::Keyboard);
+        m_input.SpyInputEvent(true);
+
+        // 主窗口设置
+        m_mainWindow.SetIcon(L"D:\\ComputerScience\\ComputerGraphics\\Projects\\TGRenderLab\\TGRenderer\\maple-leaf.ico");
+        m_mainWindow.SetInput([&input=m_input](const Input::Event& evt) { input.Receive(evt); });
+        m_mainWindow.SetTimer([&timer=m_timer](){ timer.Start(); }, [&timer=m_timer](){ timer.Pause(); });
+        m_mainWindow.SpyMessage(false);
+
+        // 初始化opengl
+        Graphics::GLCreateInfo info { 0, m_mainWindow.Hwnd()};
+        Graphics::DeviceContextGL* pContext;
+        Graphics::RenderDeviceGL* pDevice;
+        m_factory.CreateDeviceAndContext(info, &pDevice, &pContext);
+        m_device.reset(pDevice);
+        m_context.reset(pContext);
+        std::cout << "OpenGL version: " << glGetString(GL_VERSION) << std::endl;
+        glViewport(0, 0, m_mainWindow.Width(), m_mainWindow.Height());
+        wglSwapIntervalEXT(0);      // 关闭垂直同步
+	}
+
+	Renderer::~Renderer() = default;
+
+	int Renderer::Run()
+	{
+		Debug::LogLine(Chronometer::Date());
+		//d3d11Layer = std::make_unique<Graphics::GraphicsLayer>(mainWnd.get());
+
+		//m_windows[L"辅助窗口"] = std::make_shared<PopupWindow>((m_screenWidth - 400) / 2, (m_screenHeight - 300) / 2,
+		//	400, 300, m_windows[L"天工渲染器"]);
+
+		//throw TG::WinAPIException(E_OUTOFMEMORY);
+		m_unitTest.FormatTest();
+		m_unitTest.TextEncodeTest();
+		m_unitTest.TimeTest();
+		m_unitTest.MathLibTest();
+		m_unitTest.ArrayAlignmentTest();
+		//m_unitTest.SIMDTest();
+//        m_unitTest.OpenGLTest(m_mainWindow.Hwnd());
+
+		while (true)
+		{
+			if (const auto code = Window::ProcessMessage())
+				return *code;
+
+            m_input.Update();
+
+			/*auto it = m_windows.begin();
+			while (it != m_windows.end())
+			{
+				// 如果Windows窗口被销毁，则移除对应的窗口
+				if (it->second->Destroy())
+					it = m_windows.erase(it);
+				else
+					++it;
+			}*/
+
+            if (m_input.GetKeyUp(Input::KeyCode::Space))
+                Debug::LogLine(L"space up");
+
+			const float c = sin(m_timer.TotalTime() * 0.001f) / 2.0f + 0.5f;
+			//d3d11Layer->ClearBackground(Math::Color::AliceBlue * c);
+			//d3d11Layer->Update();
+//#ifdef _DEBUG
+//			if (mainWnd->Input().GetKeyDown(KeyCode::Space))
+//				d3d11Layer->dbgInfo->ReportLiveObjects();
+//#endif
+            Math::Color color = Math::Color::AliceBlue * c;
+            glClearColor(color.r(), color.g(), color.b(), color.a());
+            glClear(GL_COLOR_BUFFER_BIT);
+            SwapBuffers(m_context->m_hdc);
+		}
+	}
+}

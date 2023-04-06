@@ -10,7 +10,7 @@ namespace TG
 {
 	void UnitTest::FormatTest()
 	{
-		InputEvent ie{ KeyCode::BackSlash, InputEvent::Type::Press };
+		Input::Event ie{ Input::DeviceType::Keyboard, Input::KeyCode::BackSlash, Input::EventType::Press , {}};
 		std::wcout << std::format(L"{:k}", ie) << std::endl;
 	}
 
@@ -179,25 +179,26 @@ namespace TG
 
 	UnitTest::UnitTest()
 	{
-		if (glInst == nullptr)
-			CheckLastError();
+//		if (glInst == nullptr)
+//			CheckLastError();
 	}
 
 	UnitTest::~UnitTest()
 	{
-		FreeLibrary(glInst);
+//		FreeLibrary(glInst);
+        gladLoaderUnloadGL();
 	}
 
-	HMODULE UnitTest::glInst = LoadLibraryA("opengl32.dll");
-	UnitTest::PFN_wglGetProcAddress UnitTest::wglGetProcAddress = (PFN_wglGetProcAddress)GetProcAddress(glInst, "wglGetProcAddress");
-	static GLADapiproc GetGLProcAddress(const char* name)
-	{
-		GLADapiproc proc = reinterpret_cast<GLADapiproc>(UnitTest::wglGetProcAddress(name));
-		if (proc)
-			return proc;
-
-		return reinterpret_cast<GLADapiproc>(GetProcAddress(UnitTest::glInst, name));
-	}
+//	HMODULE UnitTest::glInst = LoadLibraryA("opengl32.dll");
+//	UnitTest::PFN_wglGetProcAddress UnitTest::wglGetProcAddress = (PFN_wglGetProcAddress)GetProcAddress(glInst, "wglGetProcAddress");
+//	static GLADapiproc GetGLProcAddress(const char* name)
+//	{
+//		GLADapiproc proc = reinterpret_cast<GLADapiproc>(UnitTest::wglGetProcAddress(name));
+//		if (proc)
+//			return proc;
+//
+//		return reinterpret_cast<GLADapiproc>(GetProcAddress(UnitTest::glInst, name));
+//	}
 
 	void UnitTest::OpenGLTest(HWND hWnd)
 	{
@@ -210,14 +211,16 @@ namespace TG
 		pfd.dwFlags = PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL | PFD_DOUBLEBUFFER;
 		pfd.iPixelType = PFD_TYPE_RGBA;
 		pfd.cColorBits = 24;
-		pfd.cDepthBits = 8;
+		pfd.cDepthBits = 24;
+		pfd.cStencilBits = 8;
 		int pxfmt = ChoosePixelFormat(hdc, &pfd);
 		SetPixelFormat(hdc, pxfmt, &pfd);
 
 		hglrc = wglCreateContext(hdc);
 		wglMakeCurrent(hdc, hglrc);
 
-		gladLoadGL(GetGLProcAddress);
+//		gladLoadGL(GetGLProcAddress);
+        gladLoaderLoadGL();
 		std::cout << "OpenGL version: " << glGetString(GL_VERSION) << std::endl;
 	}
 
@@ -247,31 +250,31 @@ namespace TG
 
 	void UnitTest::NormalAdd(int* nums, size_t n)
 	{
-		timer.Tick();
+		m_timer.Tick();
 		int sum = 0;
 		for (size_t i = 0; i < n; i++)
 		{
 			sum += nums[i];
 		}
-		timer.Tick();
-		std::cout << "NormalAdd: " << timer.DeltaTime() << " ms, result = " << sum << std::endl;
+		m_timer.Tick();
+		std::cout << "NormalAdd: " << m_timer.DeltaTime() << " ms, result = " << sum << std::endl;
 	}
 
 	void UnitTest::NormalAddf(float* nums, size_t n)
 	{
-		timer.Tick();
+		m_timer.Tick();
 		float sum = 0;
 		for (size_t i = 0; i < n; i++)
 		{
 			sum += nums[i];
 		}
-		timer.Tick();
-		std::cout << "NormalAddf: " << timer.DeltaTime() << " ms, result = " << sum << std::endl;
+		m_timer.Tick();
+		std::cout << "NormalAddf: " << m_timer.DeltaTime() << " ms, result = " << sum << std::endl;
 	}
 
 	void UnitTest::SSEAdd(int* nums, size_t n)
 	{
-		timer.Tick();
+		m_timer.Tick();
 
 		__m128i simd_sum = _mm_setzero_si128();
 		__m128i simd_load;
@@ -295,13 +298,13 @@ namespace TG
 		}
 		normal_sum += (((int*)&simd_sum)[0] + ((int*)&simd_sum)[1] + ((int*)&simd_sum)[2] + ((int*)&simd_sum)[3]);
 
-		timer.Tick();
-		std::cout << "SSEAdd: " << timer.DeltaTime() << " ms, result = " << normal_sum << std::endl;
+		m_timer.Tick();
+		std::cout << "SSEAdd: " << m_timer.DeltaTime() << " ms, result = " << normal_sum << std::endl;
 	}
 
 	void UnitTest::SSEAddf(float* nums, size_t n)
 	{
-		timer.Tick();
+		m_timer.Tick();
 
 		__m128 simd_sum = _mm_setzero_ps();
 		__m128 simd_load;
@@ -325,13 +328,13 @@ namespace TG
 		}
 		normal_sum += (((float*)&simd_sum)[0] + ((float*)&simd_sum)[1] + ((float*)&simd_sum)[2] + ((float*)&simd_sum)[3]);
 
-		timer.Tick();
-		std::cout << "SSEAddf: " << timer.DeltaTime() << " ms, result = " << normal_sum << std::endl;
+		m_timer.Tick();
+		std::cout << "SSEAddf: " << m_timer.DeltaTime() << " ms, result = " << normal_sum << std::endl;
 	}
 
 	void UnitTest::AVX2Add(int* nums, size_t n)
 	{
-		timer.Tick();
+		m_timer.Tick();
 
 		__m256i simd_sum = _mm256_setzero_si256();
 		__m256i simd_load;
@@ -358,13 +361,13 @@ namespace TG
 			((int*)&simd_sum)[4] + ((int*)&simd_sum)[5] +
 			((int*)&simd_sum)[6] + ((int*)&simd_sum)[7]);
 
-		timer.Tick();
-		std::cout << "AVX2Add: " << timer.DeltaTime() << " ms, result = " << normal_sum << std::endl;
+		m_timer.Tick();
+		std::cout << "AVX2Add: " << m_timer.DeltaTime() << " ms, result = " << normal_sum << std::endl;
 	}
 
 	void UnitTest::AVX2Addf(float* nums, size_t n)
 	{
-		timer.Tick();
+		m_timer.Tick();
 
 		__m256 simd_sum = _mm256_setzero_ps();
 		__m256 simd_load;
@@ -391,7 +394,7 @@ namespace TG
 			((float*)&simd_sum)[4] + ((float*)&simd_sum)[5] +
 			((float*)&simd_sum)[6] + ((float*)&simd_sum)[7]);
 
-		timer.Tick();
-		std::cout << "AVX2Addf: " << timer.DeltaTime() << " ms, result = " << normal_sum << std::endl;
+		m_timer.Tick();
+		std::cout << "AVX2Addf: " << m_timer.DeltaTime() << " ms, result = " << normal_sum << std::endl;
 	}*/
 }

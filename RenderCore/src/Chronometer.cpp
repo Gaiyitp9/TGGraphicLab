@@ -10,86 +10,89 @@ namespace TG
 {
 	Chronometer::Chronometer()
 	{
-		base = timer.now();
-		last = timer.now();
-		paused = std::chrono::duration<double, std::milli>(0.0);
+        m_base = std::chrono::steady_clock::now();
+        m_last = std::chrono::steady_clock::now();
+        m_paused = std::chrono::duration<double, std::milli>(0.0);
 	}
 
-	Chronometer::~Chronometer()
-	{
-
-	}
+	Chronometer::~Chronometer() = default;
 
 	float Chronometer::DeltaTime() const
 	{
-		return static_cast<float>(deltaTime);
+		return static_cast<float>(m_deltaTime);
 	}
 
 	float Chronometer::TotalTime() const
 	{
-		std::chrono::duration<double, std::milli> total;
-		if (stopped)
+		std::chrono::duration<double, std::milli> total{};
+		if (m_stopped)
 		{
-			total = stop - base;
+			total = m_stop - m_base;
 		}
 		else
 		{
-			std::chrono::steady_clock::time_point t = timer.now();
-			total = t - base;
+			std::chrono::steady_clock::time_point t = std::chrono::steady_clock::now();
+			total = t - m_base;
 		}
-		total -= paused;
+		total -= m_paused;
 		return static_cast<float>(total.count());
 	}
 
-	std::wstring Chronometer::Time() const
+	std::wstring Chronometer::Date()
 	{
-		std::chrono::system_clock::time_point t = wallClock.now();
-		auto const localT = std::chrono::current_zone()->to_local(t);
-		auto const days = std::chrono::floor<std::chrono::days>(localT);
-		auto const hhmmss = std::chrono::duration_cast<std::chrono::seconds>(localT - days);
-		return std::format(L"{:%T}", std::chrono::hh_mm_ss(hhmmss));
+        // c++20的方法，但是调用std::chrono::current_zone()之后会产生内存泄漏
+		/*auto const localT = std::chrono::current_zone()
+                ->to_local(std::chrono::system_clock::now());
+        return std::format(L"{:%Y-%m-%d %X}", localT);*/
+
+        auto now = std::chrono::system_clock::now();
+        auto localT = std::chrono::system_clock::to_time_t(now);
+
+        std::wstringstream ss;
+        ss << std::put_time(std::localtime(&localT), L"%Y-%m-%d %X");
+        return ss.str();
 	}
 
 	void Chronometer::Reset()
 	{
-		base = timer.now();
-		last = timer.now();
-		paused = std::chrono::duration<double, std::milli>(0.0);
-		deltaTime = 0;
-		stopped = false;
+        m_base = std::chrono::steady_clock::now();
+        m_last = std::chrono::steady_clock::now();
+        m_paused = std::chrono::duration<double, std::milli>(0.0);
+        m_deltaTime = 0;
+        m_stopped = false;
 	}
 
 	void Chronometer::Pause()
 	{
-		if (!stopped)
+		if (!m_stopped)
 		{
-			stop = timer.now();
-			stopped = true;
+            m_stop = std::chrono::steady_clock::now();
+            m_stopped = true;
 		}
 	}
 
 	void Chronometer::Start()
 	{
-		if (stopped)
+		if (m_stopped)
 		{
-			stopped = false;
-			std::chrono::steady_clock::time_point t = timer.now();
-			paused += t - stop;
-			last = t;
+            m_stopped = false;
+			std::chrono::steady_clock::time_point t = std::chrono::steady_clock::now();
+            m_paused += t - m_stop;
+            m_last = t;
 		}
 	}
 
 	void Chronometer::Tick()
 	{
-		if (stopped)
+		if (m_stopped)
 		{
-			deltaTime = 0;
+            m_deltaTime = 0;
 			return;
 		}
 
-		std::chrono::steady_clock::time_point t = timer.now();
-		std::chrono::duration<double, std::milli> delta = t - last;
-		deltaTime = delta.count();
-		last = t;
+		std::chrono::steady_clock::time_point t = std::chrono::steady_clock::now();
+		std::chrono::duration<double, std::milli> delta = t - m_last;
+        m_deltaTime = delta.count();
+        m_last = t;
 	}
 }

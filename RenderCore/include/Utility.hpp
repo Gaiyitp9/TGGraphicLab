@@ -12,10 +12,11 @@ namespace TG
 {
 	class Utility
 	{
-	private:
-		Utility();
-
 	public:
+		Utility() = delete;
+        Utility(const Utility&) = delete;
+
+        static WPARAM MapLeftRightKey(WPARAM wParam, LPARAM lParam);        // 映射左右按键(shift, ctrl, alt)
 		static std::wstring AnsiToWideString(const std::string& str);
 		static std::string WideStringToAnsi(const std::wstring& wstr);
 		static std::string ToLower(const std::string& str);

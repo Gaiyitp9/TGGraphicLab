@@ -6,37 +6,37 @@
 #pragma once
 
 #include "Window.hpp"
-#include "Input/InputSystem.hpp"
-#include "Chronometer.hpp"
+#include "Input/Event.hpp"
+#include "../Utility.hpp"
+#include <functional>
 
 namespace TG
 {
-	class MainWindow : public Window
+	class MainWindow final : public Window
 	{
 	public:
-		MainWindow(int x, int y, int width, int height, wchar_t const* name = L"TG RenderLab", std::shared_ptr<Window> parent = {});
+		MainWindow(int x, int y, int width, int height, wchar_t const* name = L"TG RenderLab", HWND parent = nullptr);
 		MainWindow(const MainWindow&) = delete;
+        MainWindow(MainWindow&&) = delete;
 		MainWindow& operator=(const MainWindow&) = delete;
 		~MainWindow();
 
-		void Update() override;				                                // 更新主窗口
-		void SetIcon(wchar_t const* iconPath);				                // 设置窗口的icon
+        void SetInput(std::function<void(const Input::Event&)>&& send);                 // 设置输入事件发送接口
+        void SetTimer(std::function<void()>&& start, std::function<void()>&& pause);    // 设置计时器开始和暂停接口
+		void SetIcon(wchar_t const* iconPath);				                            // 设置窗口的icon
+		void SpyMessage(bool enable) noexcept { m_spyMessage = enable; }	            // 捕捉窗口消息
 
-		const std::wstring& Name() const noexcept;							// 窗口名称
-		const InputSystem& Input() const noexcept;							// 获取输入系统
-
-		void SetTimer(const std::shared_ptr<Chronometer>&) noexcept;		// 关联计时器
-		void SpyMessage(bool enable) noexcept;								// 捕捉窗口消息
-		void SpyInputEvent(bool enable) noexcept;							// 是否监控输入事件
+		[[nodiscard]]
+        const std::wstring& Name() const noexcept { return m_name; }		            // 窗口名称
 
 	private:
-		void Initialize();
-		LRESULT CALLBACK WindowProc(HWND, UINT, WPARAM, LPARAM) override;	// 消息处理函数
+		LRESULT CALLBACK WindowProc(HWND, UINT, WPARAM, LPARAM) override;	            // 消息处理函数
 
 	private:
-		std::wstring name;					// 主窗口标题
-		std::weak_ptr<Chronometer> timer;	// 计时器
-		InputSystem input;					// 输入系统，用于记录输入信息，比如键盘和鼠标
-		bool spyMessage = false;			// 是否监控窗口消息
+		std::wstring m_name;				                // 主窗口标题
+		bool m_spyMessage = false;			                // 是否监控窗口消息
+        std::function<void(const Input::Event&)> m_send;    // 输入消息发送接口
+        std::function<void()> m_start;                      // 计时器开始接口
+        std::function<void()> m_pause;                      // 计时器暂停接口
 	};
 }

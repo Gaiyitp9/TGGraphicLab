@@ -5,46 +5,33 @@
 *****************************************************************/
 #pragma once
 
-#include "PlatformHeaders.h"
-#include "KeyCode.hpp"
+#include "Event.hpp"
 #include <bitset>
-#include <queue>
-#include "InputEvent.hpp"
 
-namespace TG
+namespace TG::Input
 {
-	class Keyboard
+	class Keyboard : public Device
 	{
 	public:
 		Keyboard();
-		~Keyboard();
+		~Keyboard() override;
 
-		void Update();									// 分析事件队列，设置各种状态
+		void Update() override;							// 分析事件队列，设置各种状态
+        void Receive(const Event& e) override;
+        void SpyEvent(bool enable) override;
+		bool GetKey(KeyCode k) override;
+		bool GetKeyDown(KeyCode k) override;
+		bool GetKeyUp(KeyCode k) override;
 
-		void OnKeyPress(KeyCode keyCode);
-		void OnKeyRelease(KeyCode keyCode);
-		void OnChar(char ch);
-
-		WPARAM MapLeftRightKey(WPARAM, LPARAM);			// 映射左右按键(shift, ctrl, alt)
-
-		static bool IsKeyboardCode(KeyCode keyCode);
-
-	private:
-		void TrimEventBuffer();
-		void TrimCharBuffer();
+    private:
+        static bool Contains(KeyCode k);
 
 	private:
-		static constexpr unsigned int NUMKEYS = 256u;	// 按键数量
-		static constexpr unsigned int BUFSIZE = 16u;	// 队列最大长度
-		std::queue<InputEvent> eventBuffer;				// 输入事件队列
-		std::queue<char> charBuffer;					// 输入字符队列
+		std::bitset<256> m_keyHold;					    // 按键状态(是否被按下)
+		std::bitset<256> m_keyDown;					    // 按键是否刚刚按下
+		std::bitset<256> m_keyUp;						// 按键是否刚刚松开
 
-	public:
-		std::bitset<NUMKEYS> keyStates;					// 按键状态(是否被按下)
-		std::bitset<NUMKEYS> keyDown;					// 按键是否刚刚按下
-		std::bitset<NUMKEYS> keyUp;						// 按键是否刚刚松开
-
-		bool autoRepeat = true;							// 按住按键是否能重复输入字符
-		bool spyKeyboard = false;						// 是否监控键盘
+		bool m_autoRepeat = true;						// 按住按键是否能重复输入字符
+		bool m_spyKeyboard = false;						// 是否监控键盘
 	};
 }
