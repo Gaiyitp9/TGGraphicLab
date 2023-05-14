@@ -1,5 +1,5 @@
 file(GLOB_RECURSE SRCS *.cpp *.c)
-file(GLOB_RECURSE INCS *.hpp *.h)
+file(GLOB_RECURSE INCS *.hpp *.h *.inl)
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${SRCS})
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${INCS})
 

@@ -25,12 +25,12 @@ namespace TG
 		std::wstring wWhatBuffer = std::format(L"Exception type: {}\n", GetType());
 		wWhatBuffer += std::format(L"HRESULT: {:#010x}\nError Message: {}", m_errorCode, m_errorMsg);
 		wWhatBuffer += m_description;
-		wWhatBuffer += SEPARATOR;
+		wWhatBuffer += Separator;
 		for (const auto& info : m_stackFrameInfo)
 		{
 			wWhatBuffer += std::format(L"Frame: {}\nFile: {}\nFunction: {}\nLine: {}",
 				info.index, info.file, info.function, info.line);
-			wWhatBuffer += SEPARATOR;
+			wWhatBuffer += Separator;
 		}
 		m_whatBuffer = Utility::WideStringToAnsi(wWhatBuffer);
 		return m_whatBuffer.c_str();

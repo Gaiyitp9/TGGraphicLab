@@ -33,15 +33,15 @@ namespace TG
 
 	MainWindow::~MainWindow() = default;
 
-    void MainWindow::SetInput(std::function<void(const Input::Event&)>&& send)
+    void MainWindow::SetInputListener(const std::function<void(const Input::Event &)>& listener)
     {
-        m_send = send;
+        m_listener = listener;
     }
 
-    void MainWindow::SetTimer(std::function<void()>&& start, std::function<void()>&& pause)
+    void MainWindow::SetStateCallback(const std::function<void()>& resume, const std::function<void()>& suspend)
     {
-        m_start = start;
-        m_pause = pause;
+        m_resume = resume;
+        m_suspend = suspend;
     }
 
 	void MainWindow::SetIcon(wchar_t const* iconPath)
@@ -70,23 +70,31 @@ namespace TG
 		// 按下按键
 		case WM_KEYDOWN:
 		case WM_SYSKEYDOWN:
+        case WM_KEYUP:
+        case WM_SYSKEYUP:
 		{
-            if (m_send)
+            if (m_listener)
             {
-                WPARAM keyCode = Utility::MapLeftRightKey(wParam, lParam);
-                m_send({Input::DeviceType::Keyboard, static_cast<Input::KeyCode>(keyCode), Input::EventType::Press, {}});
-            }
-			return 0;
-		}
+                // https://learn.microsoft.com/en-us/windows/win32/inputdev/about-keyboard-input
+                WORD vkCode = LOWORD(wParam);
+                WORD keyFlags = HIWORD(lParam);
+                WORD scanCode = LOBYTE(keyFlags);
+                BOOL isExtendedKey = (keyFlags & KF_EXTENDED) == KF_EXTENDED; // extended-key flag, 1 if scancode has 0xE0 prefix
+                if (isExtendedKey)
+                    scanCode = MAKEWORD(scanCode, 0xE0);
+                switch (vkCode)
+                {
+                    case VK_SHIFT:   // converts to VK_LSHIFT or VK_RSHIFT
+                    case VK_CONTROL: // converts to VK_LCONTROL or VK_RCONTROL
+                    case VK_MENU:    // converts to VK_LMENU or VK_RMENU
+                        vkCode = LOWORD(MapVirtualKeyW(scanCode, MAPVK_VSC_TO_VK_EX));
+                        break;
 
-		// 松开按键
-		case WM_KEYUP:
-		case WM_SYSKEYUP:
-		{
-            if (m_send)
-            {
-                WPARAM keyCode = Utility::MapLeftRightKey(wParam, lParam);
-                m_send({Input::DeviceType::Keyboard, static_cast<Input::KeyCode>(keyCode), Input::EventType::Release, {}});
+                    default:
+                        break;
+                }
+                Input::EventType type = (keyFlags & KF_UP) == KF_UP ? Input::EventType::Release : Input::EventType::Press;
+                m_listener({Input::DeviceType::Keyboard, static_cast<Input::KeyCode>(vkCode), type, nullptr});
             }
 			return 0;
 		}
@@ -98,10 +106,10 @@ namespace TG
 //			{
 //				m_input.m_keyboard.OnChar(static_cast<char>(wParam));
 //			}
-            if (m_send)
+            if (m_listener)
             {
                 Input::KeyboardData data{static_cast<char>(wParam)};
-                m_send({Input::DeviceType::Keyboard, Input::KeyCode::None, Input::EventType::Char, data});
+                m_listener({Input::DeviceType::Keyboard, Input::KeyCode::None, Input::EventType::Char, &data});
             }
 			return 0;
         }
@@ -109,82 +117,82 @@ namespace TG
 		// 鼠标移动
 		case WM_MOUSEMOVE:
 		{
-            if (m_send)
+            if (m_listener)
             {
                 Input::MouseData data{GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam)};
-                m_send({Input::DeviceType::Mouse, Input::KeyCode::None, Input::EventType::MouseMove, data});
+                m_listener({Input::DeviceType::Mouse, Input::KeyCode::None, Input::EventType::MouseMove, &data});
             }
 			return 0;
 		}
 
 		// 按下鼠标左键
 		case WM_LBUTTONDOWN:
-            if (m_send)
-                m_send({Input::DeviceType::Mouse, Input::KeyCode::LeftMouseButton, Input::EventType::Press, {}});
+            if (m_listener)
+                m_listener({Input::DeviceType::Mouse, Input::KeyCode::LeftMouseButton, Input::EventType::Press, nullptr});
 			return 0;
 
 		// 松开鼠标左键
 		case WM_LBUTTONUP:
-            if (m_send)
-                m_send({Input::DeviceType::Mouse, Input::KeyCode::LeftMouseButton, Input::EventType::Release, {}});
+            if (m_listener)
+                m_listener({Input::DeviceType::Mouse, Input::KeyCode::LeftMouseButton, Input::EventType::Release, nullptr});
 			return 0;
 
 		// 按下鼠标右键
 		case WM_RBUTTONDOWN:
-            if (m_send)
-                m_send({Input::DeviceType::Mouse, Input::KeyCode::RightMouseButton, Input::EventType::Press, {}});
+            if (m_listener)
+                m_listener({Input::DeviceType::Mouse, Input::KeyCode::RightMouseButton, Input::EventType::Press, nullptr});
 			return 0;
 
 		// 松开鼠标右键
 		case WM_RBUTTONUP:
-            if (m_send)
-                m_send({Input::DeviceType::Mouse, Input::KeyCode::RightMouseButton, Input::EventType::Release, {}});
+            if (m_listener)
+                m_listener({Input::DeviceType::Mouse, Input::KeyCode::RightMouseButton, Input::EventType::Release, nullptr});
 			return 0;
 
 		// 按下鼠标中键
 		case WM_MBUTTONDOWN:
-            if (m_send)
-                m_send({Input::DeviceType::Mouse, Input::KeyCode::MidMouseButton, Input::EventType::Press, {}});
+            if (m_listener)
+                m_listener({Input::DeviceType::Mouse, Input::KeyCode::MidMouseButton, Input::EventType::Press, nullptr});
 			return 0;
 
 		// 松开鼠标中键
 		case WM_MBUTTONUP:
-            if (m_send)
-                m_send({Input::DeviceType::Mouse, Input::KeyCode::MidMouseButton, Input::EventType::Release, {}});
+            if (m_listener)
+                m_listener({Input::DeviceType::Mouse, Input::KeyCode::MidMouseButton, Input::EventType::Release, nullptr});
 			return 0;
 
 		// 滚动鼠标滚轮
 		case WM_MOUSEWHEEL:
         {
-            if (m_send)
+            if (m_listener)
             {
                 // 每帧只会产生一个WM_MOUSEWHEEL
                 Input::MouseData data{GET_WHEEL_DELTA_WPARAM(wParam)};
-                m_send({Input::DeviceType::Mouse, Input::KeyCode::MidMouseButton, Input::EventType::WheelRoll, data});
+                m_listener({Input::DeviceType::Mouse, Input::KeyCode::MidMouseButton, Input::EventType::WheelRoll, &data});
             }
 			return 0;
         }
 
 		case WM_SIZE:
-            if (m_pause && m_start)
+            if (m_resume && m_suspend)
             {
                 m_width = LOWORD(lParam);
                 m_height = HIWORD(lParam);
                 if (wParam == SIZE_MINIMIZED)
-                    m_pause();
+                    m_suspend();
                 else if (wParam == SIZE_RESTORED)
-                    m_start();
+                    m_resume();
             }
 			return 0;
 
 		case WM_ENTERSIZEMOVE:
-            if (m_pause)
-			    m_pause();
+            if (m_suspend)
+                m_suspend();
 			return 0;
 
 		case WM_EXITSIZEMOVE:
-            if (m_start)
-			    m_start();
+            if (m_resume)
+                m_resume();
 			return 0;
 
         default:

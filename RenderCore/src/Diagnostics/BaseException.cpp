@@ -29,12 +29,12 @@ namespace TG
 		// 记录异常信息
 		std::wstring wWhatBuffer = std::format(L"Exception type: {}\n", GetType());
 		wWhatBuffer += m_description;
-		wWhatBuffer += SEPARATOR;
+		wWhatBuffer += Separator;
 		for (const auto& info : m_stackFrameInfo)
 		{
 			wWhatBuffer += std::format(L"Frame: {}\nFile: {}\nFunction: {}\nLine: {}",
 				info.index, info.file, info.function, info.line);
-			wWhatBuffer += SEPARATOR;
+			wWhatBuffer += Separator;
 		}
 		m_whatBuffer = Utility::WideStringToAnsi(wWhatBuffer);
 		return m_whatBuffer.c_str();
@@ -47,12 +47,12 @@ namespace TG
 
 	void BaseException::StackTrace()
 	{
-		void* stackFrames[FRAMESTOCAPTURE];
-		USHORT frameCount = CaptureStackBackTrace(0, FRAMESTOCAPTURE, stackFrames, nullptr);
+		void* stackFrames[Framestocapture];
+		USHORT frameCount = CaptureStackBackTrace(0, Framestocapture, stackFrames, nullptr);
 
-		auto symbol = reinterpret_cast<SYMBOL_INFOW*>(malloc(sizeof(SYMBOL_INFOW) + MAXNAMELEN * sizeof(WCHAR)));
+		auto symbol = reinterpret_cast<SYMBOL_INFOW*>(malloc(sizeof(SYMBOL_INFOW) + Maxnamelen * sizeof(WCHAR)));
 		symbol->SizeOfStruct = sizeof(SYMBOL_INFOW);
-		symbol->MaxNameLen = MAXNAMELEN;
+		symbol->MaxNameLen = Maxnamelen;
 
 		IMAGEHLP_LINEW64 imageLine = { 0 };
 		imageLine.SizeOfStruct = sizeof(IMAGEHLP_LINEW64);

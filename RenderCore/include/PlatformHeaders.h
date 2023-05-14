@@ -46,7 +46,7 @@
 
 	#include <windows.h>
 	#include <windowsx.h>
-    #include "MemoryLeakCheck.hpp"
+    #include "MemoryLeakDetect.hpp"
 #else
 	#error Unsupport Platforms
 #endif

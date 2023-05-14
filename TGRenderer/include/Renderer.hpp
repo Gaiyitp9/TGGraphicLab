@@ -7,7 +7,7 @@
 
 #include "Window/MainWindow.hpp"
 #include "Window/PopupWindow.hpp"
-#include "Input/Manager.hpp"
+#include "Input/Dispatcher.hpp"
 #include "Chronometer.hpp"
 #include "UnitTest.hpp"
 #include <locale>
@@ -32,7 +32,7 @@ namespace TG
 		std::locale m_locale;               // 语言区域
 		MainWindow m_mainWindow;            // 主窗口
         Chronometer m_timer;                // 高精度计时器
-        Input::Manager m_input;             // 输入管理器
+        Input::Dispatcher m_dispatcher;     // 输入事件分发器
 		//std::unique_ptr<Graphics::GraphicsLayer> d3d11Layer;
         Graphics::FactoryGL m_factory;
         std::unique_ptr<Graphics::RenderDeviceGL> m_device;

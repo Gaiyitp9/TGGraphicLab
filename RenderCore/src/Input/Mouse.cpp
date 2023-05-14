@@ -35,19 +35,19 @@ namespace TG::Input
                 break;
             case EventType::MouseMove:
             {
-                if (std::holds_alternative<MouseData>(e.data))
+                if (e.data)
                 {
-                    auto const data = std::get<MouseData>(e.data);
-                    m_position.x() = data.x;
-                    m_position.y() = data.y;
+                    auto const data = static_cast<MouseData*>(e.data);
+                    m_position.x() = data->x;
+                    m_position.y() = data->y;
                 }
                 break;
             }
 
             case EventType::WheelRoll:
             {
-                if (std::holds_alternative<MouseData>(e.data))
-                    m_wheelDelta = std::get<MouseData>(e.data).delta;
+                if (e.data)
+                    m_wheelDelta = static_cast<MouseData*>(e.data)->delta;
                 break;
             }
             default:
@@ -93,20 +93,20 @@ namespace TG::Input
 
 	void Mouse::SpyMouseEvent(Event e)
 	{
+        Debug::Log(std::format(L"Key: {:<20} Event: {:<20} ", EventInfo::keysName[e.key], EventInfo::eventTypes[e.type]));
 		switch (e.type)
 		{
 		case EventType::MouseMove:
-			Debug::Log(std::format(L"{}\t", e));
-			Debug::LogLine(std::format(L"MouseX: {}\tMouseY: {}", m_position.x(), m_position.y()));
+			Debug::LogLine(std::format(L"MouseX: {:<20} MouseY: {:<20}", m_position.x(), m_position.y()));
 			break;
 
 		case EventType::WheelRoll:
-			Debug::Log(std::format(L"{}\t", e));
-			Debug::LogLine(std::format(L"Raw wheel delta: {}\tWheel Delta: {}", RawWheelDelta(), WheelDelta()));
+			Debug::LogLine(std::format(L"Raw wheel delta: {:<20} Wheel Delta: {:<20}", RawWheelDelta(), WheelDelta()));
 			break;
 
 		default:
-			Debug::LogLine(std::format(L"{}", e));
+            Debug::LogLine(L"");
+            break;
 		}
 	}
 

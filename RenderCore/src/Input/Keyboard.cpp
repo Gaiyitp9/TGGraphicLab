@@ -39,8 +39,12 @@ namespace TG::Input
 
             case EventType::Char:
             {
-                if (std::holds_alternative<KeyboardData>(e.data))
-                    Debug::LogLine(std::get<KeyboardData>(e.data).c);
+                if (e.data)
+                {
+                    auto data = static_cast<KeyboardData*>(e.data);
+                    if (std::isprint(data->c))
+                        Debug::LogLine(data->c);
+                }
                 break;
             }
 
@@ -49,7 +53,7 @@ namespace TG::Input
         }
 
         if (m_spyKeyboard)
-            Debug::LogLine(std::format(L"{}", e));
+            Debug::LogLine(std::format(L"Key: {:<20} Event: {:<20} ", EventInfo::keysName[e.key], EventInfo::eventTypes[e.type]));
     }
 
     void Keyboard::SpyEvent(bool enable)
