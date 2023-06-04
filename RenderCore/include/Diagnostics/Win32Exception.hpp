@@ -9,11 +9,11 @@
 
 namespace TG
 {
-	class WinAPIException : public BaseException
+	class Win32Exception : public BaseException
 	{
 	public:
-		explicit WinAPIException(HRESULT hr, const std::wstring& description = L"");
-		~WinAPIException() override;
+		explicit Win32Exception(HRESULT hr, const std::wstring& description = L"");
+		~Win32Exception() override;
 
 		char const* what() const override;
 		wchar_t const* GetType() const noexcept override;
@@ -29,12 +29,12 @@ namespace TG
     inline void CheckHResult(HRESULT hr, const std::wstring& description = L"")
     {
         if (hr < 0)
-            throw WinAPIException(hr, description);
+            throw Win32Exception(hr, description);
     }
 
     inline void CheckLastError(const std::wstring& description = L"")
     {
         auto hr = static_cast<HRESULT>(GetLastError());
-        throw WinAPIException(hr, description);
+        throw Win32Exception(hr, description);
     }
 }

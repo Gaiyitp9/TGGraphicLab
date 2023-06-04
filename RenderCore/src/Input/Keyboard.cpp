@@ -5,7 +5,9 @@
 *****************************************************************/
 
 #include "Input/Keyboard.hpp"
-#include "Diagnostics/Debug.hpp"
+#include "Diagnostics/Log.hpp"
+#include "Input/EventData.hpp"
+#include <format>
 
 namespace TG::Input
 {
@@ -52,8 +54,10 @@ namespace TG::Input
                 break;
         }
 
-        if (m_spyKeyboard)
-            Debug::LogLine(std::format(L"Key: {:<20} Event: {:<20} ", EventInfo::keysName[e.key], EventInfo::eventTypes[e.type]));
+        if (m_spyKeyboard && EventInfo::keysName.contains(e.key) && EventInfo::eventTypes.contains(e.type))
+        {
+            Debug::LogLine(std::format("Key: {:<20} Event: {:<20} ", EventInfo::keysName.at(e.key), EventInfo::eventTypes.at(e.type)));
+        }
     }
 
     void Keyboard::SpyEvent(bool enable)

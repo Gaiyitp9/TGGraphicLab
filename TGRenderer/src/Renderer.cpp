@@ -5,7 +5,7 @@
 *****************************************************************/
 
 #include "Renderer.hpp"
-#include "Diagnostics/WinAPIException.hpp"
+#include "Diagnostics/Win32Exception.hpp"
 
 namespace TG
 {

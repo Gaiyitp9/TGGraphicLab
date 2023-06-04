@@ -11,8 +11,8 @@
 #include <string>
 #include "Math/Core.hpp"
 #include "Input/Event.hpp"
-#include "Diagnostics/Debug.hpp"
-#include "Diagnostics/WinAPIException.hpp"
+#include "Diagnostics/Log.hpp"
+#include "Diagnostics/Win32Exception.hpp"
 #include "glad/gl.h"
 
 namespace TG

@@ -4,22 +4,22 @@
 * This code is licensed under the MIT License (MIT).			*
 *****************************************************************/
 
-#include "Diagnostics/WinAPIException.hpp"
+#include "Diagnostics/Win32Exception.hpp"
 #include "Utility.hpp"
 #include <format>
 
 namespace TG
 {
-	WinAPIException::WinAPIException(HRESULT hr, const std::wstring& description)
+	Win32Exception::Win32Exception(HRESULT hr, const std::wstring& description)
 		: BaseException(description), m_errorCode(hr)
 	{
 		// 提取错误码中的信息
 		TranslateHrErrorCode();
 	}
 
-	WinAPIException::~WinAPIException() = default;
+	Win32Exception::~Win32Exception() = default;
 
-	char const* WinAPIException::what() const
+	char const* Win32Exception::what() const
 	{
 		// 记录异常信息
 		std::wstring wWhatBuffer = std::format(L"Exception type: {}\n", GetType());
@@ -36,12 +36,12 @@ namespace TG
 		return m_whatBuffer.c_str();
 	}
 
-	wchar_t const* WinAPIException::GetType() const noexcept
+	wchar_t const* Win32Exception::GetType() const noexcept
 	{
 		return L"Windows API Exception";
 	}
 
-	void WinAPIException::TranslateHrErrorCode()
+	void Win32Exception::TranslateHrErrorCode()
 	{
 		wchar_t msgBuf[256];
 		DWORD msgLen = FormatMessageW(FORMAT_MESSAGE_FROM_SYSTEM |

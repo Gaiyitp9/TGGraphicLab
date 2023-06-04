@@ -4,8 +4,6 @@ project(TGRenderLab)
 
 # msvc17.0以上
 if(MSVC_TOOLSET_VERSION GREATER_EQUAL 143)
-	# compile definitions unicode
-	add_compile_definitions(_WINDOWS UNICODE _UNICODE)
 	# compile options utf-8 arch:avx2 fp:precise
 	# 文件编码为utf-8，运行时char编码为utf-8，wchar_t编码为utf-16 LE
 	add_compile_options(/utf-8 /arch:AVX2 /fp:precise)

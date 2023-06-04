@@ -6,10 +6,7 @@
 #pragma once
 
 #include "Device.hpp"
-#include "EventData.hpp"
-#include <format>
 #include <unordered_map>
-#include <variant>
 
 namespace TG::Input
 {
@@ -33,11 +30,9 @@ namespace TG::Input
         void* data          = nullptr;              // 设备相关数据
 	};
 
-    // https://stackoverflow.com/questions/45575892/why-is-sizeofstdvariant-the-same-size-as-a-struct-with-the-same-members
-    // 关于variant的大小问题，因为variant需要额外的字节来记录哪个类型被实例化，所以比union要多一些字节，多的字节需要根据padding计算
 	struct EventInfo
 	{
-		static std::unordered_map<KeyCode, wchar_t const*> keysName;
-		static std::unordered_map<EventType, wchar_t const*> eventTypes;
+		static std::unordered_map<KeyCode, char const*> keysName;
+		static std::unordered_map<EventType, char const*> eventTypes;
 	};
 }

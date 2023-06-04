@@ -26,7 +26,7 @@ namespace TG::Input
     void Dispatcher::AddDevice(DeviceType type)
     {
         if (!m_devices.contains(type))
-            m_devices[type] = DeviceFactory::Create(type);
+            m_devices[type] = CreateDevice(type);
     }
 
     void Dispatcher::RemoveDevice(DeviceType type)

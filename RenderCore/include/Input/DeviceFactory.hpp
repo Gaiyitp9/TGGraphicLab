@@ -11,24 +11,20 @@
 
 namespace TG::Input
 {
-    // 输入设备创建工厂
-    class DeviceFactory
+    // 创建输入设备
+    inline std::unique_ptr<Device> CreateDevice(DeviceType type)
     {
-    public:
-        static std::unique_ptr<Device> Create(DeviceType type)
+        switch (type)
         {
-            switch (type)
-            {
-                case DeviceType::Mouse:
-                    return std::make_unique<Mouse>();
+            case DeviceType::Mouse:
+                return std::make_unique<Mouse>();
 
-                case DeviceType::Keyboard:
-                    return std::make_unique<Keyboard>();
+            case DeviceType::Keyboard:
+                return std::make_unique<Keyboard>();
 
-                case DeviceType::Gamepad:
-                default:
-                    return nullptr;
-            }
+            case DeviceType::Gamepad:
+            default:
+                return nullptr;
         }
-    };
+    }
 }

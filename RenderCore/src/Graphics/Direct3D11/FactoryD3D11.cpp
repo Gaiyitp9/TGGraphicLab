@@ -4,7 +4,7 @@
 * This code is licensed under the MIT License (MIT).			*
 *****************************************************************/
 #include "Graphics/Direct3D11/FactoryD3D11.hpp"
-#include "Diagnostics/Debug.hpp"
+#include "Diagnostics/Log.hpp"
 
 namespace TG::Graphics
 {

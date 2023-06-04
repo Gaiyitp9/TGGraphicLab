@@ -18,6 +18,7 @@ namespace TG::Input
         Gamepad,
     };
 
+    // 前向声明
     struct Event;
 
     // 输入设备的接口

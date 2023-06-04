@@ -4,7 +4,7 @@
 * This code is licensed under the MIT License (MIT).			*
 *****************************************************************/
 #pragma once
-#include "PlatformHeaders.h"
+#include "Win32Lean.h"
 #include <cstdint>
 
 namespace TG::Graphics

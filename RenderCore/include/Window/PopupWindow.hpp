@@ -16,7 +16,7 @@ namespace TG
 		PopupWindow(int x, int y, int width, int height, HWND parent = nullptr);
 		PopupWindow(const PopupWindow&) = delete;
 		PopupWindow& operator=(const PopupWindow&) = delete;
-		~PopupWindow();
+		~PopupWindow() override;
 
 	private:
 		LRESULT CALLBACK WindowProc(HWND, UINT, WPARAM, LPARAM) override;

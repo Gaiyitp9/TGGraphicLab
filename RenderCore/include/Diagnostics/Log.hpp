@@ -46,6 +46,7 @@ namespace TG::Debug
         requires TextTrait<Text>::Wide;
     };
 
+    // 注：尽量使用窄文本，性能比宽文本好
     template<NarrowText Text>
     inline void Log(const Text &log) { std::cout << log; }
 

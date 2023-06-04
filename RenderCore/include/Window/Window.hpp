@@ -6,8 +6,8 @@
 #pragma once
 
 #include "Window/WindowRegister.hpp"
-#include "Diagnostics/Debug.hpp"
-#include "Diagnostics/WinAPIException.hpp"
+#include "Diagnostics/Log.hpp"
+#include "Diagnostics/Win32Exception.hpp"
 #include <optional>
 
 namespace TG
@@ -19,18 +19,19 @@ namespace TG
 		Window(int x, int y, int width, int height, HWND parent);
 		Window(const Window&) = delete;
 		Window& operator=(const Window&) = delete;
-		~Window() = default;
+		virtual ~Window() = default;
 
-		static std::optional<int> ProcessMessage();							// 处理所有窗口的消息
+		static std::optional<int> ProcessMessage();							    // 处理所有窗口的消息
 
-		[[nodiscard]] HWND Hwnd() const noexcept { return m_hwnd; }		    // 窗口句柄
-		[[nodiscard]] HWND ParentHwnd() const noexcept { return m_parent; } // 返回父母窗口
-		[[nodiscard]] int Width() const noexcept { return m_width; }        // 获取窗口宽和高
+		[[nodiscard]] HWND Hwnd() const noexcept { return m_hwnd; }		        // 窗口句柄
+		[[nodiscard]] HWND ParentHwnd() const noexcept { return m_parent; }     // 返回父母窗口
+		[[nodiscard]] int Width() const noexcept { return m_width; }            // 获取窗口宽和高
 		[[nodiscard]] int Height() const noexcept { return m_height; }
-		[[nodiscard]] bool Destroy() const noexcept { return m_destroy; }   // 是否销毁窗口
+		[[nodiscard]] bool Destroy() const noexcept { return m_destroy; }       // 是否销毁窗口
 
-	protected:
-		virtual LRESULT CALLBACK WindowProc(HWND, UINT, WPARAM, LPARAM);	// 消息处理函数
+        void SpyMessage(bool enable) noexcept { m_spyMessage = enable; }	    // 捕捉窗口消息
+
+		virtual LRESULT CALLBACK WindowProc(HWND, UINT, WPARAM, LPARAM) = 0;    // 消息处理函数
 
 	protected:
 		HWND m_hwnd;
@@ -38,6 +39,7 @@ namespace TG
 		int m_posX, m_posY;
 		int m_width, m_height;
 		bool m_destroy = false;				// 是否销毁窗口
+        bool m_spyMessage = false;			// 是否监控窗口消息
 
 		friend class WindowRegister;
 	};

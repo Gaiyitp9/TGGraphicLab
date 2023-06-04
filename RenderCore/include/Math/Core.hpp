@@ -6,9 +6,9 @@
 #pragma once
 #define MATH_CORE_H
 
-#include "PlatformHeaders.h"
+#include "Win32Lean.h"
 #include <type_traits> 
-#include "Diagnostics/Debug.hpp"
+#include "Diagnostics/Log.hpp"
 #include "Diagnostics/BaseException.hpp"
 #include "Common.hpp"
 #include "NumTraits.hpp"

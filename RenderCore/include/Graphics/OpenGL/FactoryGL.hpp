@@ -5,7 +5,7 @@
 *****************************************************************/
 #pragma once
 
-#include "PlatformHeaders.h"
+#include "Win32Lean.h"
 #include "GLCreateInfo.hpp"
 #include "DeviceContextGL.hpp"
 #include "RenderDeviceGL.hpp"

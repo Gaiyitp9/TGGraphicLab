@@ -5,15 +5,14 @@
 *****************************************************************/
 
 #include "Window/MainWindow.hpp"
+#include "Input/EventData.hpp"
+#include "Utility.hpp"
 
 namespace TG
 {
 	MainWindow::MainWindow(int x, int y, int width, int height, wchar_t const* name, HWND parent)
 		: Window(x, y, width, height, parent), m_name(name)
 	{
-        // 获取窗口类名称
-        WindowRegister& windowRegister = WindowRegister::Instance();
-
         // 客户端区域大小
         RECT rect = { 0, 0, m_width, m_height };
         // 根据客户区域宽和高计算整个窗口的宽和高
@@ -21,9 +20,9 @@ namespace TG
             CheckLastError();
 
         // 创建窗口
-        m_hwnd = CreateWindowW(L"Default", m_name.c_str(), WS_OVERLAPPEDWINDOW,
+        m_hwnd = CreateWindowW(GetWindowClassName(WindowType::Default), m_name.c_str(), WS_OVERLAPPEDWINDOW,
                                m_posX, m_posY, rect.right - rect.left, rect.bottom - rect.top,
-                               m_parent, nullptr, windowRegister.HInstance(), this);
+                               m_parent, nullptr, nullptr, this);
 
         if (m_hwnd == nullptr)
             CheckLastError();
@@ -58,11 +57,13 @@ namespace TG
 	{
 		// 是否监控窗口消息
 		if (m_spyMessage)
-			Debug::LogLine(WindowRegister::Instance().GetWindowMesssageInfo(m_name, msg, wParam, lParam));
+			Debug::LogLine(std::format("{:<16} {}", Utility::WideStringToAnsi(m_name), GetWindowMessageInfo(msg, wParam, lParam)));
 
 		switch (msg)
 		{
 		case WM_DESTROY:
+            // 窗口被销毁后，窗口类也需要被销毁
+            m_destroy = true;
 			// 基础窗口一般作为主窗口，销毁后要退出线程
 			PostQuitMessage(0);
 			return 0;
@@ -102,10 +103,6 @@ namespace TG
 		// 按键字符
 		case WM_CHAR:
         {
-//			if (!(lParam & 0x40000000) || m_input.m_keyboard.m_autoRepeat)
-//			{
-//				m_input.m_keyboard.OnChar(static_cast<char>(wParam));
-//			}
             if (m_listener)
             {
                 Input::KeyboardData data{static_cast<char>(wParam)};
@@ -196,7 +193,7 @@ namespace TG
 			return 0;
 
         default:
-		    return Window::WindowProc(hwnd, msg, wParam, lParam);
+		    return DefWindowProcW(hwnd, msg, wParam, lParam);
 		}
 	}
 }

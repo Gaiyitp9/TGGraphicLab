@@ -27,9 +27,4 @@ namespace TG
 
 		return std::nullopt;
 	}
-
-	inline LRESULT CALLBACK Window::WindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
-	{
-		return DefWindowProc(hwnd, msg, wParam, lParam);
-	}
 }

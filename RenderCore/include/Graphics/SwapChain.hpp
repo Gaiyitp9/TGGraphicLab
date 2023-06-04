@@ -4,8 +4,8 @@
 * This code is licensed under the MIT License (MIT).			*
 *****************************************************************/
 #pragma once
-#include "Diagnostics/Debug.hpp"
-#include "Diagnostics/WinAPIException.hpp"
+#include "Diagnostics/Log.hpp"
+#include "Diagnostics/Win32Exception.hpp"
 
 namespace TG::Graphics
 {

@@ -15,7 +15,7 @@ namespace TG
         Singleton(const Singleton &) = delete;
         Singleton &operator=(const Singleton &) = delete;
 
-        static T &Instance()
+        static T& Instance()
         {
             static T s_instance;
             return s_instance;

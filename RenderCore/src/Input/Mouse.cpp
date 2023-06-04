@@ -5,7 +5,9 @@
 *****************************************************************/
 
 #include "Input/Mouse.hpp"
-#include "Diagnostics/Debug.hpp"
+#include "Diagnostics/Log.hpp"
+#include "Input/EventData.hpp"
+#include <format>
 
 namespace TG::Input
 {
@@ -93,19 +95,19 @@ namespace TG::Input
 
 	void Mouse::SpyMouseEvent(Event e)
 	{
-        Debug::Log(std::format(L"Key: {:<20} Event: {:<20} ", EventInfo::keysName[e.key], EventInfo::eventTypes[e.type]));
+        Debug::Log(std::format("Key: {:<20} Event: {:<20} ", EventInfo::keysName[e.key], EventInfo::eventTypes[e.type]));
 		switch (e.type)
 		{
 		case EventType::MouseMove:
-			Debug::LogLine(std::format(L"MouseX: {:<20} MouseY: {:<20}", m_position.x(), m_position.y()));
+			Debug::LogLine(std::format("MouseX: {:<20} MouseY: {:<20}", m_position.x(), m_position.y()));
 			break;
 
 		case EventType::WheelRoll:
-			Debug::LogLine(std::format(L"Raw wheel delta: {:<20} Wheel Delta: {:<20}", RawWheelDelta(), WheelDelta()));
+			Debug::LogLine(std::format("Raw wheel delta: {:<20} Wheel Delta: {:<20}", RawWheelDelta(), WheelDelta()));
 			break;
 
 		default:
-            Debug::LogLine(L"");
+            Debug::LogLine("");
             break;
 		}
 	}

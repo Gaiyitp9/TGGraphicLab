@@ -19,7 +19,7 @@ int CALLBACK wWinMain(_In_ HINSTANCE hInstance,
 		TG::Renderer app;
 //		int* leak = static_cast<int*>(malloc(sizeof(int)));
 //		int* leak2 = DBG_NEW int[2];
-        OutputDebugString(L"test output\n");
+        OutputDebugStringA("test output\n");
 		return app.Run();
 	}
 	catch (const TG::BaseException& e)
@@ -33,7 +33,7 @@ int CALLBACK wWinMain(_In_ HINSTANCE hInstance,
 	}
 	catch (...)
 	{
-		TG::Debug::Log(L"Unknown Exception");
+		TG::Debug::Log("Unknown Exception");
 	}
 
 	return -1;
