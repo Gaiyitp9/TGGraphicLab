@@ -17,8 +17,6 @@ int CALLBACK wWinMain(_In_ HINSTANCE hInstance,
 	{
 		//OutputPPMImage();
 		TG::Renderer app;
-//		int* leak = static_cast<int*>(malloc(sizeof(int)));
-//		int* leak2 = DBG_NEW int[2];
         OutputDebugStringA("test output\n");
 		return app.Run();
 	}

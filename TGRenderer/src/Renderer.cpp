@@ -11,6 +11,7 @@ namespace TG
 {
 	Renderer::Renderer() : m_mainWindow(200, 100, 800, 600, L"天工渲染器")
 	{
+        // 注：使用CRT library检测内存泄漏时，文件的行分隔符要设置为CRLF(\r\n)，否则_CrtSetDbgFlag函数不起作用
 		// 开启内存泄漏检测
 		_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 		// 设置内存泄漏消息输出到控制台

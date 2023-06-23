@@ -8,6 +8,7 @@
 #include "Diagnostics/Log.hpp"
 #include "Input/EventData.hpp"
 #include <format>
+#include <cassert>
 
 namespace TG::Input
 {
@@ -41,12 +42,10 @@ namespace TG::Input
 
             case EventType::Char:
             {
-                if (e.data)
-                {
-                    auto data = static_cast<KeyboardData*>(e.data);
-                    if (std::isprint(data->c))
-                        Debug::LogLine(data->c);
-                }
+                assert(e.data && "keyboard data is null");
+                auto data = static_cast<KeyboardData*>(e.data);
+                if (std::isprint(data->c))
+                    Debug::LogLine(data->c);
                 break;
             }
 

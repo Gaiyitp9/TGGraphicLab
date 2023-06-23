@@ -37,19 +37,17 @@ namespace TG::Input
                 break;
             case EventType::MouseMove:
             {
-                if (e.data)
-                {
-                    auto const data = static_cast<MouseData*>(e.data);
-                    m_position.x() = data->x;
-                    m_position.y() = data->y;
-                }
+                assert(e.data && "mouse data is null");
+                auto const data = static_cast<MouseData*>(e.data);
+                m_position.x() = data->x;
+                m_position.y() = data->y;
                 break;
             }
 
             case EventType::WheelRoll:
             {
-                if (e.data)
-                    m_wheelDelta = static_cast<MouseData*>(e.data)->delta;
+                assert(e.data && "mouse data is null");
+                m_wheelDelta = static_cast<MouseData*>(e.data)->delta;
                 break;
             }
             default:
