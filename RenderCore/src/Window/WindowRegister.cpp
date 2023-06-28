@@ -67,7 +67,7 @@ namespace TG
     }
 
     // 调用RegisterWindow函数
-    static int s_registerWnd = RegisterWindow();
+    [[maybe_unused]] static int gs_sRegisterWnd = RegisterWindow();
 
     wchar_t const* GetWindowClassName(const WindowType& type)
     {

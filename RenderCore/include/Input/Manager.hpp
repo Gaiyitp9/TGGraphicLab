@@ -17,8 +17,9 @@ namespace TG::Input
 	public:
         Manager();
         Manager(const Manager&) = delete;
-        Manager& operator=(const Manager&) = delete;
         Manager(Manager&&) = delete;
+        Manager& operator=(const Manager&) = delete;
+        Manager& operator=(Manager&&) = delete;
 		~Manager();
 
 		void Update();                                                          // 更新各种输入设备的状态

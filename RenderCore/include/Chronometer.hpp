@@ -15,7 +15,9 @@ namespace TG
 	public:
 		Chronometer();
 		Chronometer(const Chronometer&) = delete;
+		Chronometer(Chronometer&&) = delete;
 		Chronometer& operator=(const Chronometer&) = delete;
+		Chronometer& operator=(Chronometer&&) = delete;
 		~Chronometer();
 
 		static std::wstring Date();                             // 当前时区的日期和时间

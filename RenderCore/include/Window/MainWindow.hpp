@@ -18,6 +18,7 @@ namespace TG
 		MainWindow(const MainWindow&) = delete;
         MainWindow(MainWindow&&) = delete;
 		MainWindow& operator=(const MainWindow&) = delete;
+        MainWindow& operator=(MainWindow&&) = delete;
 		~MainWindow() override;
 
         [[nodiscard]] const std::wstring& Name() const noexcept { return m_name; }          // 窗口名称
