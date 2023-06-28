@@ -23,9 +23,6 @@ namespace TG::Input
 		bool GetKeyDown(KeyCode k) override;
 		bool GetKeyUp(KeyCode k) override;
 
-    private:
-        static bool Contains(KeyCode k);
-
 	private:
 		std::bitset<256> m_keyHold;					    // 按键状态(是否被按下)
 		std::bitset<256> m_keyDown;					    // 按键是否刚刚按下

@@ -37,8 +37,8 @@ namespace TG::Input
                 break;
             case EventType::MouseMove:
             {
-                assert(e.data && "mouse data is null");
-                auto const data = static_cast<MouseData*>(e.data);
+                auto data = std::any_cast<MouseData>(&e.data);
+                assert(data && "Mouse move event doesn't contain data or the data type is not MouseData");
                 m_position.x() = data->x;
                 m_position.y() = data->y;
                 break;
@@ -46,8 +46,9 @@ namespace TG::Input
 
             case EventType::WheelRoll:
             {
-                assert(e.data && "mouse data is null");
-                m_wheelDelta = static_cast<MouseData*>(e.data)->delta;
+                auto data = std::any_cast<MouseData>(&e.data);
+                assert(data && "WheelRoll event doesn't contain data or the data type is not MouseData");
+                m_wheelDelta = data->delta;
                 break;
             }
             default:
@@ -66,27 +67,18 @@ namespace TG::Input
 
     bool Mouse::GetKey(KeyCode k)
     {
-        if (!Contains(k))
-            return false;
-
         auto pos = static_cast<size_t>(k);
         return mouseHold.test(pos);
     }
 
     bool Mouse::GetKeyDown(KeyCode k)
     {
-        if (!Contains(k))
-            return false;
-
         auto pos = static_cast<size_t>(k);
         return mouseDown.test(pos);
     }
 
     bool Mouse::GetKeyUp(KeyCode k)
     {
-        if (!Contains(k))
-            return false;
-
         auto pos = static_cast<size_t>(k);
         return mouseUp.test(pos);
     }
@@ -109,12 +101,4 @@ namespace TG::Input
             break;
 		}
 	}
-
-    bool Mouse::Contains(KeyCode k)
-    {
-        auto index = static_cast<unsigned char>(k);
-        if (index > 0x01 && index <= 0x04)
-            return true;
-        return false;
-    }
 }

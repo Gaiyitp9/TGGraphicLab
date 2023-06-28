@@ -42,8 +42,8 @@ namespace TG::Input
 
             case EventType::Char:
             {
-                assert(e.data && "keyboard data is null");
-                auto data = static_cast<KeyboardData*>(e.data);
+                auto data = std::any_cast<KeyboardData>(&e.data);
+                assert(data && "Char event doesn't contain data or the data type is not KeyboradData");
                 if (std::isprint(data->c))
                     Debug::LogLine(data->c);
                 break;
@@ -66,36 +66,19 @@ namespace TG::Input
 
     bool Keyboard::GetKey(KeyCode k)
     {
-        if (!Contains(k))
-            return false;
-
         auto pos = static_cast<size_t>(k);
         return m_keyHold.test(pos);
     }
 
     bool Keyboard::GetKeyDown(KeyCode k)
     {
-        if (!Contains(k))
-            return false;
-
         auto pos = static_cast<size_t>(k);
         return m_keyDown.test(pos);
     }
 
     bool Keyboard::GetKeyUp(KeyCode k)
     {
-        if (!Contains(k))
-            return false;
-
         auto pos = static_cast<size_t>(k);
         return m_keyUp.test(pos);
     }
-
-	bool Keyboard::Contains(KeyCode k)
-	{
-		auto index = static_cast<unsigned char>(k);
-		if (index > 0x08 && index <= 0xDE)
-			return true;
-		return false;
-	}
 }

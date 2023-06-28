@@ -95,7 +95,7 @@ namespace TG
                         break;
                 }
                 Input::EventType type = (keyFlags & KF_UP) == KF_UP ? Input::EventType::Release : Input::EventType::Press;
-                m_listener({Input::DeviceType::Keyboard, static_cast<Input::KeyCode>(vkCode), type, nullptr});
+                m_listener({static_cast<Input::KeyCode>(vkCode), type, nullptr});
             }
 			return 0;
 		}
@@ -106,7 +106,7 @@ namespace TG
             if (m_listener)
             {
                 Input::KeyboardData data{static_cast<char>(wParam)};
-                m_listener({Input::DeviceType::Keyboard, Input::KeyCode::None, Input::EventType::Char, &data});
+                m_listener({Input::KeyCode::None, Input::EventType::Char, data});
             }
 			return 0;
         }
@@ -117,7 +117,7 @@ namespace TG
             if (m_listener)
             {
                 Input::MouseData data{GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam)};
-                m_listener({Input::DeviceType::Mouse, Input::KeyCode::None, Input::EventType::MouseMove, &data});
+                m_listener({Input::KeyCode::None, Input::EventType::MouseMove, data});
             }
 			return 0;
 		}
@@ -125,37 +125,37 @@ namespace TG
 		// 按下鼠标左键
 		case WM_LBUTTONDOWN:
             if (m_listener)
-                m_listener({Input::DeviceType::Mouse, Input::KeyCode::LeftMouseButton, Input::EventType::Press, nullptr});
+                m_listener({Input::KeyCode::LeftMouseButton, Input::EventType::Press, nullptr});
 			return 0;
 
 		// 松开鼠标左键
 		case WM_LBUTTONUP:
             if (m_listener)
-                m_listener({Input::DeviceType::Mouse, Input::KeyCode::LeftMouseButton, Input::EventType::Release, nullptr});
+                m_listener({Input::KeyCode::LeftMouseButton, Input::EventType::Release, nullptr});
 			return 0;
 
 		// 按下鼠标右键
 		case WM_RBUTTONDOWN:
             if (m_listener)
-                m_listener({Input::DeviceType::Mouse, Input::KeyCode::RightMouseButton, Input::EventType::Press, nullptr});
+                m_listener({Input::KeyCode::RightMouseButton, Input::EventType::Press, nullptr});
 			return 0;
 
 		// 松开鼠标右键
 		case WM_RBUTTONUP:
             if (m_listener)
-                m_listener({Input::DeviceType::Mouse, Input::KeyCode::RightMouseButton, Input::EventType::Release, nullptr});
+                m_listener({Input::KeyCode::RightMouseButton, Input::EventType::Release, nullptr});
 			return 0;
 
 		// 按下鼠标中键
 		case WM_MBUTTONDOWN:
             if (m_listener)
-                m_listener({Input::DeviceType::Mouse, Input::KeyCode::MidMouseButton, Input::EventType::Press, nullptr});
+                m_listener({Input::KeyCode::MidMouseButton, Input::EventType::Press, nullptr});
 			return 0;
 
 		// 松开鼠标中键
 		case WM_MBUTTONUP:
             if (m_listener)
-                m_listener({Input::DeviceType::Mouse, Input::KeyCode::MidMouseButton, Input::EventType::Release, nullptr});
+                m_listener({Input::KeyCode::MidMouseButton, Input::EventType::Release, nullptr});
 			return 0;
 
 		// 滚动鼠标滚轮
@@ -165,7 +165,7 @@ namespace TG
             {
                 // 每帧只会产生一个WM_MOUSEWHEEL
                 Input::MouseData data{GET_WHEEL_DELTA_WPARAM(wParam)};
-                m_listener({Input::DeviceType::Mouse, Input::KeyCode::MidMouseButton, Input::EventType::WheelRoll, &data});
+                m_listener({Input::KeyCode::MidMouseButton, Input::EventType::WheelRoll, data});
             }
 			return 0;
         }

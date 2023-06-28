@@ -10,7 +10,7 @@ namespace TG
 {
 	void UnitTest::FormatTest()
 	{
-		Input::Event ie{ Input::DeviceType::Keyboard, Input::KeyCode::BackSlash, Input::EventType::Press , {}};
+		Input::Event ie{Input::KeyCode::BackSlash, Input::EventType::Press , {}};
         Debug::Log(std::format("Key: {:<10} Event: {:10} ", Input::EventInfo::keysName[ie.key],
                                Input::EventInfo::eventTypes[ie.type]));
 	}

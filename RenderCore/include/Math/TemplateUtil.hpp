@@ -47,7 +47,6 @@ namespace TG::Math
 	template<typename Enum> requires std::is_enum_v<Enum>&& enum_traits<Enum>::has_none
 		constexpr bool NotNone(const Enum& e) { return e != Enum::None; }
 
-	// �Ƴ����͵�const�����ú�ָ�룬��ô�����
 	template<typename T> struct remove_all { using type = T; };
 	template<typename T> struct remove_all<const T> { using type = remove_all<T>::type; };
 	template<typename T> struct remove_all<const T&> { using type = remove_all<T>::type; };
@@ -58,7 +57,6 @@ namespace TG::Math
 	template<typename T>
 	using remove_all_t = remove_all<T>::type;
 
-	// ���const���η�
 	template<typename T> struct add_const_on_value_type { typedef const T type; };
 	template<typename T> struct add_const_on_value_type<T&> { typedef T const& type; };
 	template<typename T> struct add_const_on_value_type<T*> { typedef T const* type; };

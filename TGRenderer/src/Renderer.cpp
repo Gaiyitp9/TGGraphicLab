@@ -31,13 +31,13 @@ namespace TG
         m_screenHeight = GetSystemMetrics(SM_CYSCREEN);
 
         // windows平台上使用鼠标和键盘输入
-        m_dispatcher.AddDevice(Input::DeviceType::Mouse);
-        m_dispatcher.AddDevice(Input::DeviceType::Keyboard);
-        m_dispatcher.SpyInputEvent(true);
+        m_input.AddDevice(Input::DeviceType::Mouse);
+        m_input.AddDevice(Input::DeviceType::Keyboard);
+        m_input.SpyInputEvent(true);
 
         // 主窗口设置
         m_mainWindow.SetIcon(L"D:\\ComputerScience\\ComputerGraphics\\Projects\\TGRenderLab\\TGRenderer\\maple-leaf.ico");
-        m_mainWindow.SetInputListener([&input = m_dispatcher](const Input::Event &evt)
+        m_mainWindow.SetInputListener([&input = m_input](const Input::Event &evt)
                                       { input.Dispatch(evt); });
         m_mainWindow.SetStateCallback([&timer=m_timer](){ timer.Start(); }, [&timer=m_timer](){ timer.Pause(); });
         m_mainWindow.SpyMessage(false);
@@ -78,7 +78,7 @@ namespace TG
 			if (const auto code = Window::ProcessMessage())
 				return *code;
 
-            m_dispatcher.Update();
+            m_input.Update();
 
 			/*auto it = m_windows.begin();
 			while (it != m_windows.end())
@@ -90,7 +90,7 @@ namespace TG
 					++it;
 			}*/
 
-            if (m_dispatcher.GetKeyUp(Input::KeyCode::Space))
+            if (m_input.GetKeyUp(Input::KeyCode::Space))
                 Debug::LogLine(L"space up");
 
 			const float c = sin(m_timer.TotalTime() * 0.001f) / 2.0f + 0.5f;

@@ -9,12 +9,14 @@ namespace TG::Input
 {
 	enum class KeyCode : unsigned char
 	{
+        //------------鼠标---------------
 		None				= 0x00,
-
 		LeftMouseButton		= 0x01,
 		RightMouseButton	= 0x02,
 		MidMouseButton		= 0x04,
+        //-------------------------------
 
+        //---------键盘------------------
 		Backspace	= 0x08,
 		Tab			= 0x09,
 		Enter		= 0x0D,
@@ -110,5 +112,6 @@ namespace TG::Input
 		BackSlash		= 0xDC,
 		RightBracket	= 0xDD,
 		Quote			= 0xDE
+        //-------------------------------
 	};
 }

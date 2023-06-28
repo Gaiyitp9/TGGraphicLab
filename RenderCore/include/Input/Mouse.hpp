@@ -33,7 +33,6 @@ namespace TG::Input
 
 	private:
 		void SpyMouseEvent(Event e);
-        static bool Contains(KeyCode k);
 
 	public:
 		std::bitset<8> mouseHold;       // 按键状态(是否被按下)

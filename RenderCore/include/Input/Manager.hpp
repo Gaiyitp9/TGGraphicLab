@@ -12,14 +12,14 @@
 namespace TG::Input
 {
     // 输入管理器
-    class Dispatcher
+    class Manager
 	{
 	public:
-        Dispatcher();
-        Dispatcher(const Dispatcher&) = delete;
-        Dispatcher& operator=(const Dispatcher&) = delete;
-        Dispatcher(Dispatcher&&) = delete;
-		~Dispatcher();
+        Manager();
+        Manager(const Manager&) = delete;
+        Manager& operator=(const Manager&) = delete;
+        Manager(Manager&&) = delete;
+		~Manager();
 
 		void Update();                                                          // 更新各种输入设备的状态
 
@@ -31,6 +31,9 @@ namespace TG::Input
 		[[nodiscard]] bool GetKey(KeyCode key) const;		                    // 是否按住按键
 		[[nodiscard]] bool GetKeyDown(KeyCode key) const;	                    // 是否按下按键
 		[[nodiscard]] bool GetKeyUp(KeyCode key) const;		                    // 是否释放按键
+
+    private:
+        static DeviceType GetDeviceType(KeyCode key);                           // 根据按键码获取设备类型
 
 	private:
         std::unordered_map<DeviceType, std::unique_ptr<Device>> m_devices;      // 输入设备列表

@@ -9,24 +9,19 @@
 
 namespace TG::Debug
 {
-	template<typename CharT>
+	template<typename Text>
 	struct TextTrait
     {
-        using CharType = CharT;
-        static constexpr bool Wide = std::is_same_v<CharT, wchar_t>;
+        using CharType = std::remove_cvref_t<Text>;
+        static constexpr bool Wide = std::is_same_v<CharType, wchar_t>;
     };
-	template<typename CharT> struct TextTrait<const CharT> : TextTrait<CharT> {};
 
-	// charT const*必须分开写，否则识别不了wchar_t，暂时不知道原因。下同
 	template<typename CharT> struct TextTrait<CharT*> : TextTrait<CharT> {};
-	template<typename CharT> struct TextTrait<CharT const*> : TextTrait<CharT> {};
 	template<typename CharT, size_t N> struct TextTrait<CharT[N]> : TextTrait<CharT> {};
-	template<typename CharT, size_t N> struct TextTrait<const CharT[N]> : TextTrait<CharT> {};
     // 字符串常量 https://stackoverflow.com/questions/43435279/what-does-const-charan-mean
 	template<typename CharT, size_t N> struct TextTrait<CharT(&)[N]> : TextTrait<CharT> {};
-	template<typename CharT, size_t N> struct TextTrait<const CharT(&)[N]> : TextTrait<CharT> {};
-
 	template<typename CharT> struct TextTrait<std::basic_string<CharT>> : TextTrait<CharT> {};
+    template<typename CharT> struct TextTrait<std::basic_string_view<CharT>> : TextTrait<CharT> {};
 
     // 字符概念
     template<typename T>

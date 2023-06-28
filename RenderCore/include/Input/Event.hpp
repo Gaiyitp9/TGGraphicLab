@@ -7,6 +7,7 @@
 
 #include "Device.hpp"
 #include <unordered_map>
+#include <any>
 
 namespace TG::Input
 {
@@ -24,10 +25,9 @@ namespace TG::Input
     // 输入事件
 	struct Event
 	{
-        DeviceType device   = DeviceType::None;     // 输入设备类型
-		KeyCode key         = KeyCode::None;        // 输入按键码
-		EventType type      = EventType::None;      // 输入事件类型
-        void* data          = nullptr;              // 设备相关数据
+		KeyCode key;        // 输入按键码
+		EventType type;     // 输入事件类型
+        std::any data;      // 设备相关数据
 	};
 
 	struct EventInfo
