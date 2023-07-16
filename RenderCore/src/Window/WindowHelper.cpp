@@ -4,9 +4,9 @@
 * This code is licensed under the MIT License (MIT).			*
 *****************************************************************/
 
-#include "Window/WindowRegister.hpp"
+#include "Window/WindowHelper.hpp"
 #include "Window/Window.hpp"
-#include "Diagnostics/Log.hpp"
+#include "Diagnostics/Win32Exception.hpp"
 #include <unordered_map>
 #include <format>
 
@@ -39,7 +39,7 @@ namespace TG
     }
 
     // 记录不同类型窗口的名称
-    static std::unordered_map<WindowType, wchar_t const*> s_windowClassName;
+    static std::unordered_map<WindowType, wchar_t const*> gs_sWindowClassName;
 
     // 注册窗口类
     static int RegisterWindow()
@@ -61,7 +61,7 @@ namespace TG
         if (RegisterClassExW(&wc) == 0)
             CheckLastError();
 
-        s_windowClassName[WindowType::Default] = L"Default";
+        gs_sWindowClassName[WindowType::Default] = L"Default";
 
         return 0;
     }
@@ -71,7 +71,7 @@ namespace TG
 
     wchar_t const* GetWindowClassName(const WindowType& type)
     {
-        return s_windowClassName.at(type);
+        return gs_sWindowClassName.at(type);
     }
 
     std::string GetWindowMessageInfo(UINT msg, WPARAM wp, LPARAM lp)

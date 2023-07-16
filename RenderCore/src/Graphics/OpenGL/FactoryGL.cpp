@@ -29,8 +29,8 @@ namespace TG::Graphics
         ctxInfo.pfd.cDepthBits = 24;
         ctxInfo.pfd.cStencilBits = 8;
 
-        *ppDevice = DBG_NEW RenderDeviceGL();
-        *ppContext = DBG_NEW DeviceContextGL(ctxInfo);
+        *ppDevice = TG_NEW RenderDeviceGL();
+        *ppContext = TG_NEW DeviceContextGL(ctxInfo);
 
         if (!m_gladInit)
         {

@@ -5,10 +5,7 @@
 *****************************************************************/
 #pragma once
 
-#include "Utility.hpp"
-#include <DbgHelp.h>
-#include <format>
-#include <exception>
+#include "Win32Lean.h"
 #include <string>
 #include <vector>
 

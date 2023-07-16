@@ -5,8 +5,11 @@
 *****************************************************************/
 
 #include "Window/MainWindow.hpp"
+#include "Diagnostics/Win32Exception.hpp"
+#include "Diagnostics/Log.hpp"
 #include "Input/EventData.hpp"
 #include "Utility.hpp"
+#include <format>
 
 namespace TG
 {

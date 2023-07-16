@@ -5,6 +5,10 @@
 *****************************************************************/
 
 #include "Diagnostics/BaseException.hpp"
+#include "Utility.hpp"
+#include <DbgHelp.h>
+#include <format>
+#include <exception>
 
 namespace TG
 {

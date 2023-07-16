@@ -5,7 +5,7 @@
 *****************************************************************/
 #pragma once
 
-#include "KeyCode.hpp"
+#include "Event.hpp"
 
 namespace TG::Input
 {

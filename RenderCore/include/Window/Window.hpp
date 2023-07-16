@@ -5,9 +5,7 @@
 *****************************************************************/
 #pragma once
 
-#include "Window/WindowRegister.hpp"
-#include "Diagnostics/Log.hpp"
-#include "Diagnostics/Win32Exception.hpp"
+#include "Window/WindowHelper.hpp"
 #include <optional>
 
 namespace TG
@@ -40,7 +38,5 @@ namespace TG
 		int m_width, m_height;
 		bool m_destroy = false;				// 是否销毁窗口
         bool m_spyMessage = false;			// 是否监控窗口消息
-
-		friend class WindowRegister;
 	};
 }

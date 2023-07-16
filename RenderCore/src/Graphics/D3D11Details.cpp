@@ -5,6 +5,7 @@
 *****************************************************************/
 
 #include "Graphics/D3D11Details.hpp"
+#include "Diagnostics/Win32Exception.hpp"
 #include <format>
 #include <unordered_map>
 

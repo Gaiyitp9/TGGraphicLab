@@ -5,6 +5,7 @@
 *****************************************************************/
 
 #include "Window/PopupWindow.hpp"
+#include "Diagnostics/Win32Exception.hpp"
 
 namespace TG
 {

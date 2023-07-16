@@ -5,9 +5,9 @@
 *****************************************************************/
 #pragma once
 
-#include "Device.hpp"
 #include <unordered_map>
 #include <any>
+#include "KeyCode.hpp"
 
 namespace TG::Input
 {

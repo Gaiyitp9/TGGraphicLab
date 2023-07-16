@@ -6,7 +6,7 @@
 #pragma once
 
 #include "../Math/Core.hpp"
-#include "Event.hpp"
+#include "Device.hpp"
 #include <bitset>
 
 namespace TG::Input

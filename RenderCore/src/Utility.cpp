@@ -5,6 +5,8 @@
 *****************************************************************/
 
 #include "Utility.hpp"
+#include "Win32Lean.h"
+#include <locale>
 
 namespace TG::Utility
 {

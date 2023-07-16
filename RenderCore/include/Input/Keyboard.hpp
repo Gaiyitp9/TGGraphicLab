@@ -5,7 +5,7 @@
 *****************************************************************/
 #pragma once
 
-#include "Event.hpp"
+#include "Device.hpp"
 #include <bitset>
 
 namespace TG::Input

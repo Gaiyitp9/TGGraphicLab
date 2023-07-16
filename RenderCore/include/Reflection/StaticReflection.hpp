@@ -5,10 +5,10 @@
 *****************************************************************/
 #pragma once
 
-#if defined(_DEBUG) && defined(_WINDOWS)
-#define _CRTDBG_MAP_ALLOC
-#include <crtdbg.h>
-#define TG_NEW new(_NORMAL_BLOCK, __FILE__, __LINE__)
-#else
-#define TG_NEW new
-#endif
+#include <tuple>
+#include <type_traits>
+#include "NamedValue.hpp"
+#include "ElemList.hpp"
+#include "Attribute.hpp"
+#include "AttrList.hpp"
+#include "Field.hpp"

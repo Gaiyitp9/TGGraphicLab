@@ -48,8 +48,8 @@ namespace TG::Graphics
 		CheckHResult(D3D11CreateDevice(pAdapter.get(), D3D_DRIVER_TYPE_UNKNOWN, nullptr, creationFlags,
 			featureLevels, 2, D3D11_SDK_VERSION, d3dDevice.put(), nullptr, d3dContext.put()));
 
-		*ppDevice = DBG_NEW RenderDeviceD3D11(*d3dInfo, d3dDevice, pAdapter);
-		*ppContext = DBG_NEW DeviceContextD3D11(*d3dInfo, d3dContext);
+		*ppDevice = TG_NEW RenderDeviceD3D11(*d3dInfo, d3dDevice, pAdapter);
+		*ppContext = TG_NEW DeviceContextD3D11(*d3dInfo, d3dContext);
 	}
 
 	void FactoryD3D11::CreateSwapChain(IRenderDevice const* pDevice, HWND hwnd, const SwapChainDesc& desc, ISwapChain** ppSwapChain) const
@@ -96,6 +96,6 @@ namespace TG::Graphics
 		winrt::com_ptr<IDXGISwapChain> swapChain;
 		CheckHResult(m_dxgiFactory->CreateSwapChain(d3dDevice->device(), &swapChainDesc, swapChain.put()));
 		
-		*ppSwapChain = DBG_NEW SwapChainD3D11(d3dDevice->device(), swapChain);
+		*ppSwapChain = TG_NEW SwapChainD3D11(d3dDevice->device(), swapChain);
 	}
 }

@@ -5,8 +5,7 @@
 *****************************************************************/
 #pragma once
 
-#include "Win32Lean.h"
-#include <locale>
+#include <string>
 
 namespace TG::Utility
 {
