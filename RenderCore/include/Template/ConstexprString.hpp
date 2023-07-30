@@ -10,31 +10,51 @@
 namespace TG
 {
     // 编译期字符串 compile-time string
-    template<typename CharT, std::size_t N>
+    template<typename Char, std::size_t N>
     struct ConstexprString
     {
-        using CharType = CharT;
-        static constexpr std::size_t Size = N;
+        using CharT = Char;
+        constexpr static std::size_t Size = N;
+        constexpr static std::size_t NPos = static_cast<std::size_t>(-1);
 
-        constexpr explicit ConstexprString(const CharType(&str)[N + 1]) noexcept
+        constexpr ConstexprString() noexcept
+            : data{}
+        {}
+        constexpr explicit ConstexprString(const CharT(&str)[N + 1]) noexcept
             : ConstexprString(str, std::make_index_sequence<N>())
         {}
+        constexpr ConstexprString(const ConstexprString& other) noexcept
+            : ConstexprString(other, std::make_index_sequence<N>())
+        {}
 
-        CharType data[N + 1];
+        constexpr std::basic_string_view<CharT> View() const
+        {
+            return data;
+        }
 
     private:
         template<std::size_t... Idx>
-        constexpr explicit ConstexprString(const CharType *str, std::index_sequence<Idx...>) noexcept
+        constexpr ConstexprString(const char(&str)[sizeof...(Idx) + 1], std::index_sequence<Idx...>) noexcept
             : data{ str[Idx]..., 0}
         {}
+
+        template<std::size_t... Idx>
+        constexpr ConstexprString(const ConstexprString& other, std::index_sequence<Idx...>) noexcept
+            : data{ other.data[Idx]..., 0}
+        {}
+
+        CharT data[N + 1];
     };
 
     template<typename CharT, std::size_t N>
     ConstexprString(const CharT(&)[N])->ConstexprString<CharT, N - 1>;
 
-    template<ConstexprString str>
-    struct TStr
+    template<typename CharL, std::size_t M, typename CharR, std::size_t N>
+    constexpr bool operator==(const ConstexprString<CharL, M>& lhs, const ConstexprString<CharR, N>& rhs)
     {
-        using CharType = typename decltype(str)::CharType;
-    };
+        if constexpr (!std::is_same_v<CharL, CharR> || N != M)
+            return false;
+        else
+            return lhs.View() == rhs.View();
+    }
 }

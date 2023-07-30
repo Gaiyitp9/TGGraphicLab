@@ -10,7 +10,7 @@
 
 namespace TG::Utility
 {
-	std::wstring AnsiToWideString(const std::string& str)
+	std::wstring Utf8ToUtf16(const std::string& str)
 	{
 		int length = MultiByteToWideChar(CP_UTF8, 0, str.c_str(), -1, nullptr, 0);
 		auto* wide = static_cast<wchar_t*>(malloc(length * sizeof(wchar_t)));
@@ -20,10 +20,10 @@ namespace TG::Utility
 		return wstr;
 	}
 
-	std::string WideStringToAnsi(const std::wstring& wstr)
+	std::string Utf16ToUtf8(const std::wstring& wstr)
 	{
 		int length = WideCharToMultiByte(CP_UTF8, 0, wstr.c_str(), -1, nullptr, 0, nullptr, nullptr);
-		char* ansi = static_cast<char*>(malloc(length * sizeof(char)));
+		auto* ansi = static_cast<char*>(malloc(length * sizeof(char)));
 		WideCharToMultiByte(CP_UTF8, 0, wstr.c_str(), -1, ansi, length, nullptr, nullptr);
 		std::string str(ansi);
 		free(ansi);

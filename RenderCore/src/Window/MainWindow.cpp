@@ -60,7 +60,7 @@ namespace TG
 	{
 		// 是否监控窗口消息
 		if (m_spyMessage)
-			Debug::LogLine(std::format("{:<16} {}", Utility::WideStringToAnsi(m_name), GetWindowMessageInfo(msg, wParam, lParam)));
+			Debug::LogLine(std::format("{:<16} {}", Utility::Utf16ToUtf8(m_name), GetWindowMessageInfo(msg, wParam, lParam)));
 
 		switch (msg)
 		{

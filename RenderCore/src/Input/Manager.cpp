@@ -41,11 +41,11 @@ namespace TG::Input
         m_devices[device]->Receive(event);
     }
 
-	void Manager::Update()
+	void Manager::PreUpdate()
 	{
         // 更新设备状态
         for (std::pair<const Input::DeviceType, std::unique_ptr<Device>>& d : m_devices)
-            d.second->Update();
+            d.second->PreUpdate();
 	}
 
 	bool Manager::GetKey(KeyCode key) const

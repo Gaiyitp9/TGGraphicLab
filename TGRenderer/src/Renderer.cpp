@@ -25,6 +25,7 @@ namespace TG
 		// 编码设置为UTF-8
 		m_locale = std::locale(".utf8");
 		std::wcout.imbue(m_locale);
+		std::cout.imbue(m_locale);
 
 		// 获取当前显示器的宽和高
 		m_screenWidth = GetSystemMetrics(SM_CXSCREEN);
@@ -64,7 +65,7 @@ namespace TG
 		//m_windows[L"辅助窗口"] = std::make_shared<PopupWindow>((m_screenWidth - 400) / 2, (m_screenHeight - 300) / 2,
 		//	400, 300, m_windows[L"天工渲染器"]);
 
-		//throw TG::WinAPIException(E_OUTOFMEMORY);
+//		throw TG::Win32Exception(E_OUTOFMEMORY);
 		m_unitTest.FormatTest();
 		m_unitTest.TextEncodeTest();
 		m_unitTest.TimeTest();
@@ -75,10 +76,9 @@ namespace TG
 
 		while (true)
 		{
+            m_input.PreUpdate();
 			if (const auto code = Window::ProcessMessage())
 				return *code;
-
-            m_input.Update();
 
 			/*auto it = m_windows.begin();
 			while (it != m_windows.end())

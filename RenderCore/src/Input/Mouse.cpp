@@ -15,7 +15,7 @@ namespace TG::Input
 
 	Mouse::~Mouse() = default;
 
-	void Mouse::Update()
+	void Mouse::PreUpdate()
 	{
 		mouseDown.reset();
 		mouseUp.reset();
@@ -67,23 +67,23 @@ namespace TG::Input
 
     bool Mouse::GetKey(KeyCode k)
     {
-        auto pos = static_cast<size_t>(k);
+        auto pos = static_cast<std::size_t>(k);
         return mouseHold.test(pos);
     }
 
     bool Mouse::GetKeyDown(KeyCode k)
     {
-        auto pos = static_cast<size_t>(k);
+        auto pos = static_cast<std::size_t>(k);
         return mouseDown.test(pos);
     }
 
     bool Mouse::GetKeyUp(KeyCode k)
     {
-        auto pos = static_cast<size_t>(k);
+        auto pos = static_cast<std::size_t>(k);
         return mouseUp.test(pos);
     }
 
-	void Mouse::SpyMouseEvent(Event e)
+	void Mouse::SpyMouseEvent(const Event& e)
 	{
         Debug::Log(std::format("Key: {:<20} Event: {:<20} ", EventInfo::keysName[e.key], EventInfo::eventTypes[e.type]));
 		switch (e.type)

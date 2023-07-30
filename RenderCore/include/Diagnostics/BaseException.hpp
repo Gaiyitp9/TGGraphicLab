@@ -33,7 +33,7 @@ namespace TG
 		std::wstring m_description;										// 异常描述
 		std::vector<StackFrame> m_stackFrameInfo;						// 栈帧信息
 		constexpr static wchar_t const* Separator =						// 分隔符
-			L"\n-----------------------------------------------\n";	
+			L"\n-----------------------------------------------\n";
 
 	private:
 		void StackTrace();												// 追踪栈帧信息

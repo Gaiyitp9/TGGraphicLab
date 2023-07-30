@@ -7,8 +7,13 @@
 
 #include <tuple>
 #include <type_traits>
-#include "NamedValue.hpp"
-#include "ElemList.hpp"
+#include <string_view>
+#include "NameValuePair.hpp"
+#include "FieldList.hpp"
 #include "Attribute.hpp"
-#include "AttrList.hpp"
 #include "Field.hpp"
+
+namespace TG::Reflection
+{
+    template<typename T> struct TypeInfo;
+}

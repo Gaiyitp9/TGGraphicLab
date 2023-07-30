@@ -30,9 +30,6 @@ void TemplateTest()
 {
     constexpr ConstexprString cstr("what");
     constexpr ConstexprString cstr2("whdt");
-    Test(cstr, cstr2);
-    TStr<cstr> tstr;
-    TStr<cstr2> tstr2;
 //    TStr<"what"> tstr3;
 //    Test(tstr, tstr3);
 

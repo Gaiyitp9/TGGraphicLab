@@ -16,7 +16,7 @@ namespace TG::Input
 
 	Keyboard::~Keyboard() = default;
 
-	void Keyboard::Update()
+	void Keyboard::PreUpdate()
 	{
 		m_keyDown.reset();
 		m_keyUp.reset();

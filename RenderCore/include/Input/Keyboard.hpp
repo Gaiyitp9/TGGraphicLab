@@ -16,7 +16,7 @@ namespace TG::Input
 		Keyboard();
 		~Keyboard() override;
 
-		void Update() override;							// 分析事件队列，设置各种状态
+		void PreUpdate() override;
         void Receive(const Event& e) override;
         void SpyEvent(bool enable) override;
 		bool GetKey(KeyCode k) override;

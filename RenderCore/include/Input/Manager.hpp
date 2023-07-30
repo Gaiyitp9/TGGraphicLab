@@ -22,7 +22,7 @@ namespace TG::Input
         Manager& operator=(Manager&&) = delete;
 		~Manager();
 
-		void Update();                                                          // 更新各种输入设备的状态
+		void PreUpdate();                                                       // 更新各种输入设备的状态
 
         void AddDevice(DeviceType type);                                        // 添加输入设备
         void RemoveDevice(DeviceType type);                                     // 移除输入设备

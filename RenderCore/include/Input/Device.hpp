@@ -26,7 +26,7 @@ namespace TG::Input
     {
         virtual ~Device() = default;
 
-        virtual void Update() = 0;                  // 更新设备状态
+        virtual void PreUpdate() = 0;               // 更新设备状态
         virtual void Receive(const Event& e) = 0;   // 接收输入事件
         virtual void SpyEvent(bool enable) = 0;     // 监控输入事件
         virtual bool GetKey(KeyCode k) = 0;

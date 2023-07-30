@@ -9,8 +9,8 @@
 
 namespace TG::Utility
 {
-    std::wstring AnsiToWideString(const std::string &str);
-    std::string WideStringToAnsi(const std::wstring &wstr);
+    std::wstring Utf8ToUtf16(const std::string &str);
+    std::string Utf16ToUtf8(const std::wstring &wstr);
     std::string ToLower(const std::string &str);
     std::wstring ToLower(const std::wstring &wstr);
     std::string GetBasePath(const std::string &str);

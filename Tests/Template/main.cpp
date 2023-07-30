@@ -1,5 +1,6 @@
 #include <type_traits>
 #include <iostream>
+#include <tuple>
 #include "Template/ConstexprString.hpp"
 
 template<typename T>
@@ -99,6 +100,36 @@ void HasSpecificFuncTest(T t, Nums... nums)
     (t.template SpecificFunc(nums), ...);
 }
 
+template<char c>
+struct TypeContainer
+{
+
+};
+
+template<int N>
+constexpr int Sum()
+{
+    int sum = 0;
+    for (int i = 0; i < N; ++i)
+        sum += i;
+    return sum;
+}
+
+template<std::size_t N0, std::size_t... Ns>
+void IntList(std::index_sequence<N0, Ns...>)
+{
+    std::cout << N0 << ' ';
+    ((std::cout << Ns << ' '), ...);
+    std::cout << std::endl;
+}
+
+template<std::size_t... Ns>
+void IntList2(std::index_sequence<Ns...>)
+{
+    ((std::cout << Ns << ' '), ...);
+    std::cout << std::endl;
+}
+
 int main()
 {
     // [const] [volatile] <type> [*|&] [[N]]碰到T，会退化(decay)为 <type> [*](当类型为指针或数组时)
@@ -164,6 +195,20 @@ int main()
     NonDefaultConstructorObj obj1(4);
     NonDefaultConstructorObj2 obj2(5);
     HasSpecificFuncTest(s, obj0, obj1, obj2);
+
+    //-----------------------------------------------------------------------------------------------
+    // 测试decltype
+    std::tuple<int, float, TypeContainer<'a'>> types;
+    std::cout << typeid(decltype(std::get<2>(types))).name() << std::endl;
+
+    //-----------------------------------------------------------------------------------------------
+    // 编译期for测试
+    // for的i不能用在模板参数上
+    static_assert(Sum<5>() == 10);
+
+    //-----------------------------------------------------------------------------------------------
+    IntList(std::make_index_sequence<1>());
+    IntList2(std::make_index_sequence<0>());
 
     return 0;
 }

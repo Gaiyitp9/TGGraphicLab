@@ -12,7 +12,7 @@ namespace TG
 	class Win32Exception : public BaseException
 	{
 	public:
-		explicit Win32Exception(HRESULT hr, const std::wstring& description = L"");
+		explicit Win32Exception(HRESULT hr, const std::wstring &description = L"No Description");
 		~Win32Exception() override;
 
 		char const* what() const override;

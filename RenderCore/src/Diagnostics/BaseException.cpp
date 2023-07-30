@@ -9,6 +9,7 @@
 #include <DbgHelp.h>
 #include <format>
 #include <exception>
+#include <utility>
 
 namespace TG
 {
@@ -37,10 +38,10 @@ namespace TG
 		for (const auto& info : m_stackFrameInfo)
 		{
 			wWhatBuffer += std::format(L"Frame: {}\nFile: {}\nFunction: {}\nLine: {}",
-				info.index, info.file, info.function, info.line);
+										info.index, info.file, info.function, info.line);
 			wWhatBuffer += Separator;
 		}
-		m_whatBuffer = Utility::WideStringToAnsi(wWhatBuffer);
+		m_whatBuffer = Utility::Utf16ToUtf8(wWhatBuffer);
 		return m_whatBuffer.c_str();
 	}
 

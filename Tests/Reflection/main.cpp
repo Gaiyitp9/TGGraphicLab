@@ -6,25 +6,48 @@
 #include <utility>
 #include <iostream>
 
-template<std::size_t N0, std::size_t... Ns>
-void IntList(std::index_sequence<N0, Ns...>)
-{
-    std::cout << N0 << ' ';
-    ((std::cout << Ns << ' '), ...);
-    std::cout << std::endl;
-}
+using namespace TG::Reflection;
 
-template<std::size_t... Ns>
-void IntList2(std::index_sequence<Ns...>)
+struct Vector
 {
-    ((std::cout << Ns << ' '), ...);
-    std::cout << std::endl;
-}
+    float x;
+    float y;
+    float norm() const
+    {
+        return std::sqrt(x * x + y * y);
+    }
+};
+
+template<>
+struct TG::Reflection::TypeInfo<Vector>
+{
+    constexpr static AttributeList<> Attrs;
+    constexpr static FieldList Fields = FieldList{
+            Field{ConstexprString("x"), &Vector::x},
+            Field{ConstexprString("y"), &Vector::y},
+            Field{ConstexprString("norm"), &Vector::norm},
+    };
+};
+
+template<std::size_t M>
+struct Test1
+{
+//    template<std::size_t N>
+//    constexpr operator==(Test)
+};
 
 int main(int argc, const char **argv)
 {
 //    return ClangASTTest(argc, argv);
 //    TemplateTest();
-    IntList2(std::make_index_sequence<0>());
+
+    Vector v{1.0f, 2.0f};
+    TG::Reflection::TypeInfo<Vector>::Fields.ForEach([](const auto& field) {
+        std::cout << field.name.View() << std::endl;
+    });
+
+    constexpr std::size_t index = TG::Reflection::TypeInfo<Vector>::Fields.Find(ConstexprString("x"));
+    std::invoke(TG::Reflection::TypeInfo<Vector>::Fields.Get<index>().value, v) = 4.f;
+    std::cout << v.x << std::endl;
     return 0;
 }

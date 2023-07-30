@@ -18,7 +18,7 @@ namespace TG::Input
 		Mouse();
 		~Mouse() override;
 
-		void Update() override;
+		void PreUpdate() override;
         void Receive(const Event& e) override;
         void SpyEvent(bool enable) override;
         bool GetKey(KeyCode k) override;
@@ -32,7 +32,7 @@ namespace TG::Input
         [[nodiscard]] short WheelDelta() const noexcept { return static_cast<short>(m_wheelDelta / WHEEL_DELTA); }
 
 	private:
-		void SpyMouseEvent(Event e);
+		void SpyMouseEvent(const Event& e);
 
 	public:
 		std::bitset<8> mouseHold;       // 按键状态(是否被按下)
