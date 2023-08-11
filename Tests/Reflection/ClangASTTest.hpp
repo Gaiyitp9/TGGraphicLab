@@ -6,6 +6,7 @@
 #include "clang/Frontend/CompilerInstance.h"
 #include "clang/AST/RecursiveASTVisitor.h"
 #include "clang/ASTMatchers/ASTMatchFinder.h"
+#include "clang/Frontend/FrontendActions.h"
 #include <iostream>
 
 using namespace clang;
@@ -142,15 +143,15 @@ int ClangASTTest(int argc, const char **argv)
     ClangTool tool(optionsParser.getCompilations(),
                    optionsParser.getSourcePathList());
 
-    StatementMatcher loopMatcher =
-            forStmt(hasLoopInit(declStmt(hasSingleDecl(varDecl(
-                    hasInitializer(integerLiteral(equals(0)))))))).bind("forLoop");
-
+//    StatementMatcher loopMatcher =
+//            forStmt(hasLoopInit(declStmt(hasSingleDecl(varDecl(
+//                    hasInitializer(integerLiteral(equals(0)))))))).bind("forLoop");
+//
     DeclarationMatcher classMatcher = cxxRecordDecl(hasAttr(attr::Annotate)).bind("id");
     DeclarationMatcher fieldMatcher = fieldDecl(hasAttr(attr::Annotate)).bind("id");
     DeclarationMatcher functionMatcher = functionDecl(hasAttr(attr::Annotate)).bind("id");
-
-    LoopPrinter printer;
+//
+//    LoopPrinter printer;
     AnnotatePrinter printer2;
     MatchFinder finder;
     //    finder.addMatcher(loopMatcher, &printer);
@@ -158,7 +159,8 @@ int ClangASTTest(int argc, const char **argv)
     finder.addMatcher(fieldMatcher, &printer2);
     finder.addMatcher(functionMatcher, &printer2);
 
-    //    return tool.run(newFrontendActionFactory(&finder).get());
+//    return tool.run(newFrontendActionFactory<clang::SyntaxOnlyAction>().get());
+//    return tool.run(newFrontendActionFactory(&finder).get());
     //    return tool.run(newFrontendActionFactory<DumpAstAction>().get());
     return tool.run(newFrontendActionFactory<CustomAction>().get());
     //    runToolOnCode(std::make_unique<FindNamedClassAction>(), argv[1]);

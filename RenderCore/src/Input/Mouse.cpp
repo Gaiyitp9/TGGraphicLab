@@ -15,25 +15,28 @@ namespace TG::Input
 
 	Mouse::~Mouse() = default;
 
-	void Mouse::PreUpdate()
+	void Mouse::Update()
 	{
-		mouseDown.reset();
-		mouseUp.reset();
+		m_mouseDown.reset();
+		m_mouseUp.reset();
         m_wheelDelta = 0;
 	}
 
     void Mouse::Receive(const Event& e)
     {
-        auto key = static_cast<size_t>(e.key);
+        // 碰到非鼠标按键直接返回
+        if (!IsMouseKey(e.key)) return;
+
+        auto key = static_cast<std::size_t>(e.key);
         switch (e.type)
         {
             case EventType::Press:
-                mouseDown[key] = true;
-                mouseHold[key] = true;
+                m_mouseDown[key] = true;
+                m_mouseHold[key] = true;
                 break;
             case EventType::Release:
-                mouseUp[key] = true;
-                mouseHold[key] = false;
+                m_mouseUp[key] = true;
+                m_mouseHold[key] = false;
                 break;
             case EventType::MouseMove:
             {
@@ -56,31 +59,37 @@ namespace TG::Input
         }
 
         // 监控鼠标
-        if (m_spyMouse)
+        if (m_spyEvent)
             SpyMouseEvent(e);
     }
 
     void Mouse::SpyEvent(bool enable)
     {
-        m_spyMouse = enable;
+        m_spyEvent = enable;
     }
 
-    bool Mouse::GetKey(KeyCode k)
+    bool Mouse::GetKey(KeyCode k) const
     {
+        if (!IsMouseKey(k)) return false;
+
         auto pos = static_cast<std::size_t>(k);
-        return mouseHold.test(pos);
+        return m_mouseHold.test(pos);
     }
 
-    bool Mouse::GetKeyDown(KeyCode k)
+    bool Mouse::GetKeyDown(KeyCode k) const
     {
+        if (!IsMouseKey(k)) return false;
+
         auto pos = static_cast<std::size_t>(k);
-        return mouseDown.test(pos);
+        return m_mouseDown.test(pos);
     }
 
-    bool Mouse::GetKeyUp(KeyCode k)
+    bool Mouse::GetKeyUp(KeyCode k) const
     {
+        if (!IsMouseKey(k)) return false;
+
         auto pos = static_cast<std::size_t>(k);
-        return mouseUp.test(pos);
+        return m_mouseUp.test(pos);
     }
 
 	void Mouse::SpyMouseEvent(const Event& e)

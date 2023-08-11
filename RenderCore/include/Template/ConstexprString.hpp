@@ -49,6 +49,7 @@ namespace TG
     template<typename CharT, std::size_t N>
     ConstexprString(const CharT(&)[N])->ConstexprString<CharT, N - 1>;
 
+    // 不能定义在ConstexprString内部，因为如果==两边字符串的CharT或者N不同，编译器无法确定使用哪一边的字符串推导CharT和N，导致无法推导模板参数
     template<typename CharL, std::size_t M, typename CharR, std::size_t N>
     constexpr bool operator==(const ConstexprString<CharL, M>& lhs, const ConstexprString<CharR, N>& rhs)
     {

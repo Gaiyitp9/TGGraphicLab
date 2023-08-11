@@ -6,24 +6,24 @@
 #pragma once
 
 #include "../Math/Core.hpp"
-#include "Device.hpp"
+#include "Event.hpp"
 #include <bitset>
 
 namespace TG::Input
 {
     // 鼠标
-	class Mouse : public Device
+	class Mouse
 	{
 	public:
 		Mouse();
-		~Mouse() override;
+		~Mouse();
 
-		void PreUpdate() override;
-        void Receive(const Event& e) override;
-        void SpyEvent(bool enable) override;
-        bool GetKey(KeyCode k) override;
-        bool GetKeyDown(KeyCode k) override;
-        bool GetKeyUp(KeyCode k) override;
+		void Update();
+        void Receive(const Event& e);
+        void SpyEvent(bool enable);
+        [[nodiscard]] bool GetKey(KeyCode k) const;
+        [[nodiscard]] bool GetKeyDown(KeyCode k) const;
+        [[nodiscard]] bool GetKeyUp(KeyCode k) const;
 
         [[nodiscard]] const Math::Vector2i& Position() const noexcept { return m_position; }
         // 鼠标滚轮变化值是WHEEL_DELTA的整数倍
@@ -32,16 +32,22 @@ namespace TG::Input
         [[nodiscard]] short WheelDelta() const noexcept { return static_cast<short>(m_wheelDelta / WHEEL_DELTA); }
 
 	private:
+        static bool IsMouseKey(KeyCode k)
+        {
+            auto key = static_cast<std::size_t>(k);
+            if (key <= 0x04)
+                return true;
+            return false;
+        }
+
 		void SpyMouseEvent(const Event& e);
 
-	public:
-		std::bitset<8> mouseHold;       // 按键状态(是否被按下)
-		std::bitset<8> mouseDown;       // 按键是否刚刚按下
-		std::bitset<8> mouseUp;         // 按键是否刚刚松开
+		std::bitset<8> m_mouseHold;     // 按键状态(是否被按下)
+		std::bitset<8> m_mouseDown;     // 按键是否刚刚按下
+		std::bitset<8> m_mouseUp;       // 按键是否刚刚松开
 
-	private:
-		Math::Vector2i m_position;      // 鼠标位置
+        Math::Vector2i m_position{0, 0};      // 鼠标位置
 		short m_wheelDelta = 0;         // 滚轮变化值，正值表示向前滚动，远离使用者；负值表示向后滚动，朝向使用者
-        bool m_spyMouse = false;
+        bool m_spyEvent = false;
 	};
 }

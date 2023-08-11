@@ -130,6 +130,15 @@ void IntList2(std::index_sequence<Ns...>)
     std::cout << std::endl;
 }
 
+template<std::size_t N0, std::size_t... Ns>
+void IntList3(std::index_sequence<N0, Ns...>)
+{
+    std::cout << N0 << ' ';
+    if constexpr (sizeof...(Ns) > 0)
+        IntList3(std::index_sequence<Ns...>());
+    std::cout << std::endl;
+}
+
 int main()
 {
     // [const] [volatile] <type> [*|&] [[N]]碰到T，会退化(decay)为 <type> [*](当类型为指针或数组时)
@@ -209,6 +218,7 @@ int main()
     //-----------------------------------------------------------------------------------------------
     IntList(std::make_index_sequence<1>());
     IntList2(std::make_index_sequence<0>());
+    IntList3(std::make_index_sequence<3>());
 
     return 0;
 }

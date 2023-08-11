@@ -77,6 +77,9 @@ namespace TG::Reflection
             if (func(Get<N0>()))
                 return N0;
             // 一定要用if constexpr，否则无法匹配到FindIF函数
+            // std::index_sequence只能在编译期使用，所以一定要用if constexpr，不能用if
+            // 如果用if，那么Ns...就会一直展开到std::index_sequence<>，导致无法推导std::index_sequence<N0, Ns...>的N0
+            // 如果用if constexpr，那么只会展开到std::index_sequence<N0>，Ns...为空
             if constexpr (sizeof...(Ns) > 0)
                 return FindIf(func, std::index_sequence<Ns...>());
 

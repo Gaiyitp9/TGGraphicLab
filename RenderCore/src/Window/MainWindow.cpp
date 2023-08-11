@@ -109,7 +109,7 @@ namespace TG
             if (m_listener)
             {
                 Input::KeyboardData data{static_cast<char>(wParam)};
-                m_listener({Input::KeyCode::None, Input::EventType::Char, data});
+                m_listener({Input::KeyCode::Char, Input::EventType::Char, data});
             }
 			return 0;
         }

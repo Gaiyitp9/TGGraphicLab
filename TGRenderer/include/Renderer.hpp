@@ -15,6 +15,8 @@
 #include "GraphicsLayer.hpp"
 #include "Graphics/OpenGL/FactoryGL.hpp"
 #include "glad/wgl.h"
+#include "Input/Mouse.hpp"
+#include "Input/Keyboard.hpp"
 
 namespace TG
 {
@@ -32,7 +34,7 @@ namespace TG
 		std::locale m_locale;               // 语言区域
 		MainWindow m_mainWindow;            // 主窗口
         Chronometer m_timer;                // 高精度计时器
-        Input::Manager m_input;             // 输入管理器
+        Input::Manager<Input::Mouse, Input::Keyboard> m_input;           // 输入管理器，使用鼠标和键盘输入
 		//std::unique_ptr<Graphics::GraphicsLayer> d3d11Layer;
         Graphics::FactoryGL m_factory;
         std::unique_ptr<Graphics::RenderDeviceGL> m_device;

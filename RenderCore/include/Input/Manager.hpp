@@ -6,37 +6,113 @@
 #pragma once
 
 #include "Event.hpp"
-#include "DeviceFactory.hpp"
-#include <queue>
+#include <tuple>
 
 namespace TG::Input
 {
-    // 输入管理器
+    // 输入设备管理器
+    template<typename... Devices> requires (sizeof...(Devices) > 0)
     class Manager
 	{
+        constexpr static std::size_t Count = sizeof...(Devices);
+
 	public:
-        Manager();
+        Manager() = default;
         Manager(const Manager&) = delete;
         Manager(Manager&&) = delete;
         Manager& operator=(const Manager&) = delete;
         Manager& operator=(Manager&&) = delete;
-		~Manager();
+		~Manager() = default;
 
-		void PreUpdate();                                                       // 更新各种输入设备的状态
-
-        void AddDevice(DeviceType type);                                        // 添加输入设备
-        void RemoveDevice(DeviceType type);                                     // 移除输入设备
-        void Dispatch(const Event& event);                                      // 分发输入事件
-
-        void SpyInputEvent(bool enable, DeviceType type = DeviceType::None);    // 是否监控输入事件
-		[[nodiscard]] bool GetKey(KeyCode key) const;		                    // 是否按住按键
-		[[nodiscard]] bool GetKeyDown(KeyCode key) const;	                    // 是否按下按键
-		[[nodiscard]] bool GetKeyUp(KeyCode key) const;		                    // 是否释放按键
+        // 更新各种输入设备的状态
+		void Update() { Update<0>(); }
+        // 广播输入事件
+        void Broadcast(const Event& event) { Broadcast<0>(event); }
+        // 监控输入事件
+        void SpyEvent(bool enable) { SpyEvent<0>(enable); }
+        // 监控指定设备的输入事件
+        template<typename Device>
+        void SpyEvent(bool enable)
+        {
+            constexpr std::size_t index = DeviceIndex<Device, 0>();
+            if constexpr (index != static_cast<std::size_t>(-1))
+                std::get<index>(m_devices).SpyEvent(enable);
+        }
+        // 是否按住按键
+		[[nodiscard]] bool GetKey(KeyCode key) const { return GetKey<0>(key); }
+        // 是否按下按键
+		[[nodiscard]] bool GetKeyDown(KeyCode key) const { return GetKeyDown<0>(key); }
+        // 是否释放按键
+		[[nodiscard]] bool GetKeyUp(KeyCode key) const { return GetKeyUp<0>(key); }
 
     private:
-        static DeviceType GetDeviceType(KeyCode key);                           // 根据按键码获取设备类型
+        template<typename Device, std::size_t N>
+        [[nodiscard]] consteval static std::size_t DeviceIndex()
+        {
+            if constexpr (N == Count)
+                return static_cast<std::size_t>(-1);
+            else if constexpr (std::is_same_v<Device, std::tuple_element_t<N, std::tuple<Devices...>>>)
+                return N;
+            else
+                return DeviceIndex<Device, N + 1>();
+        }
+
+        // 编译期展开tuple
+        template<std::size_t N>
+        void Update()
+        {
+            if constexpr (N < Count)
+            {
+                std::get<N>(m_devices).Update();
+                Update<N + 1>();
+            }
+        }
+
+        template<std::size_t N>
+        void Broadcast(const Event& event)
+        {
+            if constexpr (N < Count)
+            {
+                std::get<N>(m_devices).Receive(event);
+                Broadcast<N + 1>(event);
+            }
+        }
+
+        template<std::size_t N>
+        void SpyEvent(bool enable)
+        {
+            if constexpr (N < Count)
+            {
+                std::get<N>(m_devices).SpyEvent(enable);
+                SpyEvent<N + 1>(enable);
+            }
+        }
+
+        template<std::size_t N>
+        [[nodiscard]] bool GetKey(KeyCode key) const
+        {
+            if constexpr (N < Count)
+                return std::get<N>(m_devices).GetKey(key) || GetKey<N + 1>(key);
+            return false;
+        }
+
+        template<std::size_t N>
+        [[nodiscard]] bool GetKeyDown(KeyCode key) const
+        {
+            if constexpr (N < Count)
+                return std::get<N>(m_devices).GetKeyDown(key) || GetKeyDown<N + 1>(key);
+            return false;
+        }
+
+        template<std::size_t N>
+        [[nodiscard]] bool GetKeyUp(KeyCode key) const
+        {
+            if constexpr (N < Count)
+                return std::get<N>(m_devices).GetKeyUp(key) || GetKeyUp<N + 1>(key);
+            return false;
+        }
 
 	private:
-        std::unordered_map<DeviceType, std::unique_ptr<Device>> m_devices;      // 输入设备列表
+        std::tuple<Devices...> m_devices;       // 输入设备
 	};
 }

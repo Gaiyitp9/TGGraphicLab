@@ -31,17 +31,15 @@ namespace TG
 		m_screenWidth = GetSystemMetrics(SM_CXSCREEN);
         m_screenHeight = GetSystemMetrics(SM_CYSCREEN);
 
-        // windows平台上使用鼠标和键盘输入
-        m_input.AddDevice(Input::DeviceType::Mouse);
-        m_input.AddDevice(Input::DeviceType::Keyboard);
-        m_input.SpyInputEvent(true);
-
         // 主窗口设置
         m_mainWindow.SetIcon(L"D:\\ComputerScience\\ComputerGraphics\\Projects\\TGRenderLab\\TGRenderer\\maple-leaf.ico");
         m_mainWindow.SetInputListener([&input = m_input](const Input::Event &evt)
-                                      { input.Dispatch(evt); });
+                                      { input.Broadcast(evt); });
         m_mainWindow.SetStateCallback([&timer=m_timer](){ timer.Start(); }, [&timer=m_timer](){ timer.Pause(); });
         m_mainWindow.SpyMessage(false);
+
+        m_input.SpyEvent<Input::Mouse>(true);
+        m_input.SpyEvent<Input::Keyboard>(true);
 
         // 初始化opengl
         Graphics::GLCreateInfo info { 0, m_mainWindow.Hwnd()};
@@ -76,7 +74,7 @@ namespace TG
 
 		while (true)
 		{
-            m_input.PreUpdate();
+            m_input.Update();
 			if (const auto code = Window::ProcessMessage())
 				return *code;
 

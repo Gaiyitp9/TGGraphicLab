@@ -16,7 +16,7 @@ namespace TG::Input
 
 	Keyboard::~Keyboard() = default;
 
-	void Keyboard::PreUpdate()
+	void Keyboard::Update()
 	{
 		m_keyDown.reset();
 		m_keyUp.reset();
@@ -24,6 +24,8 @@ namespace TG::Input
 
     void Keyboard::Receive(const Event &e)
     {
+        if (!IsKeyBoardKey(e.key)) return;
+
         auto key = static_cast<size_t>(e.key);
         switch (e.type)
         {
@@ -53,31 +55,38 @@ namespace TG::Input
                 break;
         }
 
-        if (m_spyKeyboard && EventInfo::keysName.contains(e.key) && EventInfo::eventTypes.contains(e.type))
+        if (m_spyEvent && EventInfo::keysName.contains(e.key) && EventInfo::eventTypes.contains(e.type))
         {
-            Debug::LogLine(std::format("Key: {:<20} Event: {:<20} ", EventInfo::keysName.at(e.key), EventInfo::eventTypes.at(e.type)));
+            Debug::LogLine(std::format("Key: {:<20} Event: {:<20} ", EventInfo::keysName.at(e.key),
+                                       EventInfo::eventTypes.at(e.type)));
         }
     }
 
     void Keyboard::SpyEvent(bool enable)
     {
-        m_spyKeyboard = enable;
+        m_spyEvent = enable;
     }
 
-    bool Keyboard::GetKey(KeyCode k)
+    bool Keyboard::GetKey(KeyCode k) const
     {
+        if (!IsKeyBoardKey(k)) return false;
+
         auto pos = static_cast<size_t>(k);
         return m_keyHold.test(pos);
     }
 
-    bool Keyboard::GetKeyDown(KeyCode k)
+    bool Keyboard::GetKeyDown(KeyCode k) const
     {
+        if (!IsKeyBoardKey(k)) return false;
+
         auto pos = static_cast<size_t>(k);
         return m_keyDown.test(pos);
     }
 
-    bool Keyboard::GetKeyUp(KeyCode k)
+    bool Keyboard::GetKeyUp(KeyCode k) const
     {
+        if (!IsKeyBoardKey(k)) return false;
+
         auto pos = static_cast<size_t>(k);
         return m_keyUp.test(pos);
     }
