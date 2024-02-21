@@ -5,18 +5,18 @@
 *****************************************************************/
 #pragma once
 
-#include "Window/MainWindow.hpp"
-#include "Window/PopupWindow.hpp"
+#include "Editor/MainWindow.h"
+#include "Editor/PopupWindow.h"
 #include "Input/Manager.hpp"
-#include "Chronometer.hpp"
+#include "Chronometer.h"
 #include "UnitTest.hpp"
 #include <locale>
 #include <unordered_map>
 #include "GraphicsLayer.hpp"
 #include "Graphics/OpenGL/FactoryGL.hpp"
 #include "glad/wgl.h"
-#include "Input/Mouse.hpp"
-#include "Input/Keyboard.hpp"
+#include "Input/Mouse.h"
+#include "Input/Keyboard.h"
 
 namespace TG
 {

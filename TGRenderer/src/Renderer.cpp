@@ -5,7 +5,7 @@
 *****************************************************************/
 
 #include "Renderer.hpp"
-#include "Diagnostics/Win32Exception.hpp"
+#include "Diagnostics/Win32Exception.h"
 
 namespace TG
 {
@@ -102,6 +102,7 @@ namespace TG
             glClearColor(color.r(), color.g(), color.b(), color.a());
             glClear(GL_COLOR_BUFFER_BIT);
             SwapBuffers(m_context->m_hdc);
+            std::cout << std::flush;
 		}
 	}
 }

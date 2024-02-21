@@ -62,7 +62,7 @@ string_type trim(const string_type& s) {
 template <typename string_type>
 string_type html_escape(const string_type& s) {
     string_type ret;
-    ret.reserve(s.size()*2);
+    ret.reserve(s.Size() * 2);
     for (const auto ch : s) {
         switch (ch) {
             case '&':
@@ -457,7 +457,7 @@ public:
 
     virtual const basic_data<string_type>* get(const string_type& name) const override {
         // process {{.}} name
-        if (name.size() == 1 && name.at(0) == '.') {
+        if (name.Size() == 1 && name.at(0) == '.') {
             return items_.front();
         }
         if (name.find('.') == string_type::npos) {
@@ -609,12 +609,12 @@ public:
     }
 
     bool is_newline() const {
-        return is_text() && ((text.size() == 2 && text[0] == '\r' && text[1] == '\n') ||
-        (text.size() == 1 && (text[0] == '\n' || text[0] == '\r')));
+        return is_text() && ((text.Size() == 2 && text[0] == '\r' && text[1] == '\n') ||
+                             (text.Size() == 1 && (text[0] == '\n' || text[0] == '\r')));
     }
 
     bool is_non_newline_whitespace() const {
-        return is_text() && !is_newline() && text.size() == 1 && (text[0] == ' ' || text[0] == '\t');
+        return is_text() && !is_newline() && text.Size() == 1 && (text[0] == ' ' || text[0] == '\t');
     }
 
     void walk_children(const walk_callback& callback) {
@@ -657,7 +657,7 @@ private:
         using streamstring = std::basic_ostringstream<typename string_type::value_type>;
 
         const string_type brace_delimiter_end_unescaped(3, '}');
-        const string_size_type input_size{input.size()};
+        const string_size_type input_size{input.Size()};
 
         bool current_delimiter_is_brace{ctx.delim_set.is_default()};
 
@@ -688,7 +688,7 @@ private:
         for (string_size_type input_position = 0; input_position != input_size;) {
             bool parse_tag = false;
 
-            if (input.compare(input_position, ctx.delim_set.begin.size(), ctx.delim_set.begin) == 0) {
+            if (input.compare(input_position, ctx.delim_set.begin.Size(), ctx.delim_set.begin) == 0) {
                 process_current_text();
 
                 // Tag start delimiter
@@ -696,12 +696,12 @@ private:
             } else {
                 bool parsed_whitespace = false;
                 for (const auto& whitespace_text : whitespace) {
-                    if (input.compare(input_position, whitespace_text.size(), whitespace_text) == 0) {
+                    if (input.compare(input_position, whitespace_text.Size(), whitespace_text) == 0) {
                         process_current_text();
 
                         const component<string_type> comp{whitespace_text, input_position};
                         sections.back()->children.push_back(comp);
-                        input_position += whitespace_text.size();
+                        input_position += whitespace_text.Size();
 
                         parsed_whitespace = true;
                         break;
@@ -725,10 +725,10 @@ private:
             const string_size_type tag_location_start = input_position;
 
             // Find the next tag end delimiter
-            string_size_type tag_contents_location{tag_location_start + ctx.delim_set.begin.size()};
+            string_size_type tag_contents_location{tag_location_start + ctx.delim_set.begin.Size()};
             const bool tag_is_unescaped_var{current_delimiter_is_brace && tag_location_start != (input_size - 2) && input.at(tag_contents_location) == ctx.delim_set.begin.at(0)};
             const string_type& current_tag_delimiter_end{tag_is_unescaped_var ? brace_delimiter_end_unescaped : ctx.delim_set.end};
-            const auto current_tag_delimiter_end_size = current_tag_delimiter_end.size();
+            const auto current_tag_delimiter_end_size = current_tag_delimiter_end.Size();
             if (tag_is_unescaped_var) {
                 ++tag_contents_location;
             }
@@ -813,13 +813,13 @@ private:
 
     bool parse_set_delimiter_tag(const string_type& contents, delimiter_set<string_type>& delimiter_set) const {
         // Smallest legal tag is "=X X="
-        if (contents.size() < 5) {
+        if (contents.Size() < 5) {
             return false;
         }
         if (contents.back() != '=') {
             return false;
         }
-        const auto contents_substr = trim(contents.substr(1, contents.size() - 2));
+        const auto contents_substr = trim(contents.substr(1, contents.Size() - 2));
         const auto spacepos = contents_substr.find(' ');
         if (spacepos == string_type::npos) {
             return false;
@@ -827,7 +827,7 @@ private:
         const auto nonspace = contents_substr.find_first_not_of(' ', spacepos + 1);
         assert(nonspace != string_type::npos);
         const string_type begin = contents_substr.substr(0, spacepos);
-        const string_type end = contents_substr.substr(nonspace, contents_substr.size() - nonspace);
+        const string_type end = contents_substr.substr(nonspace, contents_substr.Size() - nonspace);
         if (!is_set_delimiter_valid(begin) || !is_set_delimiter_valid(end)) {
             return false;
         }

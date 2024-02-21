@@ -46,7 +46,7 @@ namespace TG
 		std::array<char, 10> b;
 		std::array<int, 10> c;
 		std::array<long long, 10> d;
-		std::array<float, 10> e;
+		std::array<float, 10> m_e;
 		std::array<double, 10> f;*/
 
 		/*Math::aligned_array<bool, 10, 8> a1;
@@ -60,7 +60,7 @@ namespace TG
 		std::cout << "array<char,10>.data()       = " << (void*)b.data() << Math::IsAligned(b.data(), 16) << std::endl;
 		std::cout << "array<int,10>.data()        = " << c.data() << Math::IsAligned(c.data(), 16) << std::endl;
 		std::cout << "array<long long, 10>.data() = " << d.data() << Math::IsAligned(d.data(), 16) << std::endl;
-		std::cout << "array<float, 10>.data()     = " << e.data() << Math::IsAligned(e.data(), 16) << std::endl;
+		std::cout << "array<float, 10>.data()     = " << m_e.data() << Math::IsAligned(m_e.data(), 16) << std::endl;
 		std::cout << "array<double, 10>.data()    = " << f.data() << Math::IsAligned(f.data(), 16) << std::endl;
 
 		std::cout << "aligned_array<bool,10>.data()       = " << a1.data() << std::boolalpha << Math::IsAligned(a1.data(), 8) << std::endl;

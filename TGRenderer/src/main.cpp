@@ -6,7 +6,6 @@
 
 #include "Renderer.hpp"
 #include <tchar.h>
-#include "Graphics/RayTracing/RayTracing.h"
 
 int CALLBACK wWinMain(_In_ HINSTANCE hInstance,
 	_In_opt_ HINSTANCE hPrevInstance,
@@ -15,7 +14,6 @@ int CALLBACK wWinMain(_In_ HINSTANCE hInstance,
 {
 	try
 	{
-		//OutputPPMImage();
 		TG::Renderer app;
         OutputDebugStringA("test output\n");
 		return app.Run();

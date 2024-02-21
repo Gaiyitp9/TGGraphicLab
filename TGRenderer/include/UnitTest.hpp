@@ -5,14 +5,14 @@
 *****************************************************************/
 #pragma once
 
-#include "Chronometer.hpp"
-#include "Utility.hpp"
+#include "Chronometer.h"
+#include "Utility.h"
 #include <ctime>
 #include <string>
 #include "Math/Core.hpp"
-#include "Input/Event.hpp"
+#include "Input/Event.h"
 #include "Diagnostics/Log.hpp"
-#include "Diagnostics/Win32Exception.hpp"
+#include "Diagnostics/Win32Exception.h"
 #include "glad/gl.h"
 
 namespace TG

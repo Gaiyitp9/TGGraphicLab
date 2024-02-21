@@ -1,7 +1,8 @@
 #include <type_traits>
 #include <iostream>
 #include <tuple>
-#include "Template/ConstexprString.hpp"
+#include "ConstString.hpp"
+#include "ExpressionTemplate.hpp"
 
 template<typename T>
 void Test(T& t)
@@ -145,27 +146,27 @@ int main()
     // [const] [volatile] <type> [*|&] [[N]]碰到T&，不变
     // 注：[]内表示可能出现的词，<>内表示一定要出现的词
     // 下面是几个简单的示例
-    const int i = 2;
+    const int inum = 2;
     char const* str = "what";
     char const str2[5] = "what";
     const char& ch = 's';
     // T&
-    Test(i);        // const int -> const int
+    Test(inum);        // const int -> const int
     Test(str);      // char const* -> char const*
     Test(str2);     // char const[N] -> char const[N]
     Test(ch);       // const char& -> const char
     // const T&
-    Test1(i);        // const int -> int
+    Test1(inum);        // const int -> int
     Test1(str);      // char const* -> char const*
     Test1(str2);     // char const[N] -> char[N]
     Test1(ch);       // const char& -> char
     // T
-    Test2(i);       // const int -> int
+    Test2(inum);       // const int -> int
     Test2(str);     // char const* -> char const*
     Test2(str2);    // char const[N] -> char const*
     Test2(ch);      // const char& -> char
     // const T
-    Test3(i);       // const int -> int
+    Test3(inum);       // const int -> int
     Test3(str);     // char const* -> char const*
     Test3(str2);    // char const[N] -> char const*
     Test3(ch);      // const char& -> char
@@ -187,7 +188,7 @@ int main()
     //-----------------------------------------------------------------------------------------------
 
     std::string_view strv("what?");
-    constexpr TG::ConstexprString cstr("what");
+    constexpr TG::ConstString cstr("what");
 
     //-----------------------------------------------------------------------------------------------
     // 测试auto作为函数参数
@@ -219,6 +220,46 @@ int main()
     IntList(std::make_index_sequence<1>());
     IntList2(std::make_index_sequence<0>());
     IntList3(std::make_index_sequence<3>());
+
+    //-----------------------------------------------------------------------------------------------
+
+    MyType a(3, 1.1);
+    MyType b(3, 2.01);
+    MyType c = {3.01, 3.01, 3.01};
+
+    std::cout << "\t----computing-----\n";
+    MyType d = a + b + c;
+    for (size_t i = 0; i < d.Size(); i++)
+    {
+        std::cout << "\t" << d[i] << "\n";
+    }
+
+    const int N = 3;
+    double sa[N] = { 1.1,1.1, 1.1 };
+    double sb[N] = { 2.01, 2.01, 2.01 };
+    double sc[N] = { 3.01, 3.01, 3.01 };
+    double sd[N] = { 0 };
+    MyExpType A(sa, N), B(sb, N), C(sc, N), D(sd, N);
+    printf("\n");
+    printf(" A = ");
+    Print(A);
+    printf(" B = ");
+    Print(B);
+    printf(" C = ");
+    Print(C);
+    printf("\n\tD = A + B + C\n");
+    D = A + B + C;
+    for (int i = 0; i < A.Size(); ++i) {
+        printf("%d:\t%g + %g + %g = %g\n",
+               i, B.Value(i), C.Value(i), B.Value(i), D.Value(i));
+    }
+    printf("\n\tD = A + min(B, C)\n");
+    // D = A + expToBinaryOp<Minimum>(B, C);
+    D = A + Min(B, C);
+    for (int i = 0; i < A.Size(); ++i) {
+        printf("%d:\t%g + min(%g, %g) = %g\n",
+               i, A.Value(i), B.Value(i), C.Value(i), D.Value(i));
+    }
 
     return 0;
 }
