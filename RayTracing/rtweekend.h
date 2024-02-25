@@ -1,0 +1,25 @@
+#pragma once
+
+#include <numbers>
+#include <random>
+
+inline double Deg2Rad(double degree)
+{
+    return degree * std::numbers::pi / 180.0;
+}
+
+inline double RandomDouble()
+{
+    std::random_device rd;
+    std::mt19937 generator(rd());
+    std::uniform_real_distribution<double> distribution(0.0, 1.0);
+    return distribution(generator);
+}
+
+inline double RandomDouble(double min, double max)
+{
+    std::random_device rd;
+    std::mt19937 generator(rd());
+    std::uniform_real_distribution<double> distribution(min, max);
+    return distribution(generator);
+}
