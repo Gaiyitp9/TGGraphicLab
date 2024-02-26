@@ -10,7 +10,8 @@ Color Scene::RayColor(const Ray &ray, unsigned int depth) const
     HitRecord record;
     if (Hit(ray, Interval(0.001, std::numeric_limits<double>::max()), record))
     {
-        Vec3 direction = RandomOnHemisphere(record.normal);
+//        Vec3 direction = RandomOnHemisphere(record.normal, record.tangent, record.binormal);
+        Vec3 direction = CosineSampleHemisphere(record.normal, record.tangent, record.binormal);
         return 0.5 * RayColor({record.p, direction}, depth - 1);
     }
 

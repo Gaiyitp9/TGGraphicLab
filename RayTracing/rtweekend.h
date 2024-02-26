@@ -3,6 +3,8 @@
 #include <numbers>
 #include <random>
 
+inline constexpr double Epsilon = 1e-5;
+
 inline double Deg2Rad(double degree)
 {
     return degree * std::numbers::pi / 180.0;
