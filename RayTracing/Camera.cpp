@@ -39,6 +39,9 @@ void Camera::Render(char const* imageFile, const Scene& scene)
                 pixelColor += scene.RayColor(ray, maxDepth);
             }
             pixelColor /= samplePerPixel;
+            pixelColor.SetX(Linear2Gamma(pixelColor.X()));
+            pixelColor.SetY(Linear2Gamma(pixelColor.Y()));
+            pixelColor.SetZ(Linear2Gamma(pixelColor.Z()));
 
             Interval intensity(0.0, 1.0);
             unsigned int index = (i * imageWidth + j) * 3;

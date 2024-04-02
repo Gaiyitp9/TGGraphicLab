@@ -25,3 +25,8 @@ inline double RandomDouble(double min, double max)
     std::uniform_real_distribution<double> distribution(min, max);
     return distribution(generator);
 }
+
+inline double Linear2Gamma(double linearComponent)
+{
+    return std::sqrt(linearComponent);
+}

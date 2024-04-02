@@ -1,4 +1,5 @@
 #include "Scene.h"
+#include "Material.h"
 
 Scene::Scene() = default;
 
@@ -10,9 +11,11 @@ Color Scene::RayColor(const Ray &ray, unsigned int depth) const
     HitRecord record;
     if (Hit(ray, Interval(0.001, std::numeric_limits<double>::max()), record))
     {
-//        Vec3 direction = RandomOnHemisphere(record.normal, record.tangent, record.binormal);
-        Vec3 direction = CosineSampleHemisphere(record.normal, record.tangent, record.binormal);
-        return 0.5 * RayColor({record.p, direction}, depth - 1);
+        Ray scattered;
+        Color attenuation;
+        if (record.material->Scatter(ray, record, attenuation, scattered))
+            return attenuation * RayColor(scattered, depth - 1);
+        return {0, 0, 0};
     }
 
     Vec3 unitDirection = ray.dir.Normalized();

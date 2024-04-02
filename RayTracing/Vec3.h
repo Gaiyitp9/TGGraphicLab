@@ -128,15 +128,22 @@ inline Vec3 Cross(const Vec3& u, const Vec3& v)
     };
 }
 
-// rejection method生成均匀采样球面的向量
-inline Vec3 RandomInUnitSphere()
+inline Vec3 RandomOnUnitSphere()
 {
-    while (true)
-    {
-        Vec3 p = Vec3::Random(-1, 1);
-        if (p.LengthSquared() < 1)
-            return p.Normalized();
-    }
+// rejection method生成均匀采样球面的向量
+//    while (true)
+//    {
+//        Vec3 p = Vec3::Random(-1, 1);
+//        if (p.LengthSquared() < 1)
+//            return p.Normalized();
+//    }
+
+    // Uniform sampling sphere, 根据概率分布函数生成采样
+    double zeta1 = RandomDouble();
+    double zeta2 = RandomDouble();
+    double phi = 2 * std::numbers::pi * zeta2;
+    double sinTheta = 2 * std::sqrt(zeta1 - zeta1 * zeta1);
+    return { sinTheta * std::cos(phi), sinTheta * std::sin(phi), 1 - 2 * zeta1 };
 }
 
 inline Vec3 RandomOnHemisphere(const Vec3& normal, const Vec3& tangent, const Vec3& binormal)
@@ -180,4 +187,17 @@ inline Vec3 CosineSampleHemisphere(const Vec3& normal, const Vec3& tangent, cons
 
     // 采样变量变换到世界空间
     return sample.X() * binormal + sample.Y() * tangent + sample.Z() * normal;
+}
+
+inline Vec3 Reflect(const Vec3& v, const Vec3& n)
+{
+    return v - 2.0 * Dot(v, n) * n;
+}
+
+inline Vec3 Refract(const Vec3& r, const Vec3& n, double refractionRatio)
+{
+    double cosTheta = std::min(Dot(-r, n), 1.0);
+    Vec3 rOutPerp = refractionRatio * (r + cosTheta * n);
+    Vec3 rOutParallel = -std::sqrt(std::abs(1.0 - rOutPerp.LengthSquared())) * n;
+    return rOutPerp + rOutParallel;
 }

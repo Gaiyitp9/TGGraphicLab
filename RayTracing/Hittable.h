@@ -3,6 +3,8 @@
 #include "Ray.h"
 #include "Interval.h"
 
+class Material;
+
 struct HitRecord
 {
     Point3  p;
@@ -11,6 +13,7 @@ struct HitRecord
     bool    frontFace = true;
     Vec3    tangent;
     Vec3    binormal;
+    std::shared_ptr<Material> material;
 
     void SetFaceNormal(const Ray& r, const Vec3& outwardNormal)
     {

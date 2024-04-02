@@ -13,6 +13,7 @@ bool Sphere::Hit(const Ray &ray, const Interval& rayInterval, HitRecord &record)
         record.p = ray.At(tMin);
         Vec3 outwardNormal = (record.p - center) / radius;
         record.SetFaceNormal(ray, outwardNormal);
+        record.material = mat;
         return true;
     }
     if (rayInterval.Surrounds(tMax))
@@ -21,6 +22,7 @@ bool Sphere::Hit(const Ray &ray, const Interval& rayInterval, HitRecord &record)
         record.p = ray.At(tMax);
         Vec3 outwardNormal = (record.p - center) / radius;
         record.SetFaceNormal(ray, outwardNormal);
+        record.material = mat;
         return true;
     }
 
