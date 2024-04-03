@@ -19,7 +19,7 @@ namespace TG::Math
 	{
 	private:
 		constexpr static StorageOption Option = traits<MatrixL>::IsRowMajor ? StorageOption::RowMajor
-			: StorageOption::ColMajor;
+			: StorageOption::ColumnMajor;
 
 	public:
 		using ReturnType = Matrix<

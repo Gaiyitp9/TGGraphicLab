@@ -14,16 +14,20 @@ namespace TG::Math
 	enum class StorageOption : char
 	{
 		RowMajor,
-		ColMajor,
+		ColumnMajor,
 	};
-	inline constexpr StorageOption DEFAULT_MATRIX_STORAGE_ORDER_OPTION = StorageOption::RowMajor;
-	inline constexpr int DYNAMIC = -1;
+
+#ifdef TG_ROW_MAJOR_MATRIX
+	inline constexpr StorageOption DefaultMatrixStorageOrderOption = StorageOption::RowMajor;
+#else
+	inline constexpr StorageOption DefaultMatrixStorageOrderOption = StorageOption::ColumnMajor;
+#endif
 
 	// 矩阵类
 	template<typename ScalarT, int Rows, int Cols,
 		StorageOption Options_ = (Rows == 1 && Cols != 1 ? StorageOption::RowMajor :
-			Rows != 1 && Cols == 1 ? StorageOption::ColMajor :
-			DEFAULT_MATRIX_STORAGE_ORDER_OPTION)
+			Rows != 1 && Cols == 1 ? StorageOption::ColumnMajor :
+            DefaultMatrixStorageOrderOption)
 	> class Matrix;
 
 	// 变量对应的包特性(包中有多个变量，表示SIMD中使用的变量，比如__m128)
