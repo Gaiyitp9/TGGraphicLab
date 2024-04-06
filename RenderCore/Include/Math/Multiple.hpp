@@ -9,52 +9,44 @@ namespace TG::Math
 {
 	// 两个矩阵是否可以相乘
 	template<typename MatrixL, typename MatrixR>
-	concept MatricesMultiplable = traits<MatrixL>::ColsAtCompileTime == traits<MatrixR>::RowsAtCompileTime
-		&& std::is_same_v<typename traits<MatrixL>::Scalar, typename traits<MatrixR>::Scalar>
-		&& traits<MatrixL>::IsRowMajor == traits<MatrixR>::IsRowMajor;
+	concept MatricesMultiplable = Traits<MatrixL>::ColsAtCompileTime == Traits<MatrixR>::RowsAtCompileTime
+                                  && std::is_same_v<typename Traits<MatrixL>::Scalar, typename Traits<MatrixR>::Scalar>
+                                  && Traits<MatrixL>::IsRowMajor == Traits<MatrixR>::IsRowMajor;
 
 	template<typename MatrixL, typename MatrixR>
 		requires MatricesMultiplable<MatrixL, MatrixR>
 	struct MatricesMultipleTraits
 	{
 	private:
-		constexpr static StorageOption Option = traits<MatrixL>::IsRowMajor ? StorageOption::RowMajor
-			: StorageOption::ColumnMajor;
+		constexpr static StorageOption Option = Traits<MatrixL>::IsRowMajor ? StorageOption::RowMajor
+                                                                            : StorageOption::ColumnMajor;
 
 	public:
 		using ReturnType = Matrix<
-			typename traits<MatrixL>::Scalar,
-			traits<MatrixL>::RowsAtCompileTime,
-			traits<MatrixR>::ColsAtCompileTime,
+			typename Traits<MatrixL>::Scalar,
+			Traits<MatrixL>::RowsAtCompileTime,
+			Traits<MatrixR>::ColsAtCompileTime,
 			Option
 		>;
-		constexpr static int Stride = traits<ReturnType>::IsRowMajor
-			? traits<ReturnType>::ColsAtCompileTime
-			: traits<ReturnType>::RowsAtCompileTime;
-		using Scalar = traits<ReturnType>::Scalar;
-		constexpr static int SizeAtCompileTime = traits<MatrixL>::ColsAtCompileTime;
-		using PacketType = best_packet<Scalar, SizeAtCompileTime>;
-		constexpr static int Alignment = traits<ReturnType>::IsDynamic ? DEFAULT_ALIGN_BYTES
-			: (traits<ReturnType>::IsRowMajor 
-				? default_alignment<Scalar, traits<MatrixL>::SizeAtCompileTime>
-				: default_alignment<Scalar, traits<MatrixR>::SizeAtCompileTime>);
-		constexpr static bool IsAligned = Alignment >= unpacket_traits<PacketType>::Alignment;
-		constexpr static int VectorizableSize = (SizeAtCompileTime / unpacket_traits<PacketType>::Size)
-			* unpacket_traits<PacketType>::Size;
+		constexpr static int Stride = Traits<ReturnType>::IsRowMajor
+			? Traits<ReturnType>::ColsAtCompileTime
+			: Traits<ReturnType>::RowsAtCompileTime;
+		using Scalar = Traits<ReturnType>::Scalar;
+		constexpr static int SizeAtCompileTime = Traits<MatrixL>::ColsAtCompileTime;
 	};
 
 	template<typename MatrixL, typename MatrixR, int Index, int Stop>
 	struct DefaultMultiple
 	{
 		using MatrixType = MatricesMultipleTraits<MatrixL, MatrixR>::ReturnType;
-		using Scalar = traits<MatrixType>::Scalar;
+		using Scalar = Traits<MatrixType>::Scalar;
 		constexpr static int Row = Index / MatricesMultipleTraits<MatrixL, MatrixR>::Stride;
 		constexpr static int Col = Index % MatricesMultipleTraits<MatrixL, MatrixR>::Stride;
 
 		static void Run(MatrixType& dst, const MatrixL& left, const MatrixR& right)
 		{
 			Scalar sum = 0;
-			for (int i = 0; i < traits<MatrixL>::ColsAtCompileTime; ++i)
+			for (int i = 0; i < Traits<MatrixL>::ColsAtCompileTime; ++i)
 				sum += left(Row, i) * right(i, Col);
 			dst(Row, Col) = sum;
 
@@ -69,52 +61,6 @@ namespace TG::Math
 		static void Run(MatrixType&, const MatrixL&, const MatrixR&) {}
 	};
 
-	template<typename MatrixL, typename MatrixR, int Index, int Stop>
-	struct VectorizedMultiple
-	{
-		using Traits = MatricesMultipleTraits<MatrixL, MatrixR>;
-		using MatrixType = Traits::ReturnType;
-		using Scalar = Traits::Scalar;
-		using PacketType = Traits::PacketType;
-		constexpr static int Row = Index / Traits::Stride;
-		constexpr static int Col = Index % Traits::Stride;
-
-		static void Run(MatrixType& dst, const MatrixL& left, const MatrixR& right)
-		{
-			if constexpr(traits<MatrixType>::IsRowMajor)
-			{
-				Scalar rightCol[Traits::SizeAtCompileTime];
-				for (int i = 0; i < Traits::SizeAtCompileTime; ++i)
-					rightCol[i] = right(i, Col);
-				Scalar const* leftRow = left.m_data() + traits<MatrixL>::ColsAtCompileTime * Row;
-				VectorizedDot<Scalar, PacketType, Traits::IsAligned,
-					0, Traits::VectorizableSize>::Run(dst(Row, Col), leftRow, rightCol);
-				DefaultDot<Scalar, Traits::VectorizableSize,
-					Traits::SizeAtCompileTime>::Run(dst(Row, Col), leftRow, rightCol);
-			}
-			else
-			{
-				Scalar leftRow[Traits::SizeAtCompileTime];
-				for (int i = 0; i < Traits::SizeAtCompileTime; ++i)
-					leftRow[i] = left(Row, i);
-				Scalar const* rightCol = right.m_data() + traits<MatrixR>::RowsAtCompileTime * Col;
-				VectorizedDot<Scalar, PacketType, Traits::IsAligned,
-					0, Traits::VectorizableSize>::Run(dst(Row, Col), leftRow, rightCol);
-				DefaultDot<Scalar, Traits::VectorizableSize,
-					Traits::SizeAtCompileTime>::Run(dst(Row, Col), leftRow, rightCol);
-			}
-
-			VectorizedMultiple<MatrixL, MatrixR, Index + 1, Stop>::Run(dst, left, right);
-		}
-	};
-
-	template<typename MatrixL, typename MatrixR, int Stop>
-	struct VectorizedMultiple<MatrixL, MatrixR, Stop, Stop>
-	{
-		using MatrixType = MatricesMultipleTraits<MatrixL, MatrixR>::ReturnType;
-		static void Run(MatrixType&, const MatrixL&, const MatrixR&) {}
-	};
-
 	template<typename MatrixL, typename MatrixR> 
 		requires MatricesMultiplable<MatrixL, MatrixR>
 	struct Multiple
@@ -124,10 +70,7 @@ namespace TG::Math
 		static MatrixType Run(const MatrixL& left, const MatrixR& right)
 		{
 			MatrixType dst;
-			if constexpr (SUPPORT_SIMD)
-				VectorizedMultiple<MatrixL, MatrixR, 0, traits<MatrixType>::SizeAtCompileTime>::Run(dst, left, right);
-			else
-				DefaultMultiple<MatrixL, MatrixR, 0, traits<MatrixType>::SizeAtCompileTime>::Run(dst, left, right);
+            DefaultMultiple<MatrixL, MatrixR, 0, Traits<MatrixType>::SizeAtCompileTime>::Run(dst, left, right);
 			return dst;
 		}
 	};

@@ -32,14 +32,14 @@ namespace TG::Debug
     // 注：1. 尽量使用窄文本，性能比宽文本好
     // 2. 换行符用\n，不要用std::endl，后者会刷新缓冲区到设备，会影响性能
     template<NarrowText Text>
-    inline void Log(const Text &log) { std::cout << log; }
+    inline void Log(const Text&log) { std::cout << log; }
 
     template<WideText Text>
-    inline void Log(const Text &log) { std::wcout << log; }
+    inline void Log(const Text&log) { std::wcout << log; }
 
     template<NarrowText Text>
-    inline void LogLine(const Text &log) { std::cout << log << '\n'; }
+    inline void LogLine(const Text&log) { std::cout << log << '\n'; }
 
     template<WideText Text>
-    inline void LogLine(const Text &log) { std::wcout << log << L'\n'; }
+    inline void LogLine(const Text&log) { std::wcout << log << L'\n'; }
 }

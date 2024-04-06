@@ -1,5 +1,5 @@
 /****************************************************************
-* TianGong Graphics Tool										*
+* TianGong RenderLab										*
 * Copyright (c) Gaiyitp9. All rights reserved.					*
 * This code is licensed under the MIT License (MIT).			*
 *****************************************************************/
@@ -8,7 +8,6 @@
 #include <tuple>
 #include <type_traits>
 #include <string_view>
-#include "ConstString.hpp"
 #include "TypeList.hpp"
 #include "NameValuePair.hpp"
 #include "ElementList.hpp"

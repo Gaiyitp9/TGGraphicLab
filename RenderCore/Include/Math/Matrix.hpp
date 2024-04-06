@@ -7,36 +7,35 @@
 
 namespace TG::Math
 {
-	template<typename T, int R, int C, StorageOption Option>
-	struct traits<Matrix<T, R, C, Option>>
+	template<typename Scalar_, int Rows_, int Columns_, StorageOption Option>
+	struct Traits<Matrix<Scalar_, Rows_, Columns_, Option>>
 	{
-		using Scalar = T;
-        static constexpr int	Rows = R;
-        static constexpr int	Columns = C;
-        static constexpr bool	IsRowMajor = Option == StorageOption::RowMajor;
-        static constexpr bool	IsVector = Rows == 1 || Columns == 1;
-        static constexpr bool	IsSquare = Rows == Columns;
-        static constexpr int	Size = Rows * Columns;
+		using Scalar = Scalar_;
+        static constexpr int	    Rows = Rows_;
+        static constexpr int	    Columns = Columns_;
+        static constexpr int	    Size = Rows * Columns;
+        static constexpr XprFlag    Flags = (Option == StorageOption::RowMajor ? XprFlag::RowMajor : XprFlag::None) |
+                (Rows == 1 || Columns == 1 ? XprFlag::Vector : XprFlag::None) |
+                (Rows == Columns ? XprFlag::Square : XprFlag::None);
 	};
 
-	template<typename Scalar, int Rows, int Cols, StorageOption Option>
-	class Matrix
+	template<typename Scalar, int Rows, int Columns, StorageOption Option>
+	class Matrix : public MatrixBase<Matrix<Scalar, Rows, Columns, Option>>
 	{
-	public:
-		Matrix() { std::memset(m_storage.data(), 0, m_storage.size() * sizeof(Scalar)); }
-		Matrix(const Matrix& other) : m_storage(other.m_storage) {}
+        using Base = MatrixBase<Matrix<Scalar, Rows, Columns, Option>>;
+        using Base::Expression;
 
-		template<typename OtherDerived>
-		Matrix& operator=(const Matrix& other)
+	public:
+		Matrix() = default;
+		Matrix(const Matrix& other) { std::memcpy(m_storage, other.m_storage, Traits<Matrix>::Size * sizeof(Scalar)); }
+        Matrix(Matrix&&) = delete;
+
+		template<typename Derived>
+		Matrix& operator=(const MatrixBase<Derived>& other)
 		{
-			AssignmentOp<Matrix>::Run(*this, other);
+            CallAssignment(Expression(), other.Expression());
 			return *this;
 		}
-
-	public:
-		[[nodiscard]] constexpr int rows() const { return traits<Matrix>::Rows; }
-		[[nodiscard]] constexpr int cols() const { return traits<Matrix>::Columns; }
-		[[nodiscard]] constexpr int size() const { return traits<Matrix>::Size; }
 
 		const Scalar& operator[](int index) const
 		{
@@ -44,7 +43,7 @@ namespace TG::Math
 		}
 		const Scalar& operator()(int row, int col) const
 		{
-			if constexpr (traits<Matrix>::IsRowMajor)
+			if constexpr (Traits<Matrix>::IsRowMajor)
 				return m_storage[col + row * m_storage.cols()];
 			else
 				return m_storage[row + col * m_storage.rows()];
@@ -55,95 +54,15 @@ namespace TG::Math
 		}
 		Scalar& operator()(int row, int col)
 		{
-			if constexpr (traits<Matrix>::IsRowMajor)
+			if constexpr (Traits<Matrix>::IsRowMajor)
 				return m_storage[col + row * m_storage.cols()];
 			else
 				return m_storage[row + col * m_storage.rows()];
 		}
 
-		// 矩阵转置
-		Matrix transpose() const
-		{
-			Matrix<Scalar, Cols, Rows, Option> t;
-			for (int i = 0; i < rows(); ++i)
-			{
-				for (int j = 0; j < cols(); ++i)
-				{
-					t(j, i) = (*this)(i, j);
-				}
-			}
-			return t;
-		}
-
-	public:
-		Matrix operator+(const Matrix& other) const
-		{
-			return CwiseBinaryOp<Matrix, ScalarSumOp<Scalar>>::Run(*this, other);
-		}
-
-		Matrix operator-(const Matrix& other) const
-		{
-			return CwiseBinaryOp<Matrix, ScalarSubOp<Scalar>>::Run(*this, other);
-		}
-
-		Matrix operator/(const Scalar& factor) const
-		{
-			if (Abs(factor) < NumTraits<Scalar>::Epsilon)
-				return *this;
-
-			Matrix factorMatrix;
-			for (int i = 0; i < rows(); ++i)
-			{
-				for (int j = 0; j < cols(); ++j)
-				{
-					factorMatrix(i, j) = factor;
-				}
-			}
-			return CwiseBinaryOp<Matrix, ScalarDivideOp<Scalar>>::Run(*this, factorMatrix);
-		}
-
-		Matrix operator*(const Scalar& factor) const
-		{
-			Matrix factorMatrix;
-			for (int i = 0; i < rows(); ++i)
-			{
-				for (int j = 0; j < cols(); ++j)
-				{
-					factorMatrix(i, j) = factor;
-				}
-			}
-			return CwiseBinaryOp<Matrix, ScalarProductOp<Scalar>>::Run(*this, factorMatrix);
-		}
-
-		// 矩阵乘法(注意满足矩阵的列与other矩阵的行数要相等)
-		template<typename OtherMatrix> 
-		typename MatricesMultipleTraits<Matrix, OtherMatrix>::ReturnType 
-			operator*(const OtherMatrix& other) const
-		{
-			return Multiple<Matrix, OtherMatrix>::Run(*this, other);
-		}
-
-		// 逐元素乘法
-		Matrix CWiseMultiple(const Matrix& other) const
-		{
-			return CwiseBinaryOp<Matrix, ScalarProductOp<Scalar>>::Run(*this, other);
-		}
-
-		Scalar Dot(const Matrix& other) const
-		{
-			return DotOp<Matrix>::Run(*this, other);
-		}
-
 	private:
-		Scalar m_storage[traits<Matrix>::Size];
+		Scalar m_storage[Traits<Matrix>::Size]{};
 	};
-
-	// 矩阵乘以一个系数
-	template<typename Scalar, int Rows, int Cols, StorageOption Option>
-	Matrix<Scalar, Rows, Cols, Option> operator*(const Scalar& factor, const Matrix<Scalar, Rows, Cols, Option>& matrix)
-	{
-		return matrix * factor;
-	}
 
 	template<typename Scalar, int Size>
 	using Vector = Matrix<Scalar, Size, 1>;
@@ -155,12 +74,36 @@ namespace TG::Math
 	using RowVector##SizeSuffix##TypeSuffix = RowVector<Type, Size>;	\
 	using Matrix##SizeSuffix##TypeSuffix	= Matrix<Type, Size, Size>;
 
-	#define MATRIX_ALLSIZE_TYPEDEF(Type, TypeSuffix)	\
+	#define MATRIX_ALL_SIZE_TYPEDEF(Type, TypeSuffix)	\
 	MATRIX_TYPEDEF(Type, TypeSuffix, 2, 2)				\
 	MATRIX_TYPEDEF(Type, TypeSuffix, 3, 3)				\
 	MATRIX_TYPEDEF(Type, TypeSuffix, 4, 4)
 
-	MATRIX_ALLSIZE_TYPEDEF(float, f)
-	MATRIX_ALLSIZE_TYPEDEF(double, d)
-	MATRIX_ALLSIZE_TYPEDEF(int, i)
+	MATRIX_ALL_SIZE_TYPEDEF(float, f)
+	MATRIX_ALL_SIZE_TYPEDEF(double, d)
+	MATRIX_ALL_SIZE_TYPEDEF(int, i)
+
+    // 矩阵求值器
+    template<typename Scalar, int Rows, int Columns, StorageOption Option>
+    class Evaluator<Matrix<Scalar, Rows, Columns, Option>>
+    {
+        using MatrixType = Matrix<Scalar, Rows, Columns, Option>;
+        using ReturnType = Traits<MatrixType>::Scalar;
+
+    public:
+        explicit Evaluator(const MatrixType& mat) : m_matrix(mat) {}
+
+        [[nodiscard]] const ReturnType& Coefficient(int index) const
+        {
+            return m_matrix(index);
+        }
+
+        ReturnType& CoefficientRef(int index)
+        {
+            return m_matrix(index);
+        }
+
+    private:
+        const MatrixType& m_matrix;
+    };
 }

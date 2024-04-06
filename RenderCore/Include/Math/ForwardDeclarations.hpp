@@ -5,10 +5,12 @@
 *****************************************************************/
 #pragma once
 
+#include <cmath>
+
 namespace TG::Math
 {
-	template<typename T> struct traits;
-	template<typename T> struct traits<const T> : traits<T> {};
+    // 表达式特性，每种表达式都需要特化该类
+	template<typename T> struct Traits;
 
 	// 矩阵储存格式
 	enum class StorageOption : char
@@ -23,44 +25,34 @@ namespace TG::Math
 	inline constexpr StorageOption DefaultMatrixStorageOrderOption = StorageOption::ColumnMajor;
 #endif
 
+    // 矩阵表达式标志
+    enum class XprFlag
+    {
+        None        = 0,
+        RowMajor    = 1,            // 按行储存
+        Vector      = 1 << 2,       // 表达式是向量
+        Square      = 1 << 3,       // 表达式是方阵
+    };
+
+    // 表达式基类
+    template<typename Derived> class MatrixBase;
 	// 矩阵类
-	template<typename ScalarT, int Rows, int Cols,
-		StorageOption Options_ = (Rows == 1 && Cols != 1 ? StorageOption::RowMajor :
-			Rows != 1 && Cols == 1 ? StorageOption::ColumnMajor :
-            DefaultMatrixStorageOrderOption)
-	> class Matrix;
+	template<typename Scalar_, int Rows_, int Cols_, StorageOption Option = DefaultMatrixStorageOrderOption>
+	class Matrix;
+    // 二元表达式
+    template<typename BinaryOp, typename LhsXpr, typename RhsXpr> class CWiseBinaryOp;
 
-	// 变量对应的包特性(包中有多个变量，表示SIMD中使用的变量，比如__m128)
-	template<typename T>
-	struct packet_traits
-	{
-		using type = T;
-	};
-	template<typename T> struct packet_traits<const T> : packet_traits<T> {};
-	// 包的特性(通过包获得特性，上面是通过变量获得)
-	template<typename T> struct unpacket_traits
-	{
-		using type = T;
-		using half = T;
-		constexpr static int Size = 1;			// 包尺寸
-		constexpr static int Alignment = 1;
-	};
-	template<typename T> struct unpacket_traits<const T> : unpacket_traits<T> { };
+    // 表达式求值器，每种表达式都需要特化该类
+    template<typename Xpr> class Evaluator;
 
-	// 根据数据类型选择数学函数
-	template<typename Scalar> inline Scalar sqrt(Scalar x) { return std::sqrt(x); }
-	template<> inline float sqrt(float x) { return std::sqrtf(x); }
-	template<> inline long double sqrt(long double x) { return std::sqrtl(x); }
-
-	template<typename Scalar> inline Scalar sin(Scalar x) { return std::sin(x); }
-	template<> inline float sin(float x) { return std::sinf(x); }
-	template<> inline long double sin(long double x) { return std::sinl(x); }
-
-	template<typename Scalar> inline Scalar cos(Scalar x) { return std::cos(x); }
-	template<> inline float cos(float x) { return std::cosf(x); }
-	template<> inline long double cos(long double x) { return std::cosl(x); }
-
-	template<typename Scalar> inline Scalar tan(Scalar x) { return std::tan(x); }
-	template<> inline float tan(float x) { return std::tanf(x); }
-	template<> inline long double tan(long double x) { return std::tanl(x); }
+    // 赋值运算
+    template<typename Scalar> struct AssignOp;
+    // 逐元素加法
+    template<typename Scalar> struct ScalarSumOp;
+    // 逐元素减法
+    template<typename Scalar> struct ScalarSubtractOp;
+    // 逐元素乘法
+    template<typename Scalar> struct ScalarProductOp;
+    // 逐元素除法
+    template<typename Scalar> struct ScalarDivideOp;
 }

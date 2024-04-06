@@ -12,7 +12,7 @@ namespace TG::Math
 	class Color
 	{
 	public:
-		Color(float c = {}) { m_channels[0] = m_channels[1] = m_channels[2] = c; m_channels[3] = 1.0f; }
+		explicit Color(float c = {}) { m_channels[0] = m_channels[1] = m_channels[2] = c; m_channels[3] = 1.0f; }
 		Color(float r, float g, float b, float a)
 		{
 			m_channels[0] = r;
@@ -21,10 +21,10 @@ namespace TG::Math
 			m_channels[3] = a;
 		}
 
-		const float& r() const { return m_channels[0]; }
-		const float& g() const { return m_channels[1]; }
-		const float& b() const { return m_channels[2]; }
-		const float& a() const { return m_channels[3]; }
+		[[nodiscard]] const float& r() const { return m_channels[0]; }
+		[[nodiscard]] const float& g() const { return m_channels[1]; }
+		[[nodiscard]] const float& b() const { return m_channels[2]; }
+		[[nodiscard]] const float& a() const { return m_channels[3]; }
 		float& r() { return m_channels[0]; }
 		float& g() { return m_channels[1]; }
 		float& b() { return m_channels[2]; }
