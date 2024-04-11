@@ -41,4 +41,13 @@ namespace TG::Math
     {
         return 0 == ((size_t)value & (alignment - 1));
     }
+
+    // 获取表达式对应的矩阵类型
+    template<typename Xpr>
+    struct PlainMatrixType
+    {
+        using Type = Matrix<typename Traits<Xpr>::Scalar, Traits<Xpr>::Rows, Traits<Xpr>::Columns,
+                (Traits<Xpr>::Flags & XprFlag::RowMajor) != XprFlag::None ?
+                StorageOption::RowMajor : StorageOption::ColumnMajor>;
+    };
 }

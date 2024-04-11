@@ -30,18 +30,16 @@ namespace TG::Math
 		float& b() { return m_channels[2]; }
 		float& a() { return m_channels[3]; }
 
-		float const* RGBA() const { return m_channels.data(); }
+//		float const* RGBA() const { return m_channels.data(); }
 
 		Color operator*(const Color& color) const
 		{
 			Color result;
-			result.m_channels = m_channels.CWiseMultiple(color.m_channels);
 			return result;
 		}
 		Color operator*(float c) const
 		{
 			Color result(c);
-			result.m_channels = m_channels.CWiseMultiple(result.m_channels);
 			return result;
 		}
 

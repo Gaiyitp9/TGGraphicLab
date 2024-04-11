@@ -15,6 +15,7 @@ namespace TG::Math
         static constexpr int	    Columns = Columns_;
         static constexpr int	    Size = Rows * Columns;
         static constexpr XprFlag    Flags = (Option == StorageOption::RowMajor ? XprFlag::RowMajor : XprFlag::None) |
+                XprFlag::DirectAccess |
                 (Rows == 1 || Columns == 1 ? XprFlag::Vector : XprFlag::None) |
                 (Rows == Columns ? XprFlag::Square : XprFlag::None);
 	};
@@ -30,6 +31,12 @@ namespace TG::Math
 		Matrix(const Matrix& other) { std::memcpy(m_storage, other.m_storage, Traits<Matrix>::Size * sizeof(Scalar)); }
         Matrix(Matrix&&) = delete;
 
+        template<typename Derived>
+        Matrix(const MatrixBase<Derived>& other)
+        {
+            CallAssignmentNoAlias(Expression(), other.Expression());
+        }
+
 		template<typename Derived>
 		Matrix& operator=(const MatrixBase<Derived>& other)
 		{
@@ -37,16 +44,19 @@ namespace TG::Math
 			return *this;
 		}
 
+        const Scalar* Data() const { return m_storage; }
+        Scalar* Data() { return m_storage; }
+
 		const Scalar& operator[](int index) const
 		{
 			return m_storage[index];
 		}
 		const Scalar& operator()(int row, int col) const
 		{
-			if constexpr (Traits<Matrix>::IsRowMajor)
-				return m_storage[col + row * m_storage.cols()];
+			if constexpr ((Traits<Matrix>::Flags & XprFlag::RowMajor) != XprFlag::None)
+				return m_storage[col + row * Columns];
 			else
-				return m_storage[row + col * m_storage.rows()];
+				return m_storage[row + col * Rows];
 		}
 		Scalar& operator[](int index)
 		{
@@ -54,10 +64,10 @@ namespace TG::Math
 		}
 		Scalar& operator()(int row, int col)
 		{
-			if constexpr (Traits<Matrix>::IsRowMajor)
-				return m_storage[col + row * m_storage.cols()];
-			else
-				return m_storage[row + col * m_storage.rows()];
+            if constexpr ((Traits<Matrix>::Flags & XprFlag::RowMajor) != XprFlag::None)
+				return m_storage[col + row * Columns];
+            else
+				return m_storage[row + col * Rows];
 		}
 
 	private:
@@ -87,23 +97,36 @@ namespace TG::Math
     template<typename Scalar, int Rows, int Columns, StorageOption Option>
     class Evaluator<Matrix<Scalar, Rows, Columns, Option>>
     {
-        using MatrixType = Matrix<Scalar, Rows, Columns, Option>;
-        using ReturnType = Traits<MatrixType>::Scalar;
-
     public:
-        explicit Evaluator(const MatrixType& mat) : m_matrix(mat) {}
+        using XprType = Matrix<Scalar, Rows, Columns, Option>;
+        using CoeffType = Traits<XprType>::Scalar;
 
-        [[nodiscard]] const ReturnType& Coefficient(int index) const
+        explicit Evaluator(const XprType& mat) : m_data(mat.Data()) {}
+
+        [[nodiscard]] CoeffType Coefficient(int index) const
         {
-            return m_matrix(index);
+            return m_data[index];
         }
-
-        ReturnType& CoefficientRef(int index)
+        [[nodiscard]] CoeffType Coefficient(int row, int col) const
         {
-            return m_matrix(index);
+            if constexpr ((Traits<XprType>::Flags & XprFlag::RowMajor) != XprFlag::None)
+                return m_data[row * Traits<XprType>::Columns + col];
+            else
+                return m_data[row + col * Traits<XprType>::Rows];
+        }
+        CoeffType& CoefficientRef(int index)
+        {
+            return const_cast<CoeffType*>(m_data)[index];
+        }
+        CoeffType& CoefficientRef(int row, int col)
+        {
+            if constexpr ((Traits<XprType>::Flags & XprFlag::RowMajor) != XprFlag::None)
+                return const_cast<CoeffType*>(m_data)[row * Traits<XprType>::Columns + col];
+            else
+                return const_cast<CoeffType*>(m_data)[row + col * Traits<XprType>::Rows];
         }
 
     private:
-        const MatrixType& m_matrix;
+        CoeffType const* m_data;
     };
 }

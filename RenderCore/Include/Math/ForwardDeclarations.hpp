@@ -5,12 +5,20 @@
 *****************************************************************/
 #pragma once
 
-#include <cmath>
-
 namespace TG::Math
 {
     // 表达式特性，每种表达式都需要特化该类
 	template<typename T> struct Traits;
+
+    // 矩阵表达式标志
+    enum class XprFlag : char
+    {
+        None            = 0,
+        RowMajor        = 1,            // 按行储存
+        DirectAccess    = 1 << 1,       // 是否能直接访问矩阵数据
+        Vector          = 1 << 2,       // 表达式是向量
+        Square          = 1 << 3,       // 表达式是方阵
+    };
 
 	// 矩阵储存格式
 	enum class StorageOption : char
@@ -25,14 +33,17 @@ namespace TG::Math
 	inline constexpr StorageOption DefaultMatrixStorageOrderOption = StorageOption::ColumnMajor;
 #endif
 
-    // 矩阵表达式标志
-    enum class XprFlag
-    {
-        None        = 0,
-        RowMajor    = 1,            // 按行储存
-        Vector      = 1 << 2,       // 表达式是向量
-        Square      = 1 << 3,       // 表达式是方阵
-    };
+    // 矩阵逐元素运算，要求矩阵元素类型相同以及行列相等，如果是向量，则要求尺寸相同
+    template<typename LhsXpr, typename RhsXpr>
+    concept CWiseOperable = std::is_same_v<typename Traits<LhsXpr>::Scalar, typename Traits<RhsXpr>::Scalar> &&
+            ((Traits<LhsXpr>::Flags & Traits<RhsXpr>::Flags & XprFlag::Vector) != XprFlag::None ?
+                Traits<LhsXpr>::Size == Traits<RhsXpr>::Size :
+                Traits<LhsXpr>::Rows == Traits<RhsXpr>::Rows && Traits<LhsXpr>::Columns == Traits<RhsXpr>::Columns);
+
+    // 两个表达式是否可以执行矩阵乘法
+    template<typename LhsXpr, typename RhsXpr>
+    concept MatrixMultipliable = std::is_same_v<typename Traits<LhsXpr>::Scalar, typename Traits<RhsXpr>::Scalar> &&
+                                 Traits<LhsXpr>::Columns == Traits<RhsXpr>::Rows;
 
     // 表达式基类
     template<typename Derived> class MatrixBase;
@@ -40,19 +51,24 @@ namespace TG::Math
 	template<typename Scalar_, int Rows_, int Cols_, StorageOption Option = DefaultMatrixStorageOrderOption>
 	class Matrix;
     // 二元表达式
-    template<typename BinaryOp, typename LhsXpr, typename RhsXpr> class CWiseBinaryOp;
+    template<typename BinaryOp, typename LhsXpr, typename RhsXpr> requires CWiseOperable<LhsXpr, RhsXpr>
+    class CWiseBinaryOp;
+    // 矩阵乘法表达式
+    template<typename LhsXpr, typename RhsXpr> requires MatrixMultipliable<LhsXpr, RhsXpr>
+    class Product;
+    // 矩阵块表达式
+    template<typename Xpr, int BlockRows, int BlockColumns>
+    class Block;
 
     // 表达式求值器，每种表达式都需要特化该类
     template<typename Xpr> class Evaluator;
 
-    // 赋值运算
-    template<typename Scalar> struct AssignOp;
-    // 逐元素加法
+    // 加法函数
     template<typename Scalar> struct ScalarSumOp;
-    // 逐元素减法
+    // 减法函数
     template<typename Scalar> struct ScalarSubtractOp;
-    // 逐元素乘法
+    // 乘法函数
     template<typename Scalar> struct ScalarProductOp;
-    // 逐元素除法
+    // 除法函数
     template<typename Scalar> struct ScalarDivideOp;
 }

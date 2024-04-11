@@ -15,16 +15,16 @@ namespace TG::Math
 
 	// 直接展开赋值
 	template<typename DstEvaluator, typename SrcEvaluator, typename Functor, int Index, int Stop>
-	struct DefaultAssign
+	struct UnrollAssign
 	{
 		static void Run(DstEvaluator& dst, const SrcEvaluator& src, Functor functor)
 		{
             functor.AssignCoefficient(dst.CoefficientRef(Index), src.Coefficient(Index));
-			DefaultAssign<DstEvaluator, SrcEvaluator, Functor, Index + 1, Stop>::Run(dst, src, functor);
+            UnrollAssign<DstEvaluator, SrcEvaluator, Functor, Index + 1, Stop>::Run(dst, src, functor);
 		}
 	};
 	template<typename DstEvaluator, typename SrcEvaluator, typename Functor, int Stop>
-	struct DefaultAssign<DstEvaluator, SrcEvaluator, Functor, Stop, Stop>
+	struct UnrollAssign<DstEvaluator, SrcEvaluator, Functor, Stop, Stop>
 	{
 		static void Run(DstEvaluator&, const SrcEvaluator&, Functor){}
 	};
@@ -34,12 +34,12 @@ namespace TG::Math
 	{
 		static void Run(DstEvaluator& dst, const SrcEvaluator& src, Functor functor = {})
 		{
-            DefaultAssign<DstEvaluator, SrcEvaluator, Functor, 0, Size>::Run(dst, src, functor);
+            UnrollAssign<DstEvaluator, SrcEvaluator, Functor, 0, Size>::Run(dst, src, functor);
 		}
 	};
 
     template<typename Dst, typename Src>
-    void CallAssignment(Dst& dst, const Src& src)
+    inline void CallAssignmentNoAlias(Dst& dst, const Src& src)
     {
         using DstEvaluator = Evaluator<Dst>;
         using SrcEvaluator = Evaluator<Src>;
@@ -49,5 +49,12 @@ namespace TG::Math
         SrcEvaluator srcEvaluator{src};
 
         Assignment<DstEvaluator, SrcEvaluator, AssignOp, Traits<Dst>::Size>::Run(dstEvaluator, srcEvaluator);
+    }
+
+    template<typename Dst, typename Src>
+    inline void CallAssignment(Dst& dst, const Src& src)
+    {
+        typename PlainMatrixType<Src>::Type temp(src);
+        CallAssignmentNoAlias(dst, temp);
     }
 }

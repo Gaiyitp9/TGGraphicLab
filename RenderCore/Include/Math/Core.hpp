@@ -7,10 +7,12 @@
 
 #include <type_traits>
 #include <concepts>
-#include <cmath>
 #include "ForwardDeclarations.hpp"
 #include "XprHelper.hpp"
-#include "MatrixBase.hpp"
+#include "Redux.hpp"
 #include "Assignment.hpp"
+#include "MatrixBase.hpp"
 #include "CWiseBinaryOp.hpp"
+#include "Product.hpp"
 #include "Matrix.hpp"
+#include "Block.hpp"
