@@ -10,7 +10,7 @@
 
 namespace TG::Input
 {
-    // 输入设备概念，与接口类似
+    // 输入设备概念
     template<typename Device>
     concept InputDevice = requires(Device device)
     {

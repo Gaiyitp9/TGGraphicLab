@@ -4,8 +4,30 @@
 #include "Camera.h"
 #include "Material.h"
 
+template<typename Derived>
+class Base
+{
+public:
+    using Type = int;
+
+protected:
+    int num = 2;
+};
+
+template<typename T>
+class Derived1 : public Base<Derived1<T>>
+{
+    using Base = Base<Derived1<T>>;
+public:
+    Derived1() { std::cout << num << std::endl; }
+
+    Base::Type i = 0;
+};
+
 int main()
 {
+    Derived1<float> d;
+    Derived1<float>::Type i;
 //    auto materialGround = std::make_shared<Lambert>(Color(0.8, 0.8, 0.0));
 //    auto materialCenter = std::make_shared<Lambert>(Color(0.1, 0.2, 0.5));
 //    auto materialLeft = std::make_shared<Dielectric>(1.5);

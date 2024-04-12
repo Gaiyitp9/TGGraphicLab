@@ -15,7 +15,7 @@ namespace TG::Math
     {
         None            = 0,
         RowMajor        = 1,            // 按行储存
-        DirectAccess    = 1 << 1,       // 是否能直接访问矩阵数据
+        DirectAccess    = 1 << 1,       // 是否能直接访问表达式的数据
         Vector          = 1 << 2,       // 表达式是向量
         Square          = 1 << 3,       // 表达式是方阵
     };
@@ -33,6 +33,17 @@ namespace TG::Math
 	inline constexpr StorageOption DefaultMatrixStorageOrderOption = StorageOption::ColumnMajor;
 #endif
 
+    // 矩阵表达式概念
+    template<typename Xpr>
+    concept MatrixExpression = requires
+    {
+        typename Traits<Xpr>::Scalar;
+        Traits<Xpr>::Rows;
+        Traits<Xpr>::Columns;
+        Traits<Xpr>::Size;
+        Traits<Xpr>::Flags;
+    };
+
     // 矩阵逐元素运算，要求矩阵元素类型相同以及行列相等，如果是向量，则要求尺寸相同
     template<typename LhsXpr, typename RhsXpr>
     concept CWiseOperable = std::is_same_v<typename Traits<LhsXpr>::Scalar, typename Traits<RhsXpr>::Scalar> &&
@@ -45,8 +56,20 @@ namespace TG::Math
     concept MatrixMultipliable = std::is_same_v<typename Traits<LhsXpr>::Scalar, typename Traits<RhsXpr>::Scalar> &&
                                  Traits<LhsXpr>::Columns == Traits<RhsXpr>::Rows;
 
+    // 求值器概念
+    // TODO: 后面再看看需不需要添加这个概念，跟MatrixExpression概念类似，求值器必须实现概念里的typedef和接口，
+    //  但是需要额外添加一个基类，使用CRTP(奇异递归模板)技巧来添加概念，有点麻烦
+    template<typename Evaluator>
+    concept ExpressionEvaluator = requires(Evaluator evaluator)
+    {
+        typename Evaluator::XprType;
+        typename Evaluator::CoeffType;
+        { evaluator.Coefficient(0) } -> std::same_as<typename Evaluator::CoeffType>;
+        { evaluator.Coefficient(0, 0) } -> std::same_as<typename Evaluator::CoeffType>;
+    };
+
     // 表达式基类
-    template<typename Derived> class MatrixBase;
+    template<typename Derived> requires MatrixExpression<Derived> class MatrixBase;
 	// 矩阵类
 	template<typename Scalar_, int Rows_, int Cols_, StorageOption Option = DefaultMatrixStorageOrderOption>
 	class Matrix;

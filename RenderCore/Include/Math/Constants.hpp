@@ -5,6 +5,7 @@
 *****************************************************************/
 #pragma once
 #include <concepts>
+#include <numbers>
 
 namespace TG::Math
 {
@@ -23,4 +24,10 @@ namespace TG::Math
 
     inline constexpr double Rad2Deg = Rad2DegV<double>;
     inline constexpr double Deg2Rad = Deg2RadV<double>;
+
+//    inline constexpr double operator""_deg_to_rad(long double degree)
+//    {
+//        double radians = degree * std::numbers::pi_v<long double> / 180;
+//        return radians;
+//    }
 }

@@ -7,7 +7,7 @@
 
 namespace TG::Math
 {
-    template<typename Derived>
+    template<typename Derived> requires MatrixExpression<Derived>
     class MatrixBase
     {
         using Scalar = Traits<Derived>::Scalar;
