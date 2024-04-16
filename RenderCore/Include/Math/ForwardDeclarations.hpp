@@ -15,9 +15,10 @@ namespace TG::Math
     {
         None            = 0,
         RowMajor        = 1,            // 按行储存
-        DirectAccess    = 1 << 1,       // 是否能直接访问表达式的数据
-        Vector          = 1 << 2,       // 表达式是向量
-        Square          = 1 << 3,       // 表达式是方阵
+        DirectAccess    = 1 << 1,       // 是否能直接访问表达式的数据，也就是求值器有CoefficientRef函数
+        LinearAccess    = 1 << 2,       // 是否能看作一维向量，也就是求值器可以调用Coefficient(int)函数
+        Vector          = 1 << 3,       // 表达式是向量
+        Square          = 1 << 4,       // 表达式是方阵
     };
 
 	// 矩阵储存格式
@@ -62,8 +63,8 @@ namespace TG::Math
     template<typename Evaluator>
     concept ExpressionEvaluator = requires(Evaluator evaluator)
     {
-        typename Evaluator::XprType;
-        typename Evaluator::CoeffType;
+        typename Traits<Evaluator>::XprType;
+        typename Traits<Evaluator>::CoeffType;
         { evaluator.Coefficient(0) } -> std::same_as<typename Evaluator::CoeffType>;
         { evaluator.Coefficient(0, 0) } -> std::same_as<typename Evaluator::CoeffType>;
     };
@@ -80,7 +81,7 @@ namespace TG::Math
     template<typename LhsXpr, typename RhsXpr> requires MatrixMultipliable<LhsXpr, RhsXpr>
     class Product;
     // 矩阵块表达式
-    template<typename Xpr, int BlockRows, int BlockColumns>
+    template<typename NestedXpr, int BlockRows, int BlockColumns>
     class Block;
 
     // 表达式求值器，每种表达式都需要特化该类

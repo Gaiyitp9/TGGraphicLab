@@ -15,7 +15,7 @@ namespace TG::Math
         static constexpr int	    Columns = Columns_;
         static constexpr int	    Size = Rows * Columns;
         static constexpr XprFlag    Flags = (Option == StorageOption::RowMajor ? XprFlag::RowMajor : XprFlag::None) |
-                XprFlag::DirectAccess |
+                XprFlag::DirectAccess | XprFlag::LinearAccess |
                 (Rows == 1 || Columns == 1 ? XprFlag::Vector : XprFlag::None) |
                 (Rows == Columns ? XprFlag::Square : XprFlag::None);
 	};
@@ -99,7 +99,7 @@ namespace TG::Math
     {
     public:
         using XprType = Matrix<Scalar, Rows, Columns, Option>;
-        using CoeffType = Traits<XprType>::Scalar;
+        using CoeffType= Traits<XprType>::Scalar;
 
         explicit Evaluator(const XprType& mat) : m_data(mat.Data()) {}
 

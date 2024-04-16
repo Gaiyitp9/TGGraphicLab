@@ -19,7 +19,7 @@ class Derived1 : public Base<Derived1<T>>
 {
     using Base = Base<Derived1<T>>;
 public:
-    Derived1() { std::cout << num << std::endl; }
+    Derived1() { std::cout << Base::num << std::endl; }
 
     Base::Type i = 0;
 };

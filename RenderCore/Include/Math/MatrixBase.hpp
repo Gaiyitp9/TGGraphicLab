@@ -56,5 +56,11 @@ namespace TG::Math
         {
             return Redux(std::plus<Scalar>{});
         }
+
+        template<int BlockRows, int BlockCols>
+        Block<Derived, BlockRows, BlockCols> Block(int startRow, int startCol)
+        {
+            return { Expression(), startRow, startCol };
+        }
     };
 }

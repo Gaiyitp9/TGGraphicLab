@@ -25,9 +25,15 @@ namespace TG::Math
     inline constexpr double Rad2Deg = Rad2DegV<double>;
     inline constexpr double Deg2Rad = Deg2RadV<double>;
 
-//    inline constexpr double operator""_deg_to_rad(long double degree)
-//    {
-//        double radians = degree * std::numbers::pi_v<long double> / 180;
-//        return radians;
-//    }
+    inline constexpr long double operator""_deg_to_rad(long double degree)
+    {
+        long double radian = degree * std::numbers::pi_v<long double> / 180;
+        return radian;
+    }
+
+    inline constexpr long double operator""_rad_to_deg(long double radian)
+    {
+        long double degree = radian * 180 / std::numbers::pi_v<long double>;
+        return degree;
+    }
 }
