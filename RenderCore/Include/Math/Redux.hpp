@@ -7,43 +7,102 @@
 
 namespace TG::Math
 {
-    template<typename Evaluator, typename Functor, int Start, int Length>
-    struct UnrollRedux
+    template<typename Evaluator, typename Functor, int Index, int Length>
+    struct UnrollDefaultRedux
     {
         using Scalar = Traits<typename Evaluator::XprType>::Scalar;
         static constexpr int HalfLength = Length / 2;
 
         static Scalar Run(const Evaluator& evaluator, Functor functor)
         {
-            return functor(UnrollRedux<Evaluator, Functor, Start, HalfLength>::Run(evaluator, functor),
-                           UnrollRedux<Evaluator, Functor, Start + HalfLength, Length - HalfLength>::Run(evaluator, functor));
+            return functor(UnrollDefaultRedux<Evaluator, Functor, Index, HalfLength>::Run(evaluator, functor),
+                           UnrollDefaultRedux<Evaluator, Functor, Index + HalfLength, Length - HalfLength>::Run(evaluator, functor));
         }
     };
-
-    template<typename Evaluator, typename Functor, int Start>
-    struct UnrollRedux<Evaluator, Functor, Start, 1>
+    template<typename Evaluator, typename Functor, int Index>
+    struct UnrollDefaultRedux<Evaluator, Functor, Index, 1>
     {
         using Scalar = Traits<typename Evaluator::XprType>::Scalar;
+        static constexpr int Row = Index / Traits<typename Evaluator::XprType>::Columns;
+        static constexpr int Column = Index % Traits<typename Evaluator::XprType>::Columns;
 
         static Scalar Run(const Evaluator& evaluator, Functor functor)
         {
-            return evaluator.Coefficient(Start);
+            return evaluator.Coefficient(Row, Column);
         }
     };
-
-    template<typename Evaluator, typename Functor, int Start>
-    struct UnrollRedux<Evaluator, Functor, Start, 0>
+    template<typename Evaluator, typename Functor, int Index>
+    struct UnrollDefaultRedux<Evaluator, Functor, Index, 0>
     {
         using Scalar = Traits<typename Evaluator::XprType>::Scalar;
 
         static Scalar Run(const Evaluator& evaluator, Functor functor) { return {}; }
     };
 
+    template<typename Evaluator, typename Functor, int Index, int Length>
+    struct UnrollLinearRedux
+    {
+        using Scalar = Traits<typename Evaluator::XprType>::Scalar;
+        static constexpr int HalfLength = Length / 2;
+
+        static Scalar Run(const Evaluator& evaluator, Functor functor)
+        {
+            return functor(UnrollLinearRedux<Evaluator, Functor, Index, HalfLength>::Run(evaluator, functor),
+                           UnrollLinearRedux<Evaluator, Functor, Index + HalfLength, Length - HalfLength>::Run(evaluator, functor));
+        }
+    };
+    template<typename Evaluator, typename Functor, int Index>
+    struct UnrollLinearRedux<Evaluator, Functor, Index, 1>
+    {
+        using Scalar = Traits<typename Evaluator::XprType>::Scalar;
+
+        static Scalar Run(const Evaluator& evaluator, Functor functor)
+        {
+            return evaluator.Coefficient(Index);
+        }
+    };
+    template<typename Evaluator, typename Functor, int Index>
+    struct UnrollLinearRedux<Evaluator, Functor, Index, 0>
+    {
+        using Scalar = Traits<typename Evaluator::XprType>::Scalar;
+
+        static Scalar Run(const Evaluator& evaluator, Functor functor) { return {}; }
+    };
+
+    template<typename Evaluator, typename Functor, TraversalType Traversal =
+        CheckFlag<typename Evaluator::XprType>(XprFlag::LinearAccess) ?
+        TraversalType::Linear : TraversalType::Default>
+    struct Redux;
+
+    template<typename Evaluator, typename Functor>
+    struct Redux<Evaluator, Functor, TraversalType::Default>
+    {
+        using ReturnType = Traits<typename Evaluator::XprType>::Scalar;
+        static constexpr int Size = Traits<typename Evaluator::XprType>::Size;
+
+        static ReturnType Run(const Evaluator& evaluator, Functor functor)
+        {
+            return UnrollDefaultRedux<Evaluator, Functor, 0, Size>::Run(evaluator, functor);
+        }
+    };
+
+    template<typename Evaluator, typename Functor>
+    struct Redux<Evaluator, Functor, TraversalType::Linear>
+    {
+        using ReturnType = Traits<typename Evaluator::XprType>::Scalar;
+        static constexpr int Size = Traits<typename Evaluator::XprType>::Size;
+
+        static ReturnType Run(const Evaluator& evaluator, Functor functor)
+        {
+            return UnrollLinearRedux<Evaluator, Functor, 0, Size>::Run(evaluator, functor);
+        }
+    };
+
     template<typename Xpr, typename Functor>
-    inline Traits<Xpr>::Scalar CallRedux(const Xpr& xpr, Functor functor)
+    Traits<Xpr>::Scalar CallRedux(const Xpr& xpr, Functor functor)
     {
         Evaluator<Xpr> evaluator{xpr};
 
-        return UnrollRedux<Evaluator<Xpr>, Functor, 0, Traits<Xpr>::Size>::Run(evaluator, functor);
+        return Redux<Evaluator<Xpr>, Functor>::Run(evaluator, functor);
     }
 }

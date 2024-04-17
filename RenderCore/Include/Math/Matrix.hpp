@@ -1,5 +1,5 @@
 ﻿/****************************************************************
-* TianGong RenderLab											*
+* TianGong GraphicLab											*
 * Copyright (c) Gaiyitp9. All rights reserved.					*
 * This code is licensed under the MIT License (MIT).			*
 *****************************************************************/
@@ -53,7 +53,7 @@ namespace TG::Math
 		}
 		const Scalar& operator()(int row, int col) const
 		{
-			if constexpr ((Traits<Matrix>::Flags & XprFlag::RowMajor) != XprFlag::None)
+			if constexpr (CheckFlag<Matrix>(XprFlag::RowMajor))
 				return m_storage[col + row * Columns];
 			else
 				return m_storage[row + col * Rows];
@@ -64,7 +64,7 @@ namespace TG::Math
 		}
 		Scalar& operator()(int row, int col)
 		{
-            if constexpr ((Traits<Matrix>::Flags & XprFlag::RowMajor) != XprFlag::None)
+            if constexpr (CheckFlag<Matrix>(XprFlag::RowMajor))
 				return m_storage[col + row * Columns];
             else
 				return m_storage[row + col * Rows];
@@ -109,7 +109,7 @@ namespace TG::Math
         }
         [[nodiscard]] CoeffType Coefficient(int row, int col) const
         {
-            if constexpr ((Traits<XprType>::Flags & XprFlag::RowMajor) != XprFlag::None)
+            if constexpr (CheckFlag<XprType>(XprFlag::RowMajor))
                 return m_data[row * Traits<XprType>::Columns + col];
             else
                 return m_data[row + col * Traits<XprType>::Rows];
@@ -120,7 +120,7 @@ namespace TG::Math
         }
         CoeffType& CoefficientRef(int row, int col)
         {
-            if constexpr ((Traits<XprType>::Flags & XprFlag::RowMajor) != XprFlag::None)
+            if constexpr (CheckFlag<XprType>(XprFlag::RowMajor))
                 return const_cast<CoeffType*>(m_data)[row * Traits<XprType>::Columns + col];
             else
                 return const_cast<CoeffType*>(m_data)[row + col * Traits<XprType>::Rows];

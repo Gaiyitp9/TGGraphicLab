@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.24)
 
-project(TGRenderLab)
+project(TGGraphicLab)
 
 # msvc17.0以上
 if(MSVC_TOOLSET_VERSION GREATER_EQUAL 143)

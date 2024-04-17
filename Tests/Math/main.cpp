@@ -13,6 +13,7 @@ int main()
     TG::Math::Matrix3f c = b.Block<3, 3>(1, 1);
 
     std::cout << "sum of a: " << a.Sum() << '\n';
+    std::cout << "sum of a block: " << b.Block<3, 3>(1, 1).Sum() << '\n';
     for (int i = 0; i < 4; ++i)
     {
         for (int j = 0; j < 4; ++j)

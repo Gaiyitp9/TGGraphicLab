@@ -1,5 +1,5 @@
 /****************************************************************
-* TianGong RenderLab											*
+* TianGong GraphicLab											*
 * Copyright (c) Gaiyitp9. All rights reserved.					*
 * This code is licensed under the MIT License (MIT).			*
 *****************************************************************/
@@ -54,7 +54,7 @@ namespace TG::Math
 
         Scalar Sum() const
         {
-            return Redux(std::plus<Scalar>{});
+            return Redux(ScalarSumOp<Scalar>{});
         }
 
         template<int BlockRows, int BlockCols>

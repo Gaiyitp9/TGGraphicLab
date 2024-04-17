@@ -1,5 +1,5 @@
 /****************************************************************
-* TianGong RenderLab											*
+* TianGong GraphicLab											*
 * Copyright (c) Gaiyitp9. All rights reserved.					*
 * This code is licensed under the MIT License (MIT).			*
 *****************************************************************/
@@ -10,6 +10,34 @@ namespace TG::Math
     // 表达式特性，每种表达式都需要特化该类
 	template<typename T> struct Traits;
 
+    // 给枚举添加逻辑运算
+    template<typename Enum> requires std::is_enum_v<Enum>
+    constexpr auto UnderlyingTypeCast(Enum e) { return static_cast<std::underlying_type_t<Enum>>(e); }
+
+    template<typename Enum> requires std::is_enum_v<Enum>
+    constexpr Enum operator|(Enum left, Enum right)
+    {
+        return static_cast<Enum>(UnderlyingTypeCast(left) | UnderlyingTypeCast(right));
+    }
+
+    template<typename Enum> requires std::is_enum_v<Enum>
+    constexpr Enum operator^(Enum left, Enum right)
+    {
+        return static_cast<Enum>(UnderlyingTypeCast(left) ^ UnderlyingTypeCast(right));
+    }
+
+    template<typename Enum> requires std::is_enum_v<Enum>
+    constexpr Enum operator&(Enum left, Enum right)
+    {
+        return static_cast<Enum>(UnderlyingTypeCast(left) & UnderlyingTypeCast(right));
+    }
+
+    template<typename Enum> requires std::is_enum_v<Enum>
+    constexpr Enum operator~(Enum e)
+    {
+        return static_cast<Enum>(~UnderlyingTypeCast(e));
+    }
+
     // 矩阵表达式标志
     enum class XprFlag : char
     {
@@ -19,6 +47,14 @@ namespace TG::Math
         LinearAccess    = 1 << 2,       // 是否能看作一维向量，也就是求值器可以调用Coefficient(int)函数
         Vector          = 1 << 3,       // 表达式是向量
         Square          = 1 << 4,       // 表达式是方阵
+    };
+
+    // 赋值遍历类型
+    enum class TraversalType : char
+    {
+        Default,
+        Linear,
+        Vectorized,
     };
 
 	// 矩阵储存格式
@@ -45,11 +81,20 @@ namespace TG::Math
         Traits<Xpr>::Flags;
     };
 
+    // 表达式标志是否包含指定标志
+    template<typename Derived, typename... OtherDerived> requires MatrixExpression<Derived>
+    constexpr bool CheckFlag(XprFlag flag)
+    {
+        if constexpr (sizeof...(OtherDerived) > 0)
+            return (Traits<Derived>::Flags & flag) != XprFlag::None && CheckFlag<OtherDerived...>(flag);
+        else
+            return (Traits<Derived>::Flags & flag) != XprFlag::None;
+    }
+
     // 矩阵逐元素运算，要求矩阵元素类型相同以及行列相等，如果是向量，则要求尺寸相同
     template<typename LhsXpr, typename RhsXpr>
     concept CWiseOperable = std::is_same_v<typename Traits<LhsXpr>::Scalar, typename Traits<RhsXpr>::Scalar> &&
-            ((Traits<LhsXpr>::Flags & Traits<RhsXpr>::Flags & XprFlag::Vector) != XprFlag::None ?
-                Traits<LhsXpr>::Size == Traits<RhsXpr>::Size :
+            (CheckFlag<LhsXpr, RhsXpr>(XprFlag::Vector) ? Traits<LhsXpr>::Size == Traits<RhsXpr>::Size :
                 Traits<LhsXpr>::Rows == Traits<RhsXpr>::Rows && Traits<LhsXpr>::Columns == Traits<RhsXpr>::Columns);
 
     // 两个表达式是否可以执行矩阵乘法
@@ -70,7 +115,8 @@ namespace TG::Math
     };
 
     // 表达式基类
-    template<typename Derived> requires MatrixExpression<Derived> class MatrixBase;
+    template<typename Derived> requires MatrixExpression<Derived>
+    class MatrixBase;
 	// 矩阵类
 	template<typename Scalar_, int Rows_, int Cols_, StorageOption Option = DefaultMatrixStorageOrderOption>
 	class Matrix;
@@ -83,6 +129,9 @@ namespace TG::Math
     // 矩阵块表达式
     template<typename NestedXpr, int BlockRows, int BlockColumns>
     class Block;
+    // 矩阵转置
+    template<typename NestedXpr>
+    class Transpose;
 
     // 表达式求值器，每种表达式都需要特化该类
     template<typename Xpr> class Evaluator;
@@ -95,4 +144,12 @@ namespace TG::Math
     template<typename Scalar> struct ScalarProductOp;
     // 除法函数
     template<typename Scalar> struct ScalarDivideOp;
+
+    // 获取表达式对应的矩阵类型
+    template<typename Xpr>
+    struct PlainMatrixType
+    {
+        using Type = Matrix<typename Traits<Xpr>::Scalar, Traits<Xpr>::Rows, Traits<Xpr>::Columns,
+                CheckFlag<Xpr>(XprFlag::RowMajor) ? StorageOption::RowMajor : StorageOption::ColumnMajor>;
+    };
 }

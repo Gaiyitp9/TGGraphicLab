@@ -1,5 +1,5 @@
 /****************************************************************
-* TianGong RenderLab											*
+* TianGong GraphicLab											*
 * Copyright (c) Gaiyitp9. All rights reserved.					*
 * This code is licensed under the MIT License (MIT).			*
 *****************************************************************/
@@ -7,14 +7,6 @@
 
 namespace TG::Math
 {
-    // 赋值遍历类型
-    enum class TraversalType : char
-    {
-        Default,
-        Linear,
-        Vectorized,
-    };
-
     // 赋值运算
     template<typename Scalar>
     struct AssignOp
@@ -23,6 +15,25 @@ namespace TG::Math
     };
 
 	// 直接展开赋值
+    // 通过行列赋值
+    template<typename Kernel, int Index, int Stop>
+    struct UnrollDefaultAssign
+    {
+        static constexpr int Row = Index / Traits<typename Kernel::DstXpr>::Columns;
+        static constexpr int Column = Index % Traits<typename Kernel::DstXpr>::Columns;
+
+        static void Run(Kernel& kernel)
+        {
+            kernel.AssignCoefficient(Row, Column);
+            UnrollDefaultAssign<Kernel, Index + 1, Stop>::Run(kernel);
+        }
+    };
+    template<typename Kernel, int Stop>
+    struct UnrollDefaultAssign<Kernel, Stop, Stop>
+    {
+        static void Run(Kernel&){}
+    };
+
     // 线性赋值
 	template<typename Kernel, int Index, int Stop>
 	struct UnrollLinearAssign
@@ -39,32 +50,13 @@ namespace TG::Math
 		static void Run(Kernel&){}
 	};
 
-    // 通过行列赋值
-    template<typename Kernel, int Index, int Stop>
-    struct UnrollDefaultAssign
-    {
-        static constexpr int Row = Index / Kernel::DstTraits::Columns;
-        static constexpr int Column = Index % Kernel::DstTraits::Columns;
-
-        static void Run(Kernel& kernel)
-        {
-            kernel.AssignCoefficient(Row, Column);
-            UnrollDefaultAssign<Kernel, Index + 1, Stop>::Run(kernel);
-        }
-    };
-    template<typename Kernel, int Stop>
-    struct UnrollDefaultAssign<Kernel, Stop, Stop>
-    {
-        static void Run(Kernel&){}
-    };
-
     // 赋值核，封装赋值过程涉及的细节
     template<typename DstEvaluator, typename SrcEvaluator, typename Functor>
     class AssignmentKernel
     {
     public:
-        using DstTraits = Traits<typename DstEvaluator::XprType>;
-        using SrcTraits = Traits<typename SrcEvaluator::XprType>;
+        using DstXpr = DstEvaluator::XprType;
+        using SrcXpr = SrcEvaluator::XprType;
 
         AssignmentKernel(DstEvaluator& dstEvaluator, const SrcEvaluator& srcEvaluator, Functor functor)
             : m_dstEvaluator(dstEvaluator), m_srcEvaluator(srcEvaluator), m_functor(functor) {}
@@ -86,7 +78,7 @@ namespace TG::Math
     };
 
     template<typename Kernel, TraversalType Traversal =
-            (Kernel::DstTraits::Flags & Kernel::SrcTraits::Flags & XprFlag::LinearAccess) != XprFlag::None ?
+            CheckFlag<typename Kernel::DstXpr, typename Kernel::SrcXpr>(XprFlag::LinearAccess) ?
             TraversalType::Linear : TraversalType::Default>
     struct Assignment;
 
@@ -95,7 +87,7 @@ namespace TG::Math
     {
         static void Run(Kernel& kernel)
         {
-            UnrollDefaultAssign<Kernel, 0, Kernel::DstTraits::Size>::Run(kernel);
+            UnrollDefaultAssign<Kernel, 0, Traits<typename Kernel::DstXpr>::Size>::Run(kernel);
         }
     };
 
@@ -104,7 +96,7 @@ namespace TG::Math
 	{
 		static void Run(Kernel& kernel)
 		{
-            UnrollLinearAssign<Kernel, 0, Kernel::DstTraits::Size>::Run(kernel);
+            UnrollLinearAssign<Kernel, 0, Traits<typename Kernel::DstXpr>::Size>::Run(kernel);
 		}
 	};
 

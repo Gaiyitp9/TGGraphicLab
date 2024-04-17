@@ -15,8 +15,7 @@ namespace TG::Math
         static constexpr int        Columns = BlockColumns;
         static constexpr int        Size = Rows * Columns;
         static constexpr XprFlag    Flags = (Traits<NestedXpr>::Flags & (XprFlag::RowMajor | XprFlag::DirectAccess)) |
-                (((Traits<NestedXpr>::Flags & XprFlag::Vector) != XprFlag::None &&
-                (Traits<NestedXpr>::Flags & XprFlag::LinearAccess) != XprFlag::None) ?
+                (CheckFlag<NestedXpr>(XprFlag::Vector) && CheckFlag<NestedXpr>(XprFlag::LinearAccess) ?
                 XprFlag::LinearAccess : XprFlag::None) |
                 (Rows == 1 || Columns == 1 ? XprFlag::Vector : XprFlag::None) |
                 (Rows == Columns ? XprFlag::Square : XprFlag::None);
@@ -40,7 +39,7 @@ namespace TG::Math
     };
 
     template<typename NestedXpr, int BlockRows, int BlockColumns,
-            bool HasDirectAccess = (Traits<NestedXpr>::Flags & XprFlag::DirectAccess) != XprFlag::None>
+            bool HasDirectAccess = CheckFlag<NestedXpr>(XprFlag::DirectAccess)>
     class BlockEvaluator;
 
     template<typename NestedXpr, int BlockRows, int BlockColumns>
@@ -64,8 +63,7 @@ namespace TG::Math
 
         BlockEvaluator(const XprType& block, int startRow, int startCol)
             : m_xprEvaluator(block.NestedExpression()), m_startRow(startRow), m_startCol(startCol),
-            m_offset((Traits<XprType>::Flags & XprFlag::RowMajor) != XprFlag::None ?
-                    startRow * Traits<NestedXpr>::Columns + startCol :
+            m_offset(CheckFlag<XprType>(XprFlag::RowMajor) ? startRow * Traits<NestedXpr>::Columns + startCol :
                     startCol * Traits<NestedXpr>::Rows + startRow)
         {}
 
