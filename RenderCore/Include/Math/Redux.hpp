@@ -7,11 +7,11 @@
 
 namespace TG::Math
 {
-    template<typename Evaluator, typename Functor, int Index, int Length>
+    template<typename Evaluator, typename Functor, std::size_t Index, std::size_t Length>
     struct UnrollDefaultRedux
     {
         using Scalar = Traits<typename Evaluator::XprType>::Scalar;
-        static constexpr int HalfLength = Length / 2;
+        static constexpr std::size_t HalfLength = Length / 2;
 
         static Scalar Run(const Evaluator& evaluator, Functor functor)
         {
@@ -19,19 +19,19 @@ namespace TG::Math
                            UnrollDefaultRedux<Evaluator, Functor, Index + HalfLength, Length - HalfLength>::Run(evaluator, functor));
         }
     };
-    template<typename Evaluator, typename Functor, int Index>
+    template<typename Evaluator, typename Functor, std::size_t Index>
     struct UnrollDefaultRedux<Evaluator, Functor, Index, 1>
     {
         using Scalar = Traits<typename Evaluator::XprType>::Scalar;
-        static constexpr int Row = Index / Traits<typename Evaluator::XprType>::Columns;
-        static constexpr int Column = Index % Traits<typename Evaluator::XprType>::Columns;
+        static constexpr std::size_t Row = Index / Traits<typename Evaluator::XprType>::Columns;
+        static constexpr std::size_t Column = Index % Traits<typename Evaluator::XprType>::Columns;
 
         static Scalar Run(const Evaluator& evaluator, Functor functor)
         {
             return evaluator.Coefficient(Row, Column);
         }
     };
-    template<typename Evaluator, typename Functor, int Index>
+    template<typename Evaluator, typename Functor, std::size_t Index>
     struct UnrollDefaultRedux<Evaluator, Functor, Index, 0>
     {
         using Scalar = Traits<typename Evaluator::XprType>::Scalar;
@@ -39,11 +39,11 @@ namespace TG::Math
         static Scalar Run(const Evaluator& evaluator, Functor functor) { return {}; }
     };
 
-    template<typename Evaluator, typename Functor, int Index, int Length>
+    template<typename Evaluator, typename Functor, std::size_t Index, std::size_t Length>
     struct UnrollLinearRedux
     {
         using Scalar = Traits<typename Evaluator::XprType>::Scalar;
-        static constexpr int HalfLength = Length / 2;
+        static constexpr std::size_t HalfLength = Length / 2;
 
         static Scalar Run(const Evaluator& evaluator, Functor functor)
         {
@@ -51,7 +51,7 @@ namespace TG::Math
                            UnrollLinearRedux<Evaluator, Functor, Index + HalfLength, Length - HalfLength>::Run(evaluator, functor));
         }
     };
-    template<typename Evaluator, typename Functor, int Index>
+    template<typename Evaluator, typename Functor, std::size_t Index>
     struct UnrollLinearRedux<Evaluator, Functor, Index, 1>
     {
         using Scalar = Traits<typename Evaluator::XprType>::Scalar;
@@ -61,7 +61,7 @@ namespace TG::Math
             return evaluator.Coefficient(Index);
         }
     };
-    template<typename Evaluator, typename Functor, int Index>
+    template<typename Evaluator, typename Functor, std::size_t Index>
     struct UnrollLinearRedux<Evaluator, Functor, Index, 0>
     {
         using Scalar = Traits<typename Evaluator::XprType>::Scalar;
@@ -78,7 +78,7 @@ namespace TG::Math
     struct Redux<Evaluator, Functor, TraversalType::Default>
     {
         using ReturnType = Traits<typename Evaluator::XprType>::Scalar;
-        static constexpr int Size = Traits<typename Evaluator::XprType>::Size;
+        static constexpr std::size_t Size = Traits<typename Evaluator::XprType>::Size;
 
         static ReturnType Run(const Evaluator& evaluator, Functor functor)
         {
@@ -90,7 +90,7 @@ namespace TG::Math
     struct Redux<Evaluator, Functor, TraversalType::Linear>
     {
         using ReturnType = Traits<typename Evaluator::XprType>::Scalar;
-        static constexpr int Size = Traits<typename Evaluator::XprType>::Size;
+        static constexpr std::size_t Size = Traits<typename Evaluator::XprType>::Size;
 
         static ReturnType Run(const Evaluator& evaluator, Functor functor)
         {
@@ -98,7 +98,7 @@ namespace TG::Math
         }
     };
 
-    template<typename Xpr, typename Functor>
+    template<typename Xpr, typename Functor> requires MatrixExpression<Xpr>
     Traits<Xpr>::Scalar CallRedux(const Xpr& xpr, Functor functor)
     {
         Evaluator<Xpr> evaluator{xpr};

@@ -4,6 +4,8 @@
 #include "ConstString.hpp"
 #include "ExpressionTemplate.hpp"
 
+//-----------------------------------------------------------------
+// 测试模板参数推导
 template<typename T>
 void Test(T& t)
 {
@@ -27,6 +29,7 @@ void Test3(const T t)
 {
     std::cout << "const T: " << __FUNCSIG__ << std::endl;
 }
+//-----------------------------------------------------------------
 
 template<typename Text = void>
 struct ModifierTest
@@ -140,6 +143,30 @@ void IntList3(std::index_sequence<N0, Ns...>)
     std::cout << std::endl;
 }
 
+//-----------------------------------------------------------------
+// template two-phase lookup
+template<typename Derived>
+class Base
+{
+public:
+    using Type = int;
+
+protected:
+    int num = 2;
+};
+
+template<typename T>
+class Derived1 : public Base<Derived1<T>>
+{
+    using Base = Base<Derived1<T>>;
+public:
+    // 必须添加Base::或者this->使得num变成qualified dependent name，lookup会推迟到第二阶段，即实例化阶段
+    Derived1() { std::cout << Base::num << std::endl; }
+
+    Base::Type i = 0;
+};
+//-----------------------------------------------------------------
+
 int main()
 {
     // [const] [volatile] <type> [*|&] [[N]]碰到T，会退化(decay)为 <type> [*](当类型为指针或数组时)
@@ -150,23 +177,25 @@ int main()
     char const* str = "what";
     char const str2[5] = "what";
     const char& ch = 's';
+    std::string str3 = "what?";
     // T&
-    Test(inum);        // const int -> const int
+    Test(inum);     // const int -> const int
     Test(str);      // char const* -> char const*
     Test(str2);     // char const[N] -> char const[N]
     Test(ch);       // const char& -> const char
     // const T&
-    Test1(inum);        // const int -> int
-    Test1(str);      // char const* -> char const*
-    Test1(str2);     // char const[N] -> char[N]
-    Test1(ch);       // const char& -> char
+    Test1(inum);    // const int -> int
+    Test1(str);     // char const* -> char const*
+    Test1(str2);    // char const[N] -> char[N]
+    Test1(ch);      // const char& -> char
+    Test1(str3);      // const char& -> char
     // T
-    Test2(inum);       // const int -> int
+    Test2(inum);    // const int -> int
     Test2(str);     // char const* -> char const*
     Test2(str2);    // char const[N] -> char const*
     Test2(ch);      // const char& -> char
     // const T
-    Test3(inum);       // const int -> int
+    Test3(inum);    // const int -> int
     Test3(str);     // char const* -> char const*
     Test3(str2);    // char const[N] -> char const*
     Test3(ch);      // const char& -> char
@@ -260,6 +289,10 @@ int main()
         printf("%d:\t%g + min(%g, %g) = %g\n",
                i, A.Value(i), B.Value(i), C.Value(i), D.Value(i));
     }
+
+
+    Derived1<float> ddd;
+    Derived1<float>::Type i;
 
     return 0;
 }

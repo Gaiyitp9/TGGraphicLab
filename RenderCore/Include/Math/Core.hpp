@@ -16,3 +16,4 @@
 #include "Matrix.hpp"
 #include "Block.hpp"
 #include "Transpose.hpp"
+#include "Dot.hpp"

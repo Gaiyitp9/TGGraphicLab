@@ -8,7 +8,13 @@
 namespace TG::Math
 {
     // 表达式特性，每种表达式都需要特化该类
+    // 把表达式的特性定义在Traits里的原因：矩阵表达式基类使用CRTP(Curiously Recurring Template Pattern)，
+    // 基类需要访问表达式的特性(比如Rows)，直接把特性定义在表达式中无法访问，因为在基类中的Derived是incomplete的，
+    // 所以需要通过一个Traits类来访问
+    // https://stackoverflow.com/questions/6006614/c-static-polymorphism-crtp-and-using-typedefs-from-derived-classes
 	template<typename T> struct Traits;
+    // 表达式求值器，每种表达式都需要特化该类
+    template<typename Xpr> class Evaluator;
 
     // 给枚举添加逻辑运算
     template<typename Enum> requires std::is_enum_v<Enum>
@@ -43,11 +49,21 @@ namespace TG::Math
     {
         None            = 0,
         RowMajor        = 1,            // 按行储存
-        DirectAccess    = 1 << 1,       // 是否能直接访问表达式的数据，也就是求值器有CoefficientRef函数
-        LinearAccess    = 1 << 2,       // 是否能看作一维向量，也就是求值器可以调用Coefficient(int)函数
+        LeftValue       = 1 << 1,       // 表达式是否是左值，也就是求值器有CoefficientRef函数
+        LinearAccess    = 1 << 2,       // 是否能看作一维向量，也就是求值器可以调用Coefficient函数
         Vector          = 1 << 3,       // 表达式是向量
         Square          = 1 << 4,       // 表达式是方阵
     };
+
+    // 表达式标志是否包含指定标志
+    template<typename Derived, typename... OtherDerived> requires requires { Traits<Derived>::Flags; }
+    constexpr bool CheckFlag(XprFlag flag)
+    {
+        if constexpr (sizeof...(OtherDerived) > 0)
+            return (Traits<Derived>::Flags & flag) != XprFlag::None && CheckFlag<OtherDerived...>(flag);
+        else
+            return (Traits<Derived>::Flags & flag) != XprFlag::None;
+    }
 
     // 赋值遍历类型
     enum class TraversalType : char
@@ -70,7 +86,7 @@ namespace TG::Math
 	inline constexpr StorageOption DefaultMatrixStorageOrderOption = StorageOption::ColumnMajor;
 #endif
 
-    // 矩阵表达式概念
+    // 矩阵表达式概念，分为两部分: 1. 矩阵表达式的特性 2. 表达式求值器的要求
     template<typename Xpr>
     concept MatrixExpression = requires
     {
@@ -79,46 +95,42 @@ namespace TG::Math
         Traits<Xpr>::Columns;
         Traits<Xpr>::Size;
         Traits<Xpr>::Flags;
-    };
-
-    // 表达式标志是否包含指定标志
-    template<typename Derived, typename... OtherDerived> requires MatrixExpression<Derived>
-    constexpr bool CheckFlag(XprFlag flag)
+    } &&
+    std::constructible_from<Evaluator<Xpr>, const Xpr&> &&
+    requires(Evaluator<Xpr> evaluator, std::size_t index, std::size_t row, std::size_t column)
     {
-        if constexpr (sizeof...(OtherDerived) > 0)
-            return (Traits<Derived>::Flags & flag) != XprFlag::None && CheckFlag<OtherDerived...>(flag);
-        else
-            return (Traits<Derived>::Flags & flag) != XprFlag::None;
-    }
+        typename Evaluator<Xpr>::XprType;
+        typename Evaluator<Xpr>::CoeffType;
+        { evaluator.Coefficient(index) } -> std::same_as<typename Evaluator<Xpr>::CoeffType>;
+        { evaluator.Coefficient(row, column) } -> std::same_as<typename Evaluator<Xpr>::CoeffType>;
+    } &&
+    (
+        // 对于左值表达式，求值器需要定义CoefficientRef接口
+        !CheckFlag<Xpr>(XprFlag::LeftValue) ||
+        requires(Evaluator<Xpr> evaluator, std::size_t index, std::size_t row, std::size_t column)
+        {
+            { evaluator.CoefficientRef(index) } -> std::same_as<typename Evaluator<Xpr>::CoeffType&>;
+            { evaluator.CoefficientRef(row, column) } -> std::same_as<typename Evaluator<Xpr>::CoeffType&>;
+        }
+    );
 
-    // 矩阵逐元素运算，要求矩阵元素类型相同以及行列相等，如果是向量，则要求尺寸相同
+    // 矩阵逐元素运算，要求矩阵元素类型相同以及行列相等
     template<typename LhsXpr, typename RhsXpr>
-    concept CWiseOperable = std::is_same_v<typename Traits<LhsXpr>::Scalar, typename Traits<RhsXpr>::Scalar> &&
-            (CheckFlag<LhsXpr, RhsXpr>(XprFlag::Vector) ? Traits<LhsXpr>::Size == Traits<RhsXpr>::Size :
-                Traits<LhsXpr>::Rows == Traits<RhsXpr>::Rows && Traits<LhsXpr>::Columns == Traits<RhsXpr>::Columns);
+    concept CWiseOperable = MatrixExpression<LhsXpr> && MatrixExpression<RhsXpr> &&
+            std::is_same_v<typename Traits<LhsXpr>::Scalar, typename Traits<RhsXpr>::Scalar> &&
+            Traits<LhsXpr>::Rows == Traits<RhsXpr>::Rows && Traits<LhsXpr>::Columns == Traits<RhsXpr>::Columns;
 
-    // 两个表达式是否可以执行矩阵乘法
+    // 两个表达式是否可以执行矩阵乘法，左边表达式的列数要等于右边表达式的行数
     template<typename LhsXpr, typename RhsXpr>
-    concept MatrixMultipliable = std::is_same_v<typename Traits<LhsXpr>::Scalar, typename Traits<RhsXpr>::Scalar> &&
-                                 Traits<LhsXpr>::Columns == Traits<RhsXpr>::Rows;
-
-    // 求值器概念
-    // TODO: 后面再看看需不需要添加这个概念，跟MatrixExpression概念类似，求值器必须实现概念里的typedef和接口，
-    //  但是需要额外添加一个基类，使用CRTP(奇异递归模板)技巧来添加概念，有点麻烦
-    template<typename Evaluator>
-    concept ExpressionEvaluator = requires(Evaluator evaluator)
-    {
-        typename Traits<Evaluator>::XprType;
-        typename Traits<Evaluator>::CoeffType;
-        { evaluator.Coefficient(0) } -> std::same_as<typename Evaluator::CoeffType>;
-        { evaluator.Coefficient(0, 0) } -> std::same_as<typename Evaluator::CoeffType>;
-    };
+    concept MatrixMultipliable = MatrixExpression<LhsXpr> && MatrixExpression<RhsXpr> &&
+            std::is_same_v<typename Traits<LhsXpr>::Scalar, typename Traits<RhsXpr>::Scalar> &&
+            Traits<LhsXpr>::Columns == Traits<RhsXpr>::Rows;
 
     // 表达式基类
     template<typename Derived> requires MatrixExpression<Derived>
     class MatrixBase;
 	// 矩阵类
-	template<typename Scalar_, int Rows_, int Cols_, StorageOption Option = DefaultMatrixStorageOrderOption>
+	template<typename Scalar, std::size_t Rows, std::size_t Cols, StorageOption Option = DefaultMatrixStorageOrderOption>
 	class Matrix;
     // 二元表达式
     template<typename BinaryOp, typename LhsXpr, typename RhsXpr> requires CWiseOperable<LhsXpr, RhsXpr>
@@ -127,14 +139,11 @@ namespace TG::Math
     template<typename LhsXpr, typename RhsXpr> requires MatrixMultipliable<LhsXpr, RhsXpr>
     class Product;
     // 矩阵块表达式
-    template<typename NestedXpr, int BlockRows, int BlockColumns>
+    template<typename NestedXpr, std::size_t BlockRows, std::size_t BlockColumns>
     class Block;
-    // 矩阵转置
+    // 矩阵转置表达式
     template<typename NestedXpr>
     class Transpose;
-
-    // 表达式求值器，每种表达式都需要特化该类
-    template<typename Xpr> class Evaluator;
 
     // 加法函数
     template<typename Scalar> struct ScalarSumOp;

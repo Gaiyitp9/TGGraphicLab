@@ -27,12 +27,12 @@ namespace TG::Math
 	struct DotOp
 	{
 		using Scalar = Traits<Matrix>::Scalar;
-		constexpr static int SizeAtCompileTime = Traits<Matrix>::SizeAtCompileTime;
+		constexpr static int Size = Traits<Matrix>::Size;
 
 		static Scalar Run(const Matrix& left, const Matrix& right)
 		{
 			Scalar dot = 0;
-			DefaultDot<Scalar, 0, SizeAtCompileTime>::Run(dot, left.m_data(), right.m_data());
+			DefaultDot<Scalar, 0, Size>::Run(dot, left.m_data(), right.m_data());
 			return dot;
 		}
 	};

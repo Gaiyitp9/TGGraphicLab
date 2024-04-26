@@ -14,7 +14,7 @@ namespace TG
 	class MainWindow final : public Window
 	{
 	public:
-		MainWindow(int x, int y, int width, int height, wchar_t const* name = L"TG RenderLab", HWND parent = nullptr);
+		MainWindow(int x, int y, int width, int height, wchar_t const* name = L"TG GraphicLab", HWND parent = nullptr);
 		MainWindow(const MainWindow&) = delete;
         MainWindow(MainWindow&&) = delete;
 		MainWindow& operator=(const MainWindow&) = delete;

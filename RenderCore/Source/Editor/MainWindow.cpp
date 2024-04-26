@@ -35,7 +35,7 @@ namespace TG
 
 	MainWindow::~MainWindow() = default;
 
-    void MainWindow::SetInputListener(const std::function<void(const Input::Event &)>& listener)
+    void MainWindow::SetInputListener(const std::function<void(const Input::Event&)>& listener)
     {
         m_listener = listener;
     }

@@ -13,6 +13,13 @@ namespace TG::Math
         using Scalar = Traits<Derived>::Scalar;
 
     public:
+        template<typename OtherDerived>
+        MatrixBase& operator=(const MatrixBase<OtherDerived>& other)
+        {
+            CallAssignment(Expression(), other.Expression());
+            return *this;
+        }
+
         const Derived& Expression() const { return *static_cast<const Derived*>(this); }
         Derived& Expression() { return *static_cast<Derived*>(this); }
 
@@ -57,10 +64,15 @@ namespace TG::Math
             return Redux(ScalarSumOp<Scalar>{});
         }
 
-        template<int BlockRows, int BlockCols>
-        Block<Derived, BlockRows, BlockCols> Block(int startRow, int startCol)
+        template<std::size_t BlockRows, std::size_t BlockCols>
+        Block<Derived, BlockRows, BlockCols> Block(std::size_t startRow, std::size_t startCol)
         {
             return { Expression(), startRow, startCol };
+        }
+
+        Transpose<Derived> Transpose()
+        {
+            return Math::Transpose<Derived>(Expression());
         }
     };
 }

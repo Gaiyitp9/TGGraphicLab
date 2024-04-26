@@ -16,11 +16,11 @@ namespace TG::Math
 
 	// 直接展开赋值
     // 通过行列赋值
-    template<typename Kernel, int Index, int Stop>
+    template<typename Kernel, std::size_t Index, std::size_t Stop>
     struct UnrollDefaultAssign
     {
-        static constexpr int Row = Index / Traits<typename Kernel::DstXpr>::Columns;
-        static constexpr int Column = Index % Traits<typename Kernel::DstXpr>::Columns;
+        static constexpr std::size_t Row = Index / Traits<typename Kernel::DstXpr>::Columns;
+        static constexpr std::size_t Column = Index % Traits<typename Kernel::DstXpr>::Columns;
 
         static void Run(Kernel& kernel)
         {
@@ -28,14 +28,14 @@ namespace TG::Math
             UnrollDefaultAssign<Kernel, Index + 1, Stop>::Run(kernel);
         }
     };
-    template<typename Kernel, int Stop>
+    template<typename Kernel, std::size_t Stop>
     struct UnrollDefaultAssign<Kernel, Stop, Stop>
     {
         static void Run(Kernel&){}
     };
 
     // 线性赋值
-	template<typename Kernel, int Index, int Stop>
+	template<typename Kernel, std::size_t Index, std::size_t Stop>
 	struct UnrollLinearAssign
 	{
 		static void Run(Kernel& kernel)
@@ -44,7 +44,7 @@ namespace TG::Math
             UnrollLinearAssign<Kernel, Index + 1, Stop>::Run(kernel);
 		}
 	};
-	template<typename Kernel, int Stop>
+	template<typename Kernel, std::size_t Stop>
 	struct UnrollLinearAssign<Kernel, Stop, Stop>
 	{
 		static void Run(Kernel&){}
@@ -61,12 +61,12 @@ namespace TG::Math
         AssignmentKernel(DstEvaluator& dstEvaluator, const SrcEvaluator& srcEvaluator, Functor functor)
             : m_dstEvaluator(dstEvaluator), m_srcEvaluator(srcEvaluator), m_functor(functor) {}
 
-        void AssignCoefficient(int index)
+        void AssignCoefficient(std::size_t index)
         {
             m_functor.AssignCoefficient(m_dstEvaluator.CoefficientRef(index), m_srcEvaluator.Coefficient(index));
         }
 
-        void AssignCoefficient(int row, int column)
+        void AssignCoefficient(std::size_t row, std::size_t column)
         {
             m_functor.AssignCoefficient(m_dstEvaluator.CoefficientRef(row, column), m_srcEvaluator.Coefficient(row, column));
         }
@@ -100,8 +100,14 @@ namespace TG::Math
 		}
 	};
 
+    // 矩阵表达式赋值概念，目标表达式和源表达式的行列数需要相等，且表达式需要是左值
     template<typename Dst, typename Src>
-    inline void CallAssignmentNoAlias(Dst& dst, const Src& src)
+    concept Assignable = MatrixExpression<Dst> && MatrixExpression<Src> &&
+            (Traits<Dst>::Rows == Traits<Src>::Rows) && (Traits<Dst>::Columns == Traits<Src>::Columns) &&
+            CheckFlag<Dst>(XprFlag::LeftValue);
+
+    template<typename Dst, typename Src> requires Assignable<Dst, Src>
+    void CallAssignmentNoAlias(Dst& dst, const Src& src)
     {
         using DstEvaluator = Evaluator<Dst>;
         using SrcEvaluator = Evaluator<Src>;
@@ -115,8 +121,8 @@ namespace TG::Math
         Assignment<Kernel>::Run(kernel);
     }
 
-    template<typename Dst, typename Src>
-    inline void CallAssignment(Dst& dst, const Src& src)
+    template<typename Dst, typename Src> requires Assignable<Dst, Src>
+    void CallAssignment(Dst& dst, const Src& src)
     {
         typename PlainMatrixType<Src>::Type temp(src);
         CallAssignmentNoAlias(dst, temp);

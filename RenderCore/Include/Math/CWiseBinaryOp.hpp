@@ -8,7 +8,14 @@
 namespace TG::Math
 {
     template<typename BinaryOp, typename LhsXpr, typename RhsXpr>
-    struct Traits<CWiseBinaryOp<BinaryOp, LhsXpr, RhsXpr>> : public Traits<LhsXpr> {};
+    struct Traits<CWiseBinaryOp<BinaryOp, LhsXpr, RhsXpr>>
+    {
+        using Scalar = Traits<LhsXpr>::Scalar;
+        static constexpr std::size_t	Rows = Traits<LhsXpr>::Rows;
+        static constexpr std::size_t	Columns = Traits<LhsXpr>::Columns;
+        static constexpr std::size_t	Size = Rows * Columns;
+        static constexpr XprFlag        Flags = Traits<LhsXpr>::Flags & (~XprFlag::LeftValue);
+    };
 
     // 二元表达式
 	template<typename BinaryOp, typename LhsXpr, typename RhsXpr> requires CWiseOperable<LhsXpr, RhsXpr>
@@ -39,11 +46,11 @@ namespace TG::Math
         explicit Evaluator(const XprType& xpr) : m_functor(xpr.Functor()),
             m_lhsEvaluator(xpr.LhsExpression()), m_rhsEvaluator(xpr.RhsExpression()) {}
 
-        [[nodiscard]] CoeffType Coefficient(int index) const
+        [[nodiscard]] CoeffType Coefficient(std::size_t index) const
         {
             return m_functor(m_lhsEvaluator.Coefficient(index), m_rhsEvaluator.Coefficient(index));
         }
-        [[nodiscard]] CoeffType Coefficient(int row, int col) const
+        [[nodiscard]] CoeffType Coefficient(std::size_t row, std::size_t col) const
         {
             return m_functor(m_lhsEvaluator.Coefficient(row), m_rhsEvaluator.Coefficient(col));
         }

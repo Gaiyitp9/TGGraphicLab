@@ -7,20 +7,20 @@
 
 namespace TG::Math
 {
-	template<typename Scalar_, int Rows_, int Columns_, StorageOption Option>
+	template<typename Scalar_, std::size_t Rows_, std::size_t Columns_, StorageOption Option>
 	struct Traits<Matrix<Scalar_, Rows_, Columns_, Option>>
 	{
 		using Scalar = Scalar_;
-        static constexpr int	    Rows = Rows_;
-        static constexpr int	    Columns = Columns_;
-        static constexpr int	    Size = Rows * Columns;
-        static constexpr XprFlag    Flags = (Option == StorageOption::RowMajor ? XprFlag::RowMajor : XprFlag::None) |
-                XprFlag::DirectAccess | XprFlag::LinearAccess |
+        static constexpr std::size_t	Rows = Rows_;
+        static constexpr std::size_t	Columns = Columns_;
+        static constexpr std::size_t	Size = Rows * Columns;
+        static constexpr XprFlag        Flags = (Option == StorageOption::RowMajor ? XprFlag::RowMajor : XprFlag::None) |
+                XprFlag::LeftValue | XprFlag::LinearAccess |
                 (Rows == 1 || Columns == 1 ? XprFlag::Vector : XprFlag::None) |
                 (Rows == Columns ? XprFlag::Square : XprFlag::None);
 	};
 
-	template<typename Scalar, int Rows, int Columns, StorageOption Option>
+	template<typename Scalar, std::size_t Rows, std::size_t Columns, StorageOption Option>
 	class Matrix : public MatrixBase<Matrix<Scalar, Rows, Columns, Option>>
 	{
         using Base = MatrixBase<Matrix<Scalar, Rows, Columns, Option>>;
@@ -37,32 +37,24 @@ namespace TG::Math
             CallAssignmentNoAlias(Expression(), other.Expression());
         }
 
-		template<typename Derived>
-		Matrix& operator=(const MatrixBase<Derived>& other)
-		{
-            CallAssignment(Expression(), other.Expression());
-			return *this;
-		}
+        using Base::operator=;
 
-        const Scalar* Data() const { return m_storage; }
-        Scalar* Data() { return m_storage; }
-
-		const Scalar& operator[](int index) const
+		const Scalar& operator[](std::size_t index) const
 		{
 			return m_storage[index];
 		}
-		const Scalar& operator()(int row, int col) const
+		const Scalar& operator()(std::size_t row, std::size_t col) const
 		{
 			if constexpr (CheckFlag<Matrix>(XprFlag::RowMajor))
 				return m_storage[col + row * Columns];
 			else
 				return m_storage[row + col * Rows];
 		}
-		Scalar& operator[](int index)
+		Scalar& operator[](std::size_t index)
 		{
 			return m_storage[index];
 		}
-		Scalar& operator()(int row, int col)
+		Scalar& operator()(std::size_t row, std::size_t col)
 		{
             if constexpr (CheckFlag<Matrix>(XprFlag::RowMajor))
 				return m_storage[col + row * Columns];
@@ -72,53 +64,53 @@ namespace TG::Math
 
 	private:
 		Scalar m_storage[Traits<Matrix>::Size]{};
+
+        friend class Evaluator<Matrix>;
 	};
 
-	template<typename Scalar, int Size>
-	using Vector = Matrix<Scalar, Size, 1>;
-	template<typename Scalar, int Size>
-	using RowVector = Matrix<Scalar, 1, Size>;
+	template<typename Scalar, std::size_t Size> using Vector = Matrix<Scalar, Size, 1>;
+	template<typename Scalar, std::size_t Size> using RowVector = Matrix<Scalar, 1, Size>;
 
-	#define MATRIX_TYPEDEF(Type, TypeSuffix, Size, SizeSuffix)			\
-	using Vector##SizeSuffix##TypeSuffix	= Vector<Type, Size>;		\
-	using RowVector##SizeSuffix##TypeSuffix = RowVector<Type, Size>;	\
-	using Matrix##SizeSuffix##TypeSuffix	= Matrix<Type, Size, Size>;
+	#define MATRIX_TYPEDEF(Type, TypeSuffix, Size)			\
+	using Vector##Size##TypeSuffix	= Vector<Type, Size>;		\
+	using RowVector##Size##TypeSuffix = RowVector<Type, Size>;	\
+	using Matrix##Size##TypeSuffix	= Matrix<Type, Size, Size>;
 
 	#define MATRIX_ALL_SIZE_TYPEDEF(Type, TypeSuffix)	\
-	MATRIX_TYPEDEF(Type, TypeSuffix, 2, 2)				\
-	MATRIX_TYPEDEF(Type, TypeSuffix, 3, 3)				\
-	MATRIX_TYPEDEF(Type, TypeSuffix, 4, 4)
+	MATRIX_TYPEDEF(Type, TypeSuffix, 2)				\
+	MATRIX_TYPEDEF(Type, TypeSuffix, 3)				\
+	MATRIX_TYPEDEF(Type, TypeSuffix, 4)
 
 	MATRIX_ALL_SIZE_TYPEDEF(float, f)
 	MATRIX_ALL_SIZE_TYPEDEF(double, d)
 	MATRIX_ALL_SIZE_TYPEDEF(int, i)
 
     // 矩阵求值器
-    template<typename Scalar, int Rows, int Columns, StorageOption Option>
+    template<typename Scalar, std::size_t Rows, std::size_t Columns, StorageOption Option>
     class Evaluator<Matrix<Scalar, Rows, Columns, Option>>
     {
     public:
         using XprType = Matrix<Scalar, Rows, Columns, Option>;
         using CoeffType= Traits<XprType>::Scalar;
 
-        explicit Evaluator(const XprType& mat) : m_data(mat.Data()) {}
+        explicit Evaluator(const XprType& mat) : m_data(mat.m_storage) {}
 
-        [[nodiscard]] CoeffType Coefficient(int index) const
+        [[nodiscard]] CoeffType Coefficient(std::size_t index) const
         {
             return m_data[index];
         }
-        [[nodiscard]] CoeffType Coefficient(int row, int col) const
+        [[nodiscard]] CoeffType Coefficient(std::size_t row, std::size_t col) const
         {
             if constexpr (CheckFlag<XprType>(XprFlag::RowMajor))
                 return m_data[row * Traits<XprType>::Columns + col];
             else
                 return m_data[row + col * Traits<XprType>::Rows];
         }
-        CoeffType& CoefficientRef(int index)
+        CoeffType& CoefficientRef(std::size_t index)
         {
             return const_cast<CoeffType*>(m_data)[index];
         }
-        CoeffType& CoefficientRef(int row, int col)
+        CoeffType& CoefficientRef(std::size_t row, std::size_t col)
         {
             if constexpr (CheckFlag<XprType>(XprFlag::RowMajor))
                 return const_cast<CoeffType*>(m_data)[row * Traits<XprType>::Columns + col];
