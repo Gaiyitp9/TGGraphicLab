@@ -35,10 +35,10 @@ namespace TG
 		std::wstring wWhatBuffer = std::format(L"Exception type: {}\n", GetType());
 		wWhatBuffer += m_description;
 		wWhatBuffer += Separator;
-		for (const auto& info : m_stackFrameInfo)
+		for (const auto& [index, file, function, line] : m_stackFrameInfo)
 		{
 			wWhatBuffer += std::format(L"Frame: {}\nFile: {}\nFunction: {}\nLine: {}",
-										info.index, info.file, info.function, info.line);
+										index, file, function, line);
 			wWhatBuffer += Separator;
 		}
 		m_whatBuffer = Utility::Utf16ToUtf8(wWhatBuffer);
@@ -53,9 +53,9 @@ namespace TG
 	void BaseException::StackTrace()
 	{
 		void* stackFrames[Framestocapture];
-		USHORT frameCount = CaptureStackBackTrace(0, Framestocapture, stackFrames, nullptr);
+		const USHORT frameCount = CaptureStackBackTrace(0, Framestocapture, stackFrames, nullptr);
 
-		auto symbol = reinterpret_cast<SYMBOL_INFOW*>(malloc(sizeof(SYMBOL_INFOW) + Maxnamelen * sizeof(WCHAR)));
+		auto* symbol = static_cast<SYMBOL_INFOW*>(malloc(sizeof(SYMBOL_INFOW) + Maxnamelen * sizeof(WCHAR)));
 		symbol->SizeOfStruct = sizeof(SYMBOL_INFOW);
 		symbol->MaxNameLen = Maxnamelen;
 
@@ -65,8 +65,8 @@ namespace TG
 		DWORD displacement;
 		for (USHORT i = 0; i < frameCount; ++i)
 		{
-			SymFromAddrW(m_hProcess, (DWORD64)stackFrames[i], nullptr, symbol);
-			SymGetLineFromAddrW64(m_hProcess, (DWORD64)stackFrames[i], &displacement, &imageLine);
+			SymFromAddrW(m_hProcess, reinterpret_cast<DWORD64>(stackFrames[i]), nullptr, symbol);
+			SymGetLineFromAddrW64(m_hProcess, reinterpret_cast<DWORD64>(stackFrames[i]), &displacement, &imageLine);
 			StackFrame frame{ static_cast<unsigned int>(frameCount - i - 1), imageLine.FileName,
 				symbol->Name, static_cast<unsigned int>(imageLine.LineNumber) };
 			m_stackFrameInfo.push_back(frame);

@@ -39,12 +39,12 @@ namespace TG::Math
 
         const NestedXpr& NestedExpression() const { return m_xpr; }
         [[nodiscard]] std::size_t StartRow() const { return m_startRow; }
-        [[nodiscard]] std::size_t startColumn() const { return m_startColumn; }
+        [[nodiscard]] std::size_t StartColumn() const { return m_startColumn; }
 
     private:
         const NestedXpr& m_xpr;
-        std::size_t m_startRow;
-        std::size_t m_startColumn;
+        std::size_t m_startRow{};
+        std::size_t m_startColumn{};
     };
 
     template<typename NestedXpr, std::size_t BlockRows, std::size_t BlockColumns,
@@ -60,7 +60,7 @@ namespace TG::Math
         using XprType = Block<NestedXpr, BlockRows, BlockColumns>;
         using CoeffType = Traits<XprType>::Scalar;
 
-        explicit Evaluator(const XprType& block) : Base(block, block.StartRow(), block.startColumn()) {}
+        explicit Evaluator(const XprType& block) : Base(block, block.StartRow(), block.StartColumn()) {}
     };
 
     template<typename NestedXpr, std::size_t BlockRows, std::size_t BlockColumns>
@@ -87,10 +87,10 @@ namespace TG::Math
         }
 
     protected:
-        Evaluator<NestedXpr> m_xprEvaluator;
-        std::size_t m_startRow;
-        std::size_t m_startColumn;
-        std::size_t m_offset;
+        Evaluator<NestedXpr> m_xprEvaluator{};
+        std::size_t m_startRow{};
+        std::size_t m_startColumn{};
+        std::size_t m_offset{};
     };
 
     template<typename NestedXpr, std::size_t BlockRows, std::size_t BlockColumns>

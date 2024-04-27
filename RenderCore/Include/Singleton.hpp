@@ -17,10 +17,10 @@ namespace TG
         Singleton &operator=(const Singleton &) = delete;
         Singleton &operator=(Singleton &&) = delete;
 
-        static T &Instance()
+        static T& Instance()
         {
-            static T s_instance;
-            return s_instance;
+            static T instance;
+            return instance;
         }
 
     protected:
