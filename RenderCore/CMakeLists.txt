@@ -2,9 +2,9 @@ set(TG_MATRIX_STORAGE_ORDER "RowMajor" CACHE STRING "Default matrix storage orde
 set_property(CACHE TG_MATRIX_STORAGE_ORDER PROPERTY STRINGS "RowMajor" "ColumnMajor")
 
 file(GLOB_RECURSE SRCS *.cpp *.c)
-file(GLOB_RECURSE INCS *.hpp *.h *.inl)
+file(GLOB_RECURSE INCLUDES *.hpp *.h *.inl)
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${SRCS})
-source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${INCS})
+source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${INCLUDES})
 
 add_library(RenderCore STATIC ${SRCS} ${INCS})
 target_include_directories(RenderCore PUBLIC Include ThirdParty)

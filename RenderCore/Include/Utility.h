@@ -13,12 +13,12 @@ namespace TG::Utility
     std::string Utf16ToUtf8(const std::wstring &wstr);
     std::string ToLower(const std::string &str);
     std::wstring ToLower(const std::wstring &wstr);
-    std::string GetBasePath(const std::string &str);
-    std::wstring GetBasePath(const std::wstring &wstr);
-    std::string RemoveBasePath(const std::string &str);
-    std::wstring RemoveBasePath(const std::wstring &wstr);
-    std::string GetFileExtension(const std::string &str);
-    std::wstring GetFileExtension(const std::wstring &wstr);
-    std::string RemoveExtension(const std::string &str);
-    std::wstring RemoveExtension(const std::wstring &wstr);
+    std::string GetBasePath(const std::string &filePath);
+    std::wstring GetBasePath(const std::wstring &filePath);
+    std::string RemoveBasePath(const std::string &filePath);
+    std::wstring RemoveBasePath(const std::wstring &filePath);
+    std::string GetFileExtension(const std::string &filePath);
+    std::wstring GetFileExtension(const std::wstring &filePath);
+    std::string RemoveExtension(const std::string &filePath);
+    std::wstring RemoveExtension(const std::wstring &filePath);
 }

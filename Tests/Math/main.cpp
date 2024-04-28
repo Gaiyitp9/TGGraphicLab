@@ -1,5 +1,5 @@
-#include <iostream>
 #include "Math/Core.hpp"
+#include <iostream>
 
 class Base
 {

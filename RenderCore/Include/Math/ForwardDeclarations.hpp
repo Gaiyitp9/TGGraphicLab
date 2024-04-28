@@ -45,7 +45,7 @@ namespace TG::Math
     }
 
     // 矩阵表达式标志
-    enum class XprFlag : char
+    enum class XprFlag : unsigned char
     {
         None            = 0,
         RowMajor        = 1,            // 按行储存
@@ -66,7 +66,7 @@ namespace TG::Math
     }
 
     // 赋值遍历类型
-    enum class TraversalType : char
+    enum class TraversalType : unsigned char
     {
         Default,
         Linear,
@@ -74,7 +74,7 @@ namespace TG::Math
     };
 
 	// 矩阵储存格式
-	enum class StorageOption : char
+	enum class StorageOption : unsigned char
 	{
 		RowMajor,
 		ColumnMajor,

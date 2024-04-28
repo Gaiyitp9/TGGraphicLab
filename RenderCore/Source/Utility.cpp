@@ -94,8 +94,8 @@ namespace TG::Utility
 
 	std::string GetFileExtension(const std::string& filePath)
 	{
-		std::string fileName = RemoveBasePath(filePath);
-		size_t extOffset = fileName.rfind('.');
+		const std::string fileName = RemoveBasePath(filePath);
+		const size_t extOffset = fileName.rfind('.');
 		if (extOffset == std::string::npos)
 			return "";
 
@@ -104,8 +104,8 @@ namespace TG::Utility
 
 	std::wstring GetFileExtension(const std::wstring& filePath)
 	{
-		std::wstring fileName = RemoveBasePath(filePath);
-		size_t extOffset = fileName.rfind(L'.');
+		const std::wstring fileName = RemoveBasePath(filePath);
+		const size_t extOffset = fileName.rfind(L'.');
 		if (extOffset == std::wstring::npos)
 			return L"";
 
