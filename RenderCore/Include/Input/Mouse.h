@@ -46,7 +46,7 @@ namespace TG::Input
 		std::bitset<8> m_mouseDown;     // 按键是否刚刚按下
 		std::bitset<8> m_mouseUp;       // 按键是否刚刚松开
 
-        Math::Vector2i m_position{0, 0};      // 鼠标位置
+        Math::Vector2i m_position;      // 鼠标位置
 		short m_wheelDelta = 0;         // 滚轮变化值，正值表示向前滚动，远离使用者；负值表示向后滚动，朝向使用者
         bool m_spyEvent = false;
 	};

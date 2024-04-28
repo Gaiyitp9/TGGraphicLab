@@ -145,15 +145,6 @@ namespace TG::Math
     template<typename NestedXpr>
     class Transpose;
 
-    // 加法函数
-    template<typename Scalar> struct ScalarSumOp;
-    // 减法函数
-    template<typename Scalar> struct ScalarSubtractOp;
-    // 乘法函数
-    template<typename Scalar> struct ScalarProductOp;
-    // 除法函数
-    template<typename Scalar> struct ScalarDivideOp;
-
     // 获取表达式对应的矩阵类型
     template<typename Xpr>
     struct PlainMatrixType

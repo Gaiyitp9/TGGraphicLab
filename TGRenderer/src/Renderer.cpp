@@ -33,24 +33,24 @@ namespace TG
 
         // 主窗口设置
         m_mainWindow.SetIcon(L"D:\\ComputerScience\\ComputerGraphics\\Projects\\TGRenderLab\\TGRenderer\\maple-leaf.ico");
-        m_mainWindow.SetInputListener([&input = m_input](const Input::Event &evt)
-                                      { input.Broadcast(evt); });
+        // m_mainWindow.SetInputListener([&input = m_input](const Input::Event &evt)
+                                      // { input.Broadcast(evt); });
         m_mainWindow.SetStateCallback([&timer=m_timer](){ timer.Start(); }, [&timer=m_timer](){ timer.Pause(); });
         m_mainWindow.SpyMessage(false);
 
-        m_input.SpyEvent<Input::Mouse>(true);
-        m_input.SpyEvent<Input::Keyboard>(true);
+        // m_input.SpyEvent<Input::Mouse>(true);
+        // m_input.SpyEvent<Input::Keyboard>(true);
 
         // 初始化opengl
-        Graphics::GLCreateInfo info { 0, m_mainWindow.Hwnd()};
-        Graphics::DeviceContextGL* pContext;
-        Graphics::RenderDeviceGL* pDevice;
-        m_factory.CreateDeviceAndContext(info, &pDevice, &pContext);
-        m_device.reset(pDevice);
-        m_context.reset(pContext);
-        std::cout << "OpenGL version: " << glGetString(GL_VERSION) << std::endl;
-        glViewport(0, 0, m_mainWindow.Width(), m_mainWindow.Height());
-        wglSwapIntervalEXT(0);      // 关闭垂直同步
+        // Graphics::GLCreateInfo info { 0, m_mainWindow.Hwnd()};
+        // Graphics::DeviceContextGL* pContext;
+        // Graphics::RenderDeviceGL* pDevice;
+        // m_factory.CreateDeviceAndContext(info, &pDevice, &pContext);
+        // m_device.reset(pDevice);
+        // m_context.reset(pContext);
+        // std::cout << "OpenGL version: " << glGetString(GL_VERSION) << std::endl;
+        // glViewport(0, 0, m_mainWindow.Width(), m_mainWindow.Height());
+        // wglSwapIntervalEXT(0);      // 关闭垂直同步
 	}
 
 	Renderer::~Renderer() = default;
@@ -64,45 +64,40 @@ namespace TG
 		//	400, 300, m_windows[L"天工渲染器"]);
 
 //		throw TG::Win32Exception(E_OUTOFMEMORY);
-		m_unitTest.FormatTest();
-		m_unitTest.TextEncodeTest();
-		m_unitTest.TimeTest();
-		m_unitTest.MathLibTest();
-		m_unitTest.ArrayAlignmentTest();
+		// m_unitTest.FormatTest();
+		// m_unitTest.TextEncodeTest();
+		// m_unitTest.TimeTest();
+		// m_unitTest.MathLibTest();
+		// m_unitTest.ArrayAlignmentTest();
 		//m_unitTest.SIMDTest();
 //        m_unitTest.OpenGLTest(m_mainWindow.Hwnd());
 
 		while (true)
 		{
-            m_input.Update();
+			if (m_mainWindow.Destroy())
+				break;
+
+            // m_input.Update();
 			if (const auto code = Window::ProcessMessage())
 				return *code;
 
-			/*auto it = m_windows.begin();
-			while (it != m_windows.end())
-			{
-				// 如果Windows窗口被销毁，则移除对应的窗口
-				if (it->second->Destroy())
-					it = m_windows.erase(it);
-				else
-					++it;
-			}*/
+            // if (m_input.GetKeyUp(Input::KeyCode::Space))
+                // Debug::LogLine(L"space up");
 
-            if (m_input.GetKeyUp(Input::KeyCode::Space))
-                Debug::LogLine(L"space up");
-
-			const float c = sin(m_timer.TotalTime() * 0.001f) / 2.0f + 0.5f;
+			// const float c = sin(m_timer.TotalTime() * 0.001f) / 2.0f + 0.5f;
 			//d3d11Layer->ClearBackground(Math::Color::AliceBlue * c);
 			//d3d11Layer->Update();
 //#ifdef _DEBUG
 //			if (mainWnd->Input().GetKeyDown(KeyCode::Space))
 //				d3d11Layer->dbgInfo->ReportLiveObjects();
 //#endif
-            Math::Color color = Math::Color::AliceBlue * c;
-            glClearColor(color.r(), color.g(), color.b(), color.a());
-            glClear(GL_COLOR_BUFFER_BIT);
-            SwapBuffers(m_context->m_hdc);
-            std::cout << std::flush;
+            // Math::Color color = Math::Color::AliceBlue * c;
+            // glClearColor(color.r(), color.g(), color.b(), color.a());
+            // glClear(GL_COLOR_BUFFER_BIT);
+            // SwapBuffers(m_context->m_hdc);
+            // std::cout << std::flush;
 		}
+
+		return 0;
 	}
 }

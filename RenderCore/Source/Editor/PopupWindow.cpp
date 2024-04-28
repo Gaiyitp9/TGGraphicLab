@@ -6,6 +6,8 @@
 
 #include "Editor/PopupWindow.h"
 #include "Diagnostics/Win32Exception.h"
+#include "Diagnostics/Log.hpp"
+#include <format>
 
 namespace TG
 {
@@ -33,12 +35,18 @@ namespace TG
 
 	LRESULT CALLBACK PopupWindow::WindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	{
+		// 是否监控窗口消息
+		if (m_spyMessage)
+			Debug::LogLine(std::format("{:<16} {}", "Popup", GetWindowMessageInfo(msg, wParam, lParam)));
+
         switch (msg)
         {
             case WM_DESTROY:
                 m_destroy = true;
                 return 0;
+
+        	default:
+				return DefWindowProcW(hwnd, msg, wParam, lParam);
         }
-		return DefWindowProcW(hwnd, msg, wParam, lParam);
 	}
 }

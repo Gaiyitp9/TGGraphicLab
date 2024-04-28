@@ -12,7 +12,7 @@ namespace TG::Utility
 {
 	std::wstring Utf8ToUtf16(const std::string& str)
 	{
-		int length = MultiByteToWideChar(CP_UTF8, 0, str.c_str(), -1, nullptr, 0);
+		const int length = MultiByteToWideChar(CP_UTF8, 0, str.c_str(), -1, nullptr, 0);
 		auto* wide = static_cast<wchar_t*>(malloc(length * sizeof(wchar_t)));
 		MultiByteToWideChar(CP_UTF8, 0, str.c_str(), -1, wide, length);
 		std::wstring wstr(wide);
@@ -22,7 +22,7 @@ namespace TG::Utility
 
 	std::string Utf16ToUtf8(const std::wstring& wstr)
 	{
-		int length = WideCharToMultiByte(CP_UTF8, 0, wstr.c_str(), -1, nullptr, 0, nullptr, nullptr);
+		const int length = WideCharToMultiByte(CP_UTF8, 0, wstr.c_str(), -1, nullptr, 0, nullptr, nullptr);
 		auto* ansi = static_cast<char*>(malloc(length * sizeof(char)));
 		WideCharToMultiByte(CP_UTF8, 0, wstr.c_str(), -1, ansi, length, nullptr, nullptr);
 		std::string str(ansi);
@@ -33,7 +33,7 @@ namespace TG::Utility
 	std::string ToLower(const std::string& str)
 	{
 		std::string lowerCase = str;
-		std::locale loc;
+		const std::locale loc;
 		for (char& s : lowerCase)
 			s = std::tolower(s, loc);
 		return lowerCase;
@@ -42,7 +42,7 @@ namespace TG::Utility
 	std::wstring ToLower(const std::wstring& wstr)
 	{
 		std::wstring lowerCase = wstr;
-		std::locale loc;
+		const std::locale loc;
 		for (wchar_t& s : lowerCase)
 			s = std::tolower(s, loc);
 		return lowerCase;

@@ -9,7 +9,7 @@
 namespace TG
 {
 	Window::Window(int x, int y, int width, int height, HWND parent)
-		: m_posX(x), m_posY(y), m_width(width), m_height(height), m_hwnd(nullptr), m_parent(parent)
+		: m_hwnd(nullptr), m_parent(parent), m_posX(x), m_posY(y), m_width(width), m_height(height)
 	{}
 
 	std::optional<int> Window::ProcessMessage()
@@ -19,7 +19,7 @@ namespace TG
 		while (PeekMessageW(&msg, nullptr, 0, 0, PM_REMOVE))
 		{
 			if (msg.message == WM_QUIT)
-				return (int)msg.wParam;
+				return static_cast<int>(msg.wParam);
 
 			TranslateMessage(&msg);
 			DispatchMessageW(&msg);

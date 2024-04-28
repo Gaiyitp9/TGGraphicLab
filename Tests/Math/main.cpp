@@ -1,6 +1,20 @@
 #include <iostream>
 #include "Math/Core.hpp"
 
+class Base
+{
+public:
+    virtual ~Base() = default;
+private:
+    virtual void Test() = 0;
+};
+
+class Derived final : public Base
+{
+public:
+    void Test() override { std::cout << "Derived func" << std::endl; }
+};
+
 int main()
 {
     TG::Math::Matrix4f v1, v2, v3;

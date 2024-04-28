@@ -37,9 +37,9 @@ namespace TG::Math
         Block(const NestedXpr& xpr, std::size_t startRow, std::size_t startColumn)
             : m_xpr(xpr), m_startRow(startRow), m_startColumn(startColumn) {}
 
-        const NestedXpr& NestedExpression() const { return m_xpr; }
-        [[nodiscard]] std::size_t StartRow() const { return m_startRow; }
-        [[nodiscard]] std::size_t StartColumn() const { return m_startColumn; }
+        const NestedXpr& NestedExpression() const noexcept { return m_xpr; }
+        [[nodiscard]] std::size_t StartRow() const noexcept { return m_startRow; }
+        [[nodiscard]] std::size_t StartColumn() const noexcept { return m_startColumn; }
 
     private:
         const NestedXpr& m_xpr;

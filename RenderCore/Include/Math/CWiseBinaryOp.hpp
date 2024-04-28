@@ -23,11 +23,11 @@ namespace TG::Math
 	{
     public:
         CWiseBinaryOp(const LhsXpr& lhs, const RhsXpr& rhs, BinaryOp op = {})
-            : m_lhs(lhs), m_rhs(rhs), m_functor(op) {}
+            : m_functor(op), m_lhs(lhs), m_rhs(rhs) {}
 
-        [[nodiscard]] BinaryOp Functor() const { return m_functor; }
-        [[nodiscard]] const LhsXpr& LhsExpression() const { return m_lhs; }
-        [[nodiscard]] const RhsXpr& RhsExpression() const { return m_rhs; }
+        [[nodiscard]] BinaryOp Functor() const noexcept { return m_functor; }
+        [[nodiscard]] const LhsXpr& LhsExpression() const noexcept { return m_lhs; }
+        [[nodiscard]] const RhsXpr& RhsExpression() const noexcept { return m_rhs; }
 
     private:
         const BinaryOp m_functor;
@@ -61,22 +61,22 @@ namespace TG::Math
         Evaluator<RhsXpr> m_rhsEvaluator;
     };
 
-    template<typename Scalar>
+    template<typename Scalar> requires requires(Scalar a, Scalar b) { a + b; }
     struct ScalarSumOp
     {
         Scalar operator()(const Scalar& a, const Scalar& b) const { return a + b; }
     };
-    template<typename Scalar>
+    template<typename Scalar> requires requires(Scalar a, Scalar b) { a - b; }
     struct ScalarSubtractOp
     {
         Scalar operator()(const Scalar& a, const Scalar& b) const { return a - b; }
     };
-    template<typename Scalar>
+    template<typename Scalar> requires requires(Scalar a, Scalar b) { a * b; }
     struct ScalarProductOp
     {
         Scalar operator()(const Scalar& a, const Scalar& b) const { return a * b; }
     };
-    template<typename Scalar>
+    template<typename Scalar> requires requires(Scalar a, Scalar b) { a / b; }
     struct ScalarDivideOp
     {
         Scalar operator()(const Scalar& a, const Scalar& b) const { return a / b; }

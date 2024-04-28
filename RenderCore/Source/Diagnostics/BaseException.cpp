@@ -8,8 +8,6 @@
 #include "Utility.h"
 #include <DbgHelp.h>
 #include <format>
-#include <exception>
-#include <utility>
 
 namespace TG
 {

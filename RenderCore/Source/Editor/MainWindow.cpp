@@ -33,8 +33,6 @@ namespace TG
         ShowWindow(m_hwnd, SW_SHOW);
 	}
 
-	MainWindow::~MainWindow() = default;
-
     void MainWindow::SetInputListener(const std::function<void(const Input::Event&)>& listener)
     {
         m_listener = listener;
@@ -46,7 +44,7 @@ namespace TG
         m_suspend = suspend;
     }
 
-	void MainWindow::SetIcon(wchar_t const* iconPath)
+	void MainWindow::SetIcon(wchar_t const* iconPath) const
 	{
         HANDLE icon = LoadImageW(nullptr, iconPath, IMAGE_ICON, 32, 32, LR_LOADFROMFILE);
 		if (icon == nullptr)
@@ -59,8 +57,9 @@ namespace TG
 	LRESULT MainWindow::WindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	{
 		// 是否监控窗口消息
+		static std::string windowName = Utility::Utf16ToUtf8(m_name);
 		if (m_spyMessage)
-			Debug::LogLine(std::format("{:<16} {}", Utility::Utf16ToUtf8(m_name), GetWindowMessageInfo(msg, wParam, lParam)));
+			Debug::LogLine(std::format("{:<16} {}", windowName, GetWindowMessageInfo(msg, wParam, lParam)));
 
 		switch (msg)
 		{

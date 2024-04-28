@@ -9,7 +9,7 @@
 
 namespace TG
 {
-	class Win32Exception : public BaseException
+	class Win32Exception final : public BaseException
 	{
 	public:
 		explicit Win32Exception(HRESULT hr, const std::wstring &description = L"No Description");

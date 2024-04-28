@@ -43,23 +43,23 @@ namespace TG::Math
 		{
 			return m_storage[index];
 		}
-		const Scalar& operator()(std::size_t row, std::size_t col) const
+		const Scalar& operator()(std::size_t row, std::size_t column) const
 		{
 			if constexpr (CheckFlag<Matrix>(XprFlag::RowMajor))
-				return m_storage[col + row * Columns];
+				return m_storage[column + row * Columns];
 			else
-				return m_storage[row + col * Rows];
+				return m_storage[row + column * Rows];
 		}
 		Scalar& operator[](std::size_t index)
 		{
 			return m_storage[index];
 		}
-		Scalar& operator()(std::size_t row, std::size_t col)
+		Scalar& operator()(std::size_t row, std::size_t column)
 		{
             if constexpr (CheckFlag<Matrix>(XprFlag::RowMajor))
-				return m_storage[col + row * Columns];
+				return m_storage[column + row * Columns];
             else
-				return m_storage[row + col * Rows];
+				return m_storage[row + column * Rows];
 		}
 
 	private:
@@ -99,23 +99,23 @@ namespace TG::Math
         {
             return m_data[index];
         }
-        [[nodiscard]] CoeffType Coefficient(std::size_t row, std::size_t col) const
+        [[nodiscard]] CoeffType Coefficient(std::size_t row, std::size_t column) const
         {
             if constexpr (CheckFlag<XprType>(XprFlag::RowMajor))
-                return m_data[row * Traits<XprType>::Columns + col];
+                return m_data[row * Traits<XprType>::Columns + column];
             else
-                return m_data[row + col * Traits<XprType>::Rows];
+                return m_data[row + column * Traits<XprType>::Rows];
         }
         CoeffType& CoefficientRef(std::size_t index)
         {
             return const_cast<CoeffType*>(m_data)[index];
         }
-        CoeffType& CoefficientRef(std::size_t row, std::size_t col)
+        CoeffType& CoefficientRef(std::size_t row, std::size_t column)
         {
             if constexpr (CheckFlag<XprType>(XprFlag::RowMajor))
-                return const_cast<CoeffType*>(m_data)[row * Traits<XprType>::Columns + col];
+                return const_cast<CoeffType*>(m_data)[row * Traits<XprType>::Columns + column];
             else
-                return const_cast<CoeffType*>(m_data)[row + col * Traits<XprType>::Rows];
+                return const_cast<CoeffType*>(m_data)[row + column * Traits<XprType>::Rows];
         }
 
     private:

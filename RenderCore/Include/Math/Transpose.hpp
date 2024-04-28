@@ -27,7 +27,7 @@ namespace TG::Math
     public:
         explicit Transpose(const NestedXpr& xpr) : m_xpr(xpr) {}
 
-        const NestedXpr& NestedExpression() const { return m_xpr; }
+        const NestedXpr& NestedExpression() const noexcept { return m_xpr; }
 
     private:
         const NestedXpr& m_xpr;

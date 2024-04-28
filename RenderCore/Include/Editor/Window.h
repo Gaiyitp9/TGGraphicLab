@@ -17,6 +17,8 @@ namespace TG
 		Window(int x, int y, int width, int height, HWND parent);
 		Window(const Window&) = delete;
 		Window& operator=(const Window&) = delete;
+		Window(Window&&) = delete;
+		Window& operator=(Window&&) = delete;
 		virtual ~Window() = default;
 
 		static std::optional<int> ProcessMessage();							    // 处理所有窗口的消息
@@ -29,6 +31,7 @@ namespace TG
 
         void SpyMessage(bool enable) noexcept { m_spyMessage = enable; }	    // 捕捉窗口消息
 
+	private:
 		virtual LRESULT CALLBACK WindowProc(HWND, UINT, WPARAM, LPARAM) = 0;    // 消息处理函数
 
 	protected:

@@ -8,7 +8,7 @@
 namespace TG::Math
 {
     // 赋值运算
-    template<typename Scalar>
+    template<typename Scalar> requires requires(Scalar a, Scalar b) { a = b; }
     struct AssignOp
     {
         void AssignCoefficient(Scalar& a, Scalar b) { a = b; }

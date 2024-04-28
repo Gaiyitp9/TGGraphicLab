@@ -10,11 +10,12 @@
 namespace TG
 {
 	// 弹出窗口
-	class PopupWindow : public Window
+	class PopupWindow final : public Window
 	{
 	public:
 		PopupWindow(int x, int y, int width, int height, HWND parent = nullptr);
 		PopupWindow(const PopupWindow&) = delete;
+		PopupWindow(PopupWindow&&) = delete;
 		PopupWindow& operator=(const PopupWindow&) = delete;
 		PopupWindow& operator=(PopupWindow&&) = delete;
 		~PopupWindow() override;
