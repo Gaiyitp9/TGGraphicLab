@@ -24,10 +24,10 @@ namespace TG
 		const wchar_t* testStr2 = L"TianGong";
 		std::wcout << testStr2 << sizeof(testStr2) << std::endl;
 		std::wcout << L"你好TG" << std::endl;
-		std::string str1 = Utility::Utf16ToUtf8(L"你好");
-		std::wstring wstr1 = Utility::Utf8ToUtf16("你好");
-		std::cout << str1 << str1.size() << std::endl;
-		std::wcout << wstr1 << wstr1.size() << std::endl;
+		// std::string str1 = Utility::Utf16ToUtf8(L"你好");
+		// std::wstring wstr1 = Utility::Utf8ToUtf16("你好");
+		// std::cout << str1 << str1.size() << std::endl;
+		// std::wcout << wstr1 << wstr1.size() << std::endl;
 	}
 
 	void UnitTest::TimeTest()

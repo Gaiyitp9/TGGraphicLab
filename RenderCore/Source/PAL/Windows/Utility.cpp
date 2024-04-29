@@ -112,12 +112,12 @@ namespace TG::Utility
 		return fileName.substr(extOffset + 1);
 	}
 
-	std::string RemoveExtension(const std::string& filePath)
+	inline std::string RemoveExtension(const std::string& filePath)
 	{
 		return filePath.substr(0, filePath.rfind('.'));
 	}
 
-	std::wstring RemoveExtension(const std::wstring& filePath)
+	inline std::wstring RemoveExtension(const std::wstring& filePath)
 	{
 		return filePath.substr(0, filePath.rfind(L'.'));
 	}

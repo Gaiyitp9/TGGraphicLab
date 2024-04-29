@@ -4,8 +4,8 @@
 * This code is licensed under the MIT License (MIT).			*
 *****************************************************************/
 
-#include "Editor/WindowHelper.h"
-#include "Editor/Window.h"
+#include "PAL/Windows/Editor/WindowHelper.h"
+#include "PAL/Windows/Editor/Window.h"
 #include "Diagnostics/Win32Exception.h"
 #include <unordered_map>
 #include <format>

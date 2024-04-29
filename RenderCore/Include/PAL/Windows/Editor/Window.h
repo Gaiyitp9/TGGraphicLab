@@ -5,7 +5,7 @@
 *****************************************************************/
 #pragma once
 
-#include "Editor/WindowHelper.h"
+#include "WindowHelper.h"
 #include <optional>
 
 namespace TG

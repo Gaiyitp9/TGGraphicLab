@@ -5,7 +5,7 @@
 *****************************************************************/
 #pragma once
 
-#include "Win32Lean.h"
+#include "../Win32Lean.h"
 #include <string>
 #include <vector>
 

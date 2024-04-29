@@ -4,7 +4,7 @@
 * This code is licensed under the MIT License (MIT).			*
 *****************************************************************/
 
-#include "Diagnostics/BaseException.h"
+#include "PAL/Windows/Diagnostics/BaseException.h"
 #include "Utility.h"
 #include <DbgHelp.h>
 #include <format>

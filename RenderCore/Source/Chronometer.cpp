@@ -76,7 +76,7 @@ namespace TG
 		if (m_stopped)
 		{
             m_stopped = false;
-			std::chrono::steady_clock::time_point t = std::chrono::steady_clock::now();
+			const std::chrono::steady_clock::time_point t = std::chrono::steady_clock::now();
             m_paused += t - m_stop;
             m_last = t;
 		}
@@ -90,8 +90,8 @@ namespace TG
 			return;
 		}
 
-		std::chrono::steady_clock::time_point t = std::chrono::steady_clock::now();
-		std::chrono::duration<double, std::milli> delta = t - m_last;
+		const std::chrono::steady_clock::time_point t = std::chrono::steady_clock::now();
+		const std::chrono::duration<double, std::milli> delta = t - m_last;
         m_deltaTime = delta.count();
         m_last = t;
 	}
