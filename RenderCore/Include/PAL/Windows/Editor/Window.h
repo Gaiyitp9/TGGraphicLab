@@ -5,10 +5,11 @@
 *****************************************************************/
 #pragma once
 
-#include "WindowHelper.h"
+#include "../Win32Lean.h"
+#include <string>
 #include <optional>
 
-namespace TG
+namespace TG::PAL
 {
 	// WIN32窗口基类
 	class Window
@@ -31,7 +32,6 @@ namespace TG
 
         void SpyMessage(bool enable) noexcept { m_spyMessage = enable; }	    // 捕捉窗口消息
 
-	private:
 		virtual LRESULT CALLBACK WindowProc(HWND, UINT, WPARAM, LPARAM) = 0;    // 消息处理函数
 
 	protected:
@@ -42,4 +42,15 @@ namespace TG
 		bool m_destroy = false;				// 是否销毁窗口
         bool m_spyMessage = false;			// 是否监控窗口消息
 	};
+
+	// 窗口分类
+	enum class WindowCategory : unsigned char
+	{
+		Default
+	};
+
+	// 获取窗口类内部对应的WIN32窗口名称
+	wchar_t const* GetWindowClassName(const WindowCategory &type);
+	// 获取窗口消息
+	std::string GetWindowMessageInfo(UINT msg, WPARAM wp, LPARAM lp);
 }

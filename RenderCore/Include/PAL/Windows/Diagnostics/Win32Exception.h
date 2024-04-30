@@ -7,7 +7,7 @@
 
 #include "BaseException.h"
 
-namespace TG
+namespace TG::PAL
 {
 	class Win32Exception final : public BaseException
 	{
@@ -15,8 +15,7 @@ namespace TG
 		explicit Win32Exception(HRESULT hr, const std::wstring &description = L"No Description");
 		~Win32Exception() override;
 
-		char const* what() const override;
-		wchar_t const* GetType() const noexcept override;
+		[[nodiscard]] char const* what() const override;
 
 	protected:
 		DWORD m_errorCode;

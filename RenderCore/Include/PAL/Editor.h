@@ -5,8 +5,6 @@
 *****************************************************************/
 #pragma once
 
-// 平台抽象层 Platform Abstraction Layer(PAL)
-
 #ifdef _WIN64
-#include "Windows/MemoryLeakDetect.h"
+
 #endif

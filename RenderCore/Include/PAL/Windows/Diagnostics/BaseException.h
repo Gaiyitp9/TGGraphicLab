@@ -9,7 +9,7 @@
 #include <string>
 #include <vector>
 
-namespace TG
+namespace TG::PAL
 {
 	class BaseException : public std::exception
 	{
@@ -25,11 +25,9 @@ namespace TG
 		explicit BaseException(std::wstring description = L"No Description");
 		~BaseException() override;
 
-		char const* what() const override;
-		virtual wchar_t const* GetType() const noexcept;
+		[[nodiscard]] char const* what() const override;
 
 	protected:
-		mutable std::string m_whatBuffer;								// 异常信息
 		std::wstring m_description;										// 异常描述
 		std::vector<StackFrame> m_stackFrameInfo;						// 栈帧信息
 		constexpr static wchar_t const* Separator =						// 分隔符

@@ -5,7 +5,7 @@
 *****************************************************************/
 #pragma once
 
-#if defined(_DEBUG)
+#ifdef _DEBUG
 #define _CRTDBG_MAP_ALLOC
 #include <crtdbg.h>
 #define TG_NEW new(_NORMAL_BLOCK, __FILE__, __LINE__)

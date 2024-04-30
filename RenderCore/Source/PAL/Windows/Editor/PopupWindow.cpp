@@ -4,12 +4,12 @@
 * This code is licensed under the MIT License (MIT).			*
 *****************************************************************/
 
-#include "Editor/PopupWindow.h"
-#include "Diagnostics/Win32Exception.h"
+#include "PAL/Windows/Editor/PopupWindow.h"
+#include "PAL/Windows/Diagnostics/Win32Exception.h"
 #include "Diagnostics/Log.hpp"
 #include <format>
 
-namespace TG
+namespace TG::PAL
 {
 	PopupWindow::PopupWindow(int x, int y, int width, int height, HWND parent)
 		: Window(x, y, width, height, parent)

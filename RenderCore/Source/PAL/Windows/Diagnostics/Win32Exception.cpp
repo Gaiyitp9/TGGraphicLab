@@ -4,11 +4,11 @@
 * This code is licensed under the MIT License (MIT).			*
 *****************************************************************/
 
-#include "Diagnostics/Win32Exception.h"
-#include "Utility.h"
+#include "PAL/Windows/Diagnostics/Win32Exception.h"
+#include "PAL/Windows/Utility.h"
 #include <format>
 
-namespace TG
+namespace TG::PAL
 {
 	Win32Exception::Win32Exception(HRESULT hr, const std::wstring& description)
 		: BaseException(description), m_errorCode(hr)
@@ -21,24 +21,21 @@ namespace TG
 
 	char const* Win32Exception::what() const
 	{
+		static std::string whatBuffer;
+
 		// 记录异常信息
-        std::wstring wWhatBuffer = std::format(L"Exception type: {}\n", GetType());
+        std::wstring wWhatBuffer = std::format(L"Exception type: Windows API Exception\n");
         wWhatBuffer += std::format(L"HRESULT: {:#010x}\nError Message: {}", m_errorCode, m_errorMsg);
         wWhatBuffer += m_description;
         wWhatBuffer += Separator;
-		for (const auto& info : m_stackFrameInfo)
+		for (const auto& [index, file, function, line] : m_stackFrameInfo)
 		{
             wWhatBuffer += std::format(L"Frame: {}\nFile: {}\nFunction: {}\nLine: {}",
-				info.index, info.file, info.function, info.line);
+								index, file, function, line);
             wWhatBuffer += Separator;
 		}
-        m_whatBuffer = Utility::Utf16ToUtf8(wWhatBuffer);
-		return m_whatBuffer.c_str();
-	}
-
-	wchar_t const* Win32Exception::GetType() const noexcept
-	{
-		return L"Windows API Exception";
+        whatBuffer = Utility::Utf16ToUtf8(wWhatBuffer);
+		return whatBuffer.c_str();
 	}
 
 	void Win32Exception::TranslateHrErrorCode()

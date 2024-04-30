@@ -4,14 +4,14 @@
 * This code is licensed under the MIT License (MIT).			*
 *****************************************************************/
 
-#include "Editor/MainWindow.h"
-#include "Diagnostics/Win32Exception.h"
+#include "PAL/Windows/Editor/MainWindow.h"
+#include "PAL/Windows/Diagnostics/Win32Exception.h"
 #include "Diagnostics/Log.hpp"
 #include "Input/EventData.h"
-#include "Utility.h"
+#include "PAL/Windows/Utility.h"
 #include <format>
 
-namespace TG
+namespace TG::PAL
 {
 	MainWindow::MainWindow(int x, int y, int width, int height, wchar_t const* name, HWND parent)
 		: Window(x, y, width, height, parent), m_name(name)
@@ -23,7 +23,7 @@ namespace TG
             CheckLastError();
 
         // 创建窗口
-        m_hwnd = CreateWindowW(GetWindowClassName(WindowType::Default), m_name.c_str(), WS_OVERLAPPEDWINDOW,
+        m_hwnd = CreateWindowW(GetWindowClassName(WindowCategory::Default), m_name.c_str(), WS_OVERLAPPEDWINDOW,
                                m_posX, m_posY, rect.right - rect.left, rect.bottom - rect.top,
                                m_parent, nullptr, nullptr, this);
 

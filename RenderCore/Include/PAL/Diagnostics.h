@@ -5,7 +5,6 @@
 *****************************************************************/
 #pragma once
 
-namespace TG
-{
-
-}
+#ifdef _WIN64
+#include "Windows/Diagnostics/BaseException.h"
+#endif

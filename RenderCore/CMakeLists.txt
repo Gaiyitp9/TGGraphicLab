@@ -3,11 +3,6 @@ set_property(CACHE TG_MATRIX_STORAGE_ORDER PROPERTY STRINGS "RowMajor" "ColumnMa
 
 file(GLOB_RECURSE SRCS *.cpp *.c)
 file(GLOB_RECURSE INCLUDES *.hpp *.h *.inl)
-#list(APPEND INCLUDES )
-#list(APPEND SOURCES
-#        Source/Chronometer.cpp
-#        Source/Utility.cpp
-#        Source/Diagnostics/)
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${SRCS})
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${INCLUDES})
 

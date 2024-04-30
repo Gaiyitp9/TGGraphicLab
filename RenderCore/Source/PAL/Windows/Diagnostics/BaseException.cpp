@@ -5,11 +5,11 @@
 *****************************************************************/
 
 #include "PAL/Windows/Diagnostics/BaseException.h"
-#include "Utility.h"
+#include "PAL/Windows/Utility.h"
 #include <DbgHelp.h>
 #include <format>
 
-namespace TG
+namespace TG::PAL
 {
 	BaseException::BaseException(std::wstring description)
 		: m_description(std::move(description))
@@ -29,23 +29,20 @@ namespace TG
 
 	char const* BaseException::what() const
 	{
+		static std::string whatBuffer;
+
 		// 记录异常信息
-		std::wstring wWhatBuffer = std::format(L"Exception type: {}\n", GetType());
+		std::wstring wWhatBuffer = std::format(L"Exception type: Base Exception\n");
 		wWhatBuffer += m_description;
 		wWhatBuffer += Separator;
 		for (const auto& [index, file, function, line] : m_stackFrameInfo)
 		{
 			wWhatBuffer += std::format(L"Frame: {}\nFile: {}\nFunction: {}\nLine: {}",
-										index, file, function, line);
+								index, file, function, line);
 			wWhatBuffer += Separator;
 		}
-		m_whatBuffer = Utility::Utf16ToUtf8(wWhatBuffer);
-		return m_whatBuffer.c_str();
-	}
-
-	wchar_t const* BaseException::GetType() const noexcept
-	{
-		return L"Base Exception";
+		whatBuffer = Utility::Utf16ToUtf8(wWhatBuffer);
+		return whatBuffer.c_str();
 	}
 
 	void BaseException::StackTrace()

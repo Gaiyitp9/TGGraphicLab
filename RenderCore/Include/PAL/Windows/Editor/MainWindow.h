@@ -9,9 +9,9 @@
 #include "Input/Event.h"
 #include <functional>
 
-namespace TG
+namespace TG::PAL
 {
-	class MainWindow final : public Window
+	class MainWindow : public Window
 	{
 	public:
 		MainWindow(int x, int y, int width, int height, wchar_t const* name = L"TG GraphicLab", HWND parent = nullptr);

@@ -7,7 +7,7 @@
 
 #include <string>
 
-namespace TG::Utility
+namespace TG::PAL::Utility
 {
     std::wstring Utf8ToUtf16(const std::string &str);
     std::string Utf16ToUtf8(const std::wstring &wstr);

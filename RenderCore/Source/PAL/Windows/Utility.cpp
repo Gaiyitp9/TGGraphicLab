@@ -4,11 +4,11 @@
 * This code is licensed under the MIT License (MIT).			*
 *****************************************************************/
 
-#include "Utility.h"
-#include "Win32Lean.h"
+#include "PAL/Windows/Utility.h"
+#include "PAL/Windows/Win32Lean.h"
 #include <locale>
 
-namespace TG::Utility
+namespace TG::PAL::Utility
 {
 	std::wstring Utf8ToUtf16(const std::string& str)
 	{

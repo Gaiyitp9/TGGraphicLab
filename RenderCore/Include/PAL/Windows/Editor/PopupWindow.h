@@ -7,7 +7,7 @@
 
 #include "Window.h"
 
-namespace TG
+namespace TG::PAL
 {
 	// 弹出窗口
 	class PopupWindow final : public Window
