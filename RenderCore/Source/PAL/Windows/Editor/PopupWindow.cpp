@@ -5,7 +5,7 @@
 *****************************************************************/
 
 #include "PAL/Windows/Editor/PopupWindow.h"
-#include "PAL/Windows/Diagnostics/Win32Exception.h"
+#include "../../../../Include/PAL/Windows/WinAPIException.h"
 #include "Diagnostics/Log.hpp"
 #include <format>
 
@@ -21,7 +21,7 @@ namespace TG::PAL
             CheckLastError();
 
         // 创建窗口
-        m_hwnd = CreateWindowW(GetWindowClassName(WindowType::Default), L"Popup", WS_POPUP,
+        m_hwnd = CreateWindowW(GetWindowClassName(WindowCategory::Default), L"Popup", WS_POPUP,
                                m_posX, m_posY, rect.right - rect.left, rect.bottom - rect.top,
                                m_parent, nullptr, nullptr, this);
 

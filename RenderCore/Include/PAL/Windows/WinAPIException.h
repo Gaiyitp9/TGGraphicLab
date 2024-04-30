@@ -5,19 +5,23 @@
 *****************************************************************/
 #pragma once
 
-#include "BaseException.h"
+#include "WinAPILean.h"
+#include <stacktrace>
 
 namespace TG::PAL
 {
-	class Win32Exception final : public BaseException
+	class Win32APIException final : public std::exception
 	{
 	public:
-		explicit Win32Exception(HRESULT hr, const std::wstring &description = L"No Description");
-		~Win32Exception() override;
+		explicit Win32APIException(HRESULT hr, char const* description = "No Description");
+		~Win32APIException() override;
 
 		[[nodiscard]] char const* what() const override;
 
 	protected:
+		char const* m_description;
+		std::stacktrace m_stackTrace;
+
 		DWORD m_errorCode;
 		std::wstring m_errorMsg;
 
@@ -25,15 +29,15 @@ namespace TG::PAL
 		void TranslateHrErrorCode();		// 根据错误码生成相应错误信息
 	};
 
-    inline void CheckHResult(HRESULT hr, const std::wstring& description = L"")
+    inline void CheckHResult(HRESULT hr, char const* description = "")
     {
         if (hr < 0)
-            throw Win32Exception(hr, description);
+            throw Win32APIException(hr, description);
     }
 
-    inline void CheckLastError(const std::wstring& description = L"")
+    inline void CheckLastError(char const* description = "")
     {
         auto hr = static_cast<HRESULT>(GetLastError());
-        throw Win32Exception(hr, description);
+        throw Win32APIException(hr, description);
     }
 }

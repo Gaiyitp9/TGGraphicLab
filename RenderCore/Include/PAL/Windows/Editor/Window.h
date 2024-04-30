@@ -5,7 +5,7 @@
 *****************************************************************/
 #pragma once
 
-#include "../Win32Lean.h"
+#include "../WinAPILean.h"
 #include <string>
 #include <optional>
 
@@ -42,15 +42,4 @@ namespace TG::PAL
 		bool m_destroy = false;				// 是否销毁窗口
         bool m_spyMessage = false;			// 是否监控窗口消息
 	};
-
-	// 窗口分类
-	enum class WindowCategory : unsigned char
-	{
-		Default
-	};
-
-	// 获取窗口类内部对应的WIN32窗口名称
-	wchar_t const* GetWindowClassName(const WindowCategory &type);
-	// 获取窗口消息
-	std::string GetWindowMessageInfo(UINT msg, WPARAM wp, LPARAM lp);
 }

@@ -31,12 +31,12 @@ namespace TG
 		void Tick();
 
 	private:
-		double m_deltaTime = 0.0;                               // 单位毫秒(ms)
+		double m_deltaTime = 0.0;	// 单位毫秒(ms)
 		bool m_stopped = false;
 
-		std::chrono::steady_clock::time_point m_base;           // 开始运行的时间点
-		std::chrono::steady_clock::time_point m_last;           // 上一帧的时间点
-		std::chrono::steady_clock::time_point m_stop;           // 暂停的时间点
-		std::chrono::duration<double, std::milli> m_paused{};   // 已暂停的时间
+		std::chrono::steady_clock::time_point m_base{ std::chrono::steady_clock::now() };	// 开始运行的时间点
+		std::chrono::steady_clock::time_point m_last{ std::chrono::steady_clock::now() };   // 上一帧的时间点
+		std::chrono::steady_clock::time_point m_stop{ std::chrono::steady_clock::now() };   // 暂停的时间点
+		std::chrono::duration<double, std::milli> m_paused{0.0};	// 已暂停的时间
 	};
 }

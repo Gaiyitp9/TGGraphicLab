@@ -8,12 +8,7 @@
 
 namespace TG
 {
-	Chronometer::Chronometer()
-	{
-        m_base = std::chrono::steady_clock::now();
-        m_last = std::chrono::steady_clock::now();
-        m_paused = std::chrono::duration<double, std::milli>(0.0);
-	}
+	Chronometer::Chronometer() = default;
 
 	Chronometer::~Chronometer() = default;
 

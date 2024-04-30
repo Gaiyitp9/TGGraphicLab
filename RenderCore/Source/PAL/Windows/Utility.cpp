@@ -5,7 +5,7 @@
 *****************************************************************/
 
 #include "PAL/Windows/Utility.h"
-#include "PAL/Windows/Win32Lean.h"
+#include "PAL/Windows/WinAPILean.h"
 #include <locale>
 
 namespace TG::PAL::Utility

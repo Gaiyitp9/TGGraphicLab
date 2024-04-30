@@ -17,13 +17,8 @@ int CALLBACK wWinMain(_In_ HINSTANCE hInstance,
         OutputDebugStringA("test output\n");
 		return app.Run();
 	}
-	catch (const TG::BaseException& e)
-	{
-		TG::Debug::Log(e.what());
-	}
 	catch (const std::exception& e)
 	{
-		TG::Debug::LogLine("Standard exception: ");
 		TG::Debug::Log(e.what());
 	}
 	catch (...)

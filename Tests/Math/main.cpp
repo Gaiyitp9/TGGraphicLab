@@ -1,18 +1,28 @@
 #include "Math/Core.hpp"
 #include <iostream>
+#include <stacktrace>
+#include <format>
 
-class Base
+int nested_func(int c)
+{
+    std::cout << std::format("{}\n", std::stacktrace::current());
+    return c + 1;
+}
+
+int func(int b)
+{
+    return nested_func(b + 1);
+}
+
+class StackTraceTest
 {
 public:
-    virtual ~Base() = default;
+    StackTraceTest() {}
+
+    void print() { std::cout << std::format("{}\n", m_stackTrace); }
+
 private:
-    virtual void Test() = 0;
-};
-
-class Derived final : public Base
-{
-public:
-    void Test() override { std::cout << "Derived func" << std::endl; }
+    std::stacktrace m_stackTrace{std::stacktrace::current()};
 };
 
 int main()

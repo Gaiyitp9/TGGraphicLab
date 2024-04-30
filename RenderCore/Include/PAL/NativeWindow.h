@@ -5,6 +5,10 @@
 *****************************************************************/
 #pragma once
 
-#ifdef _WIN64
+namespace TG::PAL
+{
+    class NativeWindow
+    {
 
-#endif
+    };
+}

@@ -5,7 +5,7 @@
 *****************************************************************/
 
 #include "PAL/Windows/Editor/MainWindow.h"
-#include "PAL/Windows/Diagnostics/Win32Exception.h"
+#include "../../../../Include/PAL/Windows/WinAPIException.h"
 #include "Diagnostics/Log.hpp"
 #include "Input/EventData.h"
 #include "PAL/Windows/Utility.h"
@@ -32,17 +32,6 @@ namespace TG::PAL
 
         ShowWindow(m_hwnd, SW_SHOW);
 	}
-
-    void MainWindow::SetInputListener(const std::function<void(const Input::Event&)>& listener)
-    {
-        m_listener = listener;
-    }
-
-    void MainWindow::SetStateCallback(const std::function<void()>& resume, const std::function<void()>& suspend)
-    {
-        m_resume = resume;
-        m_suspend = suspend;
-    }
 
 	void MainWindow::SetIcon(wchar_t const* iconPath) const
 	{

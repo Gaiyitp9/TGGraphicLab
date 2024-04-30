@@ -21,12 +21,22 @@ namespace TG::PAL
         MainWindow& operator=(MainWindow&&) = delete;
 		~MainWindow() override = default;
 
-        [[nodiscard]] const std::wstring& Name() const noexcept { return m_name; }          // 窗口名称
-
-		void SetIcon(wchar_t const* iconPath) const;				                        // 设置窗口的icon
-        void SetInputListener(const std::function<void(const Input::Event&)>& listener);    // 添加输入事件监听器
+		// 窗口名称
+        [[nodiscard]] const std::wstring& Name() const noexcept { return m_name; }
+		// 设置窗口的icon
+		void SetIcon(wchar_t const* iconPath) const;
+		// 添加输入事件监听器
+		void SetInputListener(const std::function<void(const Input::Event &)> &listener) noexcept
+		{
+			m_listener = listener;
+		}
+		// 设置窗口状态回调
         void SetStateCallback(const std::function<void()>& resume,
-                              const std::function<void()>& suspend);                        // 设置窗口状态回调
+                              const std::function<void()>& suspend) noexcept
+        {
+        	m_resume = resume;
+        	m_suspend = suspend;
+        }
 
 	private:
 		LRESULT CALLBACK WindowProc(HWND, UINT, WPARAM, LPARAM) override;	                // 消息处理函数
