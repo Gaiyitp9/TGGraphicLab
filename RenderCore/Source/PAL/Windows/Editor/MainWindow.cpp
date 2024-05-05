@@ -23,7 +23,7 @@ namespace TG::PAL
             CheckLastError();
 
         // 创建窗口
-        m_hwnd = CreateWindowW(GetWindowClassName(WindowCategory::Default), m_name.c_str(), WS_OVERLAPPEDWINDOW,
+        m_hwnd = CreateWindowW(L"Default", m_name.c_str(), WS_OVERLAPPEDWINDOW,
                                m_posX, m_posY, rect.right - rect.left, rect.bottom - rect.top,
                                m_parent, nullptr, nullptr, this);
 
@@ -37,7 +37,7 @@ namespace TG::PAL
 	{
         HANDLE icon = LoadImageW(nullptr, iconPath, IMAGE_ICON, 32, 32, LR_LOADFROMFILE);
 		if (icon == nullptr)
-			CheckLastError(L"Invalid icon source");
+			CheckLastError("Invalid icon source");
 
 		SendMessageW(m_hwnd, WM_SETICON, ICON_BIG, reinterpret_cast<LPARAM>(icon));
 		SendMessageW(m_hwnd, WM_SETICON, ICON_SMALL, reinterpret_cast<LPARAM>(icon));

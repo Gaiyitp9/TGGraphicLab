@@ -43,16 +43,16 @@ list(APPEND SRCS
         Source/Input/Keyboard.cpp
         Source/Input/Mouse.cpp
 
-        Source/PAL/Windows/NativeWindow.cpp
+        Source/PAL/NativeWindow.cpp
 )
 
 if (CMAKE_SYSTEM_NAME STREQUAL "Windows")
     list(APPEND INCLUDES
             Include/PAL/Windows/MemoryLeakDetection.h
             Include/PAL/Windows/Utility.h
-            Include/PAL/Windows/WinAPILean.h
-
-            Include/PAL/Windows/WinAPIException.h
+            Include/PAL/Windows/Win32API.h
+            Include/PAL/Windows/WinApiException.h
+            Include/PAL/Windows/WindowCore.h
 
             Include/PAL/Windows/Editor/MainWindow.h
             Include/PAL/Windows/Editor/PopupWindow.h
@@ -61,7 +61,9 @@ if (CMAKE_SYSTEM_NAME STREQUAL "Windows")
 
     list(APPEND SRCS
             Source/PAL/Windows/Utility.cpp
-            Source/PAL/Windows/WinAPIException.cpp
+            Source/PAL/Windows/WinApiException.cpp
+            Source/PAL/Windows/WindowCore.cpp
+
             Source/PAL/Windows/Editor/MainWindow.cpp
             Source/PAL/Windows/Editor/PopupWindow.cpp
             Source/PAL/Windows/Editor/Window.cpp
@@ -73,9 +75,7 @@ source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${INCLUDES})
 set(TG_MATRIX_STORAGE_ORDER "RowMajor" CACHE STRING "Default matrix storage order" FORCE)
 set_property(CACHE TG_MATRIX_STORAGE_ORDER PROPERTY STRINGS "RowMajor" "ColumnMajor")
 
-add_library(RenderCore STATIC ${SRCS} ${INCLUDES}
-        Include/PAL/Windows/WindowHelper.h
-        Source/PAL/Windows/WindowHelper.cpp)
+add_library(RenderCore STATIC ${SRCS} ${INCLUDES})
 target_include_directories(RenderCore PUBLIC Include ThirdParty)
 target_link_libraries(RenderCore PRIVATE dxgi d3d11 dxguid dbghelp opengl32)
 

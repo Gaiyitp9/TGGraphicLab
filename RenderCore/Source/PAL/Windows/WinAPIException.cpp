@@ -9,16 +9,16 @@
 
 namespace TG::PAL
 {
-	Win32APIException::Win32APIException(HRESULT hr, char const* description)
+	WinApiException::WinApiException(HRESULT hr, char const* description)
 		: m_description(description), m_stackTrace(std::stacktrace::current()), m_errorCode(hr)
 	{
 		// 提取错误码中的信息
 		TranslateHrErrorCode();
 	}
 
-	Win32APIException::~Win32APIException() = default;
+	WinApiException::~WinApiException() = default;
 
-	char const* Win32APIException::what() const
+	char const* WinApiException::what() const
 	{
 		static std::string whatBuffer;
 
@@ -29,7 +29,7 @@ namespace TG::PAL
 		return whatBuffer.c_str();
 	}
 
-	void Win32APIException::TranslateHrErrorCode()
+	void WinApiException::TranslateHrErrorCode()
 	{
 		/*
 		注意：FormatMessage中的lpBuffer参数与dwFlags有关。

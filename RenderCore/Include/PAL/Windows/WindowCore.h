@@ -5,24 +5,15 @@
 *****************************************************************/
 #pragma once
 
-#ifdef _WIN64
-#include "Windows/WindowCore.h"
-#endif
+#include "Win32API.h"
+#include <string>
 
 namespace TG::PAL
 {
-    // 不同平台下的原生窗口
-    class NativeWindow
-    {
-    public:
-        NativeWindow(int x, int y, int width, int height, wchar_t const* title);
-
-#ifdef _WIN64
-    private:
-        HWND m_hwnd;
-#endif
-    };
-
+    // 创建Windows原生窗口
+    HWND CreateWin32Window(int x, int y, int width, int height, wchar_t const *title);
     // 轮询输入事件
-    void PollEvents();
+    void Win32PollEvents();
+    // 窗口消息转成字符串
+    std::pmr::string WindowMessageToString(UINT msg, WPARAM wp, LPARAM lp);
 }
