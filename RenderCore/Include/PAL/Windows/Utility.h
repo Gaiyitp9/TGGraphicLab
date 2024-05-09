@@ -9,16 +9,16 @@
 
 namespace TG::PAL::Utility
 {
-    std::wstring Utf8ToUtf16(const std::string &str);
-    std::string Utf16ToUtf8(const std::wstring &wstr);
-    std::string ToLower(const std::string &str);
-    std::wstring ToLower(const std::wstring &wstr);
-    std::string GetBasePath(const std::string &filePath);
-    std::wstring GetBasePath(const std::wstring &filePath);
-    std::string RemoveBasePath(const std::string &filePath);
-    std::wstring RemoveBasePath(const std::wstring &filePath);
-    std::string GetFileExtension(const std::string &filePath);
-    std::wstring GetFileExtension(const std::wstring &filePath);
-    std::string RemoveExtension(const std::string &filePath);
-    std::wstring RemoveExtension(const std::wstring &filePath);
+    std::wstring Utf8ToUtf16(std::string_view str);
+    std::string Utf16ToUtf8(std::wstring_view wstr);
+    std::string ToLower(std::string_view str);
+    std::wstring ToLower(std::wstring_view wstr);
+    std::string GetBasePath(std::string_view filePath);
+    std::wstring GetBasePath(std::wstring_view filePath);
+    std::string RemoveBasePath(std::string_view filePath);
+    std::wstring RemoveBasePath(std::wstring_view filePath);
+    std::string GetFileExtension(std::string_view filePath);
+    std::wstring GetFileExtension(std::wstring_view filePath);
+    std::string RemoveExtension(std::string_view filePath);
+    std::wstring RemoveExtension(std::wstring_view filePath);
 }

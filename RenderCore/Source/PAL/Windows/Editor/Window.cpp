@@ -5,7 +5,7 @@
 *****************************************************************/
 
 #include "PAL/Windows/Editor/Window.h"
-#include "PAL/Windows/WinAPIException.h"
+#include "PAL/Windows/Win32Exception.h"
 #include <unordered_map>
 #include <format>
 

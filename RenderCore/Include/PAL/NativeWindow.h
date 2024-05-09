@@ -11,18 +11,24 @@
 
 namespace TG::PAL
 {
-    // 不同平台下的原生窗口
-    class NativeWindow
+    // 代表不同平台中的原生窗口
+    class NativeWindow;
+    // 窗口基类
+    class Window : public NativeWindow
     {
+        using KeyFunction = std::function<void(int key, int scancode, int action, int mods)>;
+        using MouseButtonFunction =  std::function<void(int button, int action, int mods)>;
+
     public:
-        NativeWindow(int x, int y, int width, int height, wchar_t const* title);
+        Window(int x, int y, int width, int height, wchar_t const* title);
 
-#ifdef _WIN64
+        KeyFunction SetKeyCallback(KeyFunction function);
+        MouseButtonFunction SetMouseButtonCallback(MouseButtonFunction function);
     private:
-        HWND m_hwnd;
-#endif
+        std::string m_windowName;
+        KeyFunction m_keyFunction;
+        MouseButtonFunction m_mouseButtonFunction;
     };
-
-    // 轮询输入事件
+    // 轮询输入事件，需要每帧都调用
     void PollEvents();
 }

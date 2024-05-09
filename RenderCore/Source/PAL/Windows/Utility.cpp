@@ -10,89 +10,89 @@
 
 namespace TG::PAL::Utility
 {
-	std::wstring Utf8ToUtf16(const std::string& str)
+	std::wstring Utf8ToUtf16(std::string_view str)
 	{
-		const int length = MultiByteToWideChar(CP_UTF8, 0, str.c_str(), -1, nullptr, 0);
+		const int length = MultiByteToWideChar(CP_UTF8, 0, str.data(), -1, nullptr, 0);
 		auto* wide = static_cast<wchar_t*>(malloc(length * sizeof(wchar_t)));
-		MultiByteToWideChar(CP_UTF8, 0, str.c_str(), -1, wide, length);
+		MultiByteToWideChar(CP_UTF8, 0, str.data(), -1, wide, length);
 		std::wstring wstr(wide);
 		free(wide);
 		return wstr;
 	}
 
-	std::string Utf16ToUtf8(const std::wstring& wstr)
+	std::string Utf16ToUtf8(std::wstring_view wstr)
 	{
-		const int length = WideCharToMultiByte(CP_UTF8, 0, wstr.c_str(), -1, nullptr, 0, nullptr, nullptr);
+		const int length = WideCharToMultiByte(CP_UTF8, 0, wstr.data(), -1, nullptr, 0, nullptr, nullptr);
 		auto* ansi = static_cast<char*>(malloc(length * sizeof(char)));
-		WideCharToMultiByte(CP_UTF8, 0, wstr.c_str(), -1, ansi, length, nullptr, nullptr);
+		WideCharToMultiByte(CP_UTF8, 0, wstr.data(), -1, ansi, length, nullptr, nullptr);
 		std::string str(ansi);
 		free(ansi);
 		return str;
 	}
 
-	std::string ToLower(const std::string& str)
+	std::string ToLower(std::string_view str)
 	{
-		std::string lowerCase = str;
+		std::string lowerCase{str};
 		const std::locale loc;
 		for (char& s : lowerCase)
 			s = std::tolower(s, loc);
 		return lowerCase;
 	}
 
-	std::wstring ToLower(const std::wstring& wstr)
+	std::wstring ToLower(std::wstring_view wstr)
 	{
-		std::wstring lowerCase = wstr;
+		std::wstring lowerCase{wstr};
 		const std::locale loc;
 		for (wchar_t& s : lowerCase)
 			s = std::tolower(s, loc);
 		return lowerCase;
 	}
 
-	std::string GetBasePath(const std::string& filePath)
+	std::string GetBasePath(std::string_view filePath)
 	{
 		size_t lastSlash;
 		if ((lastSlash = filePath.rfind('/')) != std::string::npos)
-			return filePath.substr(0, lastSlash + 1);
+			return std::string{filePath.substr(0, lastSlash + 1)};
 		if ((lastSlash = filePath.rfind('\\')) != std::string::npos)
-			return filePath.substr(0, lastSlash + 1);
+			return std::string{filePath.substr(0, lastSlash + 1)};
 
-        return "";
+        return {};
 	}
 
-	std::wstring GetBasePath(const std::wstring& filePath)
+	std::wstring GetBasePath(std::wstring_view filePath)
 	{
 		size_t lastSlash;
 		if ((lastSlash = filePath.rfind(L'/')) != std::wstring::npos)
-			return filePath.substr(0, lastSlash + 1);
+			return std::wstring{filePath.substr(0, lastSlash + 1)};
 		if ((lastSlash = filePath.rfind(L'\\')) != std::wstring::npos)
-			return filePath.substr(0, lastSlash + 1);
+			return std::wstring{filePath.substr(0, lastSlash + 1)};
 
-		return L"";
+		return {};
 	}
 
-	std::string RemoveBasePath(const std::string& filePath)
+	std::string RemoveBasePath(std::string_view filePath)
 	{
 		size_t lastSlash;
 		if ((lastSlash = filePath.rfind('/')) != std::string::npos)
-			return filePath.substr(lastSlash + 1);
+			return std::string{filePath.substr(lastSlash + 1)};
 		if ((lastSlash = filePath.rfind('\\')) != std::string::npos)
-			return filePath.substr(lastSlash + 1);
+			return std::string{filePath.substr(lastSlash + 1)};
 
-		return filePath;
+		return std::string{filePath};
 	}
 
-	std::wstring RemoveBasePath(const std::wstring& filePath)
+	std::wstring RemoveBasePath(std::wstring_view filePath)
 	{
 		size_t lastSlash;
 		if ((lastSlash = filePath.rfind(L'/')) != std::wstring::npos)
-			return filePath.substr(lastSlash + 1);
+			return std::wstring{filePath.substr(lastSlash + 1)};
 		if ((lastSlash = filePath.rfind(L'\\')) != std::wstring::npos)
-			return filePath.substr(lastSlash + 1);
+			return std::wstring{filePath.substr(lastSlash + 1)};
 
-		return filePath;
+		return std::wstring{filePath};
 	}
 
-	std::string GetFileExtension(const std::string& filePath)
+	std::string GetFileExtension(std::string_view filePath)
 	{
 		const std::string fileName = RemoveBasePath(filePath);
 		const size_t extOffset = fileName.rfind('.');
@@ -102,7 +102,7 @@ namespace TG::PAL::Utility
 		return fileName.substr(extOffset + 1);
 	}
 
-	std::wstring GetFileExtension(const std::wstring& filePath)
+	std::wstring GetFileExtension(std::wstring_view filePath)
 	{
 		const std::wstring fileName = RemoveBasePath(filePath);
 		const size_t extOffset = fileName.rfind(L'.');
@@ -112,13 +112,13 @@ namespace TG::PAL::Utility
 		return fileName.substr(extOffset + 1);
 	}
 
-	inline std::string RemoveExtension(const std::string& filePath)
+	inline std::string RemoveExtension(std::string_view filePath)
 	{
-		return filePath.substr(0, filePath.rfind('.'));
+		return std::string{filePath.substr(0, filePath.rfind('.'))};
 	}
 
-	inline std::wstring RemoveExtension(const std::wstring& filePath)
+	inline std::wstring RemoveExtension(std::wstring_view filePath)
 	{
-		return filePath.substr(0, filePath.rfind(L'.'));
+		return std::wstring{filePath.substr(0, filePath.rfind(L'.'))};
 	}
 }

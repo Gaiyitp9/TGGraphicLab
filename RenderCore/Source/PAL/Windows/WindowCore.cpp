@@ -5,12 +5,13 @@
 *****************************************************************/
 
 #include "PAL/Windows/WindowCore.h"
-#include "PAL/Windows/WinAPIException.h"
+#include "PAL/Windows/Win32Exception.h"
+#include "PAL/Windows/Utility.h"
 #include <unordered_map>
 
 namespace TG::PAL
 {
-    HWND CreateWin32Window(int x, int y, int width, int height, wchar_t const* title)
+    NativeWindow::NativeWindow(int x, int y, int width, int height, wchar_t const* title)
     {
         // 客户端区域大小
         RECT rect = { 0, 0, width, height };
@@ -18,18 +19,19 @@ namespace TG::PAL
         if (!AdjustWindowRect(&rect, WS_OVERLAPPEDWINDOW, false))
             CheckLastError();
 
-        HWND hwnd = CreateWindowW(L"Default", title, WS_OVERLAPPEDWINDOW,
+        m_hwnd = CreateWindowW(L"Default", title, WS_OVERLAPPEDWINDOW,
                                x, y, rect.right - rect.left, rect.bottom - rect.top,
                                nullptr, nullptr, nullptr, this);
-        if (hwnd == nullptr)
+        if (m_hwnd == nullptr)
             CheckLastError();
         // 显示窗口
-        ShowWindow(hwnd, SW_SHOW);
+        ShowWindow(m_hwnd, SW_SHOW);
 
-        return hwnd;
+        m_windowName = Utility::Utf16ToUtf8(title);
     }
 
-    void Win32PollEvents()
+    // 轮询输入事件
+    void PollEvents()
     {
         MSG msg = {};
 
@@ -40,7 +42,8 @@ namespace TG::PAL
         }
     }
 
-    std::pmr::string WindowMessageToString(UINT msg, WPARAM wp, LPARAM lp)
+    // 窗口消息转成字符串
+    static std::pmr::string WindowMessageToString(UINT msg, WPARAM wp, LPARAM lp)
     {
         static std::unordered_map<DWORD, char const*> windowMessage
         {
@@ -231,6 +234,150 @@ namespace TG::PAL
         return msgStr;
     }
 
+    LRESULT NativeWindow::WindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
+	{
+		// 是否监控窗口消息
+		if (m_spyMessage)
+			Debug::LogLine(std::format("{:<16} {}", windowName, WindowMessageToString(msg, wParam, lParam)));
+
+		switch (msg)
+		{
+		case WM_DESTROY:
+            // 窗口被销毁后，窗口类也需要被销毁
+            m_destroy = true;
+			// 基础窗口一般作为主窗口，销毁后要退出线程
+			PostQuitMessage(0);
+			return 0;
+
+		// 按下按键
+		case WM_KEYDOWN:
+		case WM_SYSKEYDOWN:
+        case WM_KEYUP:
+        case WM_SYSKEYUP:
+		{
+            if (m_listener)
+            {
+                // https://learn.microsoft.com/en-us/windows/win32/inputdev/about-keyboard-input
+                WORD vkCode = LOWORD(wParam);
+                WORD keyFlags = HIWORD(lParam);
+                WORD scanCode = LOBYTE(keyFlags);
+                BOOL isExtendedKey = (keyFlags & KF_EXTENDED) == KF_EXTENDED; // extended-key flag, 1 if scancode has 0xE0 prefix
+                if (isExtendedKey)
+                    scanCode = MAKEWORD(scanCode, 0xE0);
+                switch (vkCode)
+                {
+                    case VK_SHIFT:   // converts to VK_LSHIFT or VK_RSHIFT
+                    case VK_CONTROL: // converts to VK_LCONTROL or VK_RCONTROL
+                    case VK_MENU:    // converts to VK_LMENU or VK_RMENU
+                        vkCode = LOWORD(MapVirtualKeyW(scanCode, MAPVK_VSC_TO_VK_EX));
+                        break;
+
+                    default:
+                        break;
+                }
+                Input::EventType type = (keyFlags & KF_UP) == KF_UP ? Input::EventType::Release : Input::EventType::Press;
+                m_listener({static_cast<Input::KeyCode>(vkCode), type, nullptr});
+            }
+			return 0;
+		}
+
+		// 按键字符
+		case WM_CHAR:
+        {
+            if (m_listener)
+            {
+                Input::KeyboardData data{static_cast<char>(wParam)};
+                m_listener({Input::KeyCode::Char, Input::EventType::Char, data});
+            }
+			return 0;
+        }
+
+		// 鼠标移动
+		case WM_MOUSEMOVE:
+		{
+            if (m_listener)
+            {
+                Input::MouseData data{GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam)};
+                m_listener({Input::KeyCode::None, Input::EventType::MouseMove, data});
+            }
+			return 0;
+		}
+
+		// 按下鼠标左键
+		case WM_LBUTTONDOWN:
+            if (m_listener)
+                m_listener({Input::KeyCode::LeftMouseButton, Input::EventType::Press, nullptr});
+			return 0;
+
+		// 松开鼠标左键
+		case WM_LBUTTONUP:
+            if (m_listener)
+                m_listener({Input::KeyCode::LeftMouseButton, Input::EventType::Release, nullptr});
+			return 0;
+
+		// 按下鼠标右键
+		case WM_RBUTTONDOWN:
+            if (m_listener)
+                m_listener({Input::KeyCode::RightMouseButton, Input::EventType::Press, nullptr});
+			return 0;
+
+		// 松开鼠标右键
+		case WM_RBUTTONUP:
+            if (m_listener)
+                m_listener({Input::KeyCode::RightMouseButton, Input::EventType::Release, nullptr});
+			return 0;
+
+		// 按下鼠标中键
+		case WM_MBUTTONDOWN:
+            if (m_listener)
+                m_listener({Input::KeyCode::MidMouseButton, Input::EventType::Press, nullptr});
+			return 0;
+
+		// 松开鼠标中键
+		case WM_MBUTTONUP:
+            if (m_listener)
+                m_listener({Input::KeyCode::MidMouseButton, Input::EventType::Release, nullptr});
+			return 0;
+
+		// 滚动鼠标滚轮
+		case WM_MOUSEWHEEL:
+        {
+            if (m_listener)
+            {
+                // 每帧只会产生一个WM_MOUSEWHEEL
+                Input::MouseData data{GET_WHEEL_DELTA_WPARAM(wParam)};
+                m_listener({Input::KeyCode::MidMouseButton, Input::EventType::WheelRoll, data});
+            }
+			return 0;
+        }
+
+		case WM_SIZE:
+            if (m_resume && m_suspend)
+            {
+                m_width = LOWORD(lParam);
+                m_height = HIWORD(lParam);
+                if (wParam == SIZE_MINIMIZED)
+                    m_suspend();
+                else if (wParam == SIZE_RESTORED)
+                    m_resume();
+            }
+			return 0;
+
+		case WM_ENTERSIZEMOVE:
+            if (m_suspend)
+                m_suspend();
+			return 0;
+
+		case WM_EXITSIZEMOVE:
+            if (m_resume)
+                m_resume();
+			return 0;
+
+        default:
+		    return DefWindowProcW(hwnd, msg, wParam, lParam);
+		}
+	}
+
     static LRESULT WindowProcThunk(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
     {
         // 注：窗口处理函数不能向上传递异常
@@ -244,7 +391,7 @@ namespace TG::PAL
         if (msg == WM_NCCREATE)
         {
             const CREATESTRUCT* const pCreate = reinterpret_cast<CREATESTRUCT*>(lParam);
-            auto* const pWnd = static_cast<Window* const>(pCreate->lpCreateParams);
+            auto* const pWnd = static_cast<NativeWindow* const>(pCreate->lpCreateParams);
 
             SetWindowLongPtrW(hwnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(pWnd));
             SetWindowLongPtrW(hwnd, GWLP_WNDPROC, reinterpret_cast<LONG_PTR>(WindowProcThunk));

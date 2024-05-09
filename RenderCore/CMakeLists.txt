@@ -42,8 +42,6 @@ list(APPEND SRCS
         Source/Input/Event.cpp
         Source/Input/Keyboard.cpp
         Source/Input/Mouse.cpp
-
-        Source/PAL/NativeWindow.cpp
 )
 
 if (CMAKE_SYSTEM_NAME STREQUAL "Windows")
@@ -51,7 +49,7 @@ if (CMAKE_SYSTEM_NAME STREQUAL "Windows")
             Include/PAL/Windows/MemoryLeakDetection.h
             Include/PAL/Windows/Utility.h
             Include/PAL/Windows/Win32API.h
-            Include/PAL/Windows/WinApiException.h
+            Include/PAL/Windows/Win32Exception.h
             Include/PAL/Windows/WindowCore.h
 
             Include/PAL/Windows/Editor/MainWindow.h
@@ -61,7 +59,7 @@ if (CMAKE_SYSTEM_NAME STREQUAL "Windows")
 
     list(APPEND SRCS
             Source/PAL/Windows/Utility.cpp
-            Source/PAL/Windows/WinApiException.cpp
+            Source/PAL/Windows/Win32Exception.cpp
             Source/PAL/Windows/WindowCore.cpp
 
             Source/PAL/Windows/Editor/MainWindow.cpp

@@ -4,21 +4,21 @@
 * This code is licensed under the MIT License (MIT).			*
 *****************************************************************/
 
-#include "PAL/Windows/WinAPIException.h"
+#include "PAL/Windows/Win32Exception.h"
 #include <format>
 
 namespace TG::PAL
 {
-	WinApiException::WinApiException(HRESULT hr, char const* description)
+	Win32Exception::Win32Exception(HRESULT hr, char const* description)
 		: m_description(description), m_stackTrace(std::stacktrace::current()), m_errorCode(hr)
 	{
 		// 提取错误码中的信息
 		TranslateHrErrorCode();
 	}
 
-	WinApiException::~WinApiException() = default;
+	Win32Exception::~Win32Exception() = default;
 
-	char const* WinApiException::what() const
+	char const* Win32Exception::what() const
 	{
 		static std::string whatBuffer;
 
@@ -29,7 +29,7 @@ namespace TG::PAL
 		return whatBuffer.c_str();
 	}
 
-	void WinApiException::TranslateHrErrorCode()
+	void Win32Exception::TranslateHrErrorCode()
 	{
 		/*
 		注意：FormatMessage中的lpBuffer参数与dwFlags有关。

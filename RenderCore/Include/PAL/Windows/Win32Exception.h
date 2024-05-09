@@ -10,11 +10,11 @@
 
 namespace TG::PAL
 {
-	class WinApiException final : public std::exception
+	class Win32Exception final : public std::exception
 	{
 	public:
-		explicit WinApiException(HRESULT hr, char const* description = "No Description");
-		~WinApiException() override;
+		explicit Win32Exception(HRESULT hr, char const* description = "No Description");
+		~Win32Exception() override;
 
 		[[nodiscard]] char const* what() const override;
 
@@ -32,12 +32,12 @@ namespace TG::PAL
     inline void CheckHResult(HRESULT hr, char const* description = "")
     {
         if (hr < 0)
-            throw WinApiException(hr, description);
+            throw Win32Exception(hr, description);
     }
 
     inline void CheckLastError(char const* description = "")
     {
         auto hr = static_cast<HRESULT>(GetLastError());
-        throw WinApiException(hr, description);
+        throw Win32Exception(hr, description);
     }
 }

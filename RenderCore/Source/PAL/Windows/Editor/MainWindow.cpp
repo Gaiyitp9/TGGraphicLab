@@ -5,7 +5,7 @@
 *****************************************************************/
 
 #include "PAL/Windows/Editor/MainWindow.h"
-#include "../../../../Include/PAL/Windows/WinAPIException.h"
+#include "PAL/Windows/Win32Exception.h"
 #include "Diagnostics/Log.hpp"
 #include "Input/EventData.h"
 #include "PAL/Windows/Utility.h"
