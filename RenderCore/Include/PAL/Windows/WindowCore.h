@@ -12,14 +12,15 @@
 namespace TG::PAL
 {
     // Windows原生窗口
-    class NativeWindow
+    struct NativeWindow
     {
-    public:
-        NativeWindow(int x, int y, int width, int height, wchar_t const* title);
+        std::string name;
+        HWND hwnd{nullptr};
 
-    private:
-        LRESULT WindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
+        bool spyMessage{false};
+        bool destroyed{false};
 
-        HWND m_hwnd;
+        std::function<void(int key, int scancode, int action, int mods)> keyFunction;
+        std::function<void(int button, int action, int mods)> mouseButtonFunction;
     };
 }

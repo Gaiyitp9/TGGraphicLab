@@ -8,26 +8,30 @@
 #include "PAL/Windows/Win32Exception.h"
 #include "PAL/Windows/Utility.h"
 #include <unordered_map>
+#include <memory>
 
 namespace TG::PAL
 {
-    NativeWindow::NativeWindow(int x, int y, int width, int height, wchar_t const* title)
+    std::unique_ptr<NativeWindow> CreateNativeWindow(int x, int y, int width, int height, wchar_t const* title)
     {
-        // 客户端区域大小
-        RECT rect = { 0, 0, width, height };
-        // 根据客户区域宽和高计算整个窗口的宽和高
-        if (!AdjustWindowRect(&rect, WS_OVERLAPPEDWINDOW, false))
-            CheckLastError();
+    	std::unique_ptr<NativeWindow> nativeWindow = std::make_unique<NativeWindow>();
+    	nativeWindow->name = Utility::Utf16ToUtf8(title);
 
-        m_hwnd = CreateWindowW(L"Default", title, WS_OVERLAPPEDWINDOW,
-                               x, y, rect.right - rect.left, rect.bottom - rect.top,
-                               nullptr, nullptr, nullptr, this);
-        if (m_hwnd == nullptr)
-            CheckLastError();
-        // 显示窗口
-        ShowWindow(m_hwnd, SW_SHOW);
+    	// 客户端区域大小
+    	RECT rect = { 0, 0, width, height };
+    	// 根据客户区域宽和高计算整个窗口的宽和高
+    	if (!AdjustWindowRect(&rect, WS_OVERLAPPEDWINDOW, false))
+    		CheckLastError();
 
-        m_windowName = Utility::Utf16ToUtf8(title);
+    	nativeWindow->hwnd = CreateWindowW(L"Default", title, WS_OVERLAPPEDWINDOW,
+							   x, y, rect.right - rect.left, rect.bottom - rect.top,
+							   nullptr, nullptr, nullptr, nativeWindow.get());
+    	if (nativeWindow->hwnd == nullptr)
+    		CheckLastError();
+    	// 显示窗口
+    	ShowWindow(nativeWindow->hwnd, SW_SHOW);
+
+        return nativeWindow;
     }
 
     // 轮询输入事件
@@ -228,23 +232,30 @@ namespace TG::PAL
         else
             msgName.append(it->second);
 
-        std::pmr::string msgStr;
-        std::format_to(std::back_inserter(msgStr), "{:<25} LP: {:#018x}   WP: {:#018x}", msgName, lp, wp);
+        std::pmr::string message;
+        std::format_to(std::back_inserter(message), "{:<25} LP: {:#018x}   WP: {:#018x}", msgName, lp, wp);
 
-        return msgStr;
+        return message;
     }
 
-    LRESULT NativeWindow::WindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
+    static LRESULT WindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	{
-		// 是否监控窗口消息
-		if (m_spyMessage)
-			Debug::LogLine(std::format("{:<16} {}", windowName, WindowMessageToString(msg, wParam, lParam)));
+        // 注：窗口处理函数不能向上传递异常
+        auto* const pWindow = reinterpret_cast<NativeWindow*>(GetWindowLongPtrW(hwnd, GWLP_USERDATA));
+
+		// 监控窗口消息
+		if (pWindow->spyMessage)
+		{
+		    std::pmr::string windowMessage;
+		    std::format_to(std::back_inserter(windowMessage), "{:<16} {}", pWindow->name, WindowMessageToString(msg, wParam, lParam));
+			OutputDebugStringA(windowMessage.data());
+		}
 
 		switch (msg)
 		{
 		case WM_DESTROY:
             // 窗口被销毁后，窗口类也需要被销毁
-            m_destroy = true;
+            pWindow->destroyed = true;
 			// 基础窗口一般作为主窗口，销毁后要退出线程
 			PostQuitMessage(0);
 			return 0;
@@ -255,135 +266,127 @@ namespace TG::PAL
         case WM_KEYUP:
         case WM_SYSKEYUP:
 		{
-            if (m_listener)
+            // https://learn.microsoft.com/en-us/windows/win32/inputdev/about-keyboard-input
+            WORD vkCode = LOWORD(wParam);
+            WORD keyFlags = HIWORD(lParam);
+            WORD scanCode = LOBYTE(keyFlags);
+            BOOL isExtendedKey = (keyFlags & KF_EXTENDED) == KF_EXTENDED; // extended-key flag, 1 if scancode has 0xE0 prefix
+            if (isExtendedKey)
+                scanCode = MAKEWORD(scanCode, 0xE0);
+            switch (vkCode)
             {
-                // https://learn.microsoft.com/en-us/windows/win32/inputdev/about-keyboard-input
-                WORD vkCode = LOWORD(wParam);
-                WORD keyFlags = HIWORD(lParam);
-                WORD scanCode = LOBYTE(keyFlags);
-                BOOL isExtendedKey = (keyFlags & KF_EXTENDED) == KF_EXTENDED; // extended-key flag, 1 if scancode has 0xE0 prefix
-                if (isExtendedKey)
-                    scanCode = MAKEWORD(scanCode, 0xE0);
-                switch (vkCode)
-                {
-                    case VK_SHIFT:   // converts to VK_LSHIFT or VK_RSHIFT
-                    case VK_CONTROL: // converts to VK_LCONTROL or VK_RCONTROL
-                    case VK_MENU:    // converts to VK_LMENU or VK_RMENU
-                        vkCode = LOWORD(MapVirtualKeyW(scanCode, MAPVK_VSC_TO_VK_EX));
-                        break;
+                case VK_SHIFT:   // converts to VK_LSHIFT or VK_RSHIFT
+                case VK_CONTROL: // converts to VK_LCONTROL or VK_RCONTROL
+                case VK_MENU:    // converts to VK_LMENU or VK_RMENU
+                    vkCode = LOWORD(MapVirtualKeyW(scanCode, MAPVK_VSC_TO_VK_EX));
+                    break;
 
-                    default:
-                        break;
-                }
-                Input::EventType type = (keyFlags & KF_UP) == KF_UP ? Input::EventType::Release : Input::EventType::Press;
-                m_listener({static_cast<Input::KeyCode>(vkCode), type, nullptr});
+                default:
+                    break;
             }
+
+			// Input::EventType type = (keyFlags & KF_UP) == KF_UP ? Input::EventType::Release : Input::EventType::Press;
+			// m_listener({static_cast<Input::KeyCode>(vkCode), type, nullptr});
+
 			return 0;
 		}
 
 		// 按键字符
 		case WM_CHAR:
         {
-            if (m_listener)
-            {
-                Input::KeyboardData data{static_cast<char>(wParam)};
-                m_listener({Input::KeyCode::Char, Input::EventType::Char, data});
-            }
+            // if (m_listener)
+            // {
+            //     Input::KeyboardData data{static_cast<char>(wParam)};
+            //     m_listener({Input::KeyCode::Char, Input::EventType::Char, data});
+            // }
 			return 0;
         }
 
 		// 鼠标移动
 		case WM_MOUSEMOVE:
 		{
-            if (m_listener)
-            {
-                Input::MouseData data{GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam)};
-                m_listener({Input::KeyCode::None, Input::EventType::MouseMove, data});
-            }
+            // if (m_listener)
+            // {
+            //     Input::MouseData data{GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam)};
+            //     m_listener({Input::KeyCode::None, Input::EventType::MouseMove, data});
+            // }
 			return 0;
 		}
 
 		// 按下鼠标左键
 		case WM_LBUTTONDOWN:
-            if (m_listener)
-                m_listener({Input::KeyCode::LeftMouseButton, Input::EventType::Press, nullptr});
+            // if (m_listener)
+                // m_listener({Input::KeyCode::LeftMouseButton, Input::EventType::Press, nullptr});
 			return 0;
 
 		// 松开鼠标左键
 		case WM_LBUTTONUP:
-            if (m_listener)
-                m_listener({Input::KeyCode::LeftMouseButton, Input::EventType::Release, nullptr});
+            // if (m_listener)
+                // m_listener({Input::KeyCode::LeftMouseButton, Input::EventType::Release, nullptr});
 			return 0;
 
 		// 按下鼠标右键
 		case WM_RBUTTONDOWN:
-            if (m_listener)
-                m_listener({Input::KeyCode::RightMouseButton, Input::EventType::Press, nullptr});
+            // if (m_listener)
+                // m_listener({Input::KeyCode::RightMouseButton, Input::EventType::Press, nullptr});
 			return 0;
 
 		// 松开鼠标右键
 		case WM_RBUTTONUP:
-            if (m_listener)
-                m_listener({Input::KeyCode::RightMouseButton, Input::EventType::Release, nullptr});
+            // if (m_listener)
+                // m_listener({Input::KeyCode::RightMouseButton, Input::EventType::Release, nullptr});
 			return 0;
 
 		// 按下鼠标中键
 		case WM_MBUTTONDOWN:
-            if (m_listener)
-                m_listener({Input::KeyCode::MidMouseButton, Input::EventType::Press, nullptr});
+            // if (m_listener)
+                // m_listener({Input::KeyCode::MidMouseButton, Input::EventType::Press, nullptr});
 			return 0;
 
 		// 松开鼠标中键
 		case WM_MBUTTONUP:
-            if (m_listener)
-                m_listener({Input::KeyCode::MidMouseButton, Input::EventType::Release, nullptr});
+            // if (m_listener)
+                // m_listener({Input::KeyCode::MidMouseButton, Input::EventType::Release, nullptr});
 			return 0;
 
 		// 滚动鼠标滚轮
 		case WM_MOUSEWHEEL:
         {
-            if (m_listener)
-            {
-                // 每帧只会产生一个WM_MOUSEWHEEL
-                Input::MouseData data{GET_WHEEL_DELTA_WPARAM(wParam)};
-                m_listener({Input::KeyCode::MidMouseButton, Input::EventType::WheelRoll, data});
-            }
+            // if (m_listener)
+            // {
+            //     // 每帧只会产生一个WM_MOUSEWHEEL
+            //     Input::MouseData data{GET_WHEEL_DELTA_WPARAM(wParam)};
+            //     m_listener({Input::KeyCode::MidMouseButton, Input::EventType::WheelRoll, data});
+            // }
 			return 0;
         }
 
 		case WM_SIZE:
-            if (m_resume && m_suspend)
-            {
-                m_width = LOWORD(lParam);
-                m_height = HIWORD(lParam);
-                if (wParam == SIZE_MINIMIZED)
-                    m_suspend();
-                else if (wParam == SIZE_RESTORED)
-                    m_resume();
-            }
+            // if (m_resume && m_suspend)
+            // {
+            //     m_width = LOWORD(lParam);
+            //     m_height = HIWORD(lParam);
+            //     if (wParam == SIZE_MINIMIZED)
+            //         m_suspend();
+            //     else if (wParam == SIZE_RESTORED)
+            //         m_resume();
+            // }
 			return 0;
 
 		case WM_ENTERSIZEMOVE:
-            if (m_suspend)
-                m_suspend();
+            // if (m_suspend)
+                // m_suspend();
 			return 0;
 
 		case WM_EXITSIZEMOVE:
-            if (m_resume)
-                m_resume();
+            // if (m_resume)
+                // m_resume();
 			return 0;
 
         default:
 		    return DefWindowProcW(hwnd, msg, wParam, lParam);
 		}
 	}
-
-    static LRESULT WindowProcThunk(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
-    {
-        // 注：窗口处理函数不能向上传递异常
-        auto* const pWnd = reinterpret_cast<Window* const>(GetWindowLongPtrW(hwnd, GWLP_USERDATA));
-        return pWnd->WindowProc(hwnd, msg, wParam, lParam);
-    }
 
     static LRESULT WindowProcSetup(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
     {
@@ -394,9 +397,9 @@ namespace TG::PAL
             auto* const pWnd = static_cast<NativeWindow* const>(pCreate->lpCreateParams);
 
             SetWindowLongPtrW(hwnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(pWnd));
-            SetWindowLongPtrW(hwnd, GWLP_WNDPROC, reinterpret_cast<LONG_PTR>(WindowProcThunk));
+            SetWindowLongPtrW(hwnd, GWLP_WNDPROC, reinterpret_cast<LONG_PTR>(WindowProc));
 
-            return pWnd->WindowProc(hwnd, msg, wParam, lParam);
+            return WindowProc(hwnd, msg, wParam, lParam);
         }
         // 处理WM_NCCREATE之前的消息
         return DefWindowProcW(hwnd, msg, wParam, lParam);

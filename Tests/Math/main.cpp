@@ -53,8 +53,20 @@ std::pmr::string PMRStr(std::pmr::monotonic_buffer_resource *mbr)
     return buffer;
 }
 
-auto main() -> int
+#include <type_traits>
+#include <memory>
+
+std::unique_ptr<int> TestUnique()
 {
+    std::unique_ptr<int> pp = std::make_unique<int>();
+    *pp = 3;
+    return pp;
+}
+
+int main()
+{
+    std::unique_ptr<int> p2;
+    p2 = TestUnique();
     std::pmr::monotonic_buffer_resource mbr;
     std::pmr::string buffer1 = PMRStr(&mbr);;
     std::cout << buffer1;

@@ -10,7 +10,6 @@ list(APPEND INCLUDES
 
         Include/Input/Event.h
         Include/Input/EventData.h
-        Include/Input/KeyCode.h
         Include/Input/Keyboard.h
         Include/Input/Mouse.h
         Include/Input/Manager.hpp
@@ -28,6 +27,7 @@ list(APPEND INCLUDES
         Include/Math/Redux.hpp
         Include/Math/Transpose.hpp
 
+        Include/PAL/KeyCode.h
         Include/PAL/NativeWindow.h
         Include/PAL/PlatformSpecific.h
 )

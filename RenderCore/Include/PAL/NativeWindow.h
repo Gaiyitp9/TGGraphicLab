@@ -5,30 +5,22 @@
 *****************************************************************/
 #pragma once
 
-#ifdef _WIN64
-#include "Windows/WindowCore.h"
-#endif
+#include "KeyCode.h"
+#include <functional>
+#include <memory>
 
 namespace TG::PAL
 {
     // 代表不同平台中的原生窗口
-    class NativeWindow;
-    // 窗口基类
-    class Window : public NativeWindow
-    {
-        using KeyFunction = std::function<void(int key, int scancode, int action, int mods)>;
-        using MouseButtonFunction =  std::function<void(int button, int action, int mods)>;
+    struct NativeWindow;
+    // 窗口消息事件回调
+    using KeyFunction = std::function<void(Input::KeyCode key, int scancode, int action, int mods)>;
+    using MouseButtonFunction =  std::function<void(Input::KeyCode button, int action, int mods)>;
+    KeyFunction SetKeyCallback(NativeWindow const* window, KeyFunction function);
+    MouseButtonFunction SetMouseButtonCallback(NativeWindow const* window, MouseButtonFunction function);
+    // 创建原生窗口
+    std::unique_ptr<NativeWindow> CreateNativeWindow(int x, int y, int width, int height, wchar_t const* title);
 
-    public:
-        Window(int x, int y, int width, int height, wchar_t const* title);
-
-        KeyFunction SetKeyCallback(KeyFunction function);
-        MouseButtonFunction SetMouseButtonCallback(MouseButtonFunction function);
-    private:
-        std::string m_windowName;
-        KeyFunction m_keyFunction;
-        MouseButtonFunction m_mouseButtonFunction;
-    };
     // 轮询输入事件，需要每帧都调用
     void PollEvents();
 }
