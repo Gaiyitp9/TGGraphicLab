@@ -4,46 +4,66 @@
 * This code is licensed under the MIT License (MIT).			*
 *****************************************************************/
 
-#include "PAL/Windows/WindowCore.h"
+#include "PAL/Window.h"
+#include "PAL/Windows/NativeWindow.h"
 #include "PAL/Windows/Win32Exception.h"
 #include "PAL/Windows/Utility.h"
-#include <unordered_map>
-#include <memory>
 
 namespace TG::PAL
 {
-    std::unique_ptr<NativeWindow> CreateNativeWindow(int x, int y, int width, int height, wchar_t const* title)
-    {
-    	std::unique_ptr<NativeWindow> nativeWindow = std::make_unique<NativeWindow>();
-    	nativeWindow->name = Utility::Utf16ToUtf8(title);
+	Window::Window(int x, int y, int width, int height, wchar_t const *title)
+	{
+		m_nativeWindow = std::make_unique<NativeWindow>(Utility::Utf16ToUtf8(title));
 
-    	// 客户端区域大小
-    	RECT rect = { 0, 0, width, height };
-    	// 根据客户区域宽和高计算整个窗口的宽和高
-    	if (!AdjustWindowRect(&rect, WS_OVERLAPPEDWINDOW, false))
-    		CheckLastError();
-
-    	nativeWindow->hwnd = CreateWindowW(L"Default", title, WS_OVERLAPPEDWINDOW,
+		// 客户端区域大小
+		RECT rect = { 0, 0, width, height };
+		// 根据客户区域宽和高计算整个窗口的宽和高
+		if (!AdjustWindowRect(&rect, WS_OVERLAPPEDWINDOW, false))
+			CheckLastError();
+		m_nativeWindow->hwnd = CreateWindowW(L"Default", title, WS_OVERLAPPEDWINDOW,
 							   x, y, rect.right - rect.left, rect.bottom - rect.top,
-							   nullptr, nullptr, nullptr, nativeWindow.get());
-    	if (nativeWindow->hwnd == nullptr)
-    		CheckLastError();
-    	// 显示窗口
-    	ShowWindow(nativeWindow->hwnd, SW_SHOW);
+							   nullptr, nullptr, nullptr, m_nativeWindow.get());
+		if (m_nativeWindow->hwnd == nullptr)
+			CheckLastError();
+		// 显示窗口
+		ShowWindow(m_nativeWindow->hwnd, SW_SHOW);
+	}
 
-        return nativeWindow;
-    }
+	void Window::SetKeyCallback(const KeyFunction& function) const
+	{
+		m_nativeWindow->keyFunction = function;
+	}
+
+	bool Window::IsDestroyed() const
+	{
+		return m_nativeWindow->destroyed;
+	}
+
+	void Window::SetCharCallback(const CharFunction &function) const
+	{
+		m_nativeWindow->charFunction = function;
+	}
+
+	void Window::SetMouseButtonCallback(const MouseButtonFunction &function) const
+	{
+		m_nativeWindow->mouseButtonFunction = function;
+	}
 
     // 轮询输入事件
-    void PollEvents()
+    std::optional<int> PollEvents()
     {
-        MSG msg = {};
+		MSG msg = { nullptr };
 
-        while (PeekMessageW(&msg, nullptr, 0, 0, PM_REMOVE))
-        {
-            TranslateMessage(&msg);
-            DispatchMessageW(&msg);
-        }
+		while (PeekMessageW(&msg, nullptr, 0, 0, PM_REMOVE))
+		{
+			if (msg.message == WM_QUIT)
+				return static_cast<int>(msg.wParam);
+
+			TranslateMessage(&msg);
+			DispatchMessageW(&msg);
+		}
+
+		return std::nullopt;
     }
 
     // 窗口消息转成字符串
@@ -287,6 +307,8 @@ namespace TG::PAL
 
 			// Input::EventType type = (keyFlags & KF_UP) == KF_UP ? Input::EventType::Release : Input::EventType::Press;
 			// m_listener({static_cast<Input::KeyCode>(vkCode), type, nullptr});
+			if (pWindow->keyFunction)
+				pWindow->keyFunction(vkCode, scanCode, 0, 0);
 
 			return 0;
 		}
@@ -294,11 +316,8 @@ namespace TG::PAL
 		// 按键字符
 		case WM_CHAR:
         {
-            // if (m_listener)
-            // {
-            //     Input::KeyboardData data{static_cast<char>(wParam)};
-            //     m_listener({Input::KeyCode::Char, Input::EventType::Char, data});
-            // }
+            if (pWindow->charFunction)
+            	pWindow->charFunction(wParam);
 			return 0;
         }
 
@@ -394,7 +413,7 @@ namespace TG::PAL
         if (msg == WM_NCCREATE)
         {
             const CREATESTRUCT* const pCreate = reinterpret_cast<CREATESTRUCT*>(lParam);
-            auto* const pWnd = static_cast<NativeWindow* const>(pCreate->lpCreateParams);
+            auto* pWnd = static_cast<NativeWindow*>(pCreate->lpCreateParams);
 
             SetWindowLongPtrW(hwnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(pWnd));
             SetWindowLongPtrW(hwnd, GWLP_WNDPROC, reinterpret_cast<LONG_PTR>(WindowProc));

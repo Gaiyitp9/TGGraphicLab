@@ -50,7 +50,7 @@ namespace TG::Math
         None            = 0,
         RowMajor        = 1,            // 按行储存
         LeftValue       = 1 << 1,       // 表达式是否是左值，也就是求值器有CoefficientRef函数
-        LinearAccess    = 1 << 2,       // 是否能看作一维向量，也就是求值器可以调用Coefficient函数
+        LinearAccess    = 1 << 2,       // 是否能看作一维向量，也就是求值器可以调用Coefficient(index)函数
         Vector          = 1 << 3,       // 表达式是向量
         Square          = 1 << 4,       // 表达式是方阵
     };

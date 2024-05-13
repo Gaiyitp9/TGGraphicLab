@@ -7,7 +7,7 @@
 
 #include <unordered_map>
 #include <any>
-#include "PAL/KeyCode.h"
+#include "KeyCode.h"
 
 namespace TG::Input
 {

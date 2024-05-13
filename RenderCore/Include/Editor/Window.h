@@ -5,7 +5,7 @@
 *****************************************************************/
 #pragma once
 
-#include "PAL/NativeWindow.h"
+#include "PAL/Window.h"
 
 namespace TG
 {
@@ -41,6 +41,6 @@ namespace TG
         Window const *m_parent; // 父母窗口，如果父母窗口销毁，所有子窗口也会销毁
         bool m_destroy = false; // 是否销毁窗口
 
-        PAL::NativeWindow m_nativeWindow;
+        PAL::Window m_nativeWindow;
     };
 }

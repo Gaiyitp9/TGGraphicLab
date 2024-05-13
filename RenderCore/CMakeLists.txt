@@ -9,6 +9,7 @@ list(APPEND INCLUDES
         Include/Editor/MainWindow.h
 
         Include/Input/Event.h
+        Include/Input/KeyCode.h
         Include/Input/EventData.h
         Include/Input/Keyboard.h
         Include/Input/Mouse.h
@@ -27,8 +28,7 @@ list(APPEND INCLUDES
         Include/Math/Redux.hpp
         Include/Math/Transpose.hpp
 
-        Include/PAL/KeyCode.h
-        Include/PAL/NativeWindow.h
+        Include/PAL/Window.h
         Include/PAL/PlatformSpecific.h
 )
 
@@ -50,7 +50,7 @@ if (CMAKE_SYSTEM_NAME STREQUAL "Windows")
             Include/PAL/Windows/Utility.h
             Include/PAL/Windows/Win32API.h
             Include/PAL/Windows/Win32Exception.h
-            Include/PAL/Windows/WindowCore.h
+            Include/PAL/Windows/NativeWindow.h
 
             Include/PAL/Windows/Editor/MainWindow.h
             Include/PAL/Windows/Editor/PopupWindow.h
@@ -60,7 +60,7 @@ if (CMAKE_SYSTEM_NAME STREQUAL "Windows")
     list(APPEND SRCS
             Source/PAL/Windows/Utility.cpp
             Source/PAL/Windows/Win32Exception.cpp
-            Source/PAL/Windows/WindowCore.cpp
+            Source/PAL/Windows/NativeWindow.cpp
 
             Source/PAL/Windows/Editor/MainWindow.cpp
             Source/PAL/Windows/Editor/PopupWindow.cpp
