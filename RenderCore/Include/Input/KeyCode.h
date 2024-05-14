@@ -115,15 +115,4 @@ namespace TG::Input
 		Quote			= 0xDE
         //-------------------------------
 	};
-
-	// 输入事件类型
-	enum class EventType : unsigned char
-	{
-		None,
-		Press,
-		Release,
-		Char,
-		MouseMove,
-		WheelRoll,
-	};
 }

@@ -65,6 +65,7 @@ std::unique_ptr<int> TestUnique()
 
 int main()
 {
+    std::is_trivially_assignable()
     std::unique_ptr<int> p2;
     p2 = TestUnique();
     std::pmr::monotonic_buffer_resource mbr;

@@ -6,19 +6,27 @@
 #pragma once
 
 #include "Win32API.h"
+#include "PAL/InputEnums.h"
 #include <string>
 
 namespace TG::PAL
 {
+    using KeyFunction = std::function<void(KeyCode key, int scanCode, int action, int mods)>;
+    using CharFunction = std::function<void(unsigned int c)>;
+    using MouseButtonFunction = std::function<void(MouseButton button, int action, int mods)>;
+    using CursorPosFunction = std::function<void(int xPos, int yPos)>;
+    using ScrollFunction = std::function<void(int xOffset, int yOffset)>;
     // Windows原生窗口
     struct NativeWindow
     {
         std::string name{};
-        HWND hwnd{nullptr};
-        bool spyMessage{false};
-        bool destroyed{false};
-        std::function<void(int key, int scancode, int action, int mods)> keyFunction{};
-        std::function<void(unsigned int c)> charFunction{};
-        std::function<void(int button, int action, int mods)> mouseButtonFunction{};
+        HWND        hwnd{nullptr};
+        bool        spyMessage{false};
+        bool        destroyed{false};
+        KeyFunction         keyFunction{};
+        CharFunction        charFunction{};
+        MouseButtonFunction mouseButtonFunction{};
+        CursorPosFunction   cursorPosFunction{};
+        ScrollFunction      scrollFunction{};
     };
 }

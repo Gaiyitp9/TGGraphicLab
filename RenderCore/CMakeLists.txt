@@ -28,6 +28,7 @@ list(APPEND INCLUDES
         Include/Math/Redux.hpp
         Include/Math/Transpose.hpp
 
+        Include/PAL/InputEnums.h
         Include/PAL/Window.h
         Include/PAL/PlatformSpecific.h
 )
@@ -60,7 +61,7 @@ if (CMAKE_SYSTEM_NAME STREQUAL "Windows")
     list(APPEND SRCS
             Source/PAL/Windows/Utility.cpp
             Source/PAL/Windows/Win32Exception.cpp
-            Source/PAL/Windows/NativeWindow.cpp
+            Source/PAL/Windows/Window.cpp
 
             Source/PAL/Windows/Editor/MainWindow.cpp
             Source/PAL/Windows/Editor/PopupWindow.cpp

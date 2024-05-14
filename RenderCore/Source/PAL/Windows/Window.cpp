@@ -12,9 +12,8 @@
 namespace TG::PAL
 {
 	Window::Window(int x, int y, int width, int height, wchar_t const *title)
+		: m_nativeWindow(std::make_unique<NativeWindow>(Utility::Utf16ToUtf8(title)))
 	{
-		m_nativeWindow = std::make_unique<NativeWindow>(Utility::Utf16ToUtf8(title));
-
 		// 客户端区域大小
 		RECT rect = { 0, 0, width, height };
 		// 根据客户区域宽和高计算整个窗口的宽和高
@@ -47,6 +46,16 @@ namespace TG::PAL
 	void Window::SetMouseButtonCallback(const MouseButtonFunction &function) const
 	{
 		m_nativeWindow->mouseButtonFunction = function;
+	}
+
+	void Window::SetCursorPosCallback(const CursorPosFunction &function) const
+	{
+		m_nativeWindow->cursorPosFunction = function;
+	}
+
+	void Window::SetScrollCallback(const ScrollFunction &function) const
+	{
+		m_nativeWindow->scrollFunction = function;
 	}
 
     // 轮询输入事件
@@ -274,13 +283,14 @@ namespace TG::PAL
 		switch (msg)
 		{
 		case WM_DESTROY:
+		{
             // 窗口被销毁后，窗口类也需要被销毁
             pWindow->destroyed = true;
 			// 基础窗口一般作为主窗口，销毁后要退出线程
 			PostQuitMessage(0);
 			return 0;
+		}
 
-		// 按下按键
 		case WM_KEYDOWN:
 		case WM_SYSKEYDOWN:
         case WM_KEYUP:
@@ -290,8 +300,8 @@ namespace TG::PAL
             WORD vkCode = LOWORD(wParam);
             WORD keyFlags = HIWORD(lParam);
             WORD scanCode = LOBYTE(keyFlags);
-            BOOL isExtendedKey = (keyFlags & KF_EXTENDED) == KF_EXTENDED; // extended-key flag, 1 if scancode has 0xE0 prefix
-            if (isExtendedKey)
+			// extended-key flag, 1 if scancode has 0xE0 prefix
+            if ((keyFlags & KF_EXTENDED) == KF_EXTENDED)
                 scanCode = MAKEWORD(scanCode, 0xE0);
             switch (vkCode)
             {
@@ -304,16 +314,15 @@ namespace TG::PAL
                 default:
                     break;
             }
-
-			// Input::EventType type = (keyFlags & KF_UP) == KF_UP ? Input::EventType::Release : Input::EventType::Press;
-			// m_listener({static_cast<Input::KeyCode>(vkCode), type, nullptr});
+			int action = keyFlags & KF_UP;
+			if (action == 0 && keyFlags & KF_REPEAT == KF_REPEAT)
+				action = 2;
 			if (pWindow->keyFunction)
-				pWindow->keyFunction(vkCode, scanCode, 0, 0);
+				pWindow->keyFunction(static_cast<KeyCode>(vkCode), scanCode, action, 0);
 
 			return 0;
 		}
 
-		// 按键字符
 		case WM_CHAR:
         {
             if (pWindow->charFunction)
@@ -321,7 +330,6 @@ namespace TG::PAL
 			return 0;
         }
 
-		// 鼠标移动
 		case WM_MOUSEMOVE:
 		{
             // if (m_listener)
@@ -332,43 +340,36 @@ namespace TG::PAL
 			return 0;
 		}
 
-		// 按下鼠标左键
 		case WM_LBUTTONDOWN:
             // if (m_listener)
                 // m_listener({Input::KeyCode::LeftMouseButton, Input::EventType::Press, nullptr});
 			return 0;
 
-		// 松开鼠标左键
 		case WM_LBUTTONUP:
             // if (m_listener)
                 // m_listener({Input::KeyCode::LeftMouseButton, Input::EventType::Release, nullptr});
 			return 0;
 
-		// 按下鼠标右键
 		case WM_RBUTTONDOWN:
             // if (m_listener)
                 // m_listener({Input::KeyCode::RightMouseButton, Input::EventType::Press, nullptr});
 			return 0;
 
-		// 松开鼠标右键
 		case WM_RBUTTONUP:
             // if (m_listener)
                 // m_listener({Input::KeyCode::RightMouseButton, Input::EventType::Release, nullptr});
 			return 0;
 
-		// 按下鼠标中键
 		case WM_MBUTTONDOWN:
             // if (m_listener)
                 // m_listener({Input::KeyCode::MidMouseButton, Input::EventType::Press, nullptr});
 			return 0;
 
-		// 松开鼠标中键
 		case WM_MBUTTONUP:
             // if (m_listener)
                 // m_listener({Input::KeyCode::MidMouseButton, Input::EventType::Release, nullptr});
 			return 0;
 
-		// 滚动鼠标滚轮
 		case WM_MOUSEWHEEL:
         {
             // if (m_listener)
