@@ -5,7 +5,7 @@
 *****************************************************************/
 #pragma once
 
-#include "Editor/MainWindow.h"
+#include "Editor/Window.h"
 // #include "Editor/PopupWindow.h"
 // #include "Input/Manager.hpp"
 #include "Chronometer.h"
@@ -32,7 +32,7 @@ namespace TG
 
 	private:
 		std::locale m_locale;               // 语言区域
-		MainWindow m_mainWindow;            // 主窗口
+		Window m_mainWindow;				// 主窗口
         Chronometer m_timer;                // 高精度计时器
         // Input::Manager<Input::Mouse, Input::Keyboard> m_input;           // 输入管理器，使用鼠标和键盘输入
 		//std::unique_ptr<Graphics::GraphicsLayer> d3d11Layer;
@@ -43,6 +43,6 @@ namespace TG
 		int m_screenWidth;		            // 主显示器的宽
 		int m_screenHeight;		            // 主显示器的高
 
-		UnitTest m_unitTest;		        // 单元测试类
+		// UnitTest m_unitTest;		        // 单元测试类
 	};
 }

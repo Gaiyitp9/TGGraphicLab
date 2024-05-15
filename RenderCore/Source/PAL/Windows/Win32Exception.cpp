@@ -5,6 +5,7 @@
 *****************************************************************/
 
 #include "PAL/Windows/Win32Exception.h"
+#include "PAL/Windows/Utility.h"
 #include <format>
 
 namespace TG::PAL
@@ -25,7 +26,7 @@ namespace TG::PAL
         whatBuffer = std::format("Exception type: Windows API Exception\n"
 								 "HRESULT: {:#010x}\nError Message: {}\n"
 								 "{}\n"
-								 "{}\n", m_errorCode, m_errorMsg, m_description, m_stackTrace);
+								 "{}\n", m_errorCode, Utility::Utf16ToUtf8(m_errorMsg), m_description, m_stackTrace);
 		return whatBuffer.c_str();
 	}
 

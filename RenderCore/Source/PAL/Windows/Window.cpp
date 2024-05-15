@@ -24,9 +24,15 @@ namespace TG::PAL
 							   nullptr, nullptr, nullptr, m_nativeWindow.get());
 		if (m_nativeWindow->hwnd == nullptr)
 			CheckLastError();
+		DWORD dwExStyle = GetWindowLongW(m_nativeWindow->hwnd, GWL_EXSTYLE);
+		dwExStyle &= ~WS_EX_APPWINDOW;
+		dwExStyle |= WS_EX_TOOLWINDOW;
+		SetWindowLongW(m_nativeWindow->hwnd, GWL_EXSTYLE, dwExStyle);
 		// 显示窗口
 		ShowWindow(m_nativeWindow->hwnd, SW_SHOW);
 	}
+
+	Window::~Window() = default;
 
 	void Window::SetKeyCallback(const KeyFunction& function) const
 	{
@@ -56,6 +62,16 @@ namespace TG::PAL
 	void Window::SetScrollCallback(const ScrollFunction &function) const
 	{
 		m_nativeWindow->scrollFunction = function;
+	}
+
+	void Window::SetWindowPosCallback(const WindowPosFunction &function) const
+	{
+		m_nativeWindow->windowPosFunction = function;
+	}
+
+	void Window::SetWindowSizeCallback(const WindowSizeFunction &function) const
+	{
+		m_nativeWindow->windowSizeFunction = function;
 	}
 
     // 轮询输入事件
@@ -301,7 +317,7 @@ namespace TG::PAL
             WORD keyFlags = HIWORD(lParam);
             WORD scanCode = LOBYTE(keyFlags);
 			// extended-key flag, 1 if scancode has 0xE0 prefix
-            if ((keyFlags & KF_EXTENDED) == KF_EXTENDED)
+            if (keyFlags & KF_EXTENDED == KF_EXTENDED)
                 scanCode = MAKEWORD(scanCode, 0xE0);
             switch (vkCode)
             {
@@ -314,9 +330,13 @@ namespace TG::PAL
                 default:
                     break;
             }
-			int action = keyFlags & KF_UP;
-			if (action == 0 && keyFlags & KF_REPEAT == KF_REPEAT)
-				action = 2;
+			// 确定按键状态，按下、释放还是按住
+			InputAction action = InputAction::Press;
+			if (keyFlags & KF_UP == KF_UP)
+				action = InputAction::Release;
+			else if (keyFlags & KF_REPEAT == KF_REPEAT)
+				action = InputAction::Hold;
+
 			if (pWindow->keyFunction)
 				pWindow->keyFunction(static_cast<KeyCode>(vkCode), scanCode, action, 0);
 
@@ -332,56 +352,70 @@ namespace TG::PAL
 
 		case WM_MOUSEMOVE:
 		{
-            // if (m_listener)
-            // {
-            //     Input::MouseData data{GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam)};
-            //     m_listener({Input::KeyCode::None, Input::EventType::MouseMove, data});
-            // }
+			if (pWindow->cursorPosFunction)
+				pWindow->cursorPosFunction(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
 			return 0;
 		}
 
 		case WM_LBUTTONDOWN:
-            // if (m_listener)
-                // m_listener({Input::KeyCode::LeftMouseButton, Input::EventType::Press, nullptr});
+		{
+			if (pWindow->mouseButtonFunction)
+				pWindow->mouseButtonFunction(MouseButton::Left, InputAction::Press, 0);
 			return 0;
+		}
 
 		case WM_LBUTTONUP:
-            // if (m_listener)
-                // m_listener({Input::KeyCode::LeftMouseButton, Input::EventType::Release, nullptr});
+		{
+			if (pWindow->mouseButtonFunction)
+				pWindow->mouseButtonFunction(MouseButton::Left, InputAction::Release, 0);
 			return 0;
+		}
 
 		case WM_RBUTTONDOWN:
-            // if (m_listener)
-                // m_listener({Input::KeyCode::RightMouseButton, Input::EventType::Press, nullptr});
+		{
+			if (pWindow->mouseButtonFunction)
+				pWindow->mouseButtonFunction(MouseButton::Right, InputAction::Press, 0);
 			return 0;
+		}
 
 		case WM_RBUTTONUP:
-            // if (m_listener)
-                // m_listener({Input::KeyCode::RightMouseButton, Input::EventType::Release, nullptr});
+		{
+			if (pWindow->mouseButtonFunction)
+				pWindow->mouseButtonFunction(MouseButton::Right, InputAction::Release, 0);
 			return 0;
+		}
 
 		case WM_MBUTTONDOWN:
-            // if (m_listener)
-                // m_listener({Input::KeyCode::MidMouseButton, Input::EventType::Press, nullptr});
+		{
+			if (pWindow->mouseButtonFunction)
+				pWindow->mouseButtonFunction(MouseButton::Middle, InputAction::Press, 0);
 			return 0;
+		}
 
 		case WM_MBUTTONUP:
-            // if (m_listener)
-                // m_listener({Input::KeyCode::MidMouseButton, Input::EventType::Release, nullptr});
+		{
+			if (pWindow->mouseButtonFunction)
+				pWindow->mouseButtonFunction(MouseButton::Middle, InputAction::Release, 0);
 			return 0;
+		}
 
 		case WM_MOUSEWHEEL:
         {
-            // if (m_listener)
-            // {
-            //     // 每帧只会产生一个WM_MOUSEWHEEL
-            //     Input::MouseData data{GET_WHEEL_DELTA_WPARAM(wParam)};
-            //     m_listener({Input::KeyCode::MidMouseButton, Input::EventType::WheelRoll, data});
-            // }
+			// 每帧只会产生一个WM_MOUSEWHEEL
+			if (pWindow->scrollFunction)
+				pWindow->scrollFunction(0, GET_WHEEL_DELTA_WPARAM(wParam) / WHEEL_DELTA);
 			return 0;
         }
 
+		case WM_MOVE:
+		{
+			if (pWindow->windowPosFunction)
+				pWindow->windowPosFunction(LOWORD(lParam), HIWORD(lParam));
+			return 0;
+		}
+
 		case WM_SIZE:
+		{
             // if (m_resume && m_suspend)
             // {
             //     m_width = LOWORD(lParam);
@@ -391,7 +425,10 @@ namespace TG::PAL
             //     else if (wParam == SIZE_RESTORED)
             //         m_resume();
             // }
+			if (pWindow->windowSizeFunction)
+				pWindow->windowSizeFunction(LOWORD(lParam), HIWORD(lParam));
 			return 0;
+		}
 
 		case WM_ENTERSIZEMOVE:
             // if (m_suspend)

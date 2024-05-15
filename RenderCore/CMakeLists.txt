@@ -8,12 +8,12 @@ list(APPEND INCLUDES
         Include/Editor/Window.h
         Include/Editor/MainWindow.h
 
-        Include/Input/Event.h
-        Include/Input/KeyCode.h
-        Include/Input/EventData.h
-        Include/Input/Keyboard.h
-        Include/Input/Mouse.h
-        Include/Input/Manager.hpp
+#        Include/Input/Event.h
+#        Include/Input/KeyCode.h
+#        Include/Input/EventData.h
+#        Include/Input/Keyboard.h
+#        Include/Input/Mouse.h
+#        Include/Input/Manager.hpp
 
         Include/Math/Assignment.hpp
         Include/Math/Block.hpp
@@ -40,9 +40,9 @@ list(APPEND SRCS
 
         Source/Editor/MainWindow.cpp
 
-        Source/Input/Event.cpp
-        Source/Input/Keyboard.cpp
-        Source/Input/Mouse.cpp
+#        Source/Input/Event.cpp
+#        Source/Input/Keyboard.cpp
+#        Source/Input/Mouse.cpp
 )
 
 if (CMAKE_SYSTEM_NAME STREQUAL "Windows")
@@ -52,20 +52,12 @@ if (CMAKE_SYSTEM_NAME STREQUAL "Windows")
             Include/PAL/Windows/Win32API.h
             Include/PAL/Windows/Win32Exception.h
             Include/PAL/Windows/NativeWindow.h
-
-            Include/PAL/Windows/Editor/MainWindow.h
-            Include/PAL/Windows/Editor/PopupWindow.h
-            Include/PAL/Windows/Editor/Window.h
     )
 
     list(APPEND SRCS
             Source/PAL/Windows/Utility.cpp
             Source/PAL/Windows/Win32Exception.cpp
             Source/PAL/Windows/Window.cpp
-
-            Source/PAL/Windows/Editor/MainWindow.cpp
-            Source/PAL/Windows/Editor/PopupWindow.cpp
-            Source/PAL/Windows/Editor/Window.cpp
     )
 endif()
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${SRCS})

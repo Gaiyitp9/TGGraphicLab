@@ -4,15 +4,15 @@
 * This code is licensed under the MIT License (MIT).			*
 *****************************************************************/
 
-#include "UnitTest.hpp"
+#include "UnitTest.h"
 
 namespace TG
 {
 	void UnitTest::FormatTest()
 	{
-		Input::Event ie{Input::KeyCode::BackSlash, Input::EventType::Press , {}};
-        Debug::Log(std::format("Key: {:<10} Event: {:10} ", Input::EventInfo::keysName[ie.key],
-                               Input::EventInfo::eventTypes[ie.type]));
+		// Input::Event ie{Input::KeyCode::BackSlash, Input::EventType::Press , {}};
+  //       Debug::Log(std::format("Key: {:<10} Event: {:10} ", Input::EventInfo::keysName[ie.key],
+  //                              Input::EventInfo::eventTypes[ie.type]));
 	}
 
 	void UnitTest::TextEncodeTest()
@@ -73,109 +73,109 @@ namespace TG
 
 	void UnitTest::MathLibTest()
 	{
-		Math::Vector4f v1, v2, v3;
-		Math::RowVector4f v4;
-		v1[0] = 0; v1[1] = 1.5f; v1[2] = 2; v1[3] = 3;
-		v2[0] = 0; v2[1] = 2.2f; v2[2] = 2; v2[3] = 3;
-		v3[0] = 0; v3[1] = 1.6f; v3[2] = 2; v3[3] = 3;
-		v4[0] = 2; v4[1] = 4.8f; v4[2] = 2; v4[3] = 3;
-		Math::Vector4f result;
-		result = v1 + v2 + v3;
-		std::cout << "result: " << result.x() << " " << result.y() << " " 
-			<< result.z() << " " << result.w() << std::endl;
-		std::cout << "result magnitude: " << result.magnitude() << " sqrMagnitude: " << result.sqrMagnitude() << std::endl;
-		Math::Vector4f resultN = result.normalized();
-		std::cout << "result normalize: " << resultN.x() << " " << resultN.y() << " "
-			<< resultN.z() << " " << resultN.w() << std::endl;
-		result.Normalize();
-		std::cout << "result: " << result.x() << " " << result.y() << " "
-			<< result.z() << " " << result.w() << std::endl;
-
-		float dot = v1.Dot(v2);
-		std::cout << "dot: " << dot << std::endl;
-		Math::Matrix4f identity = Math::Matrix4f::identity();
-		std::cout << "identity: " << std::endl;
-		for (int i = 0; i < 4; ++i)
-		{
-			for (int j = 0; j < 4; ++j)
-				std::cout << identity(i, j) << " ";
-			std::cout << std::endl;
-		}
-
-		Math::Matrix<float, 5, 1> v5, v6;
-		v5[0] = 0; v5[1] = 1; v5[2] = 2.6f; v5[3] = 3; v5[4] = 5;
-		v6[0] = 0; v6[1] = 6; v6[2] = 2.9f; v6[3] = 3; v6[4] = -2;
-		Math::Matrix<float, 5, 1> result1;
-		result1 = v5 + v6;
-		std::cout << "result: " << result1[0] << " " << result1[1] << " "
-			<< result1[2] << " " << result1[3] << " " << result1[4] << std::endl;
-		dot = v5.Dot(v6);
-		std::cout << "dot: " << dot << std::endl;
-
-		Math::Matrix4f vp, view, proj;
-		view(0, 0) = 1.0f; view(0, 1) = 0.0f; view(0, 2) = 3.0f; view(0, 3) = 0.0f;
-		view(1, 0) = 0.0f; view(1, 1) = 1.0f; view(1, 2) = 0.0f; view(1, 3) = 1.0f;
-		view(2, 0) = 0.0f; view(2, 1) = 0.0f; view(2, 2) = 1.0f; view(2, 3) = 0.0f;
-		view(3, 0) = 1.0f; view(3, 1) = 0.0f; view(3, 2) = 0.0f; view(3, 3) = 1.0f;
-
-		proj(0, 0) = 1.0f; proj(0, 1) = 0.0f; proj(0, 2) = 0.0f; proj(0, 3) = 0.0f;
-		proj(1, 0) = 0.0f; proj(1, 1) = 1.0f; proj(1, 2) = 0.0f; proj(1, 3) = 0.0f;
-		proj(2, 0) = 0.0f; proj(2, 1) = 0.0f; proj(2, 2) = 1.0f; proj(2, 3) = 0.0f;
-		proj(3, 0) = 1.0f; proj(3, 1) = 0.0f; proj(3, 2) = 0.0f; proj(3, 3) = 1.0f;
-
-		vp = proj * view;
-		std::cout << "vp: " << std::endl;
-		for (int i = 0; i < 4; ++i)
-		{
-			for (int j = 0; j < 4; ++j)
-				std::cout << vp(i, j) << " ";
-			std::cout << std::endl;
-		}
-
-		Math::Matrix<float, 5, 5> vp1, view1, proj1;
-		view1(0, 0) = 1.0f; view1(0, 1) = 0.0f; view1(0, 2) = 3.0f; view1(0, 3) = 0.0f; view1(0, 4) = 0.0f;
-		view1(1, 0) = 0.0f; view1(1, 1) = 1.0f; view1(1, 2) = 0.0f; view1(1, 3) = 1.0f; view1(1, 4) = 0.0f;
-		view1(2, 0) = 0.0f; view1(2, 1) = 0.0f; view1(2, 2) = 1.0f; view1(2, 3) = 0.0f; view1(2, 4) = 0.0f;
-		view1(3, 0) = 1.0f; view1(3, 1) = 0.0f; view1(3, 2) = 0.0f; view1(3, 3) = 1.0f; view1(3, 4) = 0.0f;
-		view1(4, 0) = 1.0f; view1(4, 1) = 0.0f; view1(4, 2) = 0.0f; view1(4, 3) = 1.0f; view1(4, 4) = 1.0f;
-
-		proj1(0, 0) = 1.0f; proj1(0, 1) = 0.0f; proj1(0, 2) = 0.0f; proj1(0, 3) = 0.0f; proj1(0, 4) = 0.0f;
-		proj1(1, 0) = 0.0f; proj1(1, 1) = 1.0f; proj1(1, 2) = 0.0f; proj1(1, 3) = 0.0f; proj1(1, 4) = 0.0f;
-		proj1(2, 0) = 0.0f; proj1(2, 1) = 0.0f; proj1(2, 2) = 1.0f; proj1(2, 3) = 0.0f; proj1(2, 4) = 0.0f;
-		proj1(3, 0) = 1.0f; proj1(3, 1) = 0.0f; proj1(3, 2) = 0.0f; proj1(3, 3) = 1.0f; proj1(3, 4) = 0.0f;
-		proj1(4, 0) = 1.0f; proj1(4, 1) = 0.0f; proj1(4, 2) = 0.0f; proj1(4, 3) = 1.0f; proj1(4, 4) = 1.0f;
-		vp1 = proj1 * view1;
-		std::cout << "vp1: " << std::endl;
-		for (int i = 0; i < 5; ++i)
-		{
-			for (int j = 0; j < 5; ++j)
-				std::cout << vp1(i, j) << " ";
-			std::cout << std::endl;
-		}
-		vp1 = vp1 * 2.0f;
-		std::cout << "vp1: " << std::endl;
-		for (int i = 0; i < 5; ++i)
-		{
-			for (int j = 0; j < 5; ++j)
-				std::cout << vp1(i, j) << " ";
-			std::cout << std::endl;
-		}
-		vp1 = 2.0f * vp1;
-		std::cout << "vp1: " << std::endl;
-		for (int i = 0; i < 5; ++i)
-		{
-			for (int j = 0; j < 5; ++j)
-				std::cout << vp1(i, j) << " ";
-			std::cout << std::endl;
-		}
-		vp1 = vp1 / 2.0f;
-		std::cout << "vp1: " << std::endl;
-		for (int i = 0; i < 5; ++i)
-		{
-			for (int j = 0; j < 5; ++j)
-				std::cout << vp1(i, j) << " ";
-			std::cout << std::endl;
-		}
+		// Math::Vector4f v1, v2, v3;
+		// Math::RowVector4f v4;
+		// v1[0] = 0; v1[1] = 1.5f; v1[2] = 2; v1[3] = 3;
+		// v2[0] = 0; v2[1] = 2.2f; v2[2] = 2; v2[3] = 3;
+		// v3[0] = 0; v3[1] = 1.6f; v3[2] = 2; v3[3] = 3;
+		// v4[0] = 2; v4[1] = 4.8f; v4[2] = 2; v4[3] = 3;
+		// Math::Vector4f result;
+		// result = v1 + v2 + v3;
+		// std::cout << "result: " << result.x() << " " << result.y() << " "
+		// 	<< result.z() << " " << result.w() << std::endl;
+		// std::cout << "result magnitude: " << result.magnitude() << " sqrMagnitude: " << result.sqrMagnitude() << std::endl;
+		// Math::Vector4f resultN = result.normalized();
+		// std::cout << "result normalize: " << resultN.x() << " " << resultN.y() << " "
+		// 	<< resultN.z() << " " << resultN.w() << std::endl;
+		// result.Normalize();
+		// std::cout << "result: " << result.x() << " " << result.y() << " "
+		// 	<< result.z() << " " << result.w() << std::endl;
+		//
+		// float dot = v1.Dot(v2);
+		// std::cout << "dot: " << dot << std::endl;
+		// Math::Matrix4f identity = Math::Matrix4f::identity();
+		// std::cout << "identity: " << std::endl;
+		// for (int i = 0; i < 4; ++i)
+		// {
+		// 	for (int j = 0; j < 4; ++j)
+		// 		std::cout << identity(i, j) << " ";
+		// 	std::cout << std::endl;
+		// }
+		//
+		// Math::Matrix<float, 5, 1> v5, v6;
+		// v5[0] = 0; v5[1] = 1; v5[2] = 2.6f; v5[3] = 3; v5[4] = 5;
+		// v6[0] = 0; v6[1] = 6; v6[2] = 2.9f; v6[3] = 3; v6[4] = -2;
+		// Math::Matrix<float, 5, 1> result1;
+		// result1 = v5 + v6;
+		// std::cout << "result: " << result1[0] << " " << result1[1] << " "
+		// 	<< result1[2] << " " << result1[3] << " " << result1[4] << std::endl;
+		// dot = v5.Dot(v6);
+		// std::cout << "dot: " << dot << std::endl;
+		//
+		// Math::Matrix4f vp, view, proj;
+		// view(0, 0) = 1.0f; view(0, 1) = 0.0f; view(0, 2) = 3.0f; view(0, 3) = 0.0f;
+		// view(1, 0) = 0.0f; view(1, 1) = 1.0f; view(1, 2) = 0.0f; view(1, 3) = 1.0f;
+		// view(2, 0) = 0.0f; view(2, 1) = 0.0f; view(2, 2) = 1.0f; view(2, 3) = 0.0f;
+		// view(3, 0) = 1.0f; view(3, 1) = 0.0f; view(3, 2) = 0.0f; view(3, 3) = 1.0f;
+		//
+		// proj(0, 0) = 1.0f; proj(0, 1) = 0.0f; proj(0, 2) = 0.0f; proj(0, 3) = 0.0f;
+		// proj(1, 0) = 0.0f; proj(1, 1) = 1.0f; proj(1, 2) = 0.0f; proj(1, 3) = 0.0f;
+		// proj(2, 0) = 0.0f; proj(2, 1) = 0.0f; proj(2, 2) = 1.0f; proj(2, 3) = 0.0f;
+		// proj(3, 0) = 1.0f; proj(3, 1) = 0.0f; proj(3, 2) = 0.0f; proj(3, 3) = 1.0f;
+		//
+		// vp = proj * view;
+		// std::cout << "vp: " << std::endl;
+		// for (int i = 0; i < 4; ++i)
+		// {
+		// 	for (int j = 0; j < 4; ++j)
+		// 		std::cout << vp(i, j) << " ";
+		// 	std::cout << std::endl;
+		// }
+		//
+		// Math::Matrix<float, 5, 5> vp1, view1, proj1;
+		// view1(0, 0) = 1.0f; view1(0, 1) = 0.0f; view1(0, 2) = 3.0f; view1(0, 3) = 0.0f; view1(0, 4) = 0.0f;
+		// view1(1, 0) = 0.0f; view1(1, 1) = 1.0f; view1(1, 2) = 0.0f; view1(1, 3) = 1.0f; view1(1, 4) = 0.0f;
+		// view1(2, 0) = 0.0f; view1(2, 1) = 0.0f; view1(2, 2) = 1.0f; view1(2, 3) = 0.0f; view1(2, 4) = 0.0f;
+		// view1(3, 0) = 1.0f; view1(3, 1) = 0.0f; view1(3, 2) = 0.0f; view1(3, 3) = 1.0f; view1(3, 4) = 0.0f;
+		// view1(4, 0) = 1.0f; view1(4, 1) = 0.0f; view1(4, 2) = 0.0f; view1(4, 3) = 1.0f; view1(4, 4) = 1.0f;
+		//
+		// proj1(0, 0) = 1.0f; proj1(0, 1) = 0.0f; proj1(0, 2) = 0.0f; proj1(0, 3) = 0.0f; proj1(0, 4) = 0.0f;
+		// proj1(1, 0) = 0.0f; proj1(1, 1) = 1.0f; proj1(1, 2) = 0.0f; proj1(1, 3) = 0.0f; proj1(1, 4) = 0.0f;
+		// proj1(2, 0) = 0.0f; proj1(2, 1) = 0.0f; proj1(2, 2) = 1.0f; proj1(2, 3) = 0.0f; proj1(2, 4) = 0.0f;
+		// proj1(3, 0) = 1.0f; proj1(3, 1) = 0.0f; proj1(3, 2) = 0.0f; proj1(3, 3) = 1.0f; proj1(3, 4) = 0.0f;
+		// proj1(4, 0) = 1.0f; proj1(4, 1) = 0.0f; proj1(4, 2) = 0.0f; proj1(4, 3) = 1.0f; proj1(4, 4) = 1.0f;
+		// vp1 = proj1 * view1;
+		// std::cout << "vp1: " << std::endl;
+		// for (int i = 0; i < 5; ++i)
+		// {
+		// 	for (int j = 0; j < 5; ++j)
+		// 		std::cout << vp1(i, j) << " ";
+		// 	std::cout << std::endl;
+		// }
+		// vp1 = vp1 * 2.0f;
+		// std::cout << "vp1: " << std::endl;
+		// for (int i = 0; i < 5; ++i)
+		// {
+		// 	for (int j = 0; j < 5; ++j)
+		// 		std::cout << vp1(i, j) << " ";
+		// 	std::cout << std::endl;
+		// }
+		// vp1 = 2.0f * vp1;
+		// std::cout << "vp1: " << std::endl;
+		// for (int i = 0; i < 5; ++i)
+		// {
+		// 	for (int j = 0; j < 5; ++j)
+		// 		std::cout << vp1(i, j) << " ";
+		// 	std::cout << std::endl;
+		// }
+		// vp1 = vp1 / 2.0f;
+		// std::cout << "vp1: " << std::endl;
+		// for (int i = 0; i < 5; ++i)
+		// {
+		// 	for (int j = 0; j < 5; ++j)
+		// 		std::cout << vp1(i, j) << " ";
+		// 	std::cout << std::endl;
+		// }
 	}
 
 	UnitTest::UnitTest()
@@ -187,7 +187,7 @@ namespace TG
 	UnitTest::~UnitTest()
 	{
 //		FreeLibrary(glInst);
-        gladLoaderUnloadGL();
+        // gladLoaderUnloadGL();
 	}
 
 //	HMODULE UnitTest::glInst = LoadLibraryA("opengl32.dll");
@@ -201,29 +201,29 @@ namespace TG
 //		return reinterpret_cast<GLADapiproc>(GetProcAddress(UnitTest::glInst, name));
 //	}
 
-	void UnitTest::OpenGLTest(HWND hWnd)
-	{
-		HDC hdc = GetDC(hWnd);
-		HGLRC hglrc;
-
-		PIXELFORMATDESCRIPTOR pfd;
-		pfd.nSize = sizeof(PIXELFORMATDESCRIPTOR);
-		pfd.nVersion = 1;
-		pfd.dwFlags = PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL | PFD_DOUBLEBUFFER;
-		pfd.iPixelType = PFD_TYPE_RGBA;
-		pfd.cColorBits = 24;
-		pfd.cDepthBits = 24;
-		pfd.cStencilBits = 8;
-		int pxfmt = ChoosePixelFormat(hdc, &pfd);
-		SetPixelFormat(hdc, pxfmt, &pfd);
-
-		hglrc = wglCreateContext(hdc);
-		wglMakeCurrent(hdc, hglrc);
-
-//		gladLoadGL(GetGLProcAddress);
-        gladLoaderLoadGL();
-		std::cout << "OpenGL version: " << glGetString(GL_VERSION) << std::endl;
-	}
+	// void UnitTest::OpenGLTest(HWND hWnd)
+// 	{
+// 		HDC hdc = GetDC(hWnd);
+// 		HGLRC hglrc;
+//
+// 		PIXELFORMATDESCRIPTOR pfd;
+// 		pfd.nSize = sizeof(PIXELFORMATDESCRIPTOR);
+// 		pfd.nVersion = 1;
+// 		pfd.dwFlags = PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL | PFD_DOUBLEBUFFER;
+// 		pfd.iPixelType = PFD_TYPE_RGBA;
+// 		pfd.cColorBits = 24;
+// 		pfd.cDepthBits = 24;
+// 		pfd.cStencilBits = 8;
+// 		int pxfmt = ChoosePixelFormat(hdc, &pfd);
+// 		SetPixelFormat(hdc, pxfmt, &pfd);
+//
+// 		hglrc = wglCreateContext(hdc);
+// 		wglMakeCurrent(hdc, hglrc);
+//
+// //		gladLoadGL(GetGLProcAddress);
+//         gladLoaderLoadGL();
+// 		std::cout << "OpenGL version: " << glGetString(GL_VERSION) << std::endl;
+// 	}
 
 	/*void UnitTest::SIMDTest()
 	{

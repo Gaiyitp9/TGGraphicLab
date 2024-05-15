@@ -11,11 +11,13 @@
 
 namespace TG::PAL
 {
-    using KeyFunction = std::function<void(KeyCode key, int scanCode, int action, int mods)>;
+    using KeyFunction = std::function<void(KeyCode key, int scanCode, InputAction action, int mods)>;
     using CharFunction = std::function<void(unsigned int c)>;
-    using MouseButtonFunction = std::function<void(MouseButton button, int action, int mods)>;
+    using MouseButtonFunction = std::function<void(MouseButton button, InputAction action, int mods)>;
     using CursorPosFunction = std::function<void(int xPos, int yPos)>;
     using ScrollFunction = std::function<void(int xOffset, int yOffset)>;
+    using WindowPosFunction = std::function<void(int xPos, int yPos)>;
+    using WindowSizeFunction = std::function<void(unsigned int width, unsigned int height)>;
     // Windows原生窗口
     struct NativeWindow
     {
@@ -28,5 +30,7 @@ namespace TG::PAL
         MouseButtonFunction mouseButtonFunction{};
         CursorPosFunction   cursorPosFunction{};
         ScrollFunction      scrollFunction{};
+        WindowPosFunction   windowPosFunction{};
+        WindowSizeFunction  windowSizeFunction{};
     };
 }

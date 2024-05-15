@@ -5,7 +5,8 @@
 *****************************************************************/
 
 #include "Renderer.hpp"
-#include "Diagnostics/Win32Exception.h"
+#include "PAL/Windows//Win32Exception.h"
+#include <iostream>
 
 namespace TG
 {
@@ -32,11 +33,11 @@ namespace TG
         m_screenHeight = GetSystemMetrics(SM_CYSCREEN);
 
         // 主窗口设置
-        m_mainWindow.SetIcon(L"D:\\ComputerScience\\ComputerGraphics\\Projects\\TGRenderLab\\TGRenderer\\maple-leaf.ico");
+        // m_mainWindow.SetIcon(L"D:\\ComputerScience\\ComputerGraphics\\Projects\\TGRenderLab\\TGRenderer\\maple-leaf.ico");
         // m_mainWindow.SetInputListener([&input = m_input](const Input::Event &evt)
                                       // { input.Broadcast(evt); });
-        m_mainWindow.SetStateCallback([&timer=m_timer](){ timer.Start(); }, [&timer=m_timer](){ timer.Pause(); });
-        m_mainWindow.SpyMessage(false);
+        // m_mainWindow.SetStateCallback([&timer=m_timer](){ timer.Start(); }, [&timer=m_timer](){ timer.Pause(); });
+        // m_mainWindow.SpyMessage(false);
 
         // m_input.SpyEvent<Input::Mouse>(true);
         // m_input.SpyEvent<Input::Keyboard>(true);
@@ -57,7 +58,7 @@ namespace TG
 
 	int Renderer::Run()
 	{
-		Debug::LogLine(Chronometer::Date());
+		// Debug::LogLine(Chronometer::Date());
 		//d3d11Layer = std::make_unique<Graphics::GraphicsLayer>(mainWnd.get());
 
 		//m_windows[L"辅助窗口"] = std::make_shared<PopupWindow>((m_screenWidth - 400) / 2, (m_screenHeight - 300) / 2,
@@ -74,11 +75,13 @@ namespace TG
 
 		while (true)
 		{
-			if (m_mainWindow.Destroy())
-				break;
+			// if (m_mainWindow.Destroy())
+				// break;
 
             // m_input.Update();
-			if (const auto code = Window::ProcessMessage())
+			// if (const auto code = Window::ProcessMessage())
+				// return *code;
+			if (const std::optional<int> code = PAL::PollEvents())
 				return *code;
 
             // if (m_input.GetKeyUp(Input::KeyCode::Space))

@@ -29,7 +29,7 @@ namespace TG::Input
         // 鼠标滚轮变化值是WHEEL_DELTA的整数倍
         [[nodiscard]] short RawWheelDelta() const noexcept { return m_wheelDelta; }
         // 两个函数分别取没有除以和除以WHEEL_DELTA后的变化值
-        [[nodiscard]] short WheelDelta() const noexcept { return static_cast<short>(m_wheelDelta / WHEEL_DELTA); }
+        [[nodiscard]] short WheelDelta() const noexcept { return static_cast<short>(m_wheelDelta); }
 
 	private:
         static bool IsMouseKey(KeyCode k)

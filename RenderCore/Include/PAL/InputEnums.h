@@ -7,6 +7,7 @@
 
 namespace TG::PAL
 {
+    // 键盘按键枚举
     enum class KeyCode : unsigned char
     {
         Backspace	= 0x08,
@@ -103,20 +104,20 @@ namespace TG::PAL
         LeftBracket		= 0xDB,
         BackSlash		= 0xDC,
         RightBracket	= 0xDD,
-        Quote			= 0xDE
+        Quote			= 0xDE,
     };
-
+    // 鼠标按键枚举
     enum class MouseButton : unsigned char
     {
         Left,
         Middle,
         Right,
     };
-
+    // 输入动作
     enum class InputAction : unsigned char
     {
         Press,
         Release,
-        Repeat,
+        Hold,
     };
 }
