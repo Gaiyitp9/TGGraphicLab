@@ -15,8 +15,12 @@ namespace TG::Input
 	class Mouse
 	{
 	public:
-		Mouse();
-		~Mouse();
+		Mouse() = default;
+		Mouse(const Mouse&) = delete;
+		Mouse& operator=(const Mouse&) = delete;
+		Mouse(Mouse&&) = delete;
+		Mouse& operator=(Mouse&&) = delete;
+		~Mouse() = default;
 
 		void Update();
         void Receive(const Event& e);
@@ -42,7 +46,6 @@ namespace TG::Input
 
 		void SpyMouseEvent(const Event& e);
 
-		std::bitset<8> m_mouseHold;     // 按键状态(是否被按下)
 		std::bitset<8> m_mouseDown;     // 按键是否刚刚按下
 		std::bitset<8> m_mouseUp;       // 按键是否刚刚松开
 

@@ -108,13 +108,3 @@ std::unordered_map<TG::Input::KeyCode, char const*> TG::Input::EventInfo::keysNa
 	{TG::Input::KeyCode::RightBracket, "RightBracket"},
 	{TG::Input::KeyCode::Quote, "Quote"},
 };
-
-std::unordered_map<TG::Input::EventType, char const*> TG::Input::EventInfo::eventTypes =
-{
-	{TG::Input::EventType::None, "None"},
-	{TG::Input::EventType::Press, "Press"},
-	{TG::Input::EventType::Release, "Release"},
-	{TG::Input::EventType::Char, "Char"},
-	{TG::Input::EventType::MouseMove, "Mouse Move"},
-	{TG::Input::EventType::WheelRoll, "Wheel Rol"},
-};

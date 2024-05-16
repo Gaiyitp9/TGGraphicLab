@@ -10,10 +10,9 @@ list(APPEND INCLUDES
 
 #        Include/Input/Event.h
 #        Include/Input/KeyCode.h
-#        Include/Input/EventData.h
-#        Include/Input/Keyboard.h
-#        Include/Input/Mouse.h
-#        Include/Input/Manager.hpp
+        Include/Input/Keyboard.h
+        Include/Input/Mouse.h
+        Include/Input/Manager.hpp
 
         Include/Math/Assignment.hpp
         Include/Math/Block.hpp
@@ -41,21 +40,21 @@ list(APPEND SRCS
         Source/Editor/MainWindow.cpp
 
 #        Source/Input/Event.cpp
-#        Source/Input/Keyboard.cpp
-#        Source/Input/Mouse.cpp
+        Source/Input/Keyboard.cpp
+        Source/Input/Mouse.cpp
 )
 
 if (CMAKE_SYSTEM_NAME STREQUAL "Windows")
     list(APPEND INCLUDES
             Include/PAL/Windows/MemoryLeakDetection.h
-            Include/PAL/Windows/Utility.h
+            Include/PAL/Windows/Auxiliary.h
             Include/PAL/Windows/Win32API.h
             Include/PAL/Windows/Win32Exception.h
             Include/PAL/Windows/NativeWindow.h
     )
 
     list(APPEND SRCS
-            Source/PAL/Windows/Utility.cpp
+            Source/PAL/Windows/Auxiliary.cpp
             Source/PAL/Windows/Win32Exception.cpp
             Source/PAL/Windows/Window.cpp
     )

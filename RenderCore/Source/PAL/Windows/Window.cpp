@@ -7,31 +7,44 @@
 #include "PAL/Window.h"
 #include "PAL/Windows/NativeWindow.h"
 #include "PAL/Windows/Win32Exception.h"
-#include "PAL/Windows/Utility.h"
+#include "PAL/Windows/Auxiliary.h"
 
 namespace TG::PAL
 {
-	Window::Window(int x, int y, int width, int height, wchar_t const *title)
-		: m_nativeWindow(std::make_unique<NativeWindow>(Utility::Utf16ToUtf8(title)))
+	Window::Window(int x, int y, int width, int height, std::string_view name, WindowType type)
+		: m_nativeWindow(std::make_unique<NativeWindow>(std::string(name)))
 	{
+		DWORD dwStyle = WS_OVERLAPPEDWINDOW;
+		DWORD dwExStyle = WS_EX_OVERLAPPEDWINDOW;
+		switch (type)
+		{
+		case WindowType::Default:
+			dwStyle = WS_OVERLAPPEDWINDOW;
+			dwExStyle = WS_EX_OVERLAPPEDWINDOW;
+			break;
+		case WindowType::Load:
+			dwStyle = WS_POPUP;
+			dwExStyle = WS_EX_TOOLWINDOW;
+			dwExStyle &= ~WS_EX_APPWINDOW;
+			break;
+		}
+
 		// 客户端区域大小
 		RECT rect = { 0, 0, width, height };
 		// 根据客户区域宽和高计算整个窗口的宽和高
-		if (!AdjustWindowRect(&rect, WS_OVERLAPPEDWINDOW, false))
+		if (!AdjustWindowRect(&rect, dwStyle, false))
 			CheckLastError();
-		m_nativeWindow->hwnd = CreateWindowW(L"Default", title, WS_OVERLAPPEDWINDOW,
+		m_nativeWindow->hwnd = CreateWindowExW(dwExStyle, L"Default", Utf8ToUtf16(name).c_str(), dwStyle,
 							   x, y, rect.right - rect.left, rect.bottom - rect.top,
 							   nullptr, nullptr, nullptr, m_nativeWindow.get());
 		if (m_nativeWindow->hwnd == nullptr)
 			CheckLastError();
-		DWORD dwExStyle = GetWindowLongW(m_nativeWindow->hwnd, GWL_EXSTYLE);
-		dwExStyle &= ~WS_EX_APPWINDOW;
-		dwExStyle |= WS_EX_TOOLWINDOW;
-		SetWindowLongW(m_nativeWindow->hwnd, GWL_EXSTYLE, dwExStyle);
+
 		// 显示窗口
 		ShowWindow(m_nativeWindow->hwnd, SW_SHOW);
 	}
 
+	// 需要在这里定义析构函数，防止其变成内联函数，让std::unique_ptr<NativeWindow>能通过编译
 	Window::~Window() = default;
 
 	void Window::SetKeyCallback(const KeyFunction& function) const
@@ -72,6 +85,16 @@ namespace TG::PAL
 	void Window::SetWindowSizeCallback(const WindowSizeFunction &function) const
 	{
 		m_nativeWindow->windowSizeFunction = function;
+	}
+
+	void Window::SetSuspendCallback(const SuspendFunction &function) const
+	{
+		m_nativeWindow->suspendFunction = function;
+	}
+
+	void Window::SetResumeCallback(const ResumeFunction &function) const
+	{
+		m_nativeWindow->resumeFunction = function;
 	}
 
     // 轮询输入事件
@@ -338,7 +361,7 @@ namespace TG::PAL
 				action = InputAction::Hold;
 
 			if (pWindow->keyFunction)
-				pWindow->keyFunction(static_cast<KeyCode>(vkCode), scanCode, action, 0);
+				pWindow->keyFunction(static_cast<KeyCode>(vkCode), scanCode, action);
 
 			return 0;
 		}
@@ -360,42 +383,42 @@ namespace TG::PAL
 		case WM_LBUTTONDOWN:
 		{
 			if (pWindow->mouseButtonFunction)
-				pWindow->mouseButtonFunction(MouseButton::Left, InputAction::Press, 0);
+				pWindow->mouseButtonFunction(MouseButton::Left, InputAction::Press);
 			return 0;
 		}
 
 		case WM_LBUTTONUP:
 		{
 			if (pWindow->mouseButtonFunction)
-				pWindow->mouseButtonFunction(MouseButton::Left, InputAction::Release, 0);
+				pWindow->mouseButtonFunction(MouseButton::Left, InputAction::Release);
 			return 0;
 		}
 
 		case WM_RBUTTONDOWN:
 		{
 			if (pWindow->mouseButtonFunction)
-				pWindow->mouseButtonFunction(MouseButton::Right, InputAction::Press, 0);
+				pWindow->mouseButtonFunction(MouseButton::Right, InputAction::Press);
 			return 0;
 		}
 
 		case WM_RBUTTONUP:
 		{
 			if (pWindow->mouseButtonFunction)
-				pWindow->mouseButtonFunction(MouseButton::Right, InputAction::Release, 0);
+				pWindow->mouseButtonFunction(MouseButton::Right, InputAction::Release);
 			return 0;
 		}
 
 		case WM_MBUTTONDOWN:
 		{
 			if (pWindow->mouseButtonFunction)
-				pWindow->mouseButtonFunction(MouseButton::Middle, InputAction::Press, 0);
+				pWindow->mouseButtonFunction(MouseButton::Middle, InputAction::Press);
 			return 0;
 		}
 
 		case WM_MBUTTONUP:
 		{
 			if (pWindow->mouseButtonFunction)
-				pWindow->mouseButtonFunction(MouseButton::Middle, InputAction::Release, 0);
+				pWindow->mouseButtonFunction(MouseButton::Middle, InputAction::Release);
 			return 0;
 		}
 
@@ -416,28 +439,23 @@ namespace TG::PAL
 
 		case WM_SIZE:
 		{
-            // if (m_resume && m_suspend)
-            // {
-            //     m_width = LOWORD(lParam);
-            //     m_height = HIWORD(lParam);
-            //     if (wParam == SIZE_MINIMIZED)
-            //         m_suspend();
-            //     else if (wParam == SIZE_RESTORED)
-            //         m_resume();
-            // }
 			if (pWindow->windowSizeFunction)
 				pWindow->windowSizeFunction(LOWORD(lParam), HIWORD(lParam));
+			if (pWindow->suspendFunction && wParam == SIZE_MINIMIZED)
+				pWindow->suspendFunction();
+			if (pWindow->resumeFunction && wParam == SIZE_RESTORED)
+				pWindow->resumeFunction();
 			return 0;
 		}
 
 		case WM_ENTERSIZEMOVE:
-            // if (m_suspend)
-                // m_suspend();
+            if (pWindow->suspendFunction)
+                pWindow->suspendFunction();
 			return 0;
 
 		case WM_EXITSIZEMOVE:
-            // if (m_resume)
-                // m_resume();
+            if (pWindow->resumeFunction)
+                pWindow->resumeFunction();
 			return 0;
 
         default:

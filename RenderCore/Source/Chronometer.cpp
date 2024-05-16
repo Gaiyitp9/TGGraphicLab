@@ -33,19 +33,13 @@ namespace TG
 		return static_cast<float>(total.count());
 	}
 
-	std::wstring Chronometer::Date()
+	std::string Chronometer::Date()
 	{
         // c++20的方法，但是调用std::chrono::current_zone()之后会产生内存泄漏
-		/*auto const localT = std::chrono::current_zone()
+		// 只是退出后泄漏，我认为影响不大
+		auto const localT = std::chrono::current_zone()
                 ->to_local(std::chrono::system_clock::now());
-        return std::format(L"{:%Y-%m-%d %X}", localT);*/
-
-        auto now = std::chrono::system_clock::now();
-        auto localT = std::chrono::system_clock::to_time_t(now);
-
-        std::wstringstream ss;
-        ss << std::put_time(std::localtime(&localT), L"%Y-%m-%d %X");
-        return ss.str();
+        return std::format("{:%Y-%m-%d %X}", localT);
 	}
 
 	void Chronometer::Reset()

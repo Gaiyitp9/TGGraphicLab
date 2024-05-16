@@ -6,11 +6,12 @@
 
 #include "Renderer.hpp"
 #include "PAL/Windows//Win32Exception.h"
+#include "Diagnostics/Log.hpp"
 #include <iostream>
 
 namespace TG
 {
-	Renderer::Renderer() : m_mainWindow(200, 100, 800, 600, L"天工渲染器")
+	Renderer::Renderer() : m_mainWindow(200, 100, 800, 600, "天工渲染器"), m_locale(".utf8")
 	{
         // 注：使用CRT library检测内存泄漏时，文件的行分隔符要设置为CRLF(\r\n)，否则_CrtSetDbgFlag函数不起作用
 		// 开启内存泄漏检测
@@ -24,7 +25,6 @@ namespace TG
 		SetConsoleOutputCP(65001);
 
 		// 编码设置为UTF-8
-		m_locale = std::locale(".utf8");
 		std::wcout.imbue(m_locale);
 		std::cout.imbue(m_locale);
 

@@ -11,13 +11,6 @@
 
 namespace TG::PAL
 {
-    using KeyFunction = std::function<void(KeyCode key, int scanCode, InputAction action, int mods)>;
-    using CharFunction = std::function<void(unsigned int c)>;
-    using MouseButtonFunction = std::function<void(MouseButton button, InputAction action, int mods)>;
-    using CursorPosFunction = std::function<void(int xPos, int yPos)>;
-    using ScrollFunction = std::function<void(int xOffset, int yOffset)>;
-    using WindowPosFunction = std::function<void(int xPos, int yPos)>;
-    using WindowSizeFunction = std::function<void(unsigned int width, unsigned int height)>;
     // Windows原生窗口
     struct NativeWindow
     {
@@ -25,12 +18,14 @@ namespace TG::PAL
         HWND        hwnd{nullptr};
         bool        spyMessage{false};
         bool        destroyed{false};
-        KeyFunction         keyFunction{};
-        CharFunction        charFunction{};
-        MouseButtonFunction mouseButtonFunction{};
-        CursorPosFunction   cursorPosFunction{};
-        ScrollFunction      scrollFunction{};
-        WindowPosFunction   windowPosFunction{};
-        WindowSizeFunction  windowSizeFunction{};
+        std::function<void(KeyCode key, int scanCode, InputAction action)> keyFunction{};
+        std::function<void(unsigned int c)> charFunction{};
+        std::function<void(MouseButton button, InputAction action)> mouseButtonFunction{};
+        std::function<void(int xPos, int yPos)> cursorPosFunction{};
+        std::function<void(int xOffset, int yOffset)> scrollFunction{};
+        std::function<void(int xPos, int yPos)> windowPosFunction{};
+        std::function<void(unsigned int width, unsigned int height)> windowSizeFunction{};
+        std::function<void()> suspendFunction{};
+        std::function<void()> resumeFunction{};
     };
 }

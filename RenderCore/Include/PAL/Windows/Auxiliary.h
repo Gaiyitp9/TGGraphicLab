@@ -5,22 +5,12 @@
 *****************************************************************/
 #pragma once
 
-namespace TG::Input
-{
-    // 鼠标数据
-    union MouseData
-    {
-        struct
-        {
-            int x;
-            int y;
-        };
-        short delta;
-    };
+#include <string>
 
-    // 键盘数据
-    struct KeyboardData
-    {
-        char c;
-    };
+namespace TG::PAL
+{
+    // 注意，运行时字符集必须设置为utf-8才能使用这两个函数
+    // 在msvc中需要传入/utf-8选项
+    std::wstring Utf8ToUtf16(std::string_view str);
+    std::string Utf16ToUtf8(std::wstring_view wstr);
 }

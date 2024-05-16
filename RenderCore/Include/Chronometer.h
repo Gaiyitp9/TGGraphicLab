@@ -20,7 +20,7 @@ namespace TG
 		Chronometer& operator=(Chronometer&&) = delete;
 		~Chronometer();
 
-		static std::wstring Date();                             // 当前时区的日期和时间
+		static std::string Date();                             // 当前时区的日期和时间
 
 		[[nodiscard]] float DeltaTime() const;
 		[[nodiscard]] float TotalTime() const;

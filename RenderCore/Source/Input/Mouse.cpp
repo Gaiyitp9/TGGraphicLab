@@ -11,10 +11,6 @@
 
 namespace TG::Input
 {
-	Mouse::Mouse() = default;
-
-	Mouse::~Mouse() = default;
-
 	void Mouse::Update()
 	{
 		m_mouseDown.reset();
@@ -32,11 +28,9 @@ namespace TG::Input
         {
             case EventType::Press:
                 m_mouseDown[key] = true;
-                m_mouseHold[key] = true;
                 break;
             case EventType::Release:
                 m_mouseUp[key] = true;
-                m_mouseHold[key] = false;
                 break;
             case EventType::MouseMove:
             {
