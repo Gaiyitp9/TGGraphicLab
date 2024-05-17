@@ -6,7 +6,6 @@
 
 #include "PAL/Windows/Auxiliary.h"
 #include "PAL/Windows/Win32API.h"
-#include <locale>
 
 namespace TG::PAL
 {

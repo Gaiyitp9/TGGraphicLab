@@ -13,29 +13,23 @@ namespace TG::PAL
 	class Win32Exception final : public std::exception
 	{
 	public:
-		explicit Win32Exception(HRESULT hr, char const* description = "No Description");
+		explicit Win32Exception(HRESULT hr, std::string_view description = "No Description");
 		~Win32Exception() override;
 
 		[[nodiscard]] char const* what() const override;
 
-	protected:
-		char const* m_description;
-		std::stacktrace m_stackTrace;
-
-		DWORD m_errorCode;
-		std::wstring m_errorMsg;
-
 	private:
-		void TranslateHrErrorCode();		// 根据错误码生成相应错误信息
+		std::stacktrace m_stackTrace{std::stacktrace::current()};
+		std::string m_whatBuffer;
 	};
 
-    inline void CheckHResult(HRESULT hr, char const* description = "")
+    inline void CheckHResult(HRESULT hr, std::string_view description = "")
     {
         if (hr < 0)
             throw Win32Exception(hr, description);
     }
 
-    inline void CheckLastError(char const* description = "")
+    inline void CheckLastError(std::string_view description = "")
     {
         auto hr = static_cast<HRESULT>(GetLastError());
         throw Win32Exception(hr, description);

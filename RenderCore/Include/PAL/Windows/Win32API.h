@@ -44,4 +44,4 @@
 
 #include <windows.h>
 #include <windowsx.h>
-#include "MemoryLeakDetection.h"
+#include "PAL/DebugNew.h"

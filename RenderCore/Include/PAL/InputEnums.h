@@ -118,6 +118,6 @@ namespace TG::PAL
     {
         Press,
         Release,
-        Hold,
+        Repeat,
     };
 }

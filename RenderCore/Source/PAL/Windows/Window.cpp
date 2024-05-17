@@ -57,6 +57,17 @@ namespace TG::PAL
 		return m_nativeWindow->destroyed;
 	}
 
+	void Window::SetIcon(std::string_view iconPath) const
+	{
+		HANDLE icon = LoadImageW(nullptr, Utf8ToUtf16(iconPath).c_str(), IMAGE_ICON, 0, 0,
+			LR_DEFAULTSIZE | LR_LOADFROMFILE);
+		if (icon == nullptr)
+			CheckLastError("Invalid icon source");
+
+		SendMessageW(m_nativeWindow->hwnd, WM_SETICON, ICON_BIG, reinterpret_cast<LPARAM>(icon));
+		SendMessageW(m_nativeWindow->hwnd, WM_SETICON, ICON_SMALL, reinterpret_cast<LPARAM>(icon));
+	}
+
 	void Window::SetCharCallback(const CharFunction &function) const
 	{
 		m_nativeWindow->charFunction = function;
@@ -315,7 +326,7 @@ namespace TG::PAL
 		if (pWindow->spyMessage)
 		{
 		    std::pmr::string windowMessage;
-		    std::format_to(std::back_inserter(windowMessage), "{:<16} {}", pWindow->name, WindowMessageToString(msg, wParam, lParam));
+		    std::format_to(std::back_inserter(windowMessage), "{:<16} {}\n", pWindow->name, WindowMessageToString(msg, wParam, lParam));
 			OutputDebugStringA(windowMessage.data());
 		}
 
@@ -358,7 +369,7 @@ namespace TG::PAL
 			if (keyFlags & KF_UP == KF_UP)
 				action = InputAction::Release;
 			else if (keyFlags & KF_REPEAT == KF_REPEAT)
-				action = InputAction::Hold;
+				action = InputAction::Repeat;
 
 			if (pWindow->keyFunction)
 				pWindow->keyFunction(static_cast<KeyCode>(vkCode), scanCode, action);

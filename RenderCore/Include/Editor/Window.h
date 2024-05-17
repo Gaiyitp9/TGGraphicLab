@@ -21,14 +21,16 @@ namespace TG
         Window& operator=(const Window&) = delete;
         Window(Window&&) = delete;
         Window& operator=(Window&&) = delete;
-        virtual ~Window() = 0 {}
+        virtual ~Window() = 0;
 
-        [[nodiscard]] Window const *Parent() const noexcept { return m_parent; }
+        [[nodiscard]] Window const* Parent() const noexcept { return m_parent; }
         [[nodiscard]] int PositionX() const noexcept { return m_posX; }
         [[nodiscard]] int PositionY() const noexcept { return m_posY; }
         [[nodiscard]] int Width() const noexcept { return m_width; }
         [[nodiscard]] int Height() const noexcept { return m_height; }
         [[nodiscard]] bool IsDestroyed() const noexcept { return m_window.IsDestroyed(); }
+
+        void SetIcon(std::string_view iconPath) const { m_window.SetIcon(iconPath); }
 
     protected:
         int m_posX, m_posY;     // 窗口位置

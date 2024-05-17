@@ -16,7 +16,6 @@ int CALLBACK wWinMain(_In_ HINSTANCE hInstance,
 	try
 	{
 		TG::Renderer app;
-        OutputDebugStringA("test output\n");
 		return app.Run();
 	}
 	catch (const std::exception& e)

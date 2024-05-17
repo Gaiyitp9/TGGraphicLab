@@ -10,9 +10,9 @@ list(APPEND INCLUDES
 
 #        Include/Input/Event.h
 #        Include/Input/KeyCode.h
-        Include/Input/Keyboard.h
-        Include/Input/Mouse.h
-        Include/Input/Manager.hpp
+#        Include/Input/Keyboard.h
+#        Include/Input/Mouse.h
+#        Include/Input/Manager.hpp
 
         Include/Math/Assignment.hpp
         Include/Math/Block.hpp
@@ -29,7 +29,7 @@ list(APPEND INCLUDES
 
         Include/PAL/InputEnums.h
         Include/PAL/Window.h
-        Include/PAL/PlatformSpecific.h
+        Include/PAL/DebugNew.h
 )
 
 list(APPEND SRCS
@@ -38,15 +38,15 @@ list(APPEND SRCS
         Source/Diagnostics/BaseException.cpp
 
         Source/Editor/MainWindow.cpp
+        Source/Editor/Window.cpp
 
 #        Source/Input/Event.cpp
-        Source/Input/Keyboard.cpp
-        Source/Input/Mouse.cpp
+#        Source/Input/Keyboard.cpp
+#        Source/Input/Mouse.cpp
 )
 
 if (CMAKE_SYSTEM_NAME STREQUAL "Windows")
     list(APPEND INCLUDES
-            Include/PAL/Windows/MemoryLeakDetection.h
             Include/PAL/Windows/Auxiliary.h
             Include/PAL/Windows/Win32API.h
             Include/PAL/Windows/Win32Exception.h
@@ -62,13 +62,18 @@ endif()
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${SRCS})
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${INCLUDES})
 
-set(TG_MATRIX_STORAGE_ORDER "RowMajor" CACHE STRING "Default matrix storage order" FORCE)
-set_property(CACHE TG_MATRIX_STORAGE_ORDER PROPERTY STRINGS "RowMajor" "ColumnMajor")
-
 add_library(RenderCore STATIC ${SRCS} ${INCLUDES})
 target_include_directories(RenderCore PUBLIC Include ThirdParty)
 target_link_libraries(RenderCore PRIVATE dxgi d3d11 dxguid dbghelp opengl32)
 
+set(TG_MATRIX_STORAGE_ORDER "RowMajor" CACHE STRING "Default matrix storage order" FORCE)
+set_property(CACHE TG_MATRIX_STORAGE_ORDER PROPERTY STRINGS "RowMajor" "ColumnMajor")
 if (TG_MATRIX_STORAGE_ORDER MATCHES "RowMajor")
-    target_compile_definitions(RenderCore PRIVATE -DTG_ROW_MAJOR_MATRIX)
+    target_compile_definitions(RenderCore PRIVATE TG_ROW_MAJOR_MATRIX)
+endif()
+
+string(TOLOWER ${CMAKE_BUILD_TYPE} build_type)
+if (CMAKE_SYSTEM_NAME STREQUAL "Windows" AND build_type STREQUAL debug)
+    #CRT库查找内存泄漏所需定义的宏
+    target_compile_definitions(RenderCore PUBLIC _CRTDBG_MAP_ALLOC)
 endif()

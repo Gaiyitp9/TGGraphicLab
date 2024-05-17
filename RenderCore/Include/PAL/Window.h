@@ -40,6 +40,8 @@ namespace TG::PAL
 
         [[nodiscard]] bool IsDestroyed() const;
 
+        void SetIcon(std::string_view iconPath) const;
+
         // 窗口消息事件回调
         void SetKeyCallback(const KeyFunction& function) const;
         void SetCharCallback(const CharFunction& function) const;

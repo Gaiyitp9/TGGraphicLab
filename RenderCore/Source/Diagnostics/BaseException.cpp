@@ -7,17 +7,15 @@
 
 namespace TG
 {
-    BaseException::BaseException(char const* description)
-        : m_description(description)
-    {}
+    BaseException::BaseException(std::string_view description)
+    {
+        m_whatBuffer = std::format("Exception type: Base Exception\n"
+                                 "{}\n"
+                                 "{}\n", description, m_stackTrace);
+    }
 
     char const* BaseException::what() const
     {
-        static std::string whatBuffer;
-
-        whatBuffer = std::format("Exception type: Base Exception\n"
-                                 "{}\n"
-                                 "{}\n", m_description, m_stackTrace);
-        return whatBuffer.c_str();
+        return m_whatBuffer.c_str();
     }
 }

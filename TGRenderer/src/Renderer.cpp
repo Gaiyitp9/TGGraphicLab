@@ -11,7 +11,7 @@
 
 namespace TG
 {
-	Renderer::Renderer() : m_mainWindow(200, 100, 800, 600, "天工渲染器"), m_locale(".utf8")
+	Renderer::Renderer() : m_locale(".utf8"), m_mainWindow(200, 100, 800, 600, "天工渲染器")
 	{
         // 注：使用CRT library检测内存泄漏时，文件的行分隔符要设置为CRLF(\r\n)，否则_CrtSetDbgFlag函数不起作用
 		// 开启内存泄漏检测
@@ -33,7 +33,7 @@ namespace TG
         m_screenHeight = GetSystemMetrics(SM_CYSCREEN);
 
         // 主窗口设置
-        // m_mainWindow.SetIcon(L"D:\\ComputerScience\\ComputerGraphics\\Projects\\TGRenderLab\\TGRenderer\\maple-leaf.ico");
+        m_mainWindow.SetIcon(R"(..\..\TGRenderer\maple-leaf.ico)");
         // m_mainWindow.SetInputListener([&input = m_input](const Input::Event &evt)
                                       // { input.Broadcast(evt); });
         // m_mainWindow.SetStateCallback([&timer=m_timer](){ timer.Start(); }, [&timer=m_timer](){ timer.Pause(); });
