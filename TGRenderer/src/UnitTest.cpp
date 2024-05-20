@@ -17,13 +17,13 @@ namespace TG
 
 	void UnitTest::TextEncodeTest()
 	{
-		const wchar_t* unicodeStr = L"\u303E";
-		std::wcout << unicodeStr << std::endl;
-		const wchar_t* testStr = L"天工渲染器";
-		std::wcout << sizeof(wchar_t) << testStr[0] << std::endl;
-		const wchar_t* testStr2 = L"TianGong";
-		std::wcout << testStr2 << sizeof(testStr2) << std::endl;
-		std::wcout << L"你好TG" << std::endl;
+		// const wchar_t* unicodeStr = L"\u303E";
+		// std::wcout << unicodeStr << std::endl;
+		// const wchar_t* testStr = L"天工渲染器";
+		// std::wcout << sizeof(wchar_t) << testStr[0] << std::endl;
+		// const wchar_t* testStr2 = L"TianGong";
+		// std::wcout << testStr2 << sizeof(testStr2) << std::endl;
+		// std::wcout << L"你好TG" << std::endl;
 		// std::string str1 = Utility::Utf16ToUtf8(L"你好");
 		// std::wstring wstr1 = Utility::Utf8ToUtf16("你好");
 		// std::cout << str1 << str1.size() << std::endl;
@@ -37,7 +37,7 @@ namespace TG
 		while (i-- > 0);
 		timer.Tick();
 
-		std::wcout << timer.DeltaTime() << " ms" << std::endl;
+		// std::wcout << timer.DeltaTime() << " ms" << std::endl;
 	}
 
 	void UnitTest::ArrayAlignmentTest()

@@ -3,7 +3,7 @@ list(APPEND INCLUDES
         Include/Singleton.hpp
 
         Include/Diagnostics/BaseException.h
-        Include/Diagnostics/Log.hpp
+        Include/Diagnostics/Log.h
 
         Include/Editor/Window.h
         Include/Editor/MainWindow.h

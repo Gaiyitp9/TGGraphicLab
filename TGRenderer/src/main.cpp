@@ -6,12 +6,12 @@
 
 #include "Renderer.hpp"
 #include "PAL/Windows/Win32API.h"
-#include "Diagnostics/Log.hpp"
+#include "Diagnostics/Log.h"
 
 int CALLBACK wWinMain(_In_ HINSTANCE hInstance,
-	_In_opt_ HINSTANCE hPrevInstance,
-	_In_ LPWSTR     lpCmdLine,
-	_In_ int       nShowCmd)
+                      _In_opt_ HINSTANCE hPrevInstance,
+                      _In_ LPWSTR     lpCmdLine,
+                      _In_ int       nShowCmd)
 {
 	try
 	{

@@ -6,16 +6,13 @@
 #pragma once
 
 #include "Editor/MainWindow.h"
-// #include "Input/Manager.hpp"
 #include "Chronometer.h"
+// #include "Input/Manager.hpp"
 // #include "UnitTest.hpp"
-#include <locale>
-// #include <unordered_map>
 // #include "GraphicsLayer.hpp"
 // #include "Graphics/OpenGL/FactoryGL.hpp"
 // #include "glad/wgl.h"
-// #include "Input/Mouse.h"
-// #include "Input/Keyboard.h"
+#include <locale>
 
 namespace TG
 {
@@ -23,14 +20,16 @@ namespace TG
 	{
 	public:
 		Renderer();
-		~Renderer();
 		Renderer(const Renderer&) = delete;
 		Renderer& operator=(const Renderer&) = delete;
+		Renderer(Renderer&&) = delete;
+		Renderer& operator=(Renderer&&) = delete;
+		~Renderer();
 
 		int Run();
 
 	private:
-		std::locale m_locale;               // 语言区域
+		std::locale m_locale{".utf8"};      // 语言区域
 		MainWindow m_mainWindow;			// 主窗口
         Chronometer m_timer;                // 高精度计时器
         // Input::Manager<Input::Mouse, Input::Keyboard> m_input;           // 输入管理器，使用鼠标和键盘输入
@@ -41,7 +40,5 @@ namespace TG
 
 		int m_screenWidth;		            // 主显示器的宽
 		int m_screenHeight;		            // 主显示器的高
-
-		// UnitTest m_unitTest;		        // 单元测试类
 	};
 }

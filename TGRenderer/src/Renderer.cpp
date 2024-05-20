@@ -5,13 +5,12 @@
 *****************************************************************/
 
 #include "Renderer.hpp"
-#include "PAL/Windows//Win32Exception.h"
-#include "Diagnostics/Log.hpp"
-#include <iostream>
+#include "PAL/Windows/Win32Exception.h"
+#include "Diagnostics/Log.h"
 
 namespace TG
 {
-	Renderer::Renderer() : m_locale(".utf8"), m_mainWindow(200, 100, 800, 600, "天工渲染器")
+	Renderer::Renderer() : m_mainWindow(200, 100, 800, 600, "天工渲染器")
 	{
         // 注：使用CRT library检测内存泄漏时，文件的行分隔符要设置为CRLF(\r\n)，否则_CrtSetDbgFlag函数不起作用
 		// 开启内存泄漏检测
@@ -25,8 +24,8 @@ namespace TG
 		SetConsoleOutputCP(65001);
 
 		// 编码设置为UTF-8
-		std::wcout.imbue(m_locale);
 		std::cout.imbue(m_locale);
+		Debug::LogLine(Chronometer::Date());
 
 		// 获取当前显示器的宽和高
 		m_screenWidth = GetSystemMetrics(SM_CXSCREEN);
@@ -58,20 +57,12 @@ namespace TG
 
 	int Renderer::Run()
 	{
-		// Debug::LogLine(Chronometer::Date());
 		//d3d11Layer = std::make_unique<Graphics::GraphicsLayer>(mainWnd.get());
 
 		//m_windows[L"辅助窗口"] = std::make_shared<PopupWindow>((m_screenWidth - 400) / 2, (m_screenHeight - 300) / 2,
 		//	400, 300, m_windows[L"天工渲染器"]);
 
 //		throw TG::Win32Exception(E_OUTOFMEMORY);
-		// m_unitTest.FormatTest();
-		// m_unitTest.TextEncodeTest();
-		// m_unitTest.TimeTest();
-		// m_unitTest.MathLibTest();
-		// m_unitTest.ArrayAlignmentTest();
-		//m_unitTest.SIMDTest();
-//        m_unitTest.OpenGLTest(m_mainWindow.Hwnd());
 
 		while (true)
 		{
@@ -79,8 +70,6 @@ namespace TG
 				// break;
 
             // m_input.Update();
-			// if (const auto code = Window::ProcessMessage())
-				// return *code;
 			if (const std::optional<int> code = PAL::PollEvents())
 				return *code;
 

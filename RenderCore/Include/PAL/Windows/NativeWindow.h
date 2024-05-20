@@ -15,9 +15,9 @@ namespace TG::PAL
     struct NativeWindow
     {
         std::string name{};
-        HWND        hwnd{nullptr};
-        bool        spyMessage{false};
-        bool        destroyed{false};
+        HWND        hwnd{ nullptr };
+        bool        spyMessage{ false };
+        bool        destroyed{ false };
         std::function<void(KeyCode key, int scanCode, InputAction action)> keyFunction{};
         std::function<void(unsigned int c)> charFunction{};
         std::function<void(MouseButton button, InputAction action)> mouseButtonFunction{};
