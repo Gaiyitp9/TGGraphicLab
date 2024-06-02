@@ -7,6 +7,7 @@
 
 #include "../Math/Core.hpp"
 #include "Event.h"
+#include "KeyCode.h"
 #include <bitset>
 
 namespace TG::Input

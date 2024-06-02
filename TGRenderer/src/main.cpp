@@ -6,7 +6,7 @@
 
 #include "Renderer.hpp"
 #include "PAL/Windows/Win32API.h"
-#include "Diagnostics/Log.h"
+#include "Log.h"
 
 int CALLBACK wWinMain(_In_ HINSTANCE hInstance,
                       _In_opt_ HINSTANCE hPrevInstance,

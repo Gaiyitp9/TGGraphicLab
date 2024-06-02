@@ -5,7 +5,7 @@
 *****************************************************************/
 
 #include "Chronometer.h"
-#include "Diagnostics/BaseException.h"
+#include "Exception/BaseException.h"
 
 namespace TG
 {

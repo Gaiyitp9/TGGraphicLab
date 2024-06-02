@@ -5,12 +5,15 @@
 *****************************************************************/
 #pragma once
 
-#include <string>
+#include "Event.h"
 
-namespace TG::PAL
+namespace TG::Input
 {
-    // 注意，运行时字符集必须设置为utf-8才能使用这两个函数
-    // 在msvc中需要设置/utf-8选项
-    std::wstring Utf8ToUtf16(std::string_view str);
-    std::string Utf16ToUtf8(std::wstring_view wstr);
+    // 输入事件处理器
+    // 比如输入管理器，读取输入事件来更新输入设备状态
+    struct IEventHandler
+    {
+        virtual ~IEventHandler() = default;
+        virtual void Consume(const Event& event) = 0;
+    };
 }

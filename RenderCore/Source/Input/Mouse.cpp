@@ -5,8 +5,7 @@
 *****************************************************************/
 
 #include "Input/Mouse.h"
-#include "Diagnostics/Log.hpp"
-#include "Input/EventData.h"
+#include "Diagnostics/Log.h"
 #include <format>
 
 namespace TG::Input

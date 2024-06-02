@@ -9,27 +9,22 @@ namespace TG::Input
 {
 	enum class KeyCode : unsigned char
 	{
-        //------------鼠标---------------
-		None				= 0x00,
-		LeftMouseButton		= 0x01,
-		RightMouseButton	= 0x02,
-		MidMouseButton		= 0x04,
-        //-------------------------------
-
-        //---------键盘------------------
-        Char        = 0x07,
-		Backspace	= 0x08,
-		Tab			= 0x09,
-		Enter		= 0x0D,
-		Esc			= 0x1B,
-		Space		= 0x20,
-		PageUp		= 0x21,
-		PageDown	= 0x22,
-		End			= 0x23,
-		Home		= 0x24,
-		LeftArrow	= 0x25,
-		UpArrow		= 0x26,
-		RightArrow	= 0x27,
+		None,
+		LeftMouseButton,
+		RightMouseButton,
+		MidMouseButton,
+		Backspace,
+		Tab,
+		Enter,
+		Esc,
+		Space,
+		PageUp,
+		PageDown,
+		End,
+		Home,
+		LeftArrow,
+		UpArrow,
+		RightArrow,
 		DownArrow	= 0x28,
 		Insert		= 0x2D,
 		Delete		= 0x2E,
@@ -96,13 +91,13 @@ namespace TG::Input
 		F10 = 0x79,
 		F11 = 0x7A,
 		F12 = 0x7B,
-		LeftShift		= 0xA0,
-		RightShift		= 0xA1,
-		LeftControl		= 0xA2,
-		RightControl	= 0xA3,
-		LeftAlt			= 0xA4,
-		RightAlt		= 0xA5,
-		Semicolon		= 0xBA,
+		LeftShift,
+		RightShift,
+		LeftControl,
+		RightControl,
+		LeftAlt,
+		RightAlt,
+		Semicolon,
 		Comma			= 0xBC,
 		Add				= 0xBB,
 		Subtract		= 0xBD,
@@ -113,6 +108,5 @@ namespace TG::Input
 		BackSlash		= 0xDC,
 		RightBracket	= 0xDD,
 		Quote			= 0xDE
-        //-------------------------------
 	};
 }

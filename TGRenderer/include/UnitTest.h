@@ -11,7 +11,7 @@
 #include <string>
 #include "Math/Core.hpp"
 #include "Input/Event.h"
-#include "Diagnostics/Log.h"
+#include "Log.h"
 // #include "Diagnostics/Win32Exception.h"
 #include "glad/gl.h"
 

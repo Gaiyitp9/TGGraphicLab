@@ -6,7 +6,7 @@
 #pragma once
 
 #include "Win32API.h"
-#include "PAL/InputEnums.h"
+#include "PAL/Input.h"
 #include <string>
 
 namespace TG::PAL
@@ -18,7 +18,7 @@ namespace TG::PAL
         HWND        hwnd{ nullptr };
         bool        spyMessage{ false };
         bool        destroyed{ false };
-        std::function<void(KeyCode key, int scanCode, InputAction action)> keyFunction{};
+        std::function<void(Key key, int scanCode, InputAction action)> keyFunction{};
         std::function<void(unsigned int c)> charFunction{};
         std::function<void(MouseButton button, InputAction action)> mouseButtonFunction{};
         std::function<void(int xPos, int yPos)> cursorPosFunction{};

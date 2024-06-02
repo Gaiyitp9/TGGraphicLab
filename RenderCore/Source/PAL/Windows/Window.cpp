@@ -372,7 +372,7 @@ namespace TG::PAL
 				action = InputAction::Repeat;
 
 			if (pWindow->keyFunction)
-				pWindow->keyFunction(static_cast<KeyCode>(vkCode), scanCode, action);
+				pWindow->keyFunction(static_cast<Key>(vkCode), scanCode, action);
 
 			return 0;
 		}

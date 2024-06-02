@@ -8,7 +8,7 @@
 namespace TG::PAL
 {
     // 键盘按键枚举
-    enum class KeyCode : unsigned char
+    enum class Key : unsigned char
     {
         Backspace	= 0x08,
         Tab			= 0x09,
@@ -119,5 +119,15 @@ namespace TG::PAL
         Press,
         Release,
         Repeat,
+    };
+    // 修饰键
+    enum class Modifier : unsigned char
+    {
+        LeftCtrl,
+        RightCtrl,
+        LeftAlt,
+        RightAlt,
+        LeftShift,
+        RightShift,
     };
 }

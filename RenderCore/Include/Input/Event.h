@@ -5,14 +5,35 @@
 *****************************************************************/
 #pragma once
 
-#include <unordered_map>
-#include <any>
 #include "KeyCode.h"
+#include <any>
 
 namespace TG::Input
 {
-	struct EventInfo
+	enum class EventType : unsigned char
 	{
-		static std::unordered_map<KeyCode, char const*> keysName;
+		Character,
+		Keyboard,
+		Mouse,
+	};
+
+	struct KeyboardState
+	{
+		KeyCode key;
+		bool isPressed;
+	};
+
+	struct MouseState
+	{
+		KeyCode button;
+		bool isPressed;
+		short x, y;
+		short wheelDelta;
+	};
+
+	struct Event
+	{
+		EventType type;
+		std::any state;
 	};
 }

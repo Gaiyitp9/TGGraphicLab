@@ -1,15 +1,17 @@
 list(APPEND INCLUDES
         Include/Chronometer.h
+        Include/Log.h
         Include/Singleton.hpp
 
-        Include/Diagnostics/BaseException.h
-        Include/Diagnostics/Log.h
+        Include/Exception/BaseException.h
 
         Include/Editor/Window.h
         Include/Editor/MainWindow.h
 
-#        Include/Input/Event.h
-#        Include/Input/KeyCode.h
+        Include/Input/Event.h
+        Include/Input/EventDispatcher.h
+        Include/Input/EventHandler.h
+        Include/Input/KeyCode.h
 #        Include/Input/Keyboard.h
 #        Include/Input/Mouse.h
 #        Include/Input/Manager.hpp
@@ -27,7 +29,7 @@ list(APPEND INCLUDES
         Include/Math/Redux.hpp
         Include/Math/Transpose.hpp
 
-        Include/PAL/InputEnums.h
+        Include/PAL/Input.h
         Include/PAL/Window.h
         Include/PAL/DebugNew.h
 )
@@ -35,7 +37,7 @@ list(APPEND INCLUDES
 list(APPEND SRCS
         Source/Chronometer.cpp
 
-        Source/Diagnostics/BaseException.cpp
+        Source/Exception/BaseException.cpp
 
         Source/Editor/MainWindow.cpp
         Source/Editor/Window.cpp

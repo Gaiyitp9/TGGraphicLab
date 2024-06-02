@@ -6,7 +6,7 @@
 
 #include "Renderer.hpp"
 #include "PAL/Windows/Win32Exception.h"
-#include "Diagnostics/Log.h"
+#include "Log.h"
 
 namespace TG
 {

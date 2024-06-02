@@ -55,6 +55,7 @@ std::pmr::string PMRStr(std::pmr::monotonic_buffer_resource *mbr)
 
 #include <type_traits>
 #include <memory>
+#include <forward_list>
 
 std::unique_ptr<int> TestUnique()
 {
@@ -63,9 +64,25 @@ std::unique_ptr<int> TestUnique()
     return pp;
 }
 
+struct base
+{
+    virtual void print() { std::cout << "base class" << std::endl; }
+};
+
+struct derived : base
+{
+    void print() override { std::cout << "derived class" << num << std::endl; }
+    int num = 0;
+};
+
+struct derived1 : base
+{
+    void print() override { std::cout << "derived1 class" << num << std::endl; }
+    int num = 0;
+};
+
 int main()
 {
-    std::is_trivially_assignable()
     std::unique_ptr<int> p2;
     p2 = TestUnique();
     std::pmr::monotonic_buffer_resource mbr;
@@ -73,6 +90,18 @@ int main()
     std::cout << buffer1;
     // buffer.clear();
 
+    derived d;
+    d.num = 2;
+    derived1 d1;
+    const derived1& d2 = d1;
+    std::vector<std::reference_wrapper<base>> vb;
+    vb.emplace_back(d);
+    vb.emplace_back(d1);
+    for (auto b : vb)
+        b.get().print();
+    std::erase_if(vb, [&d2](const std::reference_wrapper<base> b) { return std::addressof(b.get()) == std::addressof(d2); });
+    for (auto b : vb)
+        b.get().print();
     // std::format_to(
     //     std::back_inserter(buffer), //< OutputIt
     //     "Hello, {0}::{1}!{2}",      //< fmt

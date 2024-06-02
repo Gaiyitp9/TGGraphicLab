@@ -5,7 +5,8 @@
 *****************************************************************/
 #pragma once
 
-#include "Event.h"
+#include "EventHandler.h"
+#include "KeyCode.h"
 #include <tuple>
 
 namespace TG::Input
@@ -24,17 +25,17 @@ namespace TG::Input
 
     // 输入设备管理器
     template<InputDevice... Devices>
-    class Manager
+    class Manager : public IEventHandler
 	{
         constexpr static std::size_t Count = sizeof...(Devices);
 
 	public:
         Manager() = default;
         Manager(const Manager&) = delete;
-        Manager(Manager&&) = delete;
         Manager& operator=(const Manager&) = delete;
+        Manager(Manager&&) = delete;
         Manager& operator=(Manager&&) = delete;
-		~Manager() = default;
+		~Manager() override = default;
 
         // 更新各种输入设备的状态，每帧处理窗口输入事件前调用
 		void Update() { Update<0>(); }

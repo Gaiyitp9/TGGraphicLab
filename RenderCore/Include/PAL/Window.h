@@ -5,7 +5,7 @@
 *****************************************************************/
 #pragma once
 
-#include "InputEnums.h"
+#include "Input.h"
 #include <functional>
 #include <memory>
 #include <optional>
@@ -24,7 +24,7 @@ namespace TG::PAL
     // 窗口基类，Window.cpp文件放在不同平台对应的目录下
     class Window
     {
-        using KeyFunction = std::function<void(KeyCode key, int scanCode, InputAction action)>;
+        using KeyFunction = std::function<void(Key key, int scanCode, InputAction action)>;
         using CharFunction = std::function<void(unsigned int c)>;
         using MouseButtonFunction = std::function<void(MouseButton button, InputAction action)>;
         using CursorPosFunction = std::function<void(int xPos, int yPos)>;

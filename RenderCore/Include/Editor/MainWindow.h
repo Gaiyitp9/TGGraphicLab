@@ -6,6 +6,7 @@
 #pragma once
 
 #include "Window.h"
+#include "Input/EventDispatcher.h"
 
 namespace TG
 {
@@ -18,5 +19,8 @@ namespace TG
         MainWindow& operator=(const MainWindow&) = delete;
         MainWindow& operator=(MainWindow&&) = delete;
         ~MainWindow() override;
+
+    private:
+        Input::EventDispatcher m_eventDispatcher;
     };
 }
