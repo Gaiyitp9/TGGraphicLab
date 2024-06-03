@@ -298,6 +298,14 @@ namespace TG::PAL
             { WM_PRINTCLIENT,           "WM_PRINTCLIENT" },
             { WM_IME_SETCONTEXT,        "WM_IME_SETCONTEXT" },
             { WM_IME_NOTIFY,            "WM_IME_NOTIFY" },
+            { WM_IME_STARTCOMPOSITION,  "WM_IME_STARTCOMPOSITION" },
+        	{ WM_IME_COMPOSITION,		"WM_IME_COMPOSITION"},
+        	{ WM_IME_ENDCOMPOSITION,	"WM_IME_ENDCOMPOSITION"},
+            { WM_IME_SELECT,			"WM_IME_SELECT" },
+        	{ WM_IME_CHAR,				"WM_IME_CHAR" },
+        	{ WM_IME_REQUEST,			"WM_IME_REQUEST" },
+        	{ WM_IME_KEYDOWN,			"WM_IME_KEYDOWN" },
+        	{ WM_IME_KEYUP,				"WM_IME_UP" },
             { WM_NCMOUSELEAVE,          "WM_NCMOUSELEAVE" },
             { WM_EXITSIZEMOVE,          "WM_EXITSIZEMOVE" },
             { WM_DWMNCRENDERINGCHANGED, "WM_DWMNCRENDERINGCHANGED" },
@@ -323,7 +331,7 @@ namespace TG::PAL
         auto* const pWindow = reinterpret_cast<NativeWindow*>(GetWindowLongPtrW(hwnd, GWLP_USERDATA));
 
 		// 监控窗口消息
-		if (pWindow->spyMessage)
+		if (true)
 		{
 		    std::pmr::string windowMessage;
 		    std::format_to(std::back_inserter(windowMessage), "{:<16} {}\n", pWindow->name, WindowMessageToString(msg, wParam, lParam));

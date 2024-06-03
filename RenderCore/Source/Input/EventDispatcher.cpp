@@ -27,4 +27,34 @@ namespace TG::Input
                 return std::addressof(refWrapper.get()) == std::addressof(handler);
             });
     }
+
+    KeyCode ToKeyCode(PAL::Key key)
+    {
+        switch (key)
+        {
+            case PAL::Key::Backspace:
+                return KeyCode::Backspace;
+            case PAL::Key::Tab:
+                return KeyCode::Tab;
+            case PAL::Key::Enter:
+                return KeyCode::Enter;
+            case PAL::Key::Esc:
+                return KeyCode::Esc;
+        }
+    }
+
+    KeyCode ToKeyCode(PAL::MouseButton button)
+    {
+        switch (button)
+        {
+            case PAL::MouseButton::Left:
+                return KeyCode::LeftMouseButton;
+            case PAL::MouseButton::Middle:
+                return KeyCode::MiddleMouseButton;
+            case PAL::MouseButton::Right:
+                return KeyCode::RightMouseButton;
+            default:
+                return KeyCode::None;
+        }
+    }
 }

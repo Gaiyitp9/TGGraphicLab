@@ -5,8 +5,7 @@
 *****************************************************************/
 
 #include "Input/Mouse.h"
-#include "Diagnostics/Log.h"
-#include <format>
+#include <typeinfo>
 
 namespace TG::Input
 {
@@ -14,58 +13,37 @@ namespace TG::Input
 	{
 		m_mouseDown.reset();
 		m_mouseUp.reset();
-        m_wheelDelta = 0;
 	}
 
     void Mouse::Receive(const Event& e)
     {
-        // 碰到非鼠标按键直接返回
-        if (!IsMouseKey(e.key)) return;
+        // 不处理非鼠标事件
+        if (typeid(e) != typeid(MouseEvent)) return;
 
-        auto key = static_cast<std::size_t>(e.key);
-        switch (e.type)
-        {
-            case EventType::Press:
-                m_mouseDown[key] = true;
-                break;
-            case EventType::Release:
-                m_mouseUp[key] = true;
-                break;
-            case EventType::MouseMove:
-            {
-                auto data = std::any_cast<MouseData>(&e.data);
-                assert(data && "Mouse move event doesn't contain data or the data type is not MouseData");
-                m_position.x() = data->x;
-                m_position.y() = data->y;
-                break;
-            }
+		// 上面已经判断过类型了，所以这里不用dynamic_cast，提升性能
+        const auto& mouseEvent = static_cast<const MouseEvent&>(e);
+        const auto key = static_cast<std::size_t>(mouseEvent.button);
+		if (mouseEvent.isPressed)
+		{
+	        m_mouseDown[key] = true;
+			m_mouseHold[key] = true;
+		}
+		else
+		{
+			m_mouseUp[key] = true;
+			m_mouseHold[key] = false;
+		}
 
-            case EventType::WheelRoll:
-            {
-                auto data = std::any_cast<MouseData>(&e.data);
-                assert(data && "WheelRoll event doesn't contain data or the data type is not MouseData");
-                m_wheelDelta = data->delta;
-                break;
-            }
-            default:
-                break;
-        }
-
-        // 监控鼠标
-        if (m_spyEvent)
-            SpyMouseEvent(e);
-    }
-
-    void Mouse::SpyEvent(bool enable)
-    {
-        m_spyEvent = enable;
+		m_positionX = mouseEvent.x;
+		m_positionY = mouseEvent.y;
+		m_wheelDelta = mouseEvent.wheelDelta;
     }
 
     bool Mouse::GetKey(KeyCode k) const
     {
         if (!IsMouseKey(k)) return false;
 
-        auto pos = static_cast<std::size_t>(k);
+        const auto pos = static_cast<std::size_t>(k);
         return m_mouseHold.test(pos);
     }
 
@@ -73,7 +51,7 @@ namespace TG::Input
     {
         if (!IsMouseKey(k)) return false;
 
-        auto pos = static_cast<std::size_t>(k);
+        const auto pos = static_cast<std::size_t>(k);
         return m_mouseDown.test(pos);
     }
 
@@ -81,26 +59,7 @@ namespace TG::Input
     {
         if (!IsMouseKey(k)) return false;
 
-        auto pos = static_cast<std::size_t>(k);
+        const auto pos = static_cast<std::size_t>(k);
         return m_mouseUp.test(pos);
     }
-
-	void Mouse::SpyMouseEvent(const Event& e)
-	{
-        Debug::Log(std::format("Key: {:<20} Event: {:<20} ", EventInfo::keysName[e.key], EventInfo::eventTypes[e.type]));
-		switch (e.type)
-		{
-		case EventType::MouseMove:
-			Debug::LogLine(std::format("MouseX: {:<20} MouseY: {:<20}", m_position.x(), m_position.y()));
-			break;
-
-		case EventType::WheelRoll:
-			Debug::LogLine(std::format("Raw wheel delta: {:<20} Wheel Delta: {:<20}", RawWheelDelta(), WheelDelta()));
-			break;
-
-		default:
-            Debug::LogLine("");
-            break;
-		}
-	}
 }

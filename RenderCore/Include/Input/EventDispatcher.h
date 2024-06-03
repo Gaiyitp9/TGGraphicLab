@@ -6,6 +6,7 @@
 #pragma once
 
 #include "EventHandler.h"
+#include "PAL/Input.h"
 #include <vector>
 
 namespace TG::Input
@@ -21,4 +22,7 @@ namespace TG::Input
     private:
         std::vector<std::reference_wrapper<IEventHandler>> m_handlers;
     };
+
+    KeyCode ToKeyCode(PAL::Key key);
+    KeyCode ToKeyCode(PAL::MouseButton button);
 }

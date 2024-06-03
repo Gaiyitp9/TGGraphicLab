@@ -81,27 +81,50 @@ struct derived1 : base
     int num = 0;
 };
 
+struct Base
+{
+    // virtual void Print() = 0;
+    virtual ~Base() { std::cout << "base" << std::endl; };
+};
+struct Derived : Base
+{
+    // void Print() override { std::cout << "Derived\n"; }
+    int i{ 2 };
+};
+struct Derived1 : Base
+{
+    // ~Derived1() override { std::cout << "derived1" << std::endl; }
+    // void Print() override { std::cout << "Derived1\n"; }
+    int j{ 3 };
+};
+void TypeIdTest(const Base& b)
+{
+    std::cout << std::boolalpha << (typeid(b) != typeid(Derived1)) << std::endl;
+}
+
 int main()
 {
-    std::unique_ptr<int> p2;
-    p2 = TestUnique();
-    std::pmr::monotonic_buffer_resource mbr;
-    std::pmr::string buffer1 = PMRStr(&mbr);;
-    std::cout << buffer1;
-    // buffer.clear();
-
-    derived d;
-    d.num = 2;
-    derived1 d1;
-    const derived1& d2 = d1;
-    std::vector<std::reference_wrapper<base>> vb;
-    vb.emplace_back(d);
-    vb.emplace_back(d1);
-    for (auto b : vb)
-        b.get().print();
-    std::erase_if(vb, [&d2](const std::reference_wrapper<base> b) { return std::addressof(b.get()) == std::addressof(d2); });
-    for (auto b : vb)
-        b.get().print();
+    Derived1 d;
+    TypeIdTest(d);
+    // std::unique_ptr<int> p2;
+    // p2 = TestUnique();
+    // std::pmr::monotonic_buffer_resource mbr;
+    // std::pmr::string buffer1 = PMRStr(&mbr);;
+    // std::cout << buffer1;
+    // // buffer.clear();
+    //
+    // derived d;
+    // d.num = 2;
+    // derived1 d1;
+    // const derived1& d2 = d1;
+    // std::vector<std::reference_wrapper<base>> vb;
+    // vb.emplace_back(d);
+    // vb.emplace_back(d1);
+    // for (auto b : vb)
+    //     b.get().print();
+    // std::erase_if(vb, [&d2](const std::reference_wrapper<base> b) { return std::addressof(b.get()) == std::addressof(d2); });
+    // for (auto b : vb)
+    //     b.get().print();
     // std::format_to(
     //     std::back_inserter(buffer), //< OutputIt
     //     "Hello, {0}::{1}!{2}",      //< fmt

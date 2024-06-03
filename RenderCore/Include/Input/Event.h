@@ -6,34 +6,31 @@
 #pragma once
 
 #include "KeyCode.h"
-#include <any>
 
 namespace TG::Input
 {
-	enum class EventType : unsigned char
-	{
-		Character,
-		Keyboard,
-		Mouse,
-	};
-
-	struct KeyboardState
-	{
-		KeyCode key;
-		bool isPressed;
-	};
-
-	struct MouseState
-	{
-		KeyCode button;
-		bool isPressed;
-		short x, y;
-		short wheelDelta;
-	};
-
 	struct Event
 	{
-		EventType type;
-		std::any state;
+		virtual ~Event() = default;
+	};
+
+	struct CharacterEvent final : Event
+	{
+		// 字符的Unicode码，只包含基本多文种平面(BMP)
+		char16_t c{ 0 };
+	};
+
+	struct KeyboardEvent final : Event
+	{
+		KeyCode key{ KeyCode::None };
+		bool isPressed{ false };
+	};
+
+	struct MouseEvent final : Event
+	{
+		KeyCode button{ KeyCode::None };
+		bool isPressed{ false };
+		short x{ 0 }, y{ 0 };
+		short wheelDelta{ 0 };
 	};
 }

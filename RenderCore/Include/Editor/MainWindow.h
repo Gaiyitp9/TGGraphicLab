@@ -18,7 +18,7 @@ namespace TG
         MainWindow(MainWindow&&) = delete;
         MainWindow& operator=(const MainWindow&) = delete;
         MainWindow& operator=(MainWindow&&) = delete;
-        ~MainWindow() override;
+        ~MainWindow() override = default;
 
     private:
         Input::EventDispatcher m_eventDispatcher;

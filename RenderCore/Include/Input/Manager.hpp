@@ -6,7 +6,6 @@
 #pragma once
 
 #include "EventHandler.h"
-#include "KeyCode.h"
 #include <tuple>
 
 namespace TG::Input
@@ -17,7 +16,6 @@ namespace TG::Input
     {
         device.Update();
         device.Receive(Event{});
-        device.SpyEvent(true);
         device.GetKey(KeyCode::None);
         device.GetKeyDown(KeyCode::None);
         device.GetKeyUp(KeyCode::None);
@@ -25,7 +23,7 @@ namespace TG::Input
 
     // 输入设备管理器
     template<InputDevice... Devices>
-    class Manager : public IEventHandler
+    class Manager final : public IEventHandler
 	{
         constexpr static std::size_t Count = sizeof...(Devices);
 
@@ -39,15 +37,7 @@ namespace TG::Input
 
         // 更新各种输入设备的状态，每帧处理窗口输入事件前调用
 		void Update() { Update<0>(); }
-        void Broadcast(const Event& event) { Broadcast<0>(event); }
-        void SpyEvent(bool enable) { SpyEvent<0>(enable); }
-        template<typename Device>
-        void SpyEvent(bool enable)
-        {
-            constexpr std::size_t index = DeviceIndex<Device, 0>();
-            if constexpr (index != static_cast<std::size_t>(-1))
-                std::get<index>(m_devices).SpyEvent(enable);
-        }
+        void Consume(const Event& event) override { Broadcast<0>(event); }
 		[[nodiscard]] bool GetKey(KeyCode key) const { return GetKey<0>(key); }
 		[[nodiscard]] bool GetKeyDown(KeyCode key) const { return GetKeyDown<0>(key); }
 		[[nodiscard]] bool GetKeyUp(KeyCode key) const { return GetKeyUp<0>(key); }
@@ -81,16 +71,6 @@ namespace TG::Input
             {
                 std::get<N>(m_devices).Receive(event);
                 Broadcast<N + 1>(event);
-            }
-        }
-
-        template<std::size_t N>
-        void SpyEvent(bool enable)
-        {
-            if constexpr (N < Count)
-            {
-                std::get<N>(m_devices).SpyEvent(enable);
-                SpyEvent<N + 1>(enable);
             }
         }
 

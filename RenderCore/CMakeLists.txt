@@ -12,9 +12,9 @@ list(APPEND INCLUDES
         Include/Input/EventDispatcher.h
         Include/Input/EventHandler.h
         Include/Input/KeyCode.h
-#        Include/Input/Keyboard.h
-#        Include/Input/Mouse.h
-#        Include/Input/Manager.hpp
+        Include/Input/Keyboard.h
+        Include/Input/Mouse.h
+        Include/Input/Manager.hpp
 
         Include/Math/Assignment.hpp
         Include/Math/Block.hpp
@@ -42,9 +42,9 @@ list(APPEND SRCS
         Source/Editor/MainWindow.cpp
         Source/Editor/Window.cpp
 
-#        Source/Input/Event.cpp
-#        Source/Input/Keyboard.cpp
-#        Source/Input/Mouse.cpp
+        Source/Input/EventDispatcher.cpp
+        Source/Input/Keyboard.cpp
+        Source/Input/Mouse.cpp
 )
 
 if (CMAKE_SYSTEM_NAME STREQUAL "Windows")

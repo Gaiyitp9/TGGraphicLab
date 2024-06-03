@@ -5,17 +5,10 @@
 *****************************************************************/
 
 #include "Input/Keyboard.h"
-#include "Diagnostics/Log.hpp"
-#include "Input/EventData.h"
-#include <format>
-#include <cassert>
+#include <typeinfo>
 
 namespace TG::Input
 {
-	Keyboard::Keyboard() = default;
-
-	Keyboard::~Keyboard() = default;
-
 	void Keyboard::Update()
 	{
 		m_keyDown.reset();
@@ -24,54 +17,32 @@ namespace TG::Input
 
     void Keyboard::Receive(const Event &e)
     {
-        if (!IsKeyBoardKey(e.key)) return;
+	    // 不处理非键盘事件
+        if (typeid(e) != typeid(KeyboardEvent)) return;
 
-        auto key = static_cast<size_t>(e.key);
-        switch (e.type)
-        {
-            case EventType::Press:
-                // 第一次按下，key down为true
-                if (!m_keyHold.test(key))
-                    m_keyDown[key] = true;
-                m_keyHold[key] = true;
-                break;
-
-            case EventType::Release:
-                // 放开按键，key up为true(不存在第一次放开，每一次WM_KEYUP都是第一次放开)
-                m_keyUp[key] = true;
-                m_keyHold[key] = false;
-                break;
-
-            case EventType::Char:
-            {
-                auto data = std::any_cast<KeyboardData>(&e.data);
-                assert(data && "Char event doesn't contain data or the data type is not KeyboradData");
-                if (std::isprint(data->c))
-                    Debug::LogLine(data->c);
-                break;
-            }
-
-            default:
-                break;
-        }
-
-        if (m_spyEvent && EventInfo::keysName.contains(e.key) && EventInfo::eventTypes.contains(e.type))
-        {
-            Debug::LogLine(std::format("Key: {:<20} Event: {:<20} ", EventInfo::keysName.at(e.key),
-                                       EventInfo::eventTypes.at(e.type)));
-        }
-    }
-
-    void Keyboard::SpyEvent(bool enable)
-    {
-        m_spyEvent = enable;
+	    // 上面已经判断过类型了，所以这里不用dynamic_cast，提升性能
+	    const auto& keyboardEvent = static_cast<const KeyboardEvent&>(e);
+	    const auto key = static_cast<std::size_t>(keyboardEvent.key);
+	    if (keyboardEvent.isPressed)
+	    {
+	    	// 第一次按下，key down为true
+	        if (!m_keyHold.test(key))
+				m_keyDown[key] = true;
+	        m_keyHold[key] = true;
+	    }
+	    else
+	    {
+	    	// 放开按键，key up为true(不存在第一次放开，每一次WM_KEYUP都是第一次放开)
+	        m_keyUp[key] = true;
+	        m_keyHold[key] = false;
+	    }
     }
 
     bool Keyboard::GetKey(KeyCode k) const
     {
         if (!IsKeyBoardKey(k)) return false;
 
-        auto pos = static_cast<size_t>(k);
+        const auto pos = static_cast<size_t>(k);
         return m_keyHold.test(pos);
     }
 
@@ -79,7 +50,7 @@ namespace TG::Input
     {
         if (!IsKeyBoardKey(k)) return false;
 
-        auto pos = static_cast<size_t>(k);
+        const auto pos = static_cast<size_t>(k);
         return m_keyDown.test(pos);
     }
 
@@ -87,7 +58,7 @@ namespace TG::Input
     {
         if (!IsKeyBoardKey(k)) return false;
 
-        auto pos = static_cast<size_t>(k);
+        const auto pos = static_cast<size_t>(k);
         return m_keyUp.test(pos);
     }
 }
