@@ -403,6 +403,8 @@ namespace TG::PAL
 		{
 			if (pWindow->mouseButtonFunction)
 				pWindow->mouseButtonFunction(MouseButton::Left, InputAction::Press);
+			if (pWindow->cursorPosFunction)
+				pWindow->cursorPosFunction(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
 			return 0;
 		}
 
@@ -410,6 +412,8 @@ namespace TG::PAL
 		{
 			if (pWindow->mouseButtonFunction)
 				pWindow->mouseButtonFunction(MouseButton::Left, InputAction::Release);
+			if (pWindow->cursorPosFunction)
+				pWindow->cursorPosFunction(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
 			return 0;
 		}
 
@@ -417,6 +421,8 @@ namespace TG::PAL
 		{
 			if (pWindow->mouseButtonFunction)
 				pWindow->mouseButtonFunction(MouseButton::Right, InputAction::Press);
+			if (pWindow->cursorPosFunction)
+				pWindow->cursorPosFunction(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
 			return 0;
 		}
 
@@ -424,6 +430,8 @@ namespace TG::PAL
 		{
 			if (pWindow->mouseButtonFunction)
 				pWindow->mouseButtonFunction(MouseButton::Right, InputAction::Release);
+			if (pWindow->cursorPosFunction)
+				pWindow->cursorPosFunction(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
 			return 0;
 		}
 
@@ -431,6 +439,8 @@ namespace TG::PAL
 		{
 			if (pWindow->mouseButtonFunction)
 				pWindow->mouseButtonFunction(MouseButton::Middle, InputAction::Press);
+			if (pWindow->cursorPosFunction)
+				pWindow->cursorPosFunction(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
 			return 0;
 		}
 
@@ -438,6 +448,8 @@ namespace TG::PAL
 		{
 			if (pWindow->mouseButtonFunction)
 				pWindow->mouseButtonFunction(MouseButton::Middle, InputAction::Release);
+			if (pWindow->cursorPosFunction)
+				pWindow->cursorPosFunction(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
 			return 0;
 		}
 
@@ -446,6 +458,8 @@ namespace TG::PAL
 			// 每帧只会产生一个WM_MOUSEWHEEL
 			if (pWindow->scrollFunction)
 				pWindow->scrollFunction(0, GET_WHEEL_DELTA_WPARAM(wParam) / WHEEL_DELTA);
+			if (pWindow->cursorPosFunction)
+				pWindow->cursorPosFunction(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
 			return 0;
         }
 

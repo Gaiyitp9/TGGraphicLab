@@ -14,6 +14,9 @@ namespace TG
     {
         m_window.SetKeyCallback([&](PAL::Key key, int scanCode, PAL::InputAction action) {
             Input::KeyboardEvent keyboardEvent;
+            keyboardEvent.key = Input::ToKeyCode(key);
+            if (action == PAL::InputAction::Press || action == PAL::InputAction::Repeat)
+                keyboardEvent.isPressed = true;
             m_eventDispatcher.Dispatch(keyboardEvent);
         });
         m_window.SetCharCallback([&](char16_t c) {
@@ -23,6 +26,9 @@ namespace TG
         });
         m_window.SetMouseButtonCallback([&](PAL::MouseButton mouseButton, PAL::InputAction action) {
             Input::MouseEvent mouseEvent;
+            mouseEvent.button = Input::ToKeyCode(mouseButton);
+            if (action == PAL::InputAction::Press)
+                mouseEvent.isPressed = true;
             m_eventDispatcher.Dispatch(mouseEvent);
         });
         m_window.SetScrollCallback([&](int xOffset, int yOffset) {
@@ -32,8 +38,8 @@ namespace TG
         });
         m_window.SetCursorPosCallback([&](int posX, int posY) {
             Input::MouseEvent mouseEvent;
-            mouseEvent.x = posX;
-            mouseEvent.y = posY;
+            mouseEvent.x = static_cast<short>(posX);
+            mouseEvent.y = static_cast<short>(posY);
             m_eventDispatcher.Dispatch(mouseEvent);
         });
         m_window.SetWindowPosCallback([](int xPos, int yPos){});

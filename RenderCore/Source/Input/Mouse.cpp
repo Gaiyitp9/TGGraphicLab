@@ -22,16 +22,20 @@ namespace TG::Input
 
 		// 上面已经判断过类型了，所以这里不用dynamic_cast，提升性能
         const auto& mouseEvent = static_cast<const MouseEvent&>(e);
-        const auto key = static_cast<std::size_t>(mouseEvent.button);
-		if (mouseEvent.isPressed)
+		if (mouseEvent.button != KeyCode::None)
 		{
-	        m_mouseDown[key] = true;
-			m_mouseHold[key] = true;
-		}
-		else
-		{
-			m_mouseUp[key] = true;
-			m_mouseHold[key] = false;
+	        const auto key = static_cast<std::size_t>(mouseEvent.button);
+			if (mouseEvent.isPressed)
+			{
+				if (!m_mouseHold.test(key))
+					m_mouseDown[key] = true;
+				m_mouseHold[key] = true;
+			}
+			else
+			{
+				m_mouseUp[key] = true;
+				m_mouseHold[key] = false;
+			}
 		}
 
 		m_positionX = mouseEvent.x;
