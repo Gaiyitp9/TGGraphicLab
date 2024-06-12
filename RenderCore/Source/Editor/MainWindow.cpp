@@ -47,4 +47,15 @@ namespace TG
         m_window.SetSuspendCallback([]{});
         m_window.SetResumeCallback([]{});
     }
+
+    void MainWindow::AddInputEventListener(Input::IEventHandler& handler)
+    {
+        m_eventDispatcher.Register(handler);
+    }
+
+    void MainWindow::RemoveInputEventListener(const Input::IEventHandler& handler)
+    {
+        m_eventDispatcher.UnRegister(handler);
+    }
+
 }

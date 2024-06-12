@@ -43,17 +43,6 @@ namespace TG::Input
 		[[nodiscard]] bool GetKeyUp(KeyCode key) const { return GetKeyUp<0>(key); }
 
     private:
-        template<typename Device, std::size_t N>
-        consteval static std::size_t DeviceIndex()
-        {
-            if constexpr (N >= Count)
-                return static_cast<std::size_t>(-1);
-            else if constexpr (std::is_same_v<Device, std::tuple_element_t<N, std::tuple<Devices...>>>)
-                return N;
-            else
-                return DeviceIndex<Device, N + 1>();
-        }
-
         template<std::size_t N>
         void Update()
         {

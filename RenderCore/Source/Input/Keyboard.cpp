@@ -42,23 +42,20 @@ namespace TG::Input
     {
         if (!IsKeyBoardKey(k)) return false;
 
-        const auto pos = static_cast<size_t>(k);
-        return m_keyHold.test(pos);
+        return m_keyHold.test(static_cast<std::size_t>(k));
     }
 
     bool Keyboard::GetKeyDown(KeyCode k) const
     {
         if (!IsKeyBoardKey(k)) return false;
 
-        const auto pos = static_cast<size_t>(k);
-        return m_keyDown.test(pos);
+        return m_keyDown.test(static_cast<std::size_t>(k));
     }
 
     bool Keyboard::GetKeyUp(KeyCode k) const
     {
         if (!IsKeyBoardKey(k)) return false;
 
-        const auto pos = static_cast<size_t>(k);
-        return m_keyUp.test(pos);
+        return m_keyUp.test(static_cast<std::size_t>(k));
     }
 }

@@ -47,23 +47,20 @@ namespace TG::Input
     {
         if (!IsMouseKey(k)) return false;
 
-        const auto pos = static_cast<std::size_t>(k);
-        return m_mouseHold.test(pos);
+        return m_mouseHold.test(static_cast<std::size_t>(k));
     }
 
     bool Mouse::GetKeyDown(KeyCode k) const
     {
         if (!IsMouseKey(k)) return false;
 
-        const auto pos = static_cast<std::size_t>(k);
-        return m_mouseDown.test(pos);
+        return m_mouseDown.test(static_cast<std::size_t>(k));
     }
 
     bool Mouse::GetKeyUp(KeyCode k) const
     {
         if (!IsMouseKey(k)) return false;
 
-        const auto pos = static_cast<std::size_t>(k);
-        return m_mouseUp.test(pos);
+        return m_mouseUp.test(static_cast<std::size_t>(k));
     }
 }
