@@ -374,13 +374,13 @@ namespace TG::PAL
             }
 			// 确定按键状态，按下、释放还是按住
 			InputAction action = InputAction::Press;
-			if (keyFlags & KF_UP == KF_UP)
+			if ((keyFlags & KF_UP) == KF_UP)
 				action = InputAction::Release;
-			else if (keyFlags & KF_REPEAT == KF_REPEAT)
+			else if ((keyFlags & KF_REPEAT) == KF_REPEAT)
 				action = InputAction::Repeat;
 
 			if (pWindow->keyFunction)
-				pWindow->keyFunction(static_cast<Key>(vkCode), scanCode, action);
+   				pWindow->keyFunction(static_cast<Key>(vkCode), scanCode, action);
 
 			return 0;
 		}

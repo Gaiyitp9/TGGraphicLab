@@ -18,7 +18,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 # 开启使用文件夹选项，vs项目可以分类放在不同文件夹下
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
-add_subdirectory(RenderCore)
+add_subdirectory(GraphicCore)
 add_subdirectory(TGRenderer)
 add_subdirectory(Tests)
 add_subdirectory(RayTracing)

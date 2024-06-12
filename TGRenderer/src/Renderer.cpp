@@ -33,13 +33,8 @@ namespace TG
 
         // 主窗口设置
         m_mainWindow.SetIcon(R"(..\..\TGRenderer\maple-leaf.ico)");
-        // m_mainWindow.SetInputListener([&input = m_input](const Input::Event &evt)
-                                      // { input.Broadcast(evt); });
+        m_mainWindow.AddInputEventListener(m_input);
         // m_mainWindow.SetStateCallback([&timer=m_timer](){ timer.Start(); }, [&timer=m_timer](){ timer.Pause(); });
-        // m_mainWindow.SpyMessage(false);
-
-        // m_input.SpyEvent<Input::Mouse>(true);
-        // m_input.SpyEvent<Input::Keyboard>(true);
 
         // 初始化opengl
         // Graphics::GLCreateInfo info { 0, m_mainWindow.Hwnd()};
@@ -59,22 +54,17 @@ namespace TG
 	{
 		//d3d11Layer = std::make_unique<Graphics::GraphicsLayer>(mainWnd.get());
 
-		//m_windows[L"辅助窗口"] = std::make_shared<PopupWindow>((m_screenWidth - 400) / 2, (m_screenHeight - 300) / 2,
-		//	400, 300, m_windows[L"天工渲染器"]);
-
-//		throw TG::Win32Exception(E_OUTOFMEMORY);
-
 		while (true)
 		{
-			// if (m_mainWindow.Destroy())
-				// break;
+			if (m_mainWindow.IsDestroyed())
+				break;
 
-            // m_input.Update();
+            m_input.Update();
 			if (const std::optional<int> code = PAL::PollEvents())
 				return *code;
 
-            // if (m_input.GetKeyUp(Input::KeyCode::Space))
-                // Debug::LogLine(L"space up");
+            if (m_input.GetKeyUp(Input::KeyCode::Space))
+                Debug::LogLine("space up");
 
 			// const float c = sin(m_timer.TotalTime() * 0.001f) / 2.0f + 0.5f;
 			//d3d11Layer->ClearBackground(Math::Color::AliceBlue * c);
