@@ -12,7 +12,7 @@
 #include "Math/Core.hpp"
 #include "Input/Event.h"
 // #include "Diagnostics/Win32Exception.h"
-#include "glad/gl.h"
+// #include "glad/gl.h"
 
 namespace TG
 {

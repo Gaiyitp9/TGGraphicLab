@@ -1,5 +1,6 @@
 cmake_minimum_required(VERSION 3.24)
 
+# 设置toolchain文件，使用vcpkg管理部分三方库
 if (DEFINED ENV{VCPKG_ROOT})
 	set(VCPKG_ROOT $ENV{VCPKG_ROOT} CACHE PATH "vcpkg root path")
 else()
@@ -26,6 +27,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 # 开启使用文件夹选项，vs项目可以分类放在不同文件夹下
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
+add_subdirectory(ThirdParty)
 add_subdirectory(GraphicCore)
 add_subdirectory(TGRenderer)
 add_subdirectory(Tests)
