@@ -6,7 +6,7 @@
 
 #include "Renderer.hpp"
 #include "PAL/Windows/Win32API.h"
-#include "Log.h"
+#include "spdlog/spdlog.h"
 
 int CALLBACK wWinMain(_In_ HINSTANCE hInstance,
                       _In_opt_ HINSTANCE hPrevInstance,
@@ -20,11 +20,11 @@ int CALLBACK wWinMain(_In_ HINSTANCE hInstance,
 	}
 	catch (const std::exception& e)
 	{
-		TG::Debug::Log(e.what());
+		spdlog::error(e.what());
 	}
 	catch (...)
 	{
-		TG::Debug::Log("Unknown Exception");
+		spdlog::error("Unknown Exception");
 	}
 
 	return -1;

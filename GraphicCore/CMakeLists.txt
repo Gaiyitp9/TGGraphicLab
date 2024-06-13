@@ -1,6 +1,5 @@
 list(APPEND INCLUDES
         Include/Chronometer.h
-        Include/Log.h
         Include/Singleton.hpp
 
         Include/Exception/BaseException.h
@@ -74,10 +73,10 @@ if (TG_MATRIX_STORAGE_ORDER MATCHES "RowMajor")
     target_compile_definitions(RenderCore PRIVATE TG_ROW_MAJOR_MATRIX)
 endif()
 
-string(TOLOWER ${CMAKE_BUILD_TYPE} build_type)
-if (CMAKE_SYSTEM_NAME STREQUAL "Windows" AND build_type STREQUAL debug)
+if (CMAKE_SYSTEM_NAME STREQUAL "Windows")
     #CRT库查找内存泄漏所需定义的宏
-    target_compile_definitions(RenderCore PUBLIC _CRTDBG_MAP_ALLOC)
+    target_compile_definitions(RenderCore PUBLIC $<$<CONFIG:DEBUG>:_CRTDBG_MAP_ALLOC>)
 endif()
 
+find_package(spdlog CONFIG REQUIRED)
 target_link_libraries(RenderCore PUBLIC spdlog::spdlog)
