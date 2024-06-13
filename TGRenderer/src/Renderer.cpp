@@ -6,7 +6,7 @@
 
 #include "Renderer.hpp"
 #include "PAL/Windows/Win32Exception.h"
-#include "Log.h"
+#include "spdlog/spdlog.h"
 
 namespace TG
 {
@@ -23,9 +23,7 @@ namespace TG
 		SetConsoleCP(65001);
 		SetConsoleOutputCP(65001);
 
-		// 编码设置为UTF-8
-		std::cout.imbue(m_locale);
-		Debug::LogLine(Chronometer::Date());
+		spdlog::info(Chronometer::Date());
 
 		// 获取当前显示器的宽和高
 		m_screenWidth = GetSystemMetrics(SM_CXSCREEN);
@@ -64,7 +62,7 @@ namespace TG
 				return *code;
 
             if (m_input.GetKeyUp(Input::KeyCode::Space))
-                Debug::LogLine("space up");
+                spdlog::info("space up");
 
 			// const float c = sin(m_timer.TotalTime() * 0.001f) / 2.0f + 0.5f;
 			//d3d11Layer->ClearBackground(Math::Color::AliceBlue * c);

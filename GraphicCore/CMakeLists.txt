@@ -79,3 +79,5 @@ if (CMAKE_SYSTEM_NAME STREQUAL "Windows" AND build_type STREQUAL debug)
     #CRT库查找内存泄漏所需定义的宏
     target_compile_definitions(RenderCore PUBLIC _CRTDBG_MAP_ALLOC)
 endif()
+
+target_link_libraries(RenderCore PUBLIC spdlog::spdlog)

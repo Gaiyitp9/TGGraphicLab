@@ -5,7 +5,10 @@
 *****************************************************************/
 
 #include "Chronometer.h"
-#include "Exception/BaseException.h"
+
+#if defined(_DEBUG) && defined(_WIN64)
+	#include "Exception/BaseException.h"
+#endif
 
 namespace TG
 {

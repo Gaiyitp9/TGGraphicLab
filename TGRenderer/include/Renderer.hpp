@@ -14,7 +14,6 @@
 // #include "GraphicsLayer.hpp"
 // #include "Graphics/OpenGL/FactoryGL.hpp"
 // #include "glad/wgl.h"
-#include <locale>
 
 namespace TG
 {
@@ -31,7 +30,6 @@ namespace TG
 		int Run();
 
 	private:
-		std::locale m_locale{".utf8"};      // 语言区域
 		MainWindow m_mainWindow;			// 主窗口
         Chronometer m_timer;                // 高精度计时器
         Input::Manager<Input::Mouse, Input::Keyboard> m_input;           // 输入管理器，使用鼠标和键盘输入
