@@ -10,10 +10,7 @@
 #include "Input/Manager.hpp"
 #include "Input/Mouse.h"
 #include "Input/Keyboard.h"
-// #include "UnitTest.hpp"
-// #include "GraphicsLayer.hpp"
-// #include "Graphics/OpenGL/FactoryGL.hpp"
-// #include "glad/wgl.h"
+#include "glad/egl.h"
 
 namespace TG
 {
@@ -30,15 +27,15 @@ namespace TG
 		int Run();
 
 	private:
-		MainWindow m_mainWindow;			// 主窗口
-        Chronometer m_timer;                // 高精度计时器
-        Input::Manager<Input::Mouse, Input::Keyboard> m_input;           // 输入管理器，使用鼠标和键盘输入
-		//std::unique_ptr<Graphics::GraphicsLayer> d3d11Layer;
-        // Graphics::FactoryGL m_factory;
-        // std::unique_ptr<Graphics::RenderDeviceGL> m_device;
-        // std::unique_ptr<Graphics::DeviceContextGL> m_context;
-
 		int m_screenWidth;		            // 主显示器的宽
 		int m_screenHeight;		            // 主显示器的高
+		MainWindow m_mainWindow;			// 主窗口
+
+        Chronometer m_timer;                // 高精度计时器
+        Input::Manager<Input::Mouse, Input::Keyboard> m_input;           // 输入管理器，使用鼠标和键盘输入
+
+		EGLDisplay m_eglDisplay;
+		EGLSurface m_eglSurface;
+		EGLContext m_eglContext;
 	};
 }

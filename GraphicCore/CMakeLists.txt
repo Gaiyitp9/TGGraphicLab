@@ -9,7 +9,7 @@ if (NOT CMAKE_SYSTEM_NAME STREQUAL "Windows")
     list(FILTER SOURCES EXCLUDE REGEX Source/PAL/Windows)
 endif()
 
-source_group(TREE ${CMAKE_CURRENT_LIST_DIR} FILES ${HEADERS} ${SOURCES})
+source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${HEADERS} ${SOURCES})
 
 set(TG_MATRIX_STORAGE_ORDER "RowMajor" CACHE STRING "Default matrix storage order" FORCE)
 set_property(CACHE TG_MATRIX_STORAGE_ORDER PROPERTY STRINGS "RowMajor" "ColumnMajor")

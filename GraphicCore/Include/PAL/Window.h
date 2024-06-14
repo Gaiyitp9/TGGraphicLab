@@ -11,6 +11,15 @@
 #include <optional>
 #include <string_view>
 
+#ifdef _WIN64
+#include "Windows/Win32API.h"
+namespace TG::PAL
+{
+    using NativeDisplay = HDC;
+    using NativeWindowHandle = HWND;
+}
+#endif
+
 namespace TG::PAL
 {
     // 窗口类型
@@ -21,6 +30,7 @@ namespace TG::PAL
     };
     // 原生窗口内部实现，不同平台的实现不同，比如在Windows平台下内部实现包含Win32窗口句柄
     struct NativeWindow;
+
     // 窗口基类，Window.cpp文件放在不同平台对应的目录下
     class Window
     {
@@ -36,12 +46,14 @@ namespace TG::PAL
 
     public:
         Window(int x, int y, int width, int height, std::string_view name, WindowType type);
-        ~Window();
+        virtual ~Window() = 0;
 
         [[nodiscard]] bool IsDestroyed() const;
-
+        [[nodiscard]] NativeDisplay GetDisplay() const;
+        [[nodiscard]] NativeWindowHandle GetWindowHandle() const;
         void SetIcon(std::string_view iconPath) const;
 
+    protected:
         // 窗口消息事件回调
         void SetKeyCallback(const KeyFunction& function) const;
         void SetCharCallback(const CharFunction& function) const;

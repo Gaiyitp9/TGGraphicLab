@@ -68,6 +68,16 @@ namespace TG::PAL
 		SendMessageW(m_nativeWindow->hwnd, WM_SETICON, ICON_SMALL, reinterpret_cast<LPARAM>(icon));
 	}
 
+	NativeDisplay Window::GetDisplay() const
+	{
+		return { GetDC(m_nativeWindow->hwnd) };
+	}
+
+	NativeWindowHandle Window::GetWindowHandle() const
+	{
+		return m_nativeWindow->hwnd;
+	}
+
 	void Window::SetCharCallback(const CharFunction &function) const
 	{
 		m_nativeWindow->charFunction = function;

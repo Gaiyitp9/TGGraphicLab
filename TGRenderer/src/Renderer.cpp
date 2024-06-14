@@ -7,6 +7,7 @@
 #include "Renderer.hpp"
 #include "PAL/Windows/Win32Exception.h"
 #include "spdlog/spdlog.h"
+#include "eglext_angle.h"
 
 namespace TG
 {
@@ -34,16 +35,76 @@ namespace TG
         m_mainWindow.AddInputEventListener(m_input);
         // m_mainWindow.SetStateCallback([&timer=m_timer](){ timer.Start(); }, [&timer=m_timer](){ timer.Pause(); });
 
-        // 初始化opengl
-        // Graphics::GLCreateInfo info { 0, m_mainWindow.Hwnd()};
-        // Graphics::DeviceContextGL* pContext;
-        // Graphics::RenderDeviceGL* pDevice;
-        // m_factory.CreateDeviceAndContext(info, &pDevice, &pContext);
-        // m_device.reset(pDevice);
-        // m_context.reset(pContext);
-        // std::cout << "OpenGL version: " << glGetString(GL_VERSION) << std::endl;
-        // glViewport(0, 0, m_mainWindow.Width(), m_mainWindow.Height());
-        // wglSwapIntervalEXT(0);      // 关闭垂直同步
+		// 初始化OpenGL ES
+		int eglVersion = gladLoaderLoadEGL(nullptr);
+		if (eglVersion == 0)
+			spdlog::error("Unable to load EGL.");
+		spdlog::info("Loaded EGL {}.{} on first load.",
+		   GLAD_VERSION_MAJOR(eglVersion), GLAD_VERSION_MINOR(eglVersion));
+
+		PAL::NativeDisplay nativeDisplay = m_mainWindow.GetDisplay();
+		EGLint dispattrs[] =
+		{
+			EGL_PLATFORM_ANGLE_TYPE_ANGLE, EGL_PLATFORM_ANGLE_TYPE_VULKAN_ANGLE,
+			EGL_NONE
+		};
+		m_eglDisplay = eglGetPlatformDisplayEXT(EGL_PLATFORM_ANGLE_ANGLE,
+													  reinterpret_cast<void *>(nativeDisplay), dispattrs);
+		if (m_eglDisplay == EGL_NO_DISPLAY)
+			spdlog::error("Got no EGL display.");
+
+		if (!eglInitialize(m_eglDisplay, nullptr, nullptr))
+			spdlog::error("Unable to initialize EGL.");
+
+		eglVersion = gladLoaderLoadEGL(m_eglDisplay);
+		if (eglVersion == 0)
+			spdlog::error("Unable to reload EGL.");
+		spdlog::info("Loaded EGL {}.{} after load.",
+		   GLAD_VERSION_MAJOR(eglVersion), GLAD_VERSION_MINOR(eglVersion));
+
+		if (!eglBindAPI(EGL_OPENGL_ES_API))
+			spdlog::error("Unable to bind API.");
+
+		EGLint configAttributes[] =
+		{
+			EGL_BUFFER_SIZE, 0,
+			EGL_RED_SIZE, 5,
+			EGL_GREEN_SIZE, 6,
+			EGL_BLUE_SIZE, 5,
+			EGL_ALPHA_SIZE, 0,
+			EGL_COLOR_BUFFER_TYPE, EGL_RGB_BUFFER,
+			EGL_DEPTH_SIZE, 24,
+			EGL_LEVEL, 0,
+			EGL_RENDERABLE_TYPE, EGL_OPENGL_ES2_BIT,
+			EGL_SAMPLE_BUFFERS, 0,
+			EGL_SAMPLES, 0,
+			EGL_STENCIL_SIZE, 0,
+			EGL_SURFACE_TYPE, EGL_WINDOW_BIT,
+			EGL_TRANSPARENT_TYPE, EGL_NONE,
+			EGL_TRANSPARENT_RED_VALUE, EGL_DONT_CARE,
+			EGL_TRANSPARENT_GREEN_VALUE, EGL_DONT_CARE,
+			EGL_TRANSPARENT_BLUE_VALUE, EGL_DONT_CARE,
+			EGL_CONFIG_CAVEAT, EGL_DONT_CARE,
+			EGL_CONFIG_ID, EGL_DONT_CARE,
+			EGL_MAX_SWAP_INTERVAL, EGL_DONT_CARE,
+			EGL_MIN_SWAP_INTERVAL, EGL_DONT_CARE,
+			EGL_NATIVE_RENDERABLE, EGL_DONT_CARE,
+			EGL_NATIVE_VISUAL_TYPE, EGL_DONT_CARE,
+			EGL_NONE
+		};
+		EGLint numConfigs;
+		EGLConfig windowConfig;
+		if (!eglChooseConfig(m_eglDisplay, configAttributes, &windowConfig, 1, &numConfigs))
+			spdlog::error("Unable to config");
+
+		EGLint surfaceAttributes[] = { EGL_NONE };
+		m_eglSurface = eglCreateWindowSurface(m_eglDisplay, windowConfig,
+			m_mainWindow.GetWindowHandle(), surfaceAttributes);
+
+		EGLint contextAttributes[] = { EGL_CONTEXT_CLIENT_VERSION, 2, EGL_NONE };
+		m_eglContext = eglCreateContext(m_eglDisplay, windowConfig, NULL, contextAttributes);
+
+		eglMakeCurrent(m_eglDisplay, m_eglSurface, m_eglSurface, m_eglContext);
 	}
 
 	Renderer::~Renderer() = default;
@@ -76,6 +137,7 @@ namespace TG
             // glClear(GL_COLOR_BUFFER_BIT);
             // SwapBuffers(m_context->m_hdc);
             // std::cout << std::flush;
+			eglSwapBuffers(m_eglDisplay, m_eglSurface);
 		}
 
 		return 0;

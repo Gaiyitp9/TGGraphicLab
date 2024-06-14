@@ -29,6 +29,8 @@ int GLAD_EGL_VERSION_1_2 = 0;
 int GLAD_EGL_VERSION_1_3 = 0;
 int GLAD_EGL_VERSION_1_4 = 0;
 int GLAD_EGL_VERSION_1_5 = 0;
+int GLAD_EGL_EXT_client_extensions = 0;
+int GLAD_EGL_EXT_platform_base = 0;
 
 
 static void _pre_call_egl_callback_default(const char *name, GLADapiproc apiproc, int len_args, ...) {
@@ -151,6 +153,15 @@ static EGLSurface GLAD_API_PTR glad_debug_impl_eglCreatePlatformPixmapSurface(EG
     return ret;
 }
 PFNEGLCREATEPLATFORMPIXMAPSURFACEPROC glad_debug_eglCreatePlatformPixmapSurface = glad_debug_impl_eglCreatePlatformPixmapSurface;
+PFNEGLCREATEPLATFORMPIXMAPSURFACEEXTPROC glad_eglCreatePlatformPixmapSurfaceEXT = NULL;
+static EGLSurface GLAD_API_PTR glad_debug_impl_eglCreatePlatformPixmapSurfaceEXT(EGLDisplay dpy, EGLConfig config, void * native_pixmap, const EGLint * attrib_list) {
+    EGLSurface ret;
+    _pre_call_egl_callback("eglCreatePlatformPixmapSurfaceEXT", (GLADapiproc) glad_eglCreatePlatformPixmapSurfaceEXT, 4, dpy, config, native_pixmap, attrib_list);
+    ret = glad_eglCreatePlatformPixmapSurfaceEXT(dpy, config, native_pixmap, attrib_list);
+    _post_call_egl_callback((void*) &ret, "eglCreatePlatformPixmapSurfaceEXT", (GLADapiproc) glad_eglCreatePlatformPixmapSurfaceEXT, 4, dpy, config, native_pixmap, attrib_list);
+    return ret;
+}
+PFNEGLCREATEPLATFORMPIXMAPSURFACEEXTPROC glad_debug_eglCreatePlatformPixmapSurfaceEXT = glad_debug_impl_eglCreatePlatformPixmapSurfaceEXT;
 PFNEGLCREATEPLATFORMWINDOWSURFACEPROC glad_eglCreatePlatformWindowSurface = NULL;
 static EGLSurface GLAD_API_PTR glad_debug_impl_eglCreatePlatformWindowSurface(EGLDisplay dpy, EGLConfig config, void * native_window, const EGLAttrib * attrib_list) {
     EGLSurface ret;
@@ -160,6 +171,15 @@ static EGLSurface GLAD_API_PTR glad_debug_impl_eglCreatePlatformWindowSurface(EG
     return ret;
 }
 PFNEGLCREATEPLATFORMWINDOWSURFACEPROC glad_debug_eglCreatePlatformWindowSurface = glad_debug_impl_eglCreatePlatformWindowSurface;
+PFNEGLCREATEPLATFORMWINDOWSURFACEEXTPROC glad_eglCreatePlatformWindowSurfaceEXT = NULL;
+static EGLSurface GLAD_API_PTR glad_debug_impl_eglCreatePlatformWindowSurfaceEXT(EGLDisplay dpy, EGLConfig config, void * native_window, const EGLint * attrib_list) {
+    EGLSurface ret;
+    _pre_call_egl_callback("eglCreatePlatformWindowSurfaceEXT", (GLADapiproc) glad_eglCreatePlatformWindowSurfaceEXT, 4, dpy, config, native_window, attrib_list);
+    ret = glad_eglCreatePlatformWindowSurfaceEXT(dpy, config, native_window, attrib_list);
+    _post_call_egl_callback((void*) &ret, "eglCreatePlatformWindowSurfaceEXT", (GLADapiproc) glad_eglCreatePlatformWindowSurfaceEXT, 4, dpy, config, native_window, attrib_list);
+    return ret;
+}
+PFNEGLCREATEPLATFORMWINDOWSURFACEEXTPROC glad_debug_eglCreatePlatformWindowSurfaceEXT = glad_debug_impl_eglCreatePlatformWindowSurfaceEXT;
 PFNEGLCREATESYNCPROC glad_eglCreateSync = NULL;
 static EGLSync GLAD_API_PTR glad_debug_impl_eglCreateSync(EGLDisplay dpy, EGLenum type, const EGLAttrib * attrib_list) {
     EGLSync ret;
@@ -286,6 +306,15 @@ static EGLDisplay GLAD_API_PTR glad_debug_impl_eglGetPlatformDisplay(EGLenum pla
     return ret;
 }
 PFNEGLGETPLATFORMDISPLAYPROC glad_debug_eglGetPlatformDisplay = glad_debug_impl_eglGetPlatformDisplay;
+PFNEGLGETPLATFORMDISPLAYEXTPROC glad_eglGetPlatformDisplayEXT = NULL;
+static EGLDisplay GLAD_API_PTR glad_debug_impl_eglGetPlatformDisplayEXT(EGLenum platform, void * native_display, const EGLint * attrib_list) {
+    EGLDisplay ret;
+    _pre_call_egl_callback("eglGetPlatformDisplayEXT", (GLADapiproc) glad_eglGetPlatformDisplayEXT, 3, platform, native_display, attrib_list);
+    ret = glad_eglGetPlatformDisplayEXT(platform, native_display, attrib_list);
+    _post_call_egl_callback((void*) &ret, "eglGetPlatformDisplayEXT", (GLADapiproc) glad_eglGetPlatformDisplayEXT, 3, platform, native_display, attrib_list);
+    return ret;
+}
+PFNEGLGETPLATFORMDISPLAYEXTPROC glad_debug_eglGetPlatformDisplayEXT = glad_debug_impl_eglGetPlatformDisplayEXT;
 PFNEGLGETPROCADDRESSPROC glad_eglGetProcAddress = NULL;
 static __eglMustCastToProperFunctionPointerType GLAD_API_PTR glad_debug_impl_eglGetProcAddress(const char * procname) {
     __eglMustCastToProperFunctionPointerType ret;
@@ -509,6 +538,12 @@ static void glad_egl_load_EGL_VERSION_1_5( GLADuserptrloadfunc load, void* userp
     glad_eglGetSyncAttrib = (PFNEGLGETSYNCATTRIBPROC) load(userptr, "eglGetSyncAttrib");
     glad_eglWaitSync = (PFNEGLWAITSYNCPROC) load(userptr, "eglWaitSync");
 }
+static void glad_egl_load_EGL_EXT_platform_base( GLADuserptrloadfunc load, void* userptr) {
+    if(!GLAD_EGL_EXT_platform_base) return;
+    glad_eglCreatePlatformPixmapSurfaceEXT = (PFNEGLCREATEPLATFORMPIXMAPSURFACEEXTPROC) load(userptr, "eglCreatePlatformPixmapSurfaceEXT");
+    glad_eglCreatePlatformWindowSurfaceEXT = (PFNEGLCREATEPLATFORMWINDOWSURFACEEXTPROC) load(userptr, "eglCreatePlatformWindowSurfaceEXT");
+    glad_eglGetPlatformDisplayEXT = (PFNEGLGETPLATFORMDISPLAYEXTPROC) load(userptr, "eglGetPlatformDisplayEXT");
+}
 
 
 
@@ -546,7 +581,8 @@ static int glad_egl_find_extensions_egl(EGLDisplay display) {
     const char *extensions;
     if (!glad_egl_get_extensions(display, &extensions)) return 0;
 
-    GLAD_UNUSED(glad_egl_has_extension);
+    GLAD_EGL_EXT_client_extensions = glad_egl_has_extension(extensions, "EGL_EXT_client_extensions");
+    GLAD_EGL_EXT_platform_base = glad_egl_has_extension(extensions, "EGL_EXT_platform_base");
 
     return 1;
 }
@@ -609,6 +645,7 @@ int gladLoadEGLUserPtr(EGLDisplay display, GLADuserptrloadfunc load, void* userp
     glad_egl_load_EGL_VERSION_1_5(load, userptr);
 
     if (!glad_egl_find_extensions_egl(display)) return 0;
+    glad_egl_load_EGL_EXT_platform_base(load, userptr);
 
 
     return version;
@@ -631,7 +668,9 @@ void gladInstallEGLDebug() {
     glad_debug_eglCreatePbufferSurface = glad_debug_impl_eglCreatePbufferSurface;
     glad_debug_eglCreatePixmapSurface = glad_debug_impl_eglCreatePixmapSurface;
     glad_debug_eglCreatePlatformPixmapSurface = glad_debug_impl_eglCreatePlatformPixmapSurface;
+    glad_debug_eglCreatePlatformPixmapSurfaceEXT = glad_debug_impl_eglCreatePlatformPixmapSurfaceEXT;
     glad_debug_eglCreatePlatformWindowSurface = glad_debug_impl_eglCreatePlatformWindowSurface;
+    glad_debug_eglCreatePlatformWindowSurfaceEXT = glad_debug_impl_eglCreatePlatformWindowSurfaceEXT;
     glad_debug_eglCreateSync = glad_debug_impl_eglCreateSync;
     glad_debug_eglCreateWindowSurface = glad_debug_impl_eglCreateWindowSurface;
     glad_debug_eglDestroyContext = glad_debug_impl_eglDestroyContext;
@@ -646,6 +685,7 @@ void gladInstallEGLDebug() {
     glad_debug_eglGetDisplay = glad_debug_impl_eglGetDisplay;
     glad_debug_eglGetError = glad_debug_impl_eglGetError;
     glad_debug_eglGetPlatformDisplay = glad_debug_impl_eglGetPlatformDisplay;
+    glad_debug_eglGetPlatformDisplayEXT = glad_debug_impl_eglGetPlatformDisplayEXT;
     glad_debug_eglGetProcAddress = glad_debug_impl_eglGetProcAddress;
     glad_debug_eglGetSyncAttrib = glad_debug_impl_eglGetSyncAttrib;
     glad_debug_eglInitialize = glad_debug_impl_eglInitialize;
@@ -678,7 +718,9 @@ void gladUninstallEGLDebug() {
     glad_debug_eglCreatePbufferSurface = glad_eglCreatePbufferSurface;
     glad_debug_eglCreatePixmapSurface = glad_eglCreatePixmapSurface;
     glad_debug_eglCreatePlatformPixmapSurface = glad_eglCreatePlatformPixmapSurface;
+    glad_debug_eglCreatePlatformPixmapSurfaceEXT = glad_eglCreatePlatformPixmapSurfaceEXT;
     glad_debug_eglCreatePlatformWindowSurface = glad_eglCreatePlatformWindowSurface;
+    glad_debug_eglCreatePlatformWindowSurfaceEXT = glad_eglCreatePlatformWindowSurfaceEXT;
     glad_debug_eglCreateSync = glad_eglCreateSync;
     glad_debug_eglCreateWindowSurface = glad_eglCreateWindowSurface;
     glad_debug_eglDestroyContext = glad_eglDestroyContext;
@@ -693,6 +735,7 @@ void gladUninstallEGLDebug() {
     glad_debug_eglGetDisplay = glad_eglGetDisplay;
     glad_debug_eglGetError = glad_eglGetError;
     glad_debug_eglGetPlatformDisplay = glad_eglGetPlatformDisplay;
+    glad_debug_eglGetPlatformDisplayEXT = glad_eglGetPlatformDisplayEXT;
     glad_debug_eglGetProcAddress = glad_eglGetProcAddress;
     glad_debug_eglGetSyncAttrib = glad_eglGetSyncAttrib;
     glad_debug_eglInitialize = glad_eglInitialize;
