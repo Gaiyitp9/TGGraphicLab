@@ -11,7 +11,7 @@
 #include <optional>
 #include <string_view>
 
-#ifdef _WIN64
+#ifdef _WIN32
 #include "Windows/Win32API.h"
 namespace TG::PAL
 {

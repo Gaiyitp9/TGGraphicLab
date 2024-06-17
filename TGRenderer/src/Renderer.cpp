@@ -8,6 +8,7 @@
 #include "PAL/Windows/Win32Exception.h"
 #include "spdlog/spdlog.h"
 #include "eglext_angle.h"
+#include "Exception/BaseException.h"
 
 namespace TG
 {
@@ -102,7 +103,7 @@ namespace TG
 			m_mainWindow.GetWindowHandle(), surfaceAttributes);
 
 		EGLint contextAttributes[] = { EGL_CONTEXT_CLIENT_VERSION, 2, EGL_NONE };
-		m_eglContext = eglCreateContext(m_eglDisplay, windowConfig, NULL, contextAttributes);
+		m_eglContext = eglCreateContext(m_eglDisplay, windowConfig, nullptr, contextAttributes);
 
 		eglMakeCurrent(m_eglDisplay, m_eglSurface, m_eglSurface, m_eglContext);
 	}

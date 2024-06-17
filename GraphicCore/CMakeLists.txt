@@ -14,12 +14,10 @@ source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${HEADERS} ${SOURCES})
 set(TG_MATRIX_STORAGE_ORDER "RowMajor" CACHE STRING "Default matrix storage order" FORCE)
 set_property(CACHE TG_MATRIX_STORAGE_ORDER PROPERTY STRINGS "RowMajor" "ColumnMajor")
 
-find_package(spdlog CONFIG REQUIRED)
-
-add_library(RenderCore STATIC ${HEADERS} ${SOURCES})
-target_include_directories(RenderCore PUBLIC Include)
-target_link_libraries(RenderCore PRIVATE dxgi d3d11 dxguid dbghelp opengl32 PUBLIC spdlog::spdlog glad)
-target_compile_definitions(RenderCore
+add_library(GraphicCore ${HEADERS} ${SOURCES})
+target_include_directories(GraphicCore PUBLIC Include)
+target_link_libraries(GraphicCore PRIVATE dxgi d3d11 dxguid dbghelp PUBLIC glad spdlog)
+target_compile_definitions(GraphicCore
         PUBLIC $<$<STREQUAL:${TG_MATRIX_STORAGE_ORDER},RowMajor>:TG_ROW_MAJOR_MATRIX>
         # CRT库查找内存泄漏所需定义的宏
         $<$<AND:$<PLATFORM_ID:Windows>,$<CONFIG:DEBUG>>:_CRTDBG_MAP_ALLOC>

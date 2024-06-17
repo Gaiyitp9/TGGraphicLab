@@ -5,6 +5,6 @@ source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${INCS})
 
 add_executable(TGRenderer ${SRCS} ${INCS})
 target_include_directories(TGRenderer PRIVATE include)
-target_link_libraries(TGRenderer PRIVATE RenderCore)
+target_link_libraries(TGRenderer PRIVATE GraphicCore)
 # set entry point
 target_link_options(TGRenderer PRIVATE "/ENTRY:wWinMainCRTStartup")

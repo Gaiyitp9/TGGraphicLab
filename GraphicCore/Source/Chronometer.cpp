@@ -6,7 +6,7 @@
 
 #include "Chronometer.h"
 
-#if defined(_DEBUG) && defined(_WIN64)
+#if defined(_DEBUG) && defined(_WIN32)
 	#include "Exception/BaseException.h"
 #endif
 
@@ -14,13 +14,13 @@ namespace TG
 {
 	Chronometer::Chronometer()
 	{
-#if defined(_DEBUG) && defined(_WIN64)
+#if defined(_DEBUG) && defined(_WIN32)
 		// 解决chrono中current_zone在Windows平台上内存泄漏问题
 		// https://github.com/microsoft/STL/issues/2504
 		// 注意，不推荐直接调用析构函数。这里是因为在Windows平台上开启CRT memory checking时tzdb会泄漏内存
 		// 具体原因看帖子，这里用这种方法移除这个内存泄漏报告。这里的代码不影响计时器的其他逻辑
 		if (std::atexit([]{ std::chrono::get_tzdb_list().~tzdb_list(); }))
-			throw BaseException("Register exit funciton failed");
+			throw BaseException("Register exit funciton [std::chrono::get_tzdb_list().~tzdb_list()] failed");
 #endif
 	}
 

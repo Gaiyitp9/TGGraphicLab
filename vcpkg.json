@@ -3,17 +3,11 @@
   "version-string" : "1.0.0",
   "builtin-baseline" : "f007eb16d36d9a7ef22786934005d482c59a0137",
   "dependencies" : [ {
-    "name" : "fmt",
-    "version>=" : "10.2.1#2"
-  }, {
     "name" : "vcpkg-cmake-config",
     "version>=" : "2024-05-23"
   }, {
     "name" : "vcpkg-cmake",
     "version>=" : "2024-04-18"
-  }, {
-    "name" : "spdlog",
-    "version>=" : "1.14.1"
   }, {
     "name" : "gtest",
     "version>=" : "1.14.0#1"
