@@ -16,7 +16,7 @@ namespace TG::Input
 
 	struct CharacterEvent final : Event
 	{
-		// 字符的Unicode码，只包含基本多文种平面(BMP)
+		// 字符的Unicode码，只支持基本多文种平面(BMP)
 		char16_t c{ 0 };
 	};
 

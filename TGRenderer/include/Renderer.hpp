@@ -27,15 +27,24 @@ namespace TG
 		int Run();
 
 	private:
-		int m_screenWidth;			// 主显示器的宽
-		int m_screenHeight;			// 主显示器的高
+		void InitialOpenGLES();
+		void InitTriangle();
+
+		int m_screenWidth;			// 主显示器的尺寸
+		int m_screenHeight;
+		int m_windowWidth = 800;	// 主窗口的尺寸
+		int m_windowHeight = 600;
 		MainWindow m_mainWindow;	// 主窗口
 
         Chronometer m_timer;		// 高精度计时器
         Input::Manager<Input::Mouse, Input::Keyboard> m_input;	// 输入管理器，使用鼠标和键盘输入
 
-		EGLDisplay m_eglDisplay;
-		EGLSurface m_eglSurface;
-		EGLContext m_eglContext;
+		EGLDisplay m_eglDisplay{};
+		EGLSurface m_eglSurface{};
+		EGLContext m_eglContext{};
+
+		unsigned int m_shaderProgram{};
+		unsigned int m_VAO{};
+		unsigned int m_VBO{};
 	};
 }
