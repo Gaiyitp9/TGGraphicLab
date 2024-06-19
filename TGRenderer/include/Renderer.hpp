@@ -10,7 +10,6 @@
 #include "Input/Manager.hpp"
 #include "Input/Mouse.h"
 #include "Input/Keyboard.h"
-#include "glad/egl.h"
 
 namespace TG
 {
@@ -39,9 +38,8 @@ namespace TG
         Chronometer m_timer;		// 高精度计时器
         Input::Manager<Input::Mouse, Input::Keyboard> m_input;	// 输入管理器，使用鼠标和键盘输入
 
-		EGLDisplay m_eglDisplay{};
-		EGLSurface m_eglSurface{};
-		EGLContext m_eglContext{};
+		PIXELFORMATDESCRIPTOR m_pfd;
+		HGLRC m_hglrc;
 
 		unsigned int m_shaderProgram{};
 		unsigned int m_VAO{};

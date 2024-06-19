@@ -8,7 +8,6 @@
 #include "PAL/Windows/Win32Exception.h"
 #include "Exception/BaseException.h"
 #include "spdlog/spdlog.h"
-#include "eglext_angle.h"
 #include "glad/gles2.h"
 
 namespace TG
@@ -82,7 +81,8 @@ namespace TG
             // Math::Color color = Math::Color::AliceBlue * c;
             // glClearColor(color.r(), color.g(), color.b(), color.a());
             // glClear(GL_COLOR_BUFFER_BIT);
-			eglSwapBuffers(m_eglDisplay, m_eglSurface);
+			// eglSwapBuffers(m_eglDisplay, m_eglSurface);
+			SwapBuffers(m_mainWindow.GetDisplay());
 		}
 
 		return 0;
@@ -90,81 +90,88 @@ namespace TG
 
 	void Renderer::InitialOpenGLES()
 	{
-		int eglVersion = gladLoaderLoadEGL(nullptr);
-		if (eglVersion == 0)
-			spdlog::error("Unable to load EGL.");
-		spdlog::info("Loaded EGL {}.{} on first load.",
-		   GLAD_VERSION_MAJOR(eglVersion), GLAD_VERSION_MINOR(eglVersion));
+		// int eglVersion = gladLoaderLoadEGL(nullptr);
+		// if (eglVersion == 0)
+		// 	spdlog::error("Unable to load EGL.");
+		// spdlog::info("Loaded EGL {}.{} on first load.",
+		//    GLAD_VERSION_MAJOR(eglVersion), GLAD_VERSION_MINOR(eglVersion));
+		//
+		// PAL::NativeDisplay nativeDisplay = m_mainWindow.GetDisplay();
+		// EGLint dispattrs[] =
+		// {
+		// 	EGL_PLATFORM_ANGLE_TYPE_ANGLE, EGL_PLATFORM_ANGLE_TYPE_VULKAN_ANGLE,
+		// 	EGL_NONE
+		// };
+		// m_eglDisplay = eglGetPlatformDisplayEXT(EGL_PLATFORM_ANGLE_ANGLE,
+		// 											  reinterpret_cast<void *>(nativeDisplay), dispattrs);
+		// m_eglDisplay = eglGetDisplay(nativeDisplay);
+		// if (m_eglDisplay == EGL_NO_DISPLAY)
+		// 	spdlog::error("Got no EGL display.");
+		//
+		// if (!eglInitialize(m_eglDisplay, nullptr, nullptr))
+		// 	spdlog::error("Unable to initialize EGL.");
+		//
+		// eglVersion = gladLoaderLoadEGL(m_eglDisplay);
+		// if (eglVersion == 0)
+		// 	spdlog::error("Unable to reload EGL.");
+		// spdlog::info("Loaded EGL {}.{} after load.",
+		//    GLAD_VERSION_MAJOR(eglVersion), GLAD_VERSION_MINOR(eglVersion));
+		//
+		// if (!eglBindAPI(EGL_OPENGL_ES_API))
+		// 	spdlog::error("Unable to bind API.");
+		//
+		// EGLint configAttributes[] =
+		// {
+		// 	EGL_BUFFER_SIZE, 0,
+		// 	EGL_RED_SIZE, 5,
+		// 	EGL_GREEN_SIZE, 6,
+		// 	EGL_BLUE_SIZE, 5,
+		// 	EGL_ALPHA_SIZE, 0,
+		// 	EGL_COLOR_BUFFER_TYPE, EGL_RGB_BUFFER,
+		// 	EGL_DEPTH_SIZE, 24,
+		// 	EGL_LEVEL, 0,
+		// 	EGL_RENDERABLE_TYPE, EGL_OPENGL_ES2_BIT,
+		// 	EGL_SAMPLE_BUFFERS, 0,
+		// 	EGL_SAMPLES, 0,
+		// 	EGL_STENCIL_SIZE, 0,
+		// 	EGL_SURFACE_TYPE, EGL_WINDOW_BIT,
+		// 	EGL_TRANSPARENT_TYPE, EGL_NONE,
+		// 	EGL_TRANSPARENT_RED_VALUE, EGL_DONT_CARE,
+		// 	EGL_TRANSPARENT_GREEN_VALUE, EGL_DONT_CARE,
+		// 	EGL_TRANSPARENT_BLUE_VALUE, EGL_DONT_CARE,
+		// 	EGL_CONFIG_CAVEAT, EGL_DONT_CARE,
+		// 	EGL_CONFIG_ID, EGL_DONT_CARE,
+		// 	EGL_MAX_SWAP_INTERVAL, EGL_DONT_CARE,
+		// 	EGL_MIN_SWAP_INTERVAL, EGL_DONT_CARE,
+		// 	EGL_NATIVE_RENDERABLE, EGL_DONT_CARE,
+		// 	EGL_NATIVE_VISUAL_TYPE, EGL_DONT_CARE,
+		// 	EGL_NONE
+		// };
+		// EGLint numConfigs;
+		// EGLConfig windowConfig;
+		// if (!eglChooseConfig(m_eglDisplay, configAttributes, &windowConfig, 1, &numConfigs))
+		// 	spdlog::error("Unable to config");
+		//
+		// EGLint surfaceAttributes[] = { EGL_NONE };
+		// m_eglSurface = eglCreateWindowSurface(m_eglDisplay, windowConfig,
+		// 	m_mainWindow.GetWindowHandle(), surfaceAttributes);
+		//
+		// EGLint contextAttributes[] = { EGL_CONTEXT_CLIENT_VERSION, 2, EGL_NONE };
+		// m_eglContext = eglCreateContext(m_eglDisplay, windowConfig, nullptr, contextAttributes);
+		//
+		// eglMakeCurrent(m_eglDisplay, m_eglSurface, m_eglSurface, m_eglContext);
 
-		PAL::NativeDisplay nativeDisplay = m_mainWindow.GetDisplay();
-		EGLint dispattrs[] =
-		{
-			EGL_PLATFORM_ANGLE_TYPE_ANGLE, EGL_PLATFORM_ANGLE_TYPE_VULKAN_ANGLE,
-			EGL_NONE
-		};
-		m_eglDisplay = eglGetPlatformDisplayEXT(EGL_PLATFORM_ANGLE_ANGLE,
-													  reinterpret_cast<void *>(nativeDisplay), dispattrs);
-		if (m_eglDisplay == EGL_NO_DISPLAY)
-			spdlog::error("Got no EGL display.");
+		int pixelFormat = ChoosePixelFormat(m_mainWindow.GetDisplay(), &m_pfd);
+		SetPixelFormat(m_mainWindow.GetDisplay(), pixelFormat, &m_pfd);
+		m_hglrc = wglCreateContext(m_mainWindow.GetDisplay());
+		wglMakeCurrent(m_mainWindow.GetDisplay(), m_hglrc);
 
-		if (!eglInitialize(m_eglDisplay, nullptr, nullptr))
-			spdlog::error("Unable to initialize EGL.");
-
-		eglVersion = gladLoaderLoadEGL(m_eglDisplay);
-		if (eglVersion == 0)
-			spdlog::error("Unable to reload EGL.");
-		spdlog::info("Loaded EGL {}.{} after load.",
-		   GLAD_VERSION_MAJOR(eglVersion), GLAD_VERSION_MINOR(eglVersion));
-
-		if (!eglBindAPI(EGL_OPENGL_ES_API))
-			spdlog::error("Unable to bind API.");
-
-		EGLint configAttributes[] =
-		{
-			EGL_BUFFER_SIZE, 0,
-			EGL_RED_SIZE, 5,
-			EGL_GREEN_SIZE, 6,
-			EGL_BLUE_SIZE, 5,
-			EGL_ALPHA_SIZE, 0,
-			EGL_COLOR_BUFFER_TYPE, EGL_RGB_BUFFER,
-			EGL_DEPTH_SIZE, 24,
-			EGL_LEVEL, 0,
-			EGL_RENDERABLE_TYPE, EGL_OPENGL_ES2_BIT,
-			EGL_SAMPLE_BUFFERS, 0,
-			EGL_SAMPLES, 0,
-			EGL_STENCIL_SIZE, 0,
-			EGL_SURFACE_TYPE, EGL_WINDOW_BIT,
-			EGL_TRANSPARENT_TYPE, EGL_NONE,
-			EGL_TRANSPARENT_RED_VALUE, EGL_DONT_CARE,
-			EGL_TRANSPARENT_GREEN_VALUE, EGL_DONT_CARE,
-			EGL_TRANSPARENT_BLUE_VALUE, EGL_DONT_CARE,
-			EGL_CONFIG_CAVEAT, EGL_DONT_CARE,
-			EGL_CONFIG_ID, EGL_DONT_CARE,
-			EGL_MAX_SWAP_INTERVAL, EGL_DONT_CARE,
-			EGL_MIN_SWAP_INTERVAL, EGL_DONT_CARE,
-			EGL_NATIVE_RENDERABLE, EGL_DONT_CARE,
-			EGL_NATIVE_VISUAL_TYPE, EGL_DONT_CARE,
-			EGL_NONE
-		};
-		EGLint numConfigs;
-		EGLConfig windowConfig;
-		if (!eglChooseConfig(m_eglDisplay, configAttributes, &windowConfig, 1, &numConfigs))
-			spdlog::error("Unable to config");
-
-		EGLint surfaceAttributes[] = { EGL_NONE };
-		m_eglSurface = eglCreateWindowSurface(m_eglDisplay, windowConfig,
-			m_mainWindow.GetWindowHandle(), surfaceAttributes);
-
-		EGLint contextAttributes[] = { EGL_CONTEXT_CLIENT_VERSION, 2, EGL_NONE };
-		m_eglContext = eglCreateContext(m_eglDisplay, windowConfig, nullptr, contextAttributes);
-
-		eglMakeCurrent(m_eglDisplay, m_eglSurface, m_eglSurface, m_eglContext);
-
-		int glesVersion = gladLoaderLoadGLES2();
+		int glesVersion = gladLoadGLES2((GLADloadfunc)wglGetProcAddress);
 		if (glesVersion == 0)
 			spdlog::error("Unable to load GLES.");
 		spdlog::info("Loaded GLES {}.{}", GLAD_VERSION_MAJOR(glesVersion), GLAD_VERSION_MINOR(glesVersion));
 		glViewport(0, 0, m_windowWidth, m_windowHeight);
+
 	}
 
 	void Renderer::InitTriangle()
