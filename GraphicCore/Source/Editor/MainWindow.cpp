@@ -57,5 +57,4 @@ namespace TG
     {
         m_eventDispatcher.UnRegister(handler);
     }
-
 }

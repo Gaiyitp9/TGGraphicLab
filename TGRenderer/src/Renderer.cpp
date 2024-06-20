@@ -8,6 +8,7 @@
 #include "PAL/Windows/Win32Exception.h"
 #include "Exception/BaseException.h"
 #include "spdlog/spdlog.h"
+#include "glad/wgl.h"
 #include "glad/gles2.h"
 
 namespace TG
@@ -36,10 +37,11 @@ namespace TG
         m_mainWindow.AddInputEventListener(m_input);
         // m_mainWindow.SetStateCallback([&timer=m_timer](){ timer.Start(); }, [&timer=m_timer](){ timer.Pause(); });
 
+		InitialWgl();
 		// 初始化OpenGL ES
 		InitialOpenGLES();
 		// 绘制三角形
-		InitTriangle();
+		InitialTriangle();
 	}
 
 	Renderer::~Renderer()
@@ -47,6 +49,7 @@ namespace TG
 		glDeleteVertexArrays(1, &m_VAO);
 		glDeleteBuffers(1, &m_VBO);
 		glDeleteProgram(m_shaderProgram);
+		wglDeleteContext(m_hglrc);
 	}
 
 	int Renderer::Run()
@@ -88,93 +91,119 @@ namespace TG
 		return 0;
 	}
 
+	static GLADapiproc GLESGetAddress(const char* name)
+	{
+		static HMODULE openglModule = LoadLibraryA("opengl32.dll");
+		auto result = reinterpret_cast<GLADapiproc>(GetProcAddress(openglModule, name));
+		if (result == nullptr)
+			result = reinterpret_cast<GLADapiproc>(wglGetProcAddress(name));
+		return result;
+	}
+
+	static LRESULT WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
+	{
+		switch(msg)
+		{
+			case WM_CREATE:
+			{
+				PIXELFORMATDESCRIPTOR pfd =
+				{
+					sizeof(PIXELFORMATDESCRIPTOR),
+					1,
+					PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL | PFD_DOUBLEBUFFER,    //Flags
+					PFD_TYPE_RGBA,        // The kind of framebuffer. RGBA or palette.
+					32,                   // Colordepth of the framebuffer.
+					0, 0, 0, 0, 0, 0,
+					0,
+					0,
+					0,
+					0, 0, 0, 0,
+					24,                   // Number of bits for the depthbuffer
+					8,                    // Number of bits for the stencilbuffer
+					0,                    // Number of Aux buffers in the framebuffer.
+					PFD_MAIN_PLANE,
+					0,
+					0, 0, 0
+				};
+
+				HDC hdc = GetDC(hwnd);
+
+				int pixelFormat = ChoosePixelFormat(hdc, &pfd);
+				SetPixelFormat(hdc, pixelFormat, &pfd);
+
+				HGLRC hglrc = wglCreateContext(hdc);
+				wglMakeCurrent(hdc, hglrc);
+
+				gladLoaderLoadWGL(hdc);
+
+				wglDeleteContext(hglrc);
+				PostQuitMessage(0);
+				return 0;
+			}
+
+			default:
+				return DefWindowProc(hwnd, msg, wParam, lParam);
+		}
+	}
+
+	void Renderer::InitialWgl()
+	{
+		MSG msg{};
+		WNDCLASSEXW wc{};
+		wc.cbSize = sizeof(WNDCLASSEXW);
+		wc.style = CS_OWNDC;
+		wc.lpfnWndProc = WndProc;
+		wc.lpszClassName = L"dummy";
+		if (RegisterClassExW(&wc) == 0)
+			PAL::CheckLastError();
+
+		HWND hwnd = CreateWindowExW(0, wc.lpszClassName, nullptr, 0, 0, 0, 0, 0, nullptr, nullptr, nullptr, nullptr);
+		if (hwnd == nullptr)
+			PAL::CheckLastError();
+
+		while(GetMessageW(&msg, nullptr, 0, 0))
+			DispatchMessage(&msg);
+
+		UnregisterClassW(wc.lpszClassName, nullptr);
+
+		int pixelFormat;
+		UINT numFormats;
+		int formatAttribList[] =
+		{
+			WGL_DRAW_TO_WINDOW_ARB, GL_TRUE,
+			WGL_SUPPORT_OPENGL_ARB, GL_TRUE,
+			WGL_DOUBLE_BUFFER_ARB, GL_TRUE,
+			WGL_PIXEL_TYPE_ARB, WGL_TYPE_RGBA_ARB,
+			WGL_COLOR_BITS_ARB, 32,
+			WGL_DEPTH_BITS_ARB, 24,
+			WGL_STENCIL_BITS_ARB, 8,
+			0, // End
+		};
+		wglChoosePixelFormatARB(m_mainWindow.GetDisplay(), formatAttribList, nullptr, 1, &pixelFormat, &numFormats);
+		SetPixelFormat(m_mainWindow.GetDisplay(), pixelFormat, &m_pfd);
+
+		int contextAttribList[] =
+		{
+			WGL_CONTEXT_MAJOR_VERSION_ARB, 3,
+			WGL_CONTEXT_MINOR_VERSION_ARB, 2,
+			WGL_CONTEXT_PROFILE_MASK_ARB, WGL_CONTEXT_ES2_PROFILE_BIT_EXT,
+			0,
+		};
+		m_hglrc = wglCreateContextAttribsARB(m_mainWindow.GetDisplay(), nullptr, contextAttribList);
+		wglMakeCurrent(m_mainWindow.GetDisplay(), m_hglrc);
+	}
+
 	void Renderer::InitialOpenGLES()
 	{
-		// int eglVersion = gladLoaderLoadEGL(nullptr);
-		// if (eglVersion == 0)
-		// 	spdlog::error("Unable to load EGL.");
-		// spdlog::info("Loaded EGL {}.{} on first load.",
-		//    GLAD_VERSION_MAJOR(eglVersion), GLAD_VERSION_MINOR(eglVersion));
-		//
-		// PAL::NativeDisplay nativeDisplay = m_mainWindow.GetDisplay();
-		// EGLint dispattrs[] =
-		// {
-		// 	EGL_PLATFORM_ANGLE_TYPE_ANGLE, EGL_PLATFORM_ANGLE_TYPE_VULKAN_ANGLE,
-		// 	EGL_NONE
-		// };
-		// m_eglDisplay = eglGetPlatformDisplayEXT(EGL_PLATFORM_ANGLE_ANGLE,
-		// 											  reinterpret_cast<void *>(nativeDisplay), dispattrs);
-		// m_eglDisplay = eglGetDisplay(nativeDisplay);
-		// if (m_eglDisplay == EGL_NO_DISPLAY)
-		// 	spdlog::error("Got no EGL display.");
-		//
-		// if (!eglInitialize(m_eglDisplay, nullptr, nullptr))
-		// 	spdlog::error("Unable to initialize EGL.");
-		//
-		// eglVersion = gladLoaderLoadEGL(m_eglDisplay);
-		// if (eglVersion == 0)
-		// 	spdlog::error("Unable to reload EGL.");
-		// spdlog::info("Loaded EGL {}.{} after load.",
-		//    GLAD_VERSION_MAJOR(eglVersion), GLAD_VERSION_MINOR(eglVersion));
-		//
-		// if (!eglBindAPI(EGL_OPENGL_ES_API))
-		// 	spdlog::error("Unable to bind API.");
-		//
-		// EGLint configAttributes[] =
-		// {
-		// 	EGL_BUFFER_SIZE, 0,
-		// 	EGL_RED_SIZE, 5,
-		// 	EGL_GREEN_SIZE, 6,
-		// 	EGL_BLUE_SIZE, 5,
-		// 	EGL_ALPHA_SIZE, 0,
-		// 	EGL_COLOR_BUFFER_TYPE, EGL_RGB_BUFFER,
-		// 	EGL_DEPTH_SIZE, 24,
-		// 	EGL_LEVEL, 0,
-		// 	EGL_RENDERABLE_TYPE, EGL_OPENGL_ES2_BIT,
-		// 	EGL_SAMPLE_BUFFERS, 0,
-		// 	EGL_SAMPLES, 0,
-		// 	EGL_STENCIL_SIZE, 0,
-		// 	EGL_SURFACE_TYPE, EGL_WINDOW_BIT,
-		// 	EGL_TRANSPARENT_TYPE, EGL_NONE,
-		// 	EGL_TRANSPARENT_RED_VALUE, EGL_DONT_CARE,
-		// 	EGL_TRANSPARENT_GREEN_VALUE, EGL_DONT_CARE,
-		// 	EGL_TRANSPARENT_BLUE_VALUE, EGL_DONT_CARE,
-		// 	EGL_CONFIG_CAVEAT, EGL_DONT_CARE,
-		// 	EGL_CONFIG_ID, EGL_DONT_CARE,
-		// 	EGL_MAX_SWAP_INTERVAL, EGL_DONT_CARE,
-		// 	EGL_MIN_SWAP_INTERVAL, EGL_DONT_CARE,
-		// 	EGL_NATIVE_RENDERABLE, EGL_DONT_CARE,
-		// 	EGL_NATIVE_VISUAL_TYPE, EGL_DONT_CARE,
-		// 	EGL_NONE
-		// };
-		// EGLint numConfigs;
-		// EGLConfig windowConfig;
-		// if (!eglChooseConfig(m_eglDisplay, configAttributes, &windowConfig, 1, &numConfigs))
-		// 	spdlog::error("Unable to config");
-		//
-		// EGLint surfaceAttributes[] = { EGL_NONE };
-		// m_eglSurface = eglCreateWindowSurface(m_eglDisplay, windowConfig,
-		// 	m_mainWindow.GetWindowHandle(), surfaceAttributes);
-		//
-		// EGLint contextAttributes[] = { EGL_CONTEXT_CLIENT_VERSION, 2, EGL_NONE };
-		// m_eglContext = eglCreateContext(m_eglDisplay, windowConfig, nullptr, contextAttributes);
-		//
-		// eglMakeCurrent(m_eglDisplay, m_eglSurface, m_eglSurface, m_eglContext);
-
-		int pixelFormat = ChoosePixelFormat(m_mainWindow.GetDisplay(), &m_pfd);
-		SetPixelFormat(m_mainWindow.GetDisplay(), pixelFormat, &m_pfd);
-		m_hglrc = wglCreateContext(m_mainWindow.GetDisplay());
-		wglMakeCurrent(m_mainWindow.GetDisplay(), m_hglrc);
-
-		int glesVersion = gladLoadGLES2((GLADloadfunc)wglGetProcAddress);
+		int glesVersion = gladLoadGLES2(GLESGetAddress);
 		if (glesVersion == 0)
 			spdlog::error("Unable to load GLES.");
 		spdlog::info("Loaded GLES {}.{}", GLAD_VERSION_MAJOR(glesVersion), GLAD_VERSION_MINOR(glesVersion));
+		const unsigned char* version = glGetString(GL_VERSION);
 		glViewport(0, 0, m_windowWidth, m_windowHeight);
-
 	}
 
-	void Renderer::InitTriangle()
+	void Renderer::InitialTriangle()
 	{
 		float vertices[] = {
 			-0.5f, -0.5f, 0.0f,

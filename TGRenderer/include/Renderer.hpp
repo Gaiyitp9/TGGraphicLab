@@ -26,8 +26,9 @@ namespace TG
 		int Run();
 
 	private:
+		void InitialWgl();
 		void InitialOpenGLES();
-		void InitTriangle();
+		void InitialTriangle();
 
 		int m_screenWidth;			// 主显示器的尺寸
 		int m_screenHeight;
@@ -38,8 +39,8 @@ namespace TG
         Chronometer m_timer;		// 高精度计时器
         Input::Manager<Input::Mouse, Input::Keyboard> m_input;	// 输入管理器，使用鼠标和键盘输入
 
-		PIXELFORMATDESCRIPTOR m_pfd;
-		HGLRC m_hglrc;
+		PIXELFORMATDESCRIPTOR m_pfd{};
+		HGLRC m_hglrc{};
 
 		unsigned int m_shaderProgram{};
 		unsigned int m_VAO{};
