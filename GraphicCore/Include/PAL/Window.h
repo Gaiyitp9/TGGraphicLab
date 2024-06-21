@@ -48,10 +48,10 @@ namespace TG::PAL
         Window(int x, int y, int width, int height, std::string_view name, WindowType type);
         virtual ~Window() = 0;
 
-        [[nodiscard]] bool IsDestroyed() const;
         [[nodiscard]] NativeDisplay GetDisplay() const;
         [[nodiscard]] NativeWindowHandle GetWindowHandle() const;
         void SetIcon(std::string_view iconPath) const;
+        [[nodiscard]] bool IsDestroyed() const;
 
     protected:
         // 窗口消息事件回调

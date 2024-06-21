@@ -106,6 +106,10 @@ int main()
 {
     Derived1 d;
     TypeIdTest(d);
+
+    int* inum = new int(2);
+    std::reference_wrapper<int> iwrap(*inum);
+    delete inum;
     // std::unique_ptr<int> p2;
     // p2 = TestUnique();
     // std::pmr::monotonic_buffer_resource mbr;

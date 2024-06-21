@@ -13,7 +13,7 @@ namespace TG
     class MainWindow final : public Window
     {
     public:
-        MainWindow(int x, int y, int width, int height, std::string_view name, Window const* parent = nullptr);
+        MainWindow(int x, int y, int width, int height, std::string_view name);
         MainWindow(const MainWindow&) = delete;
         MainWindow(MainWindow&&) = delete;
         MainWindow& operator=(const MainWindow&) = delete;

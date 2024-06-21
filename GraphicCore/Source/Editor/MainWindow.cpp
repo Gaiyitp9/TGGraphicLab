@@ -9,8 +9,8 @@
 
 namespace TG
 {
-    MainWindow::MainWindow(int x, int y, int width, int height, std::string_view name, Window const *parent)
-        : Window(x, y, width, height, name, PAL::WindowType::Default, parent)
+    MainWindow::MainWindow(int x, int y, int width, int height, std::string_view name)
+        : Window(x, y, width, height, name, PAL::WindowType::Default)
     {
         SetKeyCallback([&](PAL::Key key, int scanCode, PAL::InputAction action) {
             Input::KeyboardEvent keyboardEvent;
