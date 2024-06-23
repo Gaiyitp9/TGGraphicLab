@@ -15,8 +15,8 @@ namespace TG::Math
         // 1. 内嵌表达式可以线性访问
         // 2. 对于row major的表达式，Block的列数等于内嵌表达式的列数或者Block行数等于1;
         // 对于column major的表达式，Block的行数等于内嵌表达式的行数或者Block列数等于1
-        static constexpr bool CanLinearAccess = CheckFlag<NestedXpr>(XprFlag::LinearAccess) && (
-                CheckFlag<NestedXpr>(XprFlag::RowMajor) ? (BlockColumns == Traits<NestedXpr>::Columns || BlockRows == 1) :
+        static constexpr bool CanLinearAccess = ContainFlag<NestedXpr, XprFlag::LinearAccess>() && (
+                ContainFlag<NestedXpr, XprFlag::RowMajor>() ? (BlockColumns == Traits<NestedXpr>::Columns || BlockRows == 1) :
                 (BlockRows == Traits<NestedXpr>::Rows || BlockColumns == 1));
 
     public:
@@ -48,7 +48,7 @@ namespace TG::Math
     };
 
     template<typename NestedXpr, std::size_t BlockRows, std::size_t BlockColumns,
-            bool IsLeftValue = CheckFlag<NestedXpr>(XprFlag::LeftValue)>
+            bool IsLeftValue = ContainFlag<NestedXpr, XprFlag::LeftValue>()>
     class BlockEvaluator;
 
     template<typename NestedXpr, std::size_t BlockRows, std::size_t BlockColumns>
@@ -72,7 +72,7 @@ namespace TG::Math
 
         BlockEvaluator(const XprType& block, std::size_t startRow, std::size_t startColumn)
             : m_xprEvaluator(block.NestedExpression()), m_startRow(startRow), m_startColumn(startColumn),
-            m_offset(CheckFlag<XprType>(XprFlag::RowMajor) ? startRow * Traits<NestedXpr>::Columns + startColumn :
+            m_offset(ContainFlag<XprType, XprFlag::RowMajor>() ? startRow * Traits<NestedXpr>::Columns + startColumn :
                     startColumn * Traits<NestedXpr>::Rows + startRow)
         {}
 

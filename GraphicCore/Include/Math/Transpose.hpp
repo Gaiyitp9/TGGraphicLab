@@ -15,8 +15,7 @@ namespace TG::Math
         static constexpr std::size_t    Columns = Traits<NestedXpr>::Rows;
         static constexpr std::size_t    Size = Rows * Columns;
         static constexpr XprFlag        Flags = (Traits<NestedXpr>::Flags & (XprFlag::RowMajor | XprFlag::LeftValue)) |
-                (CheckFlag<NestedXpr>(XprFlag::LinearAccess) && CheckFlag<NestedXpr>(XprFlag::Vector) ?
-                XprFlag::LinearAccess : XprFlag::None) |
+                (ContainFlag<NestedXpr, XprFlag::LinearAccess | XprFlag::Vector>() ? XprFlag::LinearAccess : XprFlag::None) |
                 (Rows == 1 || Columns == 1 ? XprFlag::Vector : XprFlag::None) |
                 (Rows == Columns ? XprFlag::Square : XprFlag::None);
     };
@@ -33,7 +32,7 @@ namespace TG::Math
         const NestedXpr& m_xpr;
     };
 
-    template<typename NestedXpr, bool IsLeftValue = CheckFlag<NestedXpr>(XprFlag::LeftValue)>
+    template<typename NestedXpr, bool IsLeftValue = ContainFlag<NestedXpr, XprFlag::LeftValue>()>
     class TransposeEvaluator;
 
     template<typename NestedXpr>

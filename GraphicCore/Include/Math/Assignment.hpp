@@ -78,7 +78,8 @@ namespace TG::Math
     };
 
     template<typename Kernel, TraversalType Traversal =
-            CheckFlag<typename Kernel::DstXpr, typename Kernel::SrcXpr>(XprFlag::LinearAccess) ?
+            ContainFlag<typename Kernel::DstXpr, XprFlag::LinearAccess>() &&
+                ContainFlag<typename Kernel::SrcXpr, XprFlag::LinearAccess>() ?
             TraversalType::Linear : TraversalType::Default>
     struct Assignment;
 
@@ -104,7 +105,7 @@ namespace TG::Math
     template<typename Dst, typename Src>
     concept Assignable = MatrixExpression<Dst> && MatrixExpression<Src> &&
             (Traits<Dst>::Rows == Traits<Src>::Rows) && (Traits<Dst>::Columns == Traits<Src>::Columns) &&
-            CheckFlag<Dst>(XprFlag::LeftValue);
+            ContainFlag<Dst, XprFlag::LeftValue>();
 
     template<typename Dst, typename Src> requires Assignable<Dst, Src>
     void CallAssignmentNoAlias(Dst& dst, const Src& src)

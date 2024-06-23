@@ -23,7 +23,7 @@ namespace TG::Math
 	template<typename Scalar, std::size_t Rows, std::size_t Columns, StorageOption Option>
 	class Matrix : public MatrixBase<Matrix<Scalar, Rows, Columns, Option>>
 	{
-        using Base = MatrixBase<Matrix<Scalar, Rows, Columns, Option>>;
+        using Base = MatrixBase<Matrix>;
         using Base::Expression;
 
 	public:
@@ -45,7 +45,7 @@ namespace TG::Math
 		}
 		const Scalar& operator()(std::size_t row, std::size_t column) const
 		{
-			if constexpr (CheckFlag<Matrix>(XprFlag::RowMajor))
+			if constexpr (ContainFlag<Matrix, XprFlag::RowMajor>())
 				return m_storage[column + row * Columns];
 			else
 				return m_storage[row + column * Rows];
@@ -56,7 +56,7 @@ namespace TG::Math
 		}
 		Scalar& operator()(std::size_t row, std::size_t column)
 		{
-            if constexpr (CheckFlag<Matrix>(XprFlag::RowMajor))
+            if constexpr (ContainFlag<Matrix, XprFlag::RowMajor>())
 				return m_storage[column + row * Columns];
             else
 				return m_storage[row + column * Rows];
@@ -101,7 +101,7 @@ namespace TG::Math
         }
         [[nodiscard]] CoeffType Coefficient(std::size_t row, std::size_t column) const
         {
-            if constexpr (CheckFlag<XprType>(XprFlag::RowMajor))
+            if constexpr (ContainFlag<XprType, XprFlag::RowMajor>())
                 return m_data[row * Traits<XprType>::Columns + column];
             else
                 return m_data[row + column * Traits<XprType>::Rows];
@@ -112,7 +112,7 @@ namespace TG::Math
         }
         CoeffType& CoefficientRef(std::size_t row, std::size_t column)
         {
-            if constexpr (CheckFlag<XprType>(XprFlag::RowMajor))
+            if constexpr (ContainFlag<XprType, XprFlag::RowMajor>())
                 return const_cast<CoeffType*>(m_data)[row * Traits<XprType>::Columns + column];
             else
                 return const_cast<CoeffType*>(m_data)[row + column * Traits<XprType>::Rows];
