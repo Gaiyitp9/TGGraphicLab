@@ -5,12 +5,12 @@
 *****************************************************************/
 #pragma once
 
-#include "Chronometer.h"
+#include "../../GraphicCore/Include/Chronometer.h"
 // #include "Utility.h"
 #include <ctime>
 #include <string>
-#include "Math/Core.hpp"
-#include "Input/Event.h"
+#include "../../GraphicCore/Include/Math/Core.hpp"
+#include "../../GraphicCore/Include/Input/Event.h"
 // #include "Diagnostics/Win32Exception.h"
 // #include "glad/gl.h"
 
