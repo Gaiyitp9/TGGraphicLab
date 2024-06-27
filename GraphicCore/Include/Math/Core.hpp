@@ -39,8 +39,8 @@ namespace TG::Math
 
     // 表达式特性，每种表达式都需要特化该类
     // 把表达式的特性定义在Traits里的原因：矩阵表达式基类使用CRTP(Curiously Recurring Template Pattern)，
-    // 基类需要访问表达式的特性(比如Rows)，直接把特性定义在表达式中无法访问，因为在基类中的Derived是incomplete的，
-    // 所以需要通过一个Traits类来访问
+    // 基类需要访问表达式的特性(比如Rows)，直接把特性定义在表达式中无法访问，因为在基类中的Derived是incomplete的
+    // (我觉得这里是指派生类还未实例化，因为此时正在实例化基类)，可以使用Traits<Derived>来访问
     // https://stackoverflow.com/questions/6006614/c-static-polymorphism-crtp-and-using-typedefs-from-derived-classes
     template<typename T> struct Traits;
     // 表达式求值器，每种表达式都需要特化该类
@@ -161,7 +161,6 @@ namespace TG::Math
     };
 }
 
-#include <cstring>
 #include "MatrixBase.hpp"
 #include "Matrix.hpp"
 #include "Assignment.hpp"

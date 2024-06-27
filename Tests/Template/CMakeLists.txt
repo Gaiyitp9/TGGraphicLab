@@ -3,4 +3,4 @@ add_executable(Template main.cpp ExpressionTemplate.hpp)
 target_compile_options(Template PRIVATE /Zc:nrvo)
 # vs项目放在Tests目录下
 set_target_properties(Template PROPERTIES FOLDER ${TestsFolderName})
-target_include_directories(Template PRIVATE ../../RenderCore/Include)
+target_include_directories(Template PRIVATE ../../GraphicCore/Include)

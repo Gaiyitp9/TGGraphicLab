@@ -9,29 +9,21 @@
 
 namespace TG::Math
 {
-    template <class T>
-    struct Invalid
-    {
-        static_assert(false, "A program that instantiates a primary template of a mathematical constant "
-                             "variable template is ill-formed.");
-    };
+    template<std::floating_point T> inline constexpr T Rad2DegV = static_cast<T>(57.2957795130823);
+    template<std::floating_point T> inline constexpr T Deg2RadV = static_cast<T>(0.0174532925199433);
 
-    template<typename T> inline constexpr T Rad2DegV = Invalid<T>{};
-    template<typename T> inline constexpr T Deg2RadV = Invalid<T>{};
+    inline constexpr double Rad2Degd = Rad2DegV<double>;
+    inline constexpr double Deg2Radd = Deg2RadV<double>;
+    inline constexpr double Rad2Degf = Rad2DegV<float>;
+    inline constexpr double Deg2Radf = Deg2RadV<float>;
 
-    template<std::floating_point T> inline constexpr T Rad2DegV<T> = static_cast<T>(57.2957795130823);
-    template<std::floating_point T> inline constexpr T Deg2RadV<T> = static_cast<T>(0.0174532925199433);
-
-    inline constexpr double Rad2Deg = Rad2DegV<double>;
-    inline constexpr double Deg2Rad = Deg2RadV<double>;
-
-    inline constexpr long double operator""_deg_to_rad(long double degree)
+    constexpr long double operator""_deg_to_rad(long double degree)
     {
         long double radian = degree * std::numbers::pi_v<long double> / 180;
         return radian;
     }
 
-    inline constexpr long double operator""_rad_to_deg(long double radian)
+    constexpr long double operator""_rad_to_deg(long double radian)
     {
         long double degree = radian * 180 / std::numbers::pi_v<long double>;
         return degree;

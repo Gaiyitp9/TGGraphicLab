@@ -23,21 +23,14 @@ namespace TG::Math
 	template<typename Scalar, std::size_t Rows, std::size_t Columns, StorageOption Option>
 	class Matrix : public MatrixBase<Matrix<Scalar, Rows, Columns, Option>>
 	{
-        using Base = MatrixBase<Matrix>;
-        using Base::Expression;
-
 	public:
 		Matrix() = default;
-		Matrix(const Matrix& other) { std::memcpy(m_storage, other.m_storage, Traits<Matrix>::Size * sizeof(Scalar)); }
-        Matrix(Matrix&&) = delete;
 
         template<typename Derived>
         Matrix(const MatrixBase<Derived>& other)
         {
-            CallAssignmentNoAlias(Expression(), other.Expression());
+            CallAssignmentNoAlias(this->Expression(), other.Expression());
         }
-
-        using Base::operator=;
 
 		const Scalar& operator[](std::size_t index) const
 		{
