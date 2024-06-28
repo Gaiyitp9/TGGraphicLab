@@ -77,14 +77,14 @@ namespace TG::Math
         Functor m_functor;
     };
 
-    template<typename Kernel, TraversalType Traversal =
+    template<typename Kernel, Traversal Traversal =
             ContainFlag<typename Kernel::DstXpr, XprFlag::LinearAccess>() &&
                 ContainFlag<typename Kernel::SrcXpr, XprFlag::LinearAccess>() ?
-            TraversalType::Linear : TraversalType::Default>
+            Traversal::Linear : Traversal::Default>
     struct Assignment;
 
     template<typename Kernel>
-    struct Assignment<Kernel, TraversalType::Default>
+    struct Assignment<Kernel, Traversal::Default>
     {
         static void Run(Kernel& kernel)
         {
@@ -93,7 +93,7 @@ namespace TG::Math
     };
 
 	template<typename Kernel>
-	struct Assignment<Kernel, TraversalType::Linear>
+	struct Assignment<Kernel, Traversal::Linear>
 	{
 		static void Run(Kernel& kernel)
 		{
@@ -103,7 +103,7 @@ namespace TG::Math
 
     // 矩阵表达式赋值概念，目标表达式和源表达式的行列数需要相等，且表达式需要是左值
     template<typename Dst, typename Src>
-    concept Assignable = MatrixExpression<Dst> && MatrixExpression<Src> &&
+    concept Assignable = IsMatrixExpression<Dst> && IsMatrixExpression<Src> &&
             (Traits<Dst>::Rows == Traits<Src>::Rows) && (Traits<Dst>::Columns == Traits<Src>::Columns) &&
             ContainFlag<Dst, XprFlag::LeftValue>();
 

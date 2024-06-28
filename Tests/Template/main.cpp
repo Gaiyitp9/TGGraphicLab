@@ -167,8 +167,45 @@ public:
 };
 //-----------------------------------------------------------------
 
+class MyBase
+{
+public:
+    // template<typename T>
+    MyBase& operator=(const MyBase&)
+    {
+        std::cout << "MyBase operator=" << std::endl;
+        return *this;
+    }
+};
+
+class MyDerived : public MyBase
+{
+public:
+    MyDerived() = default;
+    MyDerived(const MyDerived&)
+    {
+        std::cout << "MyDerived copy constructor" << std::endl;
+    }
+    // template<typename T>
+    // MyDerived& operator=(const T&)
+    // {
+    //     std::cout << "MyDerived operator=" << std::endl;
+    //     return *this;
+    // }
+    // using MyBase::operator=;
+    // MyDerived(MyDerived&&) = delete;
+    MyDerived& operator=(const MyDerived&)
+    {
+        std::cout << "MyDerived operator=" << std::endl;
+        return *this;
+    }
+};
+
 int main()
 {
+    MyDerived dd;
+    MyDerived dd1;
+    dd1 = dd;
     // [const] [volatile] <type> [*|&] [[N]]碰到T，会退化(decay)为 <type> [*](当类型为指针或数组时)
     // [const] [volatile] <type> [*|&] [[N]]碰到T&，不变
     // 注：[]内表示可能出现的词，<>内表示一定要出现的词

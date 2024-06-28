@@ -40,11 +40,12 @@ namespace TG::Math
     // 表达式特性，每种表达式都需要特化该类
     // 把表达式的特性定义在Traits里的原因：矩阵表达式基类使用CRTP(Curiously Recurring Template Pattern)，
     // 基类需要访问表达式的特性(比如Rows)，直接把特性定义在表达式中无法访问，因为在基类中的Derived是incomplete的
-    // (我觉得这里是指派生类还未实例化，因为此时正在实例化基类)，可以使用Traits<Derived>来访问
+    // (我觉得这里是指派生类还未实例化，因为此时正在实例化基类)。可以使用Traits<Derived>来访问。
     // https://stackoverflow.com/questions/6006614/c-static-polymorphism-crtp-and-using-typedefs-from-derived-classes
-    template<typename T> struct Traits;
+    template<typename Xpr> struct Traits;
     // 表达式求值器，每种表达式都需要特化该类
     template<typename Xpr> class Evaluator;
+
     // 矩阵表达式标志
     enum class XprFlag : unsigned char
     {
@@ -52,41 +53,38 @@ namespace TG::Math
         RowMajor        = 1,            // 按行储存
         LeftValue       = 1 << 1,       // 表达式是否是左值，也就是求值器有CoefficientRef函数
         LinearAccess    = 1 << 2,       // 是否能看作一维向量，也就是求值器可以调用Coefficient(index)函数
-        Vector          = 1 << 3,       // 表达式是向量
-        Square          = 1 << 4,       // 表达式是方阵
     };
-
     // 表达式标志是否包含指定标志
     template<typename Xpr, XprFlag flag> requires requires { Traits<Xpr>::Flags; }
-    constexpr bool ContainFlag()
+    consteval bool ContainFlag()
     {
         return (Traits<Xpr>::Flags & flag) != XprFlag::None;
     }
 
     // 赋值遍历类型
-    enum class TraversalType : unsigned char
+    enum class Traversal : unsigned char
     {
         Default,
         Linear,
         Vectorized,
     };
 
-	// 矩阵储存格式
-	enum class StorageOption : unsigned char
+	// 矩阵储存顺序
+	enum class StorageOrder : unsigned char
 	{
 		RowMajor,
 		ColumnMajor,
 	};
-
+    // 默认储存顺序，可以使用宏定义修改
 #ifdef TG_ROW_MAJOR_MATRIX
-	inline constexpr StorageOption DefaultMatrixStorageOrderOption = StorageOption::RowMajor;
+	inline constexpr StorageOrder DefaultOrder = StorageOrder::RowMajor;
 #else
-	inline constexpr StorageOption DefaultMatrixStorageOrderOption = StorageOption::ColumnMajor;
+	inline constexpr StorageOrder DefaultOrder = StorageOrder::ColumnMajor;
 #endif
 
     // 矩阵表达式概念，分为两部分: 1. 矩阵表达式的特性 2. 表达式求值器的要求
     template<typename Xpr>
-    concept MatrixExpression = requires
+    concept IsMatrixExpression = requires
     {
         typename Traits<Xpr>::Scalar;
         Traits<Xpr>::Rows;
@@ -114,21 +112,21 @@ namespace TG::Math
 
     // 矩阵逐元素运算，要求矩阵元素类型相同以及行列相等
     template<typename LhsXpr, typename RhsXpr>
-    concept CWiseOperable = MatrixExpression<LhsXpr> && MatrixExpression<RhsXpr> &&
+    concept CWiseOperable = IsMatrixExpression<LhsXpr> && IsMatrixExpression<RhsXpr> &&
             std::is_same_v<typename Traits<LhsXpr>::Scalar, typename Traits<RhsXpr>::Scalar> &&
             Traits<LhsXpr>::Rows == Traits<RhsXpr>::Rows && Traits<LhsXpr>::Columns == Traits<RhsXpr>::Columns;
 
     // 两个表达式是否可以执行矩阵乘法，左边表达式的列数要等于右边表达式的行数
     template<typename LhsXpr, typename RhsXpr>
-    concept MatrixMultipliable = MatrixExpression<LhsXpr> && MatrixExpression<RhsXpr> &&
+    concept MatrixMultipliable = IsMatrixExpression<LhsXpr> && IsMatrixExpression<RhsXpr> &&
             std::is_same_v<typename Traits<LhsXpr>::Scalar, typename Traits<RhsXpr>::Scalar> &&
             Traits<LhsXpr>::Columns == Traits<RhsXpr>::Rows;
 
     // 表达式基类
-    template<typename Derived> requires MatrixExpression<Derived>
+    template<typename Derived> requires IsMatrixExpression<Derived>
     class MatrixBase;
 	// 矩阵类
-	template<typename Scalar, std::size_t Rows, std::size_t Cols, StorageOption Option = DefaultMatrixStorageOrderOption>
+	template<typename Scalar, std::size_t Rows, std::size_t Cols, StorageOrder Order = DefaultOrder>
 	class Matrix;
     // 二元表达式
     template<typename BinaryOp, typename LhsXpr, typename RhsXpr> requires CWiseOperable<LhsXpr, RhsXpr>
@@ -157,7 +155,7 @@ namespace TG::Math
     struct PlainMatrixType
     {
         using Type = Matrix<typename Traits<Xpr>::Scalar, Traits<Xpr>::Rows, Traits<Xpr>::Columns,
-                ContainFlag<Xpr, XprFlag::RowMajor>() ? StorageOption::RowMajor : StorageOption::ColumnMajor>;
+                ContainFlag<Xpr, XprFlag::RowMajor>() ? StorageOrder::RowMajor : StorageOrder::ColumnMajor>;
     };
 }
 

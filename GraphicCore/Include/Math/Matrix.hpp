@@ -7,22 +7,22 @@
 
 namespace TG::Math
 {
-	template<typename Scalar_, std::size_t Rows_, std::size_t Columns_, StorageOption Option>
-	struct Traits<Matrix<Scalar_, Rows_, Columns_, Option>>
+	template<typename Scalar_, std::size_t Rows_, std::size_t Columns_, StorageOrder Order>
+	struct Traits<Matrix<Scalar_, Rows_, Columns_, Order>>
 	{
 		using Scalar = Scalar_;
         static constexpr std::size_t	Rows = Rows_;
         static constexpr std::size_t	Columns = Columns_;
         static constexpr std::size_t	Size = Rows * Columns;
-        static constexpr XprFlag        Flags = (Option == StorageOption::RowMajor ? XprFlag::RowMajor : XprFlag::None) |
-                XprFlag::LeftValue | XprFlag::LinearAccess |
-                (Rows == 1 || Columns == 1 ? XprFlag::Vector : XprFlag::None) |
-                (Rows == Columns ? XprFlag::Square : XprFlag::None);
+        static constexpr XprFlag        Flags = (Order == StorageOrder::RowMajor ? XprFlag::RowMajor : XprFlag::None) |
+                XprFlag::LeftValue | XprFlag::LinearAccess;
 	};
 
-	template<typename Scalar, std::size_t Rows, std::size_t Columns, StorageOption Option>
-	class Matrix : public MatrixBase<Matrix<Scalar, Rows, Columns, Option>>
+	template<typename Scalar, std::size_t Rows, std::size_t Columns, StorageOrder Order>
+	class Matrix : public MatrixBase<Matrix<Scalar, Rows, Columns, Order>>
 	{
+		using Base = MatrixBase<Matrix>;
+
 	public:
 		Matrix() = default;
 
@@ -31,6 +31,7 @@ namespace TG::Math
         {
             CallAssignmentNoAlias(this->Expression(), other.Expression());
         }
+		using Base::operator=;
 
 		const Scalar& operator[](std::size_t index) const
 		{
@@ -79,7 +80,7 @@ namespace TG::Math
 	MATRIX_ALL_SIZE_TYPEDEF(int, i)
 
     // 矩阵求值器
-    template<typename Scalar, std::size_t Rows, std::size_t Columns, StorageOption Option>
+    template<typename Scalar, std::size_t Rows, std::size_t Columns, StorageOrder Option>
     class Evaluator<Matrix<Scalar, Rows, Columns, Option>>
     {
     public:

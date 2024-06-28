@@ -25,9 +25,7 @@ namespace TG::Math
         static constexpr std::size_t    Columns = BlockColumns;
         static constexpr std::size_t    Size = Rows * Columns;
         static constexpr XprFlag        Flags = (Traits<NestedXpr>::Flags & (XprFlag::RowMajor | XprFlag::LeftValue)) |
-                (CanLinearAccess ? XprFlag::LinearAccess : XprFlag::None) |
-                (Rows == 1 || Columns == 1 ? XprFlag::Vector : XprFlag::None) |
-                (Rows == Columns ? XprFlag::Square : XprFlag::None);
+                (CanLinearAccess ? XprFlag::LinearAccess : XprFlag::None);
     };
 
     template<typename NestedXpr, std::size_t BlockRows, std::size_t BlockColumns>

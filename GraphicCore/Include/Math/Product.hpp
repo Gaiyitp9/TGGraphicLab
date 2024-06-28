@@ -14,9 +14,7 @@ namespace TG::Math
         static constexpr int	    Rows = Traits<LhsXpr>::Rows;
         static constexpr int	    Columns = Traits<RhsXpr>::Columns;
         static constexpr int	    Size = Rows * Columns;
-        static constexpr XprFlag    Flags = (Traits<LhsXpr>::Flags == StorageOption::RowMajor ? XprFlag::RowMajor : XprFlag::None) |
-                                            (Rows == 1 || Columns == 1 ? XprFlag::Vector : XprFlag::None) |
-                                            (Rows == Columns ? XprFlag::Square : XprFlag::None);
+        static constexpr XprFlag    Flags = (Traits<LhsXpr>::Flags == StorageOrder::RowMajor ? XprFlag::RowMajor : XprFlag::None);
     };
 
     // 矩阵乘法表达式
