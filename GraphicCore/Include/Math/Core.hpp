@@ -5,6 +5,8 @@
 *****************************************************************/
 #pragma once
 
+// 参考Eigen实现，使用Expression template
+
 #include <concepts>
 
 namespace TG::Math
@@ -77,7 +79,7 @@ namespace TG::Math
 	};
     // 默认储存顺序，可以使用宏定义修改
 #ifdef TG_ROW_MAJOR_MATRIX
-	inline constexpr StorageOrder DefaultOrder = StorageOrder::RowMajor;
+	inline constexpr auto DefaultOrder = StorageOrder::RowMajor;
 #else
 	inline constexpr StorageOrder DefaultOrder = StorageOrder::ColumnMajor;
 #endif
@@ -150,7 +152,6 @@ namespace TG::Math
     template<typename NestedXpr>
     class Transpose;
 
-    // 获取表达式对应的矩阵类型
     template<typename Xpr>
     struct PlainMatrixType
     {
@@ -159,9 +160,9 @@ namespace TG::Math
     };
 }
 
+#include "Assignment.hpp"
 #include "MatrixBase.hpp"
 #include "Matrix.hpp"
-#include "Assignment.hpp"
 #include "CWiseBinaryOp.hpp"
 #include "Transpose.hpp"
 #include "Block.hpp"

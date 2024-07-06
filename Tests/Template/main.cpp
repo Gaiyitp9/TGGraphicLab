@@ -194,11 +194,11 @@ public:
     // }
     // using MyBase::operator=;
     // MyDerived(MyDerived&&) = delete;
-    MyDerived& operator=(const MyDerived&)
-    {
-        std::cout << "MyDerived operator=" << std::endl;
-        return *this;
-    }
+    // MyDerived& operator=(const MyDerived&)
+    // {
+    //     std::cout << "MyDerived operator=" << std::endl;
+    //     return *this;
+    // }
 };
 
 int main()

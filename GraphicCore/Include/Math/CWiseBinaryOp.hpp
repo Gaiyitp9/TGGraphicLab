@@ -19,7 +19,7 @@ namespace TG::Math
 
     // 二元表达式
 	template<typename BinaryOp, typename LhsXpr, typename RhsXpr> requires CWiseOperable<LhsXpr, RhsXpr>
-	class CWiseBinaryOp : public MatrixBase<CWiseBinaryOp<BinaryOp, LhsXpr, RhsXpr>>
+	class CWiseBinaryOp final : public MatrixBase<CWiseBinaryOp<BinaryOp, LhsXpr, RhsXpr>>
 	{
     public:
         CWiseBinaryOp(const LhsXpr& lhs, const RhsXpr& rhs, BinaryOp op = {})

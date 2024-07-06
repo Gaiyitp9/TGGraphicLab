@@ -19,19 +19,26 @@ namespace TG::Math
 	};
 
 	template<typename Scalar, std::size_t Rows, std::size_t Columns, StorageOrder Order>
-	class Matrix : public MatrixBase<Matrix<Scalar, Rows, Columns, Order>>
+	class Matrix final : public MatrixBase<Matrix<Scalar, Rows, Columns, Order>>
 	{
 		using Base = MatrixBase<Matrix>;
 
 	public:
 		Matrix() = default;
 
+		// 构造时才会调用，可以保证不存在aliasing问题
         template<typename Derived>
         Matrix(const MatrixBase<Derived>& other)
         {
-            CallAssignmentNoAlias(this->Expression(), other.Expression());
+            CallAssignmentNoAlias(this->Expression(), other.Expression(), AssignOp<Scalar>{});
         }
-		using Base::operator=;
+
+		template<typename Derived>
+		Matrix& operator=(const MatrixBase<Derived>& other)
+        {
+        	Base::operator=(other);
+	        return *this;
+        }
 
 		const Scalar& operator[](std::size_t index) const
 		{
@@ -57,7 +64,7 @@ namespace TG::Math
 		}
 
 	private:
-		Scalar m_storage[Traits<Matrix>::Size]{};
+		Scalar m_storage[Rows * Columns]{};
 
         friend class Evaluator<Matrix>;
 	};
@@ -65,19 +72,25 @@ namespace TG::Math
 	template<typename Scalar, std::size_t Size> using Vector = Matrix<Scalar, Size, 1>;
 	template<typename Scalar, std::size_t Size> using RowVector = Matrix<Scalar, 1, Size>;
 
-	#define MATRIX_TYPEDEF(Type, TypeSuffix, Size)			\
-	using Vector##Size##TypeSuffix	= Vector<Type, Size>;		\
-	using RowVector##Size##TypeSuffix = RowVector<Type, Size>;	\
-	using Matrix##Size##TypeSuffix	= Matrix<Type, Size, Size>;
+	using Vector2f = Vector<float, 2>;
+	using Vector3f = Vector<float, 3>;
+	using Vector4f = Vector<float, 4>;
+	using RowVector2f = RowVector<float, 2>;
+	using RowVector3f = RowVector<float, 3>;
+	using RowVector4f = RowVector<float, 4>;
+	using Matrix2f = Matrix<float, 2, 2>;
+	using Matrix3f = Matrix<float, 3, 3>;
+	using Matrix4f = Matrix<float, 4, 4>;
 
-	#define MATRIX_ALL_SIZE_TYPEDEF(Type, TypeSuffix)	\
-	MATRIX_TYPEDEF(Type, TypeSuffix, 2)				\
-	MATRIX_TYPEDEF(Type, TypeSuffix, 3)				\
-	MATRIX_TYPEDEF(Type, TypeSuffix, 4)
-
-	MATRIX_ALL_SIZE_TYPEDEF(float, f)
-	MATRIX_ALL_SIZE_TYPEDEF(double, d)
-	MATRIX_ALL_SIZE_TYPEDEF(int, i)
+	using Vector2d = Vector<double, 2>;
+	using Vector3d = Vector<double, 3>;
+	using Vector4d = Vector<double, 4>;
+	using RowVector2d = RowVector<double, 2>;
+	using RowVector3d = RowVector<double, 3>;
+	using RowVector4d = RowVector<double, 4>;
+	using Matrix2d = Matrix<double, 2, 2>;
+	using Matrix3d = Matrix<double, 3, 3>;
+	using Matrix4d = Matrix<double, 4, 4>;
 
     // 矩阵求值器
     template<typename Scalar, std::size_t Rows, std::size_t Columns, StorageOrder Option>
