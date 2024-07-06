@@ -107,25 +107,32 @@ namespace TG::Math
             (Traits<Dst>::Rows == Traits<Src>::Rows) && (Traits<Dst>::Columns == Traits<Src>::Columns) &&
             ContainFlag<Dst, XprFlag::LeftValue>();
 
-    template<typename Dst, typename Src> requires Assignable<Dst, Src>
-    void CallAssignmentNoAlias(Dst& dst, const Src& src)
+    // In Eigen, aliasing refers to assignment statement in which the same matrix (or array or vector)
+    // appears on the left and on the right of the assignment operators.
+    template<typename Dst, typename Src, typename Func> requires Assignable<Dst, Src>
+    void CallAssignmentNoAlias(Dst& dst, const Src& src, const Func& func)
     {
         using DstEvaluator = Evaluator<Dst>;
         using SrcEvaluator = Evaluator<Src>;
-        using AssignOp = AssignOp<typename Traits<Dst>::Scalar>;
-        using Kernel = AssignmentKernel<DstEvaluator, SrcEvaluator, AssignOp>;
+        using Kernel = AssignmentKernel<DstEvaluator, SrcEvaluator, Func>;
 
         DstEvaluator dstEvaluator{dst};
         SrcEvaluator srcEvaluator{src};
 
-        Kernel kernel(dstEvaluator, srcEvaluator, AssignOp{});
+        Kernel kernel(dstEvaluator, srcEvaluator, func);
         Assignment<Kernel>::Run(kernel);
+    }
+
+    template<typename Dst, typename Src, typename Func>
+    void CallAssignment(Dst& dst, const Src& src, const Func& func)
+    {
+        typename PlainMatrixType<Src>::Type temp(src);
+        CallAssignmentNoAlias(dst, temp, func);
     }
 
     template<typename Dst, typename Src> requires Assignable<Dst, Src>
     void CallAssignment(Dst& dst, const Src& src)
     {
-        typename PlainMatrixType<Src>::Type temp(src);
-        CallAssignmentNoAlias(dst, temp);
+        CallAssignment(dst, src, AssignOp<typename Traits<Dst>::Scalar>{});
     }
 }

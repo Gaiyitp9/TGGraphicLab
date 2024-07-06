@@ -13,6 +13,8 @@ namespace TG::Math
         using Scalar = Traits<Derived>::Scalar;
 
     public:
+        virtual ~MatrixBase() = 0 {}
+
         template<typename OtherDerived>
         MatrixBase& operator=(const MatrixBase<OtherDerived>& other)
         {
