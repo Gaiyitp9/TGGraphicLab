@@ -70,7 +70,7 @@ namespace TG::Math
     };
 
     template<typename Evaluator, typename Functor, Traversal Traversal =
-        ContainFlag<typename Evaluator::XprType, XprFlag::LinearAccess>() ?
+        HasFlag<typename Evaluator::XprType, XprFlag::LinearAccess> ?
         Traversal::Linear : Traversal::Default>
     struct Redux;
 

@@ -78,8 +78,8 @@ namespace TG::Math
     };
 
     template<typename Kernel, Traversal Traversal =
-            ContainFlag<typename Kernel::DstXpr, XprFlag::LinearAccess>() &&
-                ContainFlag<typename Kernel::SrcXpr, XprFlag::LinearAccess>() ?
+            HasFlag<typename Kernel::DstXpr, XprFlag::LinearAccess> &&
+                HasFlag<typename Kernel::SrcXpr, XprFlag::LinearAccess> ?
             Traversal::Linear : Traversal::Default>
     struct Assignment;
 
@@ -105,7 +105,7 @@ namespace TG::Math
     template<typename Dst, typename Src>
     concept Assignable = IsMatrixExpression<Dst> && IsMatrixExpression<Src> &&
             (Traits<Dst>::Rows == Traits<Src>::Rows) && (Traits<Dst>::Columns == Traits<Src>::Columns) &&
-            ContainFlag<Dst, XprFlag::LeftValue>();
+            HasFlag<Dst, XprFlag::LeftValue>;
 
     // In Eigen, aliasing refers to assignment statement in which the same matrix (or array or vector)
     // appears on the left and on the right of the assignment operators.
