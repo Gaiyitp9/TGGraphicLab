@@ -5,7 +5,7 @@
 *****************************************************************/
 #pragma once
 
-// 参考Eigen实现，使用Expression template
+// 参考Eigen的实现，使用Expression template
 
 #include <concepts>
 
@@ -58,10 +58,7 @@ namespace TG::Math
     };
     // 表达式标志是否包含指定标志
     template<typename Xpr, XprFlag flag> requires requires { Traits<Xpr>::Flags; }
-    consteval bool ContainFlag()
-    {
-        return (Traits<Xpr>::Flags & flag) != XprFlag::None;
-    }
+    constexpr bool HasFlag = (Traits<Xpr>::Flags & flag) != XprFlag::None;
 
     // 赋值遍历类型
     enum class Traversal : unsigned char
@@ -104,7 +101,7 @@ namespace TG::Math
     } &&
     (
         // 对于左值表达式，求值器需要定义CoefficientRef接口
-        !ContainFlag<Xpr, XprFlag::LeftValue>() ||
+        !HasFlag<Xpr, XprFlag::LeftValue> ||
         requires(Evaluator<Xpr> evaluator, std::size_t index, std::size_t row, std::size_t column)
         {
             { evaluator.CoefficientRef(index) } -> std::same_as<typename Evaluator<Xpr>::CoeffType&>;
@@ -156,7 +153,7 @@ namespace TG::Math
     struct PlainMatrixType
     {
         using Type = Matrix<typename Traits<Xpr>::Scalar, Traits<Xpr>::Rows, Traits<Xpr>::Columns,
-                ContainFlag<Xpr, XprFlag::RowMajor>() ? StorageOrder::RowMajor : StorageOrder::ColumnMajor>;
+                HasFlag<Xpr, XprFlag::RowMajor> ? StorageOrder::RowMajor : StorageOrder::ColumnMajor>;
     };
 }
 

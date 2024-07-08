@@ -177,7 +177,7 @@ namespace TG
 			WGL_COLOR_BITS_ARB, 32,
 			WGL_DEPTH_BITS_ARB, 24,
 			WGL_STENCIL_BITS_ARB, 8,
-			0, // End
+			0,
 		};
 		wglChoosePixelFormatARB(m_mainWindow.GetDisplay(), formatAttribList, nullptr, 1, &pixelFormat, &numFormats);
 		SetPixelFormat(m_mainWindow.GetDisplay(), pixelFormat, &m_pfd);
