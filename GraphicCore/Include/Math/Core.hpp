@@ -91,22 +91,21 @@ namespace TG::Math
         Traits<Xpr>::Size;
         Traits<Xpr>::Flags;
     } &&
-    std::constructible_from<Evaluator<Xpr>, const Xpr&> &&
     requires(Evaluator<Xpr> evaluator, std::size_t index, std::size_t row, std::size_t column)
     {
-        typename Evaluator<Xpr>::XprType;
-        typename Evaluator<Xpr>::CoeffType;
-        { evaluator.Coefficient(index) } -> std::same_as<typename Evaluator<Xpr>::CoeffType>;
-        { evaluator.Coefficient(row, column) } -> std::same_as<typename Evaluator<Xpr>::CoeffType>;
+        typename Evaluator<Xpr>::Xpr;
+        { evaluator.Coefficient(index) } -> std::same_as<typename Traits<Xpr>::Scalar>;
+        { evaluator.Coefficient(row, column) } -> std::same_as<typename Traits<Xpr>::Scalar>;
     } &&
     (
         // 对于左值表达式，求值器需要定义CoefficientRef接口
-        !HasFlag<Xpr, XprFlag::LeftValue> ||
+        (!HasFlag<Xpr, XprFlag::LeftValue> && std::constructible_from<Evaluator<Xpr>, const Xpr&>) ||
+        (std::constructible_from<Evaluator<Xpr>, Xpr&> &&
         requires(Evaluator<Xpr> evaluator, std::size_t index, std::size_t row, std::size_t column)
         {
-            { evaluator.CoefficientRef(index) } -> std::same_as<typename Evaluator<Xpr>::CoeffType&>;
-            { evaluator.CoefficientRef(row, column) } -> std::same_as<typename Evaluator<Xpr>::CoeffType&>;
-        }
+            { evaluator.CoefficientRef(index) } -> std::same_as<typename Traits<Xpr>::Scalar&>;
+            { evaluator.CoefficientRef(row, column) } -> std::same_as<typename Traits<Xpr>::Scalar&>;
+        })
     );
 
     // 矩阵逐元素运算，要求矩阵元素类型相同以及行列相等

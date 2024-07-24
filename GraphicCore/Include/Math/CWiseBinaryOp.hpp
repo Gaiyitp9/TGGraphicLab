@@ -24,6 +24,7 @@ namespace TG::Math
     public:
         CWiseBinaryOp(const LhsXpr& lhs, const RhsXpr& rhs, BinaryOp op = {})
             : m_functor(op), m_lhs(lhs), m_rhs(rhs) {}
+	    ~CWiseBinaryOp() override = default;
 
         [[nodiscard]] BinaryOp Functor() const noexcept { return m_functor; }
         [[nodiscard]] const LhsXpr& LhsExpression() const noexcept { return m_lhs; }
@@ -40,17 +41,16 @@ namespace TG::Math
     class Evaluator<CWiseBinaryOp<BinaryOp, LhsXpr, RhsXpr>>
     {
     public:
-        using XprType = CWiseBinaryOp<BinaryOp, LhsXpr, RhsXpr>;
-        using CoeffType = Traits<XprType>::Scalar;
+        using Xpr = CWiseBinaryOp<BinaryOp, LhsXpr, RhsXpr>;
 
-        explicit Evaluator(const XprType& xpr) : m_functor(xpr.Functor()),
+        explicit Evaluator(const Xpr& xpr) : m_functor(xpr.Functor()),
             m_lhsEvaluator(xpr.LhsExpression()), m_rhsEvaluator(xpr.RhsExpression()) {}
 
-        [[nodiscard]] CoeffType Coefficient(std::size_t index) const
+        [[nodiscard]] Traits<Xpr>::Scalar Coefficient(std::size_t index) const
         {
             return m_functor(m_lhsEvaluator.Coefficient(index), m_rhsEvaluator.Coefficient(index));
         }
-        [[nodiscard]] CoeffType Coefficient(std::size_t row, std::size_t col) const
+        [[nodiscard]] Traits<Xpr>::Scalar Coefficient(std::size_t row, std::size_t col) const
         {
             return m_functor(m_lhsEvaluator.Coefficient(row), m_rhsEvaluator.Coefficient(col));
         }

@@ -201,8 +201,22 @@ public:
     // }
 };
 
+class TestConstFunction
+{
+public:
+    explicit TestConstFunction(int& i) : m_i(i) {}
+
+    [[nodiscard]] int& GetNum() const { return m_i; }
+private:
+    int& m_i;
+};
+
 int main()
 {
+    int myii = 2;
+    const TestConstFunction fffff(myii);
+    int& whatnum = fffff.GetNum();
+    whatnum = 3;
     MyDerived dd;
     MyDerived dd1;
     dd1 = dd;
