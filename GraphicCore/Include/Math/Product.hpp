@@ -41,21 +41,21 @@ namespace TG::Math
 
     public:
         using XprType = Product<LhsXpr, RhsXpr>;
-        using CoeffType = Traits<XprType>::Scalar;
+        using Scalar = Traits<XprType>::Scalar;
 
         explicit Evaluator(const XprType& xpr) : m_lhsEvaluator(xpr.LhsExpression()),
             m_rhsEvaluator(xpr.RhsExpression()) {}
 
-        CoeffType Coefficient(int index) const
+        Scalar Coefficient(int index) const
         {
             int row = index / Traits<XprType>::Columns;
             int col = index % Traits<XprType>::Columns;
             return Coefficient(row, col);
         }
 
-        CoeffType Coefficient(int row, int col) const
+        Scalar Coefficient(int row, int col) const
         {
-            CoeffType coefficient = 0;
+            Scalar coefficient = 0;
             for (int i = 0; i < Traits<XprType>::Columns; ++i)
                 coefficient += m_lhsEvaluator.Coefficient(row, i) * m_rhsEvaluator.Coefficient(i, col);
             return coefficient;

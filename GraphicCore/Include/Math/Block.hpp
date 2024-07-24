@@ -56,7 +56,7 @@ namespace TG::Math
 
     public:
         using XprType = Block<NestedXpr, BlockRows, BlockColumns>;
-        using CoeffType = Traits<XprType>::Scalar;
+        using Scalar = Traits<XprType>::Scalar;
 
         explicit Evaluator(const XprType& block) : Base(block, block.StartRow(), block.StartColumn()) {}
     };
@@ -65,21 +65,21 @@ namespace TG::Math
     class BlockEvaluator<NestedXpr, BlockRows, BlockColumns, false>
     {
     public:
-        using XprType = Block<NestedXpr, BlockRows, BlockColumns>;
-        using CoeffType = Traits<XprType>::Scalar;
+        using Xpr = Block<NestedXpr, BlockRows, BlockColumns>;
+        using Scalar = Traits<Xpr>::Scalar;
 
-        BlockEvaluator(const XprType& block, std::size_t startRow, std::size_t startColumn)
+        BlockEvaluator(const Xpr& block, std::size_t startRow, std::size_t startColumn)
             : m_xprEvaluator(block.NestedExpression()), m_startRow(startRow), m_startColumn(startColumn),
-            m_offset(HasFlag<XprType, XprFlag::RowMajor> ? startRow * Traits<NestedXpr>::Columns + startColumn :
+            m_offset(HasFlag<Xpr, XprFlag::RowMajor> ? startRow * Traits<NestedXpr>::Columns + startColumn :
                     startColumn * Traits<NestedXpr>::Rows + startRow)
         {}
 
-        [[nodiscard]] CoeffType Coefficient(std::size_t index) const
+        [[nodiscard]] Scalar Coefficient(std::size_t index) const
         {
             return m_xprEvaluator.Coefficient(m_offset + index);
         }
 
-        [[nodiscard]] CoeffType Coefficient(std::size_t row, std::size_t column) const
+        [[nodiscard]] Scalar Coefficient(std::size_t row, std::size_t column) const
         {
             return m_xprEvaluator.Coefficient(m_startRow + row, m_startColumn + column);
         }
@@ -96,7 +96,7 @@ namespace TG::Math
     {
         using Base = BlockEvaluator<NestedXpr, BlockRows, BlockColumns, false>;
         using XprType = Base::XprType;
-        using CoeffType = Base::CoeffType;
+        using Scalar = Base::Scalar;
         using Base::m_xprEvaluator;
         using Base::m_offset;
         using Base::m_startRow;
@@ -106,12 +106,12 @@ namespace TG::Math
         BlockEvaluator(const XprType& block, std::size_t startRow, std::size_t startColumn)
             : Base(block, startRow, startColumn) {}
 
-        CoeffType& CoefficientRef(std::size_t index)
+        Scalar& CoefficientRef(std::size_t index)
         {
             return m_xprEvaluator.CoefficientRef(m_offset + index);
         }
 
-        CoeffType& CoefficientRef(std::size_t row, std::size_t column)
+        Scalar& CoefficientRef(std::size_t row, std::size_t column)
         {
             return m_xprEvaluator.CoefficientRef(m_startRow + row, m_startColumn + column);
         }

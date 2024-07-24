@@ -547,5 +547,5 @@ namespace TG::PAL
     }
 
     // 在main之前调用RegisterWindow函数
-    [[maybe_unused]] static char gPlaceHolder = RegisterWindow();
+    [[maybe_unused]] static char gIgnore = RegisterWindow();
 }

@@ -25,6 +25,7 @@ namespace TG::Math
 
 	public:
 		Matrix() = default;
+		~Matrix() override = default;
 
 		// 构造时才会调用，可以保证不存在aliasing问题
         template<typename Derived>
@@ -93,39 +94,38 @@ namespace TG::Math
 	using Matrix4d = Matrix<double, 4, 4>;
 
     // 矩阵求值器
-    template<typename Scalar, std::size_t Rows, std::size_t Columns, StorageOrder Option>
-    class Evaluator<Matrix<Scalar, Rows, Columns, Option>>
+    template<typename Scalar, std::size_t Rows, std::size_t Columns, StorageOrder Order>
+    class Evaluator<Matrix<Scalar, Rows, Columns, Order>>
     {
     public:
-        using XprType = Matrix<Scalar, Rows, Columns, Option>;
-        using CoeffType= Traits<XprType>::Scalar;
+        using Xpr = Matrix<Scalar, Rows, Columns, Order>;
 
-        explicit Evaluator(const XprType& mat) : m_data(mat.m_storage) {}
+        explicit Evaluator(Xpr& mat) : m_data(mat.m_storage) {}
 
-        [[nodiscard]] CoeffType Coefficient(std::size_t index) const
+        [[nodiscard]] Scalar Coefficient(std::size_t index) const
         {
             return m_data[index];
         }
-        [[nodiscard]] CoeffType Coefficient(std::size_t row, std::size_t column) const
+        [[nodiscard]] Scalar Coefficient(std::size_t row, std::size_t column) const
         {
-            if constexpr (HasFlag<XprType, XprFlag::RowMajor>)
-                return m_data[row * Traits<XprType>::Columns + column];
+            if constexpr (HasFlag<Xpr, XprFlag::RowMajor>)
+                return m_data[row * Columns + column];
             else
-                return m_data[row + column * Traits<XprType>::Rows];
+                return m_data[row + column * Rows];
         }
-        CoeffType& CoefficientRef(std::size_t index)
+        Scalar& CoefficientRef(std::size_t index)
         {
-            return const_cast<CoeffType*>(m_data)[index];
+            return const_cast<Scalar*>(m_data)[index];
         }
-        CoeffType& CoefficientRef(std::size_t row, std::size_t column)
+        Scalar& CoefficientRef(std::size_t row, std::size_t column)
         {
-            if constexpr (HasFlag<XprType, XprFlag::RowMajor>)
-                return const_cast<CoeffType*>(m_data)[row * Traits<XprType>::Columns + column];
+            if constexpr (HasFlag<Xpr, XprFlag::RowMajor>)
+                return const_cast<Scalar*>(m_data)[row * Columns + column];
             else
-                return const_cast<CoeffType*>(m_data)[row + column * Traits<XprType>::Rows];
+                return const_cast<Scalar*>(m_data)[row + column * Rows];
         }
 
     private:
-        CoeffType const* m_data;
+        Scalar const* m_data;
     };
 }

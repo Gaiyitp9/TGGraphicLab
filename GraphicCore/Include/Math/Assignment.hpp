@@ -55,8 +55,8 @@ namespace TG::Math
     class AssignmentKernel
     {
     public:
-        using DstXpr = DstEvaluator::XprType;
-        using SrcXpr = SrcEvaluator::XprType;
+        using DstXpr = DstEvaluator::Xpr;
+        using SrcXpr = SrcEvaluator::Xpr;
 
         AssignmentKernel(DstEvaluator& dstEvaluator, const SrcEvaluator& srcEvaluator, Functor functor)
             : m_dstEvaluator(dstEvaluator), m_srcEvaluator(srcEvaluator), m_functor(functor) {}

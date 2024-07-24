@@ -40,7 +40,7 @@ namespace TG::Math
 
     public:
         using XprType = Transpose<NestedXpr>;
-        using CoeffType = Traits<NestedXpr>::Scalar;
+        using Scalar = Traits<NestedXpr>::Scalar;
 
         explicit Evaluator(const XprType& transpose) : Base(transpose) {}
     };
@@ -49,17 +49,17 @@ namespace TG::Math
     class TransposeEvaluator<NestedXpr, false>
     {
     public:
-        using XprType = Transpose<NestedXpr>;
-        using CoeffType = Traits<XprType>::Scalar;
+        using Xpr = Transpose<NestedXpr>;
+        using Scalar = Traits<Xpr>::Scalar;
 
-        explicit TransposeEvaluator(const XprType& transpose) : m_xprEvaluator(transpose.NestedExpression()) {}
+        explicit TransposeEvaluator(const Xpr& transpose) : m_xprEvaluator(transpose.NestedExpression()) {}
 
-        [[nodiscard]] CoeffType Coefficient(std::size_t index) const
+        [[nodiscard]] Scalar Coefficient(std::size_t index) const
         {
             return m_xprEvaluator.Coefficient(index);
         }
 
-        [[nodiscard]] CoeffType Coefficient(std::size_t row, std::size_t column) const
+        [[nodiscard]] Scalar Coefficient(std::size_t row, std::size_t column) const
         {
             return m_xprEvaluator.Coefficient(column, row);
         }
@@ -72,19 +72,19 @@ namespace TG::Math
     class TransposeEvaluator<NestedXpr, true> : public TransposeEvaluator<NestedXpr, false>
     {
         using Base = TransposeEvaluator<NestedXpr, false>;
-        using XprType = Base::XprType;
-        using CoeffType = Base::CoeffType;
+        using Xpr = Base::Xpr;
+        using Scalar = Base::Scalar;
         using Base::m_xprEvaluator;
 
     public:
-        explicit TransposeEvaluator(const XprType& transpose) : Base(transpose) {}
+        explicit TransposeEvaluator(const Xpr& transpose) : Base(transpose) {}
 
-        CoeffType& CoefficientRef(std::size_t index)
+        Scalar& CoefficientRef(std::size_t index)
         {
             return m_xprEvaluator.Coefficient(index);
         }
 
-        CoeffType& CoefficientRef(std::size_t row, std::size_t column)
+        Scalar& CoefficientRef(std::size_t row, std::size_t column)
         {
             return m_xprEvaluator.Coefficient(column, row);
         }
