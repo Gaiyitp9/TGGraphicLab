@@ -53,8 +53,8 @@ namespace TG::Math
     {
         None            = 0,
         RowMajor        = 1,            // 按行储存
-        LeftValue       = 1 << 1,       // 表达式是否是左值，也就是求值器有CoefficientRef函数
-        LinearAccess    = 1 << 2,       // 是否能看作一维向量，也就是求值器可以调用Coefficient(index)函数
+        LeftValue       = 1 << 1,       // 表达式是否可以作为左值，也就是求值器有EntryRef函数
+        LinearAccess    = 1 << 2,       // 是否能以一维向量的方式访问，也就是求值器可以调用Entry(index)函数
     };
     // 表达式标志是否包含指定标志
     template<typename Xpr, XprFlag flag> requires requires { Traits<Xpr>::Flags; }
@@ -94,8 +94,8 @@ namespace TG::Math
     requires(Evaluator<Xpr> evaluator, std::size_t index, std::size_t row, std::size_t column)
     {
         typename Evaluator<Xpr>::Xpr;
-        { evaluator.Coefficient(index) } -> std::same_as<typename Traits<Xpr>::Scalar>;
-        { evaluator.Coefficient(row, column) } -> std::same_as<typename Traits<Xpr>::Scalar>;
+        { evaluator.Entry(index) } -> std::same_as<typename Traits<Xpr>::Scalar>;
+        { evaluator.Entry(row, column) } -> std::same_as<typename Traits<Xpr>::Scalar>;
     } &&
     (
         // 对于左值表达式，求值器需要定义CoefficientRef接口
@@ -103,8 +103,8 @@ namespace TG::Math
         (std::constructible_from<Evaluator<Xpr>, Xpr&> &&
         requires(Evaluator<Xpr> evaluator, std::size_t index, std::size_t row, std::size_t column)
         {
-            { evaluator.CoefficientRef(index) } -> std::same_as<typename Traits<Xpr>::Scalar&>;
-            { evaluator.CoefficientRef(row, column) } -> std::same_as<typename Traits<Xpr>::Scalar&>;
+            { evaluator.EntryRef(index) } -> std::same_as<typename Traits<Xpr>::Scalar&>;
+            { evaluator.EntryRef(row, column) } -> std::same_as<typename Traits<Xpr>::Scalar&>;
         })
     );
 

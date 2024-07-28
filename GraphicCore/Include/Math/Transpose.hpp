@@ -54,14 +54,14 @@ namespace TG::Math
 
         explicit TransposeEvaluator(const Xpr& transpose) : m_xprEvaluator(transpose.NestedExpression()) {}
 
-        [[nodiscard]] Scalar Coefficient(std::size_t index) const
+        [[nodiscard]] Scalar Entry(std::size_t index) const
         {
-            return m_xprEvaluator.Coefficient(index);
+            return m_xprEvaluator.Entry(index);
         }
 
-        [[nodiscard]] Scalar Coefficient(std::size_t row, std::size_t column) const
+        [[nodiscard]] Scalar Entry(std::size_t row, std::size_t column) const
         {
-            return m_xprEvaluator.Coefficient(column, row);
+            return m_xprEvaluator.Entry(column, row);
         }
 
     protected:
@@ -79,14 +79,14 @@ namespace TG::Math
     public:
         explicit TransposeEvaluator(const Xpr& transpose) : Base(transpose) {}
 
-        Scalar& CoefficientRef(std::size_t index)
+        Scalar& EntryRef(std::size_t index)
         {
-            return m_xprEvaluator.Coefficient(index);
+            return m_xprEvaluator.EntryRef(index);
         }
 
-        Scalar& CoefficientRef(std::size_t row, std::size_t column)
+        Scalar& EntryRef(std::size_t row, std::size_t column)
         {
-            return m_xprEvaluator.Coefficient(column, row);
+            return m_xprEvaluator.EntryRef(column, row);
         }
     };
 }

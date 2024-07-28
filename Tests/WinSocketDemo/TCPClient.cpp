@@ -1,6 +1,6 @@
-#include <iostream>
 #include <winsock2.h>
 #include <ws2tcpip.h>
+#include <print>
 
 int main()
 {
@@ -8,62 +8,58 @@ int main()
     WSADATA wsadata;
     int error = WSAStartup(MAKEWORD(2, 2), &wsadata);
     if (error == 0)
-        std::cout << "Open client socket success." << std::endl;
+        std::println("Open client socket success.");
     else
     {
-        std::cout << "Open client socket failed: " << error << std::endl;
+        std::println("Open client socket failed. Error code: {}", error);
         return -1;
     }
     // 创建客户端socket
-    SOCKET clientSocket = socket(AF_INET, SOCK_STREAM, 0);
+    SOCKET clientSocket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
     if (clientSocket == INVALID_SOCKET)
     {
-        error = WSAGetLastError();
-        std::cout << "Create client socket failed: " << error << std::endl;
+        std::println("Create client socket failed. Error code: {}", WSAGetLastError());
         return -1;
     }
     // 服务器的地址信息
     SOCKADDR_IN server;
     server.sin_family = AF_INET;
-    server.sin_port = htons(8888);
+    server.sin_port = htons(12345);
     IN_ADDR ip;
     if (inet_pton(AF_INET, "127.0.0.1", &ip) == 0)
     {
-        error = WSAGetLastError();
-        std::cout << "ipv4 address convert failed: " << error << std::endl;
+        std::println("Ipv4 address convert failed. Error code: {}", WSAGetLastError());
         return -1;
     }
     server.sin_addr = ip;
     // 连接服务器
     if (connect(clientSocket, reinterpret_cast<SOCKADDR*>(&server), sizeof(SOCKADDR)) != 0)
     {
-        error = WSAGetLastError();
-        std::cout << "Connect server failed: " << error << std::endl;
+        std::println("Connect server failed. Error code: {}", WSAGetLastError());
         return -1;
     }
-    std::cout << "Connect to server. Waiting for data..." << std::endl;
+    std::println("Connect to server.");
 
     int i = 5;
     while (i-- > 0)
     {
-        char sendBuf[1024];
+        std::println("Waiting for data...");
         char receiveBuf[1024];
         // 从服务器接收数据
         if (recv(clientSocket, receiveBuf, 1024, 0) == SOCKET_ERROR)
         {
-            error = WSAGetLastError();
-            std::cout << "Client receive data failed: " << error << std::endl;
+            std::println("Client receive data failed. Error code: {}", WSAGetLastError());
             return -1;
         }
-        std::cout << "Receive: " << receiveBuf << std::endl;
-        // 向服务器发送数据
-        std::cout << "Send: ";
-        gets_s(sendBuf, 1024);
+        std::println("Data: {}", receiveBuf);
 
+        // 向服务器发送数据
+        std::print("Send: ");
+        char sendBuf[1024];
+        gets_s(sendBuf, 1024);
         if (send(clientSocket, sendBuf, 1024, 0) == SOCKET_ERROR)
         {
-            error = WSAGetLastError();
-            std::cout << "Client send data failed: " << error << std::endl;
+            std::println("Client send data failed. Error code: {}", WSAGetLastError());
             return -1;
         }
     }

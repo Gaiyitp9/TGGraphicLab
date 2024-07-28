@@ -201,22 +201,48 @@ public:
     // }
 };
 
+class MiniMatrix
+{
+public:
+    MiniMatrix() {}
+
+    int operator[](int index) const { return m_data[index]; }
+    int& operator[](int index) { return m_data[index]; }
+
+private:
+    int m_data[4] { 0, 1, 2, 3 };
+};
+
 class TestConstFunction
 {
 public:
-    explicit TestConstFunction(int& i) : m_i(i) {}
+    explicit TestConstFunction(int& i, MiniMatrix& matrix) : m_i(i), m_matrix(matrix) {}
 
-    [[nodiscard]] int& GetNum() const { return m_i; }
+    int& GetNum() { return m_i; }
+    [[nodiscard]] int GetNum() const { return m_i; }
+    int& GetEntry(int index) { return m_matrix[index]; }
+    [[nodiscard]] int GetEntry(int index) const { return m_matrix[index]; }
+
 private:
     int& m_i;
+    MiniMatrix& m_matrix;
 };
 
 int main()
 {
+    MiniMatrix matrix;
     int myii = 2;
-    const TestConstFunction fffff(myii);
-    int& whatnum = fffff.GetNum();
-    whatnum = 3;
+    const TestConstFunction fffff(myii, matrix);
+    int num = fffff.GetNum();
+    int entry = fffff.GetEntry(2);
+
+    int const* ci = new int[3] { 1, 2, 3 };
+    int* nonci = const_cast<int*>(ci);
+    int* ai = new int[3] { 1, 2, 3 };
+    int& rc = ai[0];
+    nonci[0] = 4;
+    rc = 2;
+
     MyDerived dd;
     MyDerived dd1;
     dd1 = dd;
