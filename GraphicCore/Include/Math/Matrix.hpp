@@ -41,11 +41,13 @@ namespace TG::Math
 	        return *this;
         }
 
-		const Scalar& operator[](std::size_t index) const
+		Scalar const* Data() const { return m_storage; }
+
+		Scalar operator[](std::size_t index) const
 		{
 			return m_storage[index];
 		}
-		const Scalar& operator()(std::size_t row, std::size_t column) const
+		Scalar operator()(std::size_t row, std::size_t column) const
 		{
 			if constexpr (HasFlag<Matrix, XprFlag::RowMajor>)
 				return m_storage[column + row * Columns];
@@ -66,8 +68,6 @@ namespace TG::Math
 
 	private:
 		Scalar m_storage[Rows * Columns]{};
-
-        friend class Evaluator<Matrix>;
 	};
 
 	template<typename Scalar, std::size_t Size> using Vector = Matrix<Scalar, Size, 1>;
@@ -93,39 +93,32 @@ namespace TG::Math
 	using Matrix3d = Matrix<double, 3, 3>;
 	using Matrix4d = Matrix<double, 4, 4>;
 
-    // 矩阵求值器
     template<typename Scalar, std::size_t Rows, std::size_t Columns, StorageOrder Order>
     class Evaluator<Matrix<Scalar, Rows, Columns, Order>>
     {
     public:
         using Xpr = Matrix<Scalar, Rows, Columns, Order>;
 
-        explicit Evaluator(Xpr& mat) : m_data(mat.m_storage) {}
+        explicit Evaluator(Xpr& matrix) : m_matrix(matrix) {}
 
-        [[nodiscard]] Scalar Coefficient(std::size_t index) const
+        [[nodiscard]] Scalar Entry(std::size_t index) const
         {
-            return m_data[index];
+            return m_matrix[index];
         }
-        [[nodiscard]] Scalar Coefficient(std::size_t row, std::size_t column) const
+        [[nodiscard]] Scalar Entry(std::size_t row, std::size_t column) const
         {
-            if constexpr (HasFlag<Xpr, XprFlag::RowMajor>)
-                return m_data[row * Columns + column];
-            else
-                return m_data[row + column * Rows];
+            return m_matrix(row, column);
         }
-        Scalar& CoefficientRef(std::size_t index)
+        Scalar& EntryRef(std::size_t index)
         {
-            return const_cast<Scalar*>(m_data)[index];
+        	return m_matrix[index];
         }
-        Scalar& CoefficientRef(std::size_t row, std::size_t column)
+        Scalar& EntryRef(std::size_t row, std::size_t column)
         {
-            if constexpr (HasFlag<Xpr, XprFlag::RowMajor>)
-                return const_cast<Scalar*>(m_data)[row * Columns + column];
-            else
-                return const_cast<Scalar*>(m_data)[row + column * Rows];
+        	return m_matrix(row, column);
         }
 
     private:
-        Scalar const* m_data;
+        Xpr& m_matrix;
     };
 }

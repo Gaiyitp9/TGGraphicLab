@@ -10,7 +10,7 @@ endif()
 if (EXISTS ${VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake)
 	message(STATUS "vcpkg root path: ${VCPKG_ROOT}")
 else()
-	message(FATAL_ERROR "VCPKG_ROOT is not valid vcpkg root path")
+	message(FATAL_ERROR "VCPKG_ROOT is not a valid vcpkg root path")
 endif()
 
 set(CMAKE_TOOLCHAIN_FILE "${VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake")
@@ -21,14 +21,14 @@ project(TGGraphicLab)
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# 文件编码为utf-8，运行时char编码为utf-8，wchar_t编码为utf-16 LE
-add_compile_options($<$<CXX_COMPILER_ID:MSVC>:/utf-8>
-		$<$<CXX_COMPILER_ID:MSVC>:/arch:AVX2>
-		$<$<CXX_COMPILER_ID:MSVC>:/fp:precise>)
-
-# add_library是否默认编译成动态库
-option(BUILD_SHARED_LIBS "Build using shared libraries" OFF)
-set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ${BUILD_SHARED_LIBS})
+if(WIN32)
+	set(TG_PLATFORM_WINDOWS true)
+	# 文件编码为utf-8，运行时char编码为utf-8，wchar_t编码为utf-16 LE
+	add_compile_options(/utf-8 /arch:AVX2 /fp:precise)
+	# add_library是否默认编译成动态库
+	option(BUILD_SHARED_LIBS "Build using shared libraries" OFF)
+	set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ${BUILD_SHARED_LIBS})
+endif()
 
 # 开启使用文件夹选项，vs项目可以分类放在不同文件夹下
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
