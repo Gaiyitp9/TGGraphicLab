@@ -228,6 +228,11 @@ private:
     MiniMatrix& m_matrix;
 };
 
+template <typename T>
+constexpr auto addLambda = [](T a, T b) -> T {
+    return a + b;
+};
+
 int main()
 {
     MiniMatrix matrix;

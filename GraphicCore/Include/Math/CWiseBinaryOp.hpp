@@ -62,22 +62,22 @@ namespace TG::Math
         Evaluator<RhsXpr> m_rhsEvaluator;
     };
 
-    template<typename Scalar> requires requires(Scalar a, Scalar b) { a + b; }
+    template<typename Scalar>
     struct ScalarSumOp
     {
         Scalar operator()(const Scalar& a, const Scalar& b) const { return a + b; }
     };
-    template<typename Scalar> requires requires(Scalar a, Scalar b) { a - b; }
+    template<typename Scalar>
     struct ScalarSubtractOp
     {
         Scalar operator()(const Scalar& a, const Scalar& b) const { return a - b; }
     };
-    template<typename Scalar> requires requires(Scalar a, Scalar b) { a * b; }
+    template<typename Scalar>
     struct ScalarProductOp
     {
         Scalar operator()(const Scalar& a, const Scalar& b) const { return a * b; }
     };
-    template<typename Scalar> requires requires(Scalar a, Scalar b) { a / b; }
+    template<typename Scalar>
     struct ScalarDivideOp
     {
         Scalar operator()(const Scalar& a, const Scalar& b) const { return a / b; }
