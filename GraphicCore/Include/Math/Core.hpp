@@ -45,8 +45,30 @@ namespace TG::Math
     // (我觉得这里是指派生类还未实例化，因为此时正在实例化基类)。可以使用Traits<Derived>来访问。
     // https://stackoverflow.com/questions/6006614/c-static-polymorphism-crtp-and-using-typedefs-from-derived-classes
     template<typename Xpr> struct Traits;
-    // 表达式求值器，每种表达式都需要特化该类
+    // 表达式求值器，每种表达式都需要特化自己的求值器
     template<typename Xpr> class Evaluator;
+    // 求值器推导指南。分为两种类型的求值器: 1. 根据索引返回值，用于计算 2. 根据索引返回引用，用来修改表达式的值
+    // 所有表达式都需要特化第一种求值器，可以作为左值的表达式需要特化第二种求值器
+    // 根据构造函数传入的表达式选择对应求值器。const Xpr&选择第一种求值器，Xpr&选择第二种求值器
+    // 注: 这里使用Xpr&作为构造函数的参数，不能使用Xpr，因为值传递会产生decay，即推倒的参数会忽略所有修饰符
+    // C++ Templates The Complete Guide Second Edition. P43
+    // When declaring call parameters by value, only trivial conversions that decay are supported:
+    // Qualifications with const or volatile are ignored, references convert to the referenced type, and raw
+    // arrays or functions convert to the corresponding pointer type.
+    template<typename Xpr> Evaluator(Xpr&) -> Evaluator<Xpr>;
+
+    // 矩阵储存顺序
+    enum class StorageOrder : unsigned char
+    {
+        RowMajor,
+        ColumnMajor,
+    };
+    // 默认储存顺序，可以使用宏定义修改
+#ifdef TG_ROW_MAJOR_MATRIX
+    inline constexpr auto DefaultOrder = StorageOrder::RowMajor;
+#else
+    inline constexpr StorageOrder DefaultOrder = StorageOrder::ColumnMajor;
+#endif
 
     // 矩阵表达式标志
     enum class XprFlag : unsigned char
@@ -56,9 +78,6 @@ namespace TG::Math
         LeftValue       = 1 << 1,       // 表达式是否可以作为左值，也就是求值器有EntryRef函数
         LinearAccess    = 1 << 2,       // 是否能以一维向量的方式访问，也就是求值器可以调用Entry(index)函数
     };
-    // 表达式标志是否包含指定标志
-    template<typename Xpr, XprFlag flag> requires requires { Traits<Xpr>::Flags; }
-    constexpr bool HasFlag = (Traits<Xpr>::Flags & flag) != XprFlag::None;
 
     // 赋值遍历类型
     enum class Traversal : unsigned char
@@ -68,45 +87,48 @@ namespace TG::Math
         Vectorized,
     };
 
-	// 矩阵储存顺序
-	enum class StorageOrder : unsigned char
-	{
-		RowMajor,
-		ColumnMajor,
-	};
-    // 默认储存顺序，可以使用宏定义修改
-#ifdef TG_ROW_MAJOR_MATRIX
-	inline constexpr auto DefaultOrder = StorageOrder::RowMajor;
-#else
-	inline constexpr StorageOrder DefaultOrder = StorageOrder::ColumnMajor;
-#endif
+    // 矩阵表达式支持的数据类型，用来限制自定义数据类型
+    template<typename Scalar>
+    concept IsMatrixScalar = requires(Scalar a, Scalar b)
+    {
+        { a + b } -> std::convertible_to<Scalar>;
+        { a - b } -> std::convertible_to<Scalar>;
+        { a * b } -> std::convertible_to<Scalar>;
+        { a / b } -> std::convertible_to<Scalar>;
+    };
 
     // 矩阵表达式概念，分为两部分: 1. 矩阵表达式的特性 2. 表达式求值器的要求
     template<typename Xpr>
     concept IsMatrixExpression = requires
     {
-        typename Traits<Xpr>::Scalar;
+        requires IsMatrixScalar<typename Traits<Xpr>::Scalar>;
         Traits<Xpr>::Rows;
         Traits<Xpr>::Columns;
         Traits<Xpr>::Size;
         Traits<Xpr>::Flags;
     } &&
-    requires(Evaluator<Xpr> evaluator, std::size_t index, std::size_t row, std::size_t column)
+    requires(Evaluator<const Xpr> evaluator, std::size_t index, std::size_t row, std::size_t column)
     {
+        requires std::constructible_from<Evaluator<const Xpr>, const Xpr&>;
         typename Evaluator<Xpr>::Xpr;
         { evaluator.Entry(index) } -> std::same_as<typename Traits<Xpr>::Scalar>;
         { evaluator.Entry(row, column) } -> std::same_as<typename Traits<Xpr>::Scalar>;
     } &&
     (
-        // 对于左值表达式，求值器需要定义CoefficientRef接口
-        (!HasFlag<Xpr, XprFlag::LeftValue> && std::constructible_from<Evaluator<Xpr>, const Xpr&>) ||
-        (std::constructible_from<Evaluator<Xpr>, Xpr&> &&
+        // 可以作为左值的表达式求值器概念
+        (Traits<Xpr>::Flags & XprFlag::LeftValue) == XprFlag::None ||
         requires(Evaluator<Xpr> evaluator, std::size_t index, std::size_t row, std::size_t column)
         {
-            { evaluator.EntryRef(index) } -> std::same_as<typename Traits<Xpr>::Scalar&>;
-            { evaluator.EntryRef(row, column) } -> std::same_as<typename Traits<Xpr>::Scalar&>;
-        })
+            requires std::constructible_from<Evaluator<Xpr>, Xpr&>;
+            typename Evaluator<Xpr>::Xpr;
+            { evaluator.Entry(index) } -> std::same_as<typename Traits<Xpr>::Scalar&>;
+            { evaluator.Entry(row, column) } -> std::same_as<typename Traits<Xpr>::Scalar&>;
+        }
     );
+
+    // 表达式标志是否包含指定标志
+    template<typename Xpr, XprFlag flag> requires IsMatrixExpression<Xpr>
+    constexpr bool HasFlag = (Traits<Xpr>::Flags & flag) != XprFlag::None;
 
     // 矩阵逐元素运算，要求矩阵元素类型相同以及行列相等
     template<typename LhsXpr, typename RhsXpr>
@@ -130,14 +152,10 @@ namespace TG::Math
     template<typename BinaryOp, typename LhsXpr, typename RhsXpr> requires CWiseOperable<LhsXpr, RhsXpr>
     class CWiseBinaryOp;
     // 二元运算
-    template<typename Scalar> requires requires(Scalar a, Scalar b) { a + b; }
-    struct ScalarSumOp;
-    template<typename Scalar> requires requires(Scalar a, Scalar b) { a - b; }
-    struct ScalarSubtractOp;
-    template<typename Scalar> requires requires(Scalar a, Scalar b) { a * b; }
-    struct ScalarProductOp;
-    template<typename Scalar> requires requires(Scalar a, Scalar b) { a / b; }
-    struct ScalarDivideOp;
+    template<typename Scalar> struct ScalarSumOp;
+    template<typename Scalar> struct ScalarSubtractOp;
+    template<typename Scalar> struct ScalarProductOp;
+    template<typename Scalar> struct ScalarDivideOp;
     // 矩阵乘法表达式
     template<typename LhsXpr, typename RhsXpr> requires MatrixMultipliable<LhsXpr, RhsXpr>
     class Product;
