@@ -63,12 +63,12 @@ namespace TG::Math
 
         void AssignCoefficient(std::size_t index)
         {
-            m_functor.AssignCoefficient(m_dstEvaluator.CoefficientRef(index), m_srcEvaluator.Coefficient(index));
+            m_functor.AssignCoefficient(m_dstEvaluator.Entry(index), m_srcEvaluator.Entry(index));
         }
 
         void AssignCoefficient(std::size_t row, std::size_t column)
         {
-            m_functor.AssignCoefficient(m_dstEvaluator.CoefficientRef(row, column), m_srcEvaluator.Coefficient(row, column));
+            m_functor.AssignCoefficient(m_dstEvaluator.Entry(row, column), m_srcEvaluator.Entry(row, column));
         }
 
     private:
@@ -113,7 +113,7 @@ namespace TG::Math
     void CallAssignmentNoAlias(Dst& dst, const Src& src, const Func& func)
     {
         using DstEvaluator = Evaluator<Dst>;
-        using SrcEvaluator = Evaluator<Src>;
+        using SrcEvaluator = Evaluator<const Src>;
         using Kernel = AssignmentKernel<DstEvaluator, SrcEvaluator, Func>;
 
         DstEvaluator dstEvaluator{dst};

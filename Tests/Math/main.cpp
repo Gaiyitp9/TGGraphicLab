@@ -11,6 +11,23 @@ namespace TG::Math
             EXPECT_EQ(mat[i], 0);
     }
 
+    TEST(TestMatrix, CWiseAdd)
+    {
+        std::random_device rd;
+        std::mt19937 gen(rd());
+        std::uniform_real_distribution urd(-1e5f, 1e5f);
+
+        Matrix4f mat1, mat2;
+        for (int i = 0; i < 15; ++i)
+        {
+            mat1[i] = urd(gen);
+            mat2[i] = urd(gen);
+        }
+        Matrix4f result = mat1 + mat2;
+        for (int i = 0; i < 15; ++i)
+            EXPECT_EQ(result[i], mat1[i] + mat2[i]);
+    }
+
     TEST(TestMatrix, CWiseProduct)
     {
         std::random_device rd;
