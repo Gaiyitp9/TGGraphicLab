@@ -95,7 +95,12 @@ namespace TG::Math
         { a - b } -> std::convertible_to<Scalar>;
         { a * b } -> std::convertible_to<Scalar>;
         { a / b } -> std::convertible_to<Scalar>;
+        a = b;
     };
+
+    // 表达式标志是否包含指定标志
+    template<typename Xpr, XprFlag flag>
+    constexpr bool HasFlag = (Traits<Xpr>::Flags & flag) != XprFlag::None;
 
     // 矩阵表达式概念，分为两部分: 1. 矩阵表达式的特性 2. 表达式求值器的要求
     template<typename Xpr>
@@ -109,26 +114,23 @@ namespace TG::Math
     } &&
     requires(Evaluator<const Xpr> evaluator, std::size_t index, std::size_t row, std::size_t column)
     {
+        typename Evaluator<const Xpr>::Xpr;
         requires std::constructible_from<Evaluator<const Xpr>, const Xpr&>;
-        typename Evaluator<Xpr>::Xpr;
-        { evaluator.Entry(index) } -> std::same_as<typename Traits<Xpr>::Scalar>;
         { evaluator.Entry(row, column) } -> std::same_as<typename Traits<Xpr>::Scalar>;
-    } &&
+        requires !HasFlag<Xpr, XprFlag::LinearAccess> ||
+            requires { { evaluator.Entry(index) } -> std::same_as<typename Traits<Xpr>::Scalar>; };
+    } && // 可以作为左值的表达式求值器概念
     (
-        // 可以作为左值的表达式求值器概念
-        (Traits<Xpr>::Flags & XprFlag::LeftValue) == XprFlag::None ||
+        !HasFlag<Xpr, XprFlag::LeftValue> ||
         requires(Evaluator<Xpr> evaluator, std::size_t index, std::size_t row, std::size_t column)
         {
-            requires std::constructible_from<Evaluator<Xpr>, Xpr&>;
             typename Evaluator<Xpr>::Xpr;
-            { evaluator.Entry(index) } -> std::same_as<typename Traits<Xpr>::Scalar&>;
+            requires std::constructible_from<Evaluator<Xpr>, Xpr&>;
             { evaluator.Entry(row, column) } -> std::same_as<typename Traits<Xpr>::Scalar&>;
+            requires !HasFlag<Xpr, XprFlag::LinearAccess> ||
+                requires { { evaluator.Entry(index) } -> std::same_as<typename Traits<Xpr>::Scalar&>; };
         }
     );
-
-    // 表达式标志是否包含指定标志
-    template<typename Xpr, XprFlag flag> requires IsMatrixExpression<Xpr>
-    constexpr bool HasFlag = (Traits<Xpr>::Flags & flag) != XprFlag::None;
 
     // 矩阵逐元素运算，要求矩阵元素类型相同以及行列相等
     template<typename LhsXpr, typename RhsXpr>
@@ -152,7 +154,7 @@ namespace TG::Math
     template<typename BinaryOp, typename LhsXpr, typename RhsXpr> requires CWiseOperable<LhsXpr, RhsXpr>
     class CWiseBinaryOp;
     // 二元运算
-    template<typename Scalar> struct ScalarSumOp;
+    template<typename Scalar> struct ScalarAddOp;
     template<typename Scalar> struct ScalarSubtractOp;
     template<typename Scalar> struct ScalarProductOp;
     template<typename Scalar> struct ScalarDivideOp;

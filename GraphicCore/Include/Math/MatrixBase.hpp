@@ -13,8 +13,6 @@ namespace TG::Math
         using Scalar = Traits<Derived>::Scalar;
 
     public:
-        virtual ~MatrixBase() = 0 {}
-
         template<typename OtherDerived>
         MatrixBase& operator=(const MatrixBase<OtherDerived>& other)
         {
@@ -26,7 +24,7 @@ namespace TG::Math
         Derived& Expression() { return *static_cast<Derived*>(this); }
 
         template<typename OtherDerived>
-        CWiseBinaryOp<ScalarSumOp<Scalar>, Derived, OtherDerived> operator+(const MatrixBase<OtherDerived>& other) const
+        CWiseBinaryOp<ScalarAddOp<Scalar>, Derived, OtherDerived> operator+(const MatrixBase<OtherDerived>& other) const
         {
             return { Expression(), other.Expression() };
         }
@@ -63,7 +61,7 @@ namespace TG::Math
 
         Scalar Sum() const
         {
-            return Redux(ScalarSumOp<Scalar>{});
+            return Redux(ScalarAddOp<Scalar>{});
         }
 
         template<std::size_t BlockRows, std::size_t BlockCols>

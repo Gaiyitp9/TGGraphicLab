@@ -25,7 +25,6 @@ namespace TG::Math
 
 	public:
 		Matrix() = default;
-		~Matrix() override = default;
 
 		// 构造时才会调用，可以保证不存在aliasing问题
         template<typename Derived>

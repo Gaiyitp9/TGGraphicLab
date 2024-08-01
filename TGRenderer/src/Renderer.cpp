@@ -10,6 +10,7 @@
 #include "spdlog/spdlog.h"
 #include "glad/wgl.h"
 #include "glad/gles2.h"
+#include <fstream>
 
 namespace TG
 {
@@ -221,12 +222,16 @@ namespace TG
 		glEnableVertexAttribArray(0);
 		glBindVertexArray(0);
 
-		char const* vertexShaderSource = "#version 300 es\n"
-			"layout (location = 0) in vec3 aPos;\n"
-			"void main()\n"
-			"{\n"
-			"   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
-			"}\0";
+		std::ifstream vertexFile("../../Source/Shaders/GLSL/simple.vert");
+		if (!vertexFile)
+		{
+			spdlog::error("Load simple vertex file failed!");
+			return;
+		}
+		std::stringstream vertexBuffer;
+		vertexBuffer << vertexFile.rdbuf();
+		std::string vertexStr = vertexBuffer.str();
+		char const* vertexShaderSource = vertexStr.c_str();
 		unsigned int vertexShader = glCreateShader(GL_VERTEX_SHADER);
 		glShaderSource(vertexShader, 1, &vertexShaderSource, nullptr);
 		glCompileShader(vertexShader);
@@ -236,16 +241,19 @@ namespace TG
 		if (!success)
 		{
 			glGetShaderInfoLog(vertexShader, 512, nullptr, infoLog);
-			spdlog::info("ERROR::SHADER::VERTEX::COMPILATION_FAILED\n{}", infoLog);
+			spdlog::error("ERROR::SHADER::VERTEX::COMPILATION_FAILED\n{}", infoLog);
 		}
 
-		char const* fragmentShaderSource = "#version 300 es\n"
-		"precision mediump float;\n"
-		"out vec4 FragColor;\n"
-		"void main()\n"
-		"{\n"
-		"	FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
-		"}\n\0";
+		std::ifstream fragmentFile("../../Source/Shaders/GLSL/simple.frag");
+		if (!fragmentFile)
+		{
+			spdlog::error("Load simple fragment file failed!");
+			return;
+		}
+		std::stringstream fragBuffer;
+		fragBuffer << fragmentFile.rdbuf();
+		std::string fragStr = fragBuffer.str();
+		char const* fragmentShaderSource = fragStr.c_str();
 		unsigned int fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
 		glShaderSource(fragmentShader, 1, &fragmentShaderSource, nullptr);
 		glCompileShader(fragmentShader);
@@ -253,7 +261,7 @@ namespace TG
 		if (!success)
 		{
 			glGetShaderInfoLog(fragmentShader, 512, nullptr, infoLog);
-			spdlog::info("ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n {}", infoLog);
+			spdlog::error("ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n {}", infoLog);
 		}
 
 		m_shaderProgram = glCreateProgram();
@@ -263,7 +271,7 @@ namespace TG
 		glGetProgramiv(m_shaderProgram, GL_LINK_STATUS, &success);
 		if (!success) {
 			glGetProgramInfoLog(m_shaderProgram, 512, nullptr, infoLog);
-			spdlog::info("ERROR::SHADER::PROGRAM::LINKING_FAILED\n {}", infoLog);
+			spdlog::error("ERROR::SHADER::PROGRAM::LINKING_FAILED\n {}", infoLog);
 		}
 		glDeleteShader(vertexShader);
 		glDeleteShader(fragmentShader);
