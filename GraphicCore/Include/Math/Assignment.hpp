@@ -11,95 +11,48 @@ namespace TG::Math
     template<typename Scalar> requires requires(Scalar a, Scalar b) { a = b; }
     struct AssignOp
     {
-        void AssignCoefficient(Scalar& a, Scalar b) { a = b; }
+        void operator()(Scalar& a, Scalar b) { a = b; }
     };
 
-	// 直接展开赋值
-    // 通过行列赋值
-    template<typename Kernel, std::size_t Index, std::size_t Stop>
-    struct UnrollDefaultAssign
+    template<typename Dst, typename Src, typename AssignFunctor>
+    class Assignment
     {
-        static constexpr std::size_t Row = Index / Traits<typename Kernel::DstXpr>::Columns;
-        static constexpr std::size_t Column = Index % Traits<typename Kernel::DstXpr>::Columns;
+    	static constexpr Traversal TraverseManner = HasFlag<Dst, XprFlag::LinearAccess> &&
+    	    HasFlag<Src, XprFlag::LinearAccess> ? Traversal::Linear : Traversal::Default;
 
-        static void Run(Kernel& kernel)
-        {
-            kernel.AssignCoefficient(Row, Column);
-            UnrollDefaultAssign<Kernel, Index + 1, Stop>::Run(kernel);
-        }
-    };
-    template<typename Kernel, std::size_t Stop>
-    struct UnrollDefaultAssign<Kernel, Stop, Stop>
-    {
-        static void Run(Kernel&){}
-    };
-
-    // 线性赋值
-	template<typename Kernel, std::size_t Index, std::size_t Stop>
-	struct UnrollLinearAssign
-	{
-		static void Run(Kernel& kernel)
-		{
-            kernel.AssignCoefficient(Index);
-            UnrollLinearAssign<Kernel, Index + 1, Stop>::Run(kernel);
-		}
-	};
-	template<typename Kernel, std::size_t Stop>
-	struct UnrollLinearAssign<Kernel, Stop, Stop>
-	{
-		static void Run(Kernel&){}
-	};
-
-    // 赋值核，封装赋值过程涉及的细节
-    template<typename DstEvaluator, typename SrcEvaluator, typename Functor>
-    class AssignmentKernel
-    {
     public:
-        using DstXpr = DstEvaluator::Xpr;
-        using SrcXpr = SrcEvaluator::Xpr;
+        Assignment(Dst& dst, const Src& src, AssignFunctor functor)
+            : m_dstEvaluator(dst), m_srcEvaluator(src), m_functor(functor)
+        {}
 
-        AssignmentKernel(DstEvaluator& dstEvaluator, const SrcEvaluator& srcEvaluator, Functor functor)
-            : m_dstEvaluator(dstEvaluator), m_srcEvaluator(srcEvaluator), m_functor(functor) {}
-
-        void AssignCoefficient(std::size_t index)
+		// 通过行列赋值
+        template<std::size_t Index> requires (TraverseManner == Traversal::Default)
+        void Run()
         {
-            m_functor.AssignCoefficient(m_dstEvaluator.Entry(index), m_srcEvaluator.Entry(index));
+            if constexpr (Index < Traits<Dst>::Size)
+            {
+	            constexpr std::size_t row = Index / Traits<Dst>::Columns;
+	            constexpr std::size_t column = Index % Traits<Dst>::Columns;
+				m_functor(m_dstEvaluator.Entry(row, column), m_srcEvaluator.Entry(row, column));
+                Run<Index + 1>();
+            }
         }
-
-        void AssignCoefficient(std::size_t row, std::size_t column)
+    	// 线性赋值
+        template<std::size_t Index> requires (TraverseManner == Traversal::Linear)
+        void Run()
         {
-            m_functor.AssignCoefficient(m_dstEvaluator.Entry(row, column), m_srcEvaluator.Entry(row, column));
+            if constexpr (Index < Traits<Dst>::Size)
+            {
+				m_functor(m_dstEvaluator.Entry(Index), m_srcEvaluator.Entry(Index));
+                Run<Index + 1>();
+            }
         }
 
     private:
-        DstEvaluator& m_dstEvaluator;
-        const SrcEvaluator& m_srcEvaluator;
-        Functor m_functor;
+        Evaluator<Dst> m_dstEvaluator;
+        Evaluator<const Src> m_srcEvaluator;
+        AssignFunctor m_functor;
     };
-
-    template<typename Kernel, Traversal Traversal =
-            HasFlag<typename Kernel::DstXpr, XprFlag::LinearAccess> &&
-                HasFlag<typename Kernel::SrcXpr, XprFlag::LinearAccess> ?
-            Traversal::Linear : Traversal::Default>
-    struct Assignment;
-
-    template<typename Kernel>
-    struct Assignment<Kernel, Traversal::Default>
-    {
-        static void Run(Kernel& kernel)
-        {
-            UnrollDefaultAssign<Kernel, 0, Traits<typename Kernel::DstXpr>::Size>::Run(kernel);
-        }
-    };
-
-	template<typename Kernel>
-	struct Assignment<Kernel, Traversal::Linear>
-	{
-		static void Run(Kernel& kernel)
-		{
-            UnrollLinearAssign<Kernel, 0, Traits<typename Kernel::DstXpr>::Size>::Run(kernel);
-		}
-	};
 
     // 矩阵表达式赋值概念，目标表达式和源表达式的行列数需要相等，且表达式需要是左值
     template<typename Dst, typename Src>
@@ -109,22 +62,15 @@ namespace TG::Math
 
     // In Eigen, aliasing refers to assignment statement in which the same matrix (or array or vector)
     // appears on the left and on the right of the assignment operators.
-    template<typename Dst, typename Src, typename Func> requires Assignable<Dst, Src>
-    void CallAssignmentNoAlias(Dst& dst, const Src& src, const Func& func)
+    template<typename Dst, typename Src, typename AssignFunctor> requires Assignable<Dst, Src>
+    void CallAssignmentNoAlias(Dst& dst, const Src& src, const AssignFunctor& func)
     {
-        using DstEvaluator = Evaluator<Dst>;
-        using SrcEvaluator = Evaluator<const Src>;
-        using Kernel = AssignmentKernel<DstEvaluator, SrcEvaluator, Func>;
-
-        DstEvaluator dstEvaluator{dst};
-        SrcEvaluator srcEvaluator{src};
-
-        Kernel kernel(dstEvaluator, srcEvaluator, func);
-        Assignment<Kernel>::Run(kernel);
+    	Assignment assign(dst, src, func);
+    	assign.template Run<0>();
     }
 
-    template<typename Dst, typename Src, typename Func>
-    void CallAssignment(Dst& dst, const Src& src, const Func& func)
+    template<typename Dst, typename Src, typename AssignFunctor>
+    void CallAssignment(Dst& dst, const Src& src, const AssignFunctor& func)
     {
         typename PlainMatrixType<Src>::Type temp(src);
         CallAssignmentNoAlias(dst, temp, func);
