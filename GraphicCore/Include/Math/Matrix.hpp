@@ -21,8 +21,6 @@ namespace TG::Math
 	template<typename Scalar, std::size_t Rows, std::size_t Columns, StorageOrder Order>
 	class Matrix final : public MatrixBase<Matrix<Scalar, Rows, Columns, Order>>
 	{
-		using Base = MatrixBase<Matrix>;
-
 	public:
 		Matrix() = default;
 
@@ -36,11 +34,11 @@ namespace TG::Math
 		template<typename Derived>
 		Matrix& operator=(const MatrixBase<Derived>& other)
         {
-        	Base::operator=(other);
+        	MatrixBase<Matrix>::operator=(other);
 	        return *this;
         }
 
-		Scalar const* Data() const { return m_storage; }
+		Scalar const* Data() const noexcept { return m_storage; }
 
 		Scalar operator[](std::size_t index) const
 		{

@@ -26,31 +26,31 @@ namespace TG::Math
         template<typename OtherDerived>
         CWiseBinaryOp<ScalarAddOp<Scalar>, Derived, OtherDerived> operator+(const MatrixBase<OtherDerived>& other) const
         {
-            return { Expression(), other.Expression() };
+            return {Expression(), other.Expression()};
         }
 
         template<typename OtherDerived>
         CWiseBinaryOp<ScalarSubtractOp<Scalar>, Derived, OtherDerived> operator-(const MatrixBase<OtherDerived>& other) const
         {
-            return { Expression(), other.Expression() };
+            return {Expression(), other.Expression()};
         }
 
         template<typename OtherDerived>
         CWiseBinaryOp<ScalarDivideOp<Scalar>, Derived, OtherDerived> operator/(const MatrixBase<OtherDerived>& other) const
         {
-            return { Expression(), other.Expression() };
+            return {Expression(), other.Expression()};
         }
 
         template<typename OtherDerived>
         CWiseBinaryOp<ScalarProductOp<Scalar>, Derived, OtherDerived> CWiseProduct(const MatrixBase<OtherDerived>& other) const
         {
-            return { Expression(), other.Expression() };
+            return {Expression(), other.Expression()};
         }
 
         template<typename OtherDerived>
         Product<Derived, OtherDerived> operator*(const MatrixBase<OtherDerived>& other) const
         {
-            return { Expression(), other.Expression() };
+            return {Expression(), other.Expression()};
         }
 
         template<typename BinaryOp>
@@ -64,10 +64,10 @@ namespace TG::Math
             return Redux(ScalarAddOp<Scalar>{});
         }
 
-        template<std::size_t BlockRows, std::size_t BlockCols>
-        Block<Derived, BlockRows, BlockCols> Block(std::size_t startRow, std::size_t startCol)
+        template<std::size_t StartRow, std::size_t StartColumn, std::size_t BlockRows, std::size_t BlockCols>
+        Block<Derived, StartRow, StartColumn, BlockRows, BlockCols> Block()
         {
-            return { Expression(), startRow, startCol };
+            return Math::Block<Derived, StartRow, StartColumn, BlockRows, BlockCols>(Expression());
         }
 
         Transpose<Derived> Transpose()

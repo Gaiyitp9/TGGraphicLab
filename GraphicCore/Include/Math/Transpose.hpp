@@ -81,12 +81,12 @@ namespace TG::Math
 
         Scalar& EntryRef(std::size_t index)
         {
-            return m_xprEvaluator.EntryRef(index);
+            return m_xprEvaluator.Entry(index);
         }
 
         Scalar& EntryRef(std::size_t row, std::size_t column)
         {
-            return m_xprEvaluator.EntryRef(column, row);
+            return m_xprEvaluator.Entry(column, row);
         }
     };
 }

@@ -46,7 +46,7 @@ namespace TG::Math
     // https://stackoverflow.com/questions/6006614/c-static-polymorphism-crtp-and-using-typedefs-from-derived-classes
     template<typename Xpr> struct Traits;
     // 表达式求值器，每种表达式都需要特化自己的求值器
-    template<typename Xpr> class Evaluator;
+    template<typename Xpr, bool IsConst> class Evaluator;
     // 求值器推导指南(template deduction guide)
     // 分为两种类型的求值器: 1. 根据索引返回值，用于计算 2. 根据索引返回引用，用来修改表达式的值
     // 所有表达式都需要特化第一种求值器，可以作为左值的表达式需要特化第二种求值器
@@ -56,7 +56,7 @@ namespace TG::Math
     // When declaring call parameters by value, only trivial conversions that decay are supported:
     // Qualifications with const or volatile are ignored, references convert to the referenced type, and raw
     // arrays or functions convert to the corresponding pointer type.
-    template<typename Xpr> Evaluator(Xpr&) -> Evaluator<Xpr>;
+    template<typename Xpr> Evaluator(Xpr&) -> Evaluator<Xpr, std::is_const_v<Xpr>>;
 
     // 矩阵储存顺序
     enum class StorageOrder : unsigned char
@@ -113,20 +113,18 @@ namespace TG::Math
         Traits<Xpr>::Size;
         Traits<Xpr>::Flags;
     } &&
-    requires(Evaluator<const Xpr> evaluator, std::size_t index, std::size_t row, std::size_t column)
+    requires(Evaluator<Xpr, true> evaluator, std::size_t index, std::size_t row, std::size_t column)
     {
-        typename Evaluator<const Xpr>::Xpr;
-        requires std::constructible_from<Evaluator<const Xpr>, const Xpr&>;
+        requires std::constructible_from<Evaluator<Xpr, true>, const Xpr&>;
         { evaluator.Entry(row, column) } -> std::same_as<typename Traits<Xpr>::Scalar>;
         requires !HasFlag<Xpr, XprFlag::LinearAccess> ||
             requires { { evaluator.Entry(index) } -> std::same_as<typename Traits<Xpr>::Scalar>; };
     } && // 可以作为左值的表达式求值器概念
     (
         !HasFlag<Xpr, XprFlag::LeftValue> ||
-        requires(Evaluator<Xpr> evaluator, std::size_t index, std::size_t row, std::size_t column)
+        requires(Evaluator<Xpr, false> evaluator, std::size_t index, std::size_t row, std::size_t column)
         {
-            typename Evaluator<Xpr>::Xpr;
-            requires std::constructible_from<Evaluator<Xpr>, Xpr&>;
+            requires std::constructible_from<Evaluator<Xpr, false>, Xpr&>;
             { evaluator.Entry(row, column) } -> std::same_as<typename Traits<Xpr>::Scalar&>;
             requires !HasFlag<Xpr, XprFlag::LinearAccess> ||
                 requires { { evaluator.Entry(index) } -> std::same_as<typename Traits<Xpr>::Scalar&>; };
@@ -163,7 +161,8 @@ namespace TG::Math
     template<typename LhsXpr, typename RhsXpr> requires MatrixMultipliable<LhsXpr, RhsXpr>
     class Product;
     // 矩阵块表达式
-    template<typename NestedXpr, std::size_t BlockRows, std::size_t BlockColumns>
+    template<typename NestedXpr, std::size_t StartRow, std::size_t StartColumn, std::size_t BlockRows,
+        std::size_t BlockColumns>
     class Block;
     // 矩阵转置表达式
     template<typename NestedXpr>
