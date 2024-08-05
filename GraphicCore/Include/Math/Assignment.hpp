@@ -49,8 +49,8 @@ namespace TG::Math
         }
 
     private:
-        Evaluator<Dst> m_dstEvaluator;
-        Evaluator<Src> m_srcEvaluator;
+        Evaluator<Dst, false> m_dstEvaluator;
+        Evaluator<Src, true> m_srcEvaluator;
         AssignFunctor m_functor;
     };
 

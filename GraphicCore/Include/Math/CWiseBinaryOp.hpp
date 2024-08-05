@@ -36,7 +36,7 @@ namespace TG::Math
 	};
 
     template<typename BinaryOp, typename LhsXpr, typename RhsXpr>
-    class Evaluator<const CWiseBinaryOp<BinaryOp, LhsXpr, RhsXpr>>
+    class Evaluator<CWiseBinaryOp<BinaryOp, LhsXpr, RhsXpr>, true>
     {
     public:
         using Xpr = CWiseBinaryOp<BinaryOp, LhsXpr, RhsXpr>;
@@ -55,8 +55,8 @@ namespace TG::Math
 
     private:
         const BinaryOp m_functor;
-        Evaluator<const LhsXpr> m_lhsEvaluator;
-        Evaluator<const RhsXpr> m_rhsEvaluator;
+        Evaluator<LhsXpr, true> m_lhsEvaluator;
+        Evaluator<RhsXpr, true> m_rhsEvaluator;
     };
 
     template<typename Scalar>

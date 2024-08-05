@@ -34,7 +34,7 @@ namespace TG::Math
 
     // 矩阵乘法求值器
     template<typename LhsXpr, typename RhsXpr>
-    class Evaluator<Product<LhsXpr, RhsXpr>>
+    class Evaluator<Product<LhsXpr, RhsXpr>, true>
     {
         using Lhs = PlainMatrixType<LhsXpr>::Type;
         using Rhs = PlainMatrixType<RhsXpr>::Type;
@@ -46,23 +46,23 @@ namespace TG::Math
         explicit Evaluator(const XprType& xpr) : m_lhsEvaluator(xpr.LhsExpression()),
             m_rhsEvaluator(xpr.RhsExpression()) {}
 
-        Scalar Coefficient(int index) const
+        Scalar Entry(int index) const
         {
             int row = index / Traits<XprType>::Columns;
             int col = index % Traits<XprType>::Columns;
-            return Coefficient(row, col);
+            return Entry(row, col);
         }
 
-        Scalar Coefficient(int row, int col) const
+        Scalar Entry(int row, int col) const
         {
             Scalar coefficient = 0;
             for (int i = 0; i < Traits<XprType>::Columns; ++i)
-                coefficient += m_lhsEvaluator.Coefficient(row, i) * m_rhsEvaluator.Coefficient(i, col);
+                coefficient += m_lhsEvaluator.Entry(row, i) * m_rhsEvaluator.Entry(i, col);
             return coefficient;
         }
 
     private:
-        Evaluator<Lhs> m_lhsEvaluator;
-        Evaluator<Rhs> m_rhsEvaluator;
+        Evaluator<Lhs, true> m_lhsEvaluator;
+        Evaluator<Rhs, true> m_rhsEvaluator;
     };
 }
