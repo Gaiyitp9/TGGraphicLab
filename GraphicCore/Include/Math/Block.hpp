@@ -41,62 +41,48 @@ namespace TG::Math
         NestedXpr& NestedExpression() noexcept { return m_xpr; }
         const NestedXpr& NestedExpression() const noexcept { return m_xpr; }
 
-        static consteval std::size_t StartRow() { return StartRow_; }
-        static consteval std::size_t StartColumn() { return StartColumn_; }
+        static constexpr std::size_t StartRow() { return StartRow_; }
+        static constexpr std::size_t StartColumn() { return StartColumn_; }
 
     private:
         NestedXpr& m_xpr;
     };
 
     template<typename NestedXpr, std::size_t StartRow, std::size_t StartColumn, std::size_t BlockRows,
-        std::size_t BlockColumns>
-    class Evaluator<const Block<NestedXpr, StartRow, StartColumn, BlockRows, BlockColumns>>
+        std::size_t BlockColumns, bool IsConst>
+    class Evaluator<Block<NestedXpr, StartRow, StartColumn, BlockRows, BlockColumns>, IsConst>
     {
-    public:
         using Xpr = Block<NestedXpr, StartRow, StartColumn, BlockRows, BlockColumns>;
-
-        explicit Evaluator(const Xpr& block) : m_xprEvaluator(block.NestedExpression()) {}
-
-        Traits<Xpr>::Scalar Entry(std::size_t index) const requires HasFlag<Xpr, XprFlag::LinearAccess>
-        {
-            static constexpr std::size_t Offset = HasFlag<Xpr, XprFlag::RowMajor> ?
+        using InternalXpr = std::conditional_t<IsConst, const Xpr, Xpr>;
+        using Scalar = Traits<Xpr>::Scalar;
+        static constexpr std::size_t Offset = HasFlag<Xpr, XprFlag::RowMajor> ?
                 Traits<Xpr>::StartRow * Traits<Xpr>::Columns + Traits<Xpr>::StartColumn :
                 Traits<Xpr>::StartColumn * Traits<Xpr>::Rows + Traits<Xpr>::StartRow;
+
+    public:
+        explicit Evaluator(InternalXpr& block) : m_xprEvaluator(block.NestedExpression()) {}
+
+        Scalar Entry(std::size_t index) const requires HasFlag<Xpr, XprFlag::LinearAccess>
+        {
             return m_xprEvaluator.Entry(Offset + index);
         }
 
-        Traits<Xpr>::Scalar Entry(std::size_t row, std::size_t column) const
+        Scalar Entry(std::size_t row, std::size_t column) const
+        {
+            return m_xprEvaluator.Entry(Traits<Xpr>::StartRow + row, Traits<Xpr>::StartColumn + column);
+        }
+
+        Scalar& Entry(std::size_t index) requires (HasFlag<Xpr, XprFlag::LinearAccess> && !IsConst)
+        {
+            return m_xprEvaluator.Entry(Offset + index);
+        }
+
+        Scalar& Entry(std::size_t row, std::size_t column) requires !IsConst
         {
             return m_xprEvaluator.Entry(Traits<Xpr>::StartRow + row, Traits<Xpr>::StartColumn + column);
         }
 
     private:
-        Evaluator<const NestedXpr> m_xprEvaluator;
-    };
-
-    template<typename NestedXpr, std::size_t StartRow, std::size_t StartColumn, std::size_t BlockRows,
-        std::size_t BlockColumns>
-    class Evaluator<Block<NestedXpr, StartRow, StartColumn, BlockRows, BlockColumns>>
-    {
-    public:
-        using Xpr = Block<NestedXpr, StartRow, StartColumn, BlockRows, BlockColumns>;
-
-        explicit Evaluator(Xpr& block) : m_xprEvaluator(block.NestedExpression()) {}
-
-        Traits<Xpr>::Scalar& Entry(std::size_t index) requires HasFlag<Xpr, XprFlag::LinearAccess>
-        {
-            static constexpr std::size_t Offset = HasFlag<Xpr, XprFlag::RowMajor> ?
-                Traits<Xpr>::StartRow * Traits<Xpr>::Columns + Traits<Xpr>::StartColumn :
-                Traits<Xpr>::StartColumn * Traits<Xpr>::Rows + Traits<Xpr>::StartRow;
-            return m_xprEvaluator.Entry(Offset + index);
-        }
-
-        Traits<Xpr>::Scalar& Entry(std::size_t row, std::size_t column)
-        {
-            return m_xprEvaluator.Entry(Traits<Xpr>::StartRow + row, Traits<Xpr>::StartColumn + column);
-        }
-
-    private:
-        Evaluator<NestedXpr> m_xprEvaluator;
+        Evaluator<NestedXpr, IsConst> m_xprEvaluator;
     };
 }

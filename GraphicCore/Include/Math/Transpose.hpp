@@ -22,39 +22,29 @@ namespace TG::Math
     class Transpose : public MatrixBase<Transpose<NestedXpr>>
     {
     public:
-        explicit Transpose(const NestedXpr& xpr) : m_xpr(xpr) {}
+        explicit Transpose(NestedXpr& xpr) : m_xpr(xpr) {}
 
         const NestedXpr& NestedExpression() const noexcept { return m_xpr; }
+        NestedXpr& NestedExpression() noexcept { return m_xpr; }
 
     private:
-        const NestedXpr& m_xpr;
+        NestedXpr& m_xpr;
     };
 
     template<typename NestedXpr, bool IsLeftValue = HasFlag<NestedXpr, XprFlag::LeftValue>>
     class TransposeEvaluator;
 
-    template<typename NestedXpr>
-    class Evaluator<Transpose<NestedXpr>> : public TransposeEvaluator<NestedXpr>
+    template<typename NestedXpr, bool IsConst>
+    class Evaluator<Transpose<NestedXpr>, IsConst>
     {
-        using Base = TransposeEvaluator<NestedXpr>;
-
-    public:
-        using XprType = Transpose<NestedXpr>;
-        using Scalar = Traits<NestedXpr>::Scalar;
-
-        explicit Evaluator(const XprType& transpose) : Base(transpose) {}
-    };
-
-    template<typename NestedXpr>
-    class TransposeEvaluator<NestedXpr, false>
-    {
-    public:
         using Xpr = Transpose<NestedXpr>;
+        using InternalXpr = std::conditional_t<IsConst, const Xpr, Xpr>;
         using Scalar = Traits<Xpr>::Scalar;
 
-        explicit TransposeEvaluator(const Xpr& transpose) : m_xprEvaluator(transpose.NestedExpression()) {}
+    public:
+        explicit Evaluator(InternalXpr& transpose) : m_xprEvaluator(transpose.NestedExpression()) {}
 
-        [[nodiscard]] Scalar Entry(std::size_t index) const
+        [[nodiscard]] Scalar Entry(std::size_t index) const requires HasFlag<Xpr, XprFlag::LinearAccess>
         {
             return m_xprEvaluator.Entry(index);
         }
@@ -64,29 +54,17 @@ namespace TG::Math
             return m_xprEvaluator.Entry(column, row);
         }
 
-    protected:
-        Evaluator<NestedXpr> m_xprEvaluator;
-    };
-
-    template<typename NestedXpr>
-    class TransposeEvaluator<NestedXpr, true> : public TransposeEvaluator<NestedXpr, false>
-    {
-        using Base = TransposeEvaluator<NestedXpr, false>;
-        using Xpr = Base::Xpr;
-        using Scalar = Base::Scalar;
-        using Base::m_xprEvaluator;
-
-    public:
-        explicit TransposeEvaluator(const Xpr& transpose) : Base(transpose) {}
-
-        Scalar& EntryRef(std::size_t index)
+        Scalar& Entry(std::size_t index) requires (HasFlag<Xpr, XprFlag::LinearAccess> && !IsConst)
         {
             return m_xprEvaluator.Entry(index);
         }
 
-        Scalar& EntryRef(std::size_t row, std::size_t column)
+        Scalar& Entry(std::size_t row, std::size_t column) requires !IsConst
         {
             return m_xprEvaluator.Entry(column, row);
         }
+
+    private:
+        Evaluator<NestedXpr, IsConst> m_xprEvaluator;
     };
 }
