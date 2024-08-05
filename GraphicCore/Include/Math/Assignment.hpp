@@ -50,7 +50,7 @@ namespace TG::Math
 
     private:
         Evaluator<Dst> m_dstEvaluator;
-        Evaluator<const Src> m_srcEvaluator;
+        Evaluator<Src> m_srcEvaluator;
         AssignFunctor m_functor;
     };
 

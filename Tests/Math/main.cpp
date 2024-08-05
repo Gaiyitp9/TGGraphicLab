@@ -7,45 +7,55 @@ namespace TG::Math
     TEST(TestMatrix, Constructor)
     {
         Matrix4f mat;
-        for (int i = 0; i < 15; ++i)
+        for (int i = 0; i < 16; ++i)
             EXPECT_EQ(mat[i], 0);
     }
 
-    TEST(TestMatrix, CWiseAdd)
+    TEST(TestMatrix, CWiseBinaryOp)
     {
         std::random_device rd;
         std::mt19937 gen(rd());
-        std::uniform_real_distribution urd(-1e5f, 1e5f);
+        std::uniform_real_distribution urd(1.0f, 1e5f);
 
         Matrix4f mat1, mat2;
-        for (int i = 0; i < 15; ++i)
+        for (int i = 0; i < 16; ++i)
         {
             mat1[i] = urd(gen);
             mat2[i] = urd(gen);
         }
         Matrix4f result = mat1 + mat2;
-        for (int i = 0; i < 15; ++i)
+        for (int i = 0; i < 16; ++i)
             EXPECT_EQ(result[i], mat1[i] + mat2[i]);
+
+        result = mat1 - mat2;
+        for (int i = 0; i < 16; ++i)
+            EXPECT_EQ(result[i], mat1[i] - mat2[i]);
+
+        result = mat1.CWiseProduct(mat2);
+        for (int i = 0; i < 16; ++i)
+            EXPECT_EQ(result[i], mat1[i] * mat2[i]);
+
+        result = mat1 / mat2;
+        for (int i = 0; i < 16; ++i)
+            EXPECT_EQ(result[i], mat1[i] / mat2[i]);
     }
 
-    TEST(TestMatrix, CWiseProduct)
+    TEST(TestMatrix, Block)
     {
         std::random_device rd;
         std::mt19937 gen(rd());
-        std::uniform_real_distribution urd(-1e5f, 1e5f);
+        std::uniform_real_distribution urd(1.0f, 1e5f);
 
-        Matrix4f mat1, mat2;
-        for (int i = 0; i < 15; ++i)
-        {
-            mat1[i] = urd(gen);
-            mat2[i] = urd(gen);
-        }
-        Matrix4f result = mat1.CWiseProduct(mat2);
-        for (int i = 0; i < 15; ++i)
-            EXPECT_EQ(result[i], mat1[i] * mat2[i]);
+        Matrix4f mat4;
+        for (int i = 0; i < 16; ++i)
+            mat4[i] = urd(gen);
+
+        Matrix3f mat3 = mat4.Block<1, 1, 3, 3>();
+        for (int i = 1; i < 4; ++i)
+            for (int j = 1; j < 4; ++j)
+                EXPECT_EQ(mat3(i - 1, j - 1), mat4(i, j));
     }
 }
-
 
 //
 // int main()
