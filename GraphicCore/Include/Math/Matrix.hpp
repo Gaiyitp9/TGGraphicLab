@@ -28,7 +28,7 @@ namespace TG::Math
         template<typename Derived>
         Matrix(const MatrixBase<Derived>& other)
         {
-            CallAssignmentNoAlias(this->Expression(), other.Expression(), AssignOp<Scalar>{});
+            CallAssignmentNoAlias(this->Expression(), other.Expression());
         }
 
 		template<typename Derived>
