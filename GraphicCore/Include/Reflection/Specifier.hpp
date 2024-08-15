@@ -5,6 +5,9 @@
 *****************************************************************/
 #pragma once
 
+#include <algorithm>
+#include <string>
+
 namespace TG::Reflection
 {
     enum class SpecifierCategory : unsigned char

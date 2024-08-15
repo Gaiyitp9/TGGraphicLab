@@ -55,8 +55,8 @@ namespace TG::Math
 
     private:
         const BinaryOp m_functor;
-        Evaluator<LhsXpr, true> m_lhsEvaluator;
-        Evaluator<RhsXpr, true> m_rhsEvaluator;
+        ConstEvaluator<LhsXpr> m_lhsEvaluator;
+        ConstEvaluator<RhsXpr> m_rhsEvaluator;
     };
 
     template<typename Scalar>
