@@ -133,14 +133,12 @@ namespace TG::Math
 
     // 矩阵逐元素运算，要求矩阵元素类型相同以及行列相等
     template<typename LhsXpr, typename RhsXpr>
-    concept CWiseOperable = IsMatrixExpression<LhsXpr> && IsMatrixExpression<RhsXpr> &&
-            std::is_same_v<typename Traits<LhsXpr>::Scalar, typename Traits<RhsXpr>::Scalar> &&
+    concept CWiseOperable = std::is_same_v<typename Traits<LhsXpr>::Scalar, typename Traits<RhsXpr>::Scalar> &&
             Traits<LhsXpr>::Rows == Traits<RhsXpr>::Rows && Traits<LhsXpr>::Columns == Traits<RhsXpr>::Columns;
 
     // 两个表达式是否可以执行矩阵乘法，左边表达式的列数要等于右边表达式的行数
     template<typename LhsXpr, typename RhsXpr>
-    concept MatrixMultipliable = IsMatrixExpression<LhsXpr> && IsMatrixExpression<RhsXpr> &&
-            std::is_same_v<typename Traits<LhsXpr>::Scalar, typename Traits<RhsXpr>::Scalar> &&
+    concept MatrixMultipliable = std::is_same_v<typename Traits<LhsXpr>::Scalar, typename Traits<RhsXpr>::Scalar> &&
             Traits<LhsXpr>::Columns == Traits<RhsXpr>::Rows;
 
     // 表达式基类
@@ -182,6 +180,6 @@ namespace TG::Math
 #include "CWiseBinaryOp.hpp"
 #include "Transpose.hpp"
 #include "Block.hpp"
-#include "Redux.hpp"
+#include "ReductionOp.hpp"
 #include "Product.hpp"
 #include "Dot.hpp"

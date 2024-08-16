@@ -72,10 +72,10 @@ namespace TG::Math
     template<typename Evaluator, typename Functor, Traversal Traversal =
         HasFlag<typename Evaluator::XprType, XprFlag::LinearAccess> ?
         Traversal::Linear : Traversal::Default>
-    struct Redux;
+    struct ReductionOp;
 
     template<typename Evaluator, typename Functor>
-    struct Redux<Evaluator, Functor, Traversal::Default>
+    struct ReductionOp<Evaluator, Functor, Traversal::Default>
     {
         using ReturnType = Traits<typename Evaluator::XprType>::Scalar;
         static constexpr std::size_t Size = Traits<typename Evaluator::XprType>::Size;
@@ -87,7 +87,7 @@ namespace TG::Math
     };
 
     template<typename Evaluator, typename Functor>
-    struct Redux<Evaluator, Functor, Traversal::Linear>
+    struct ReductionOp<Evaluator, Functor, Traversal::Linear>
     {
         using ReturnType = Traits<typename Evaluator::XprType>::Scalar;
         static constexpr std::size_t Size = Traits<typename Evaluator::XprType>::Size;
@@ -98,11 +98,11 @@ namespace TG::Math
         }
     };
 
-    template<typename Xpr, typename Functor> requires IsMatrixExpression<Xpr>
-    Traits<Xpr>::Scalar CallRedux(const Xpr& xpr, Functor functor)
+    template<typename Xpr, typename Functor>
+    Traits<Xpr>::Scalar CallReduction(const Xpr& xpr, Functor functor)
     {
         Evaluator<Xpr> evaluator{xpr};
 
-        return Redux<Evaluator<Xpr>, Functor>::Run(evaluator, functor);
+        return ReductionOp<Evaluator<Xpr>, Functor>::Run(evaluator, functor);
     }
 }

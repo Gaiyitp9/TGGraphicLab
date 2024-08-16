@@ -20,8 +20,10 @@ namespace TG::Math
             return *this;
         }
 
-        const Derived& Expression() const { return *static_cast<const Derived*>(this); }
-        Derived& Expression() { return *static_cast<Derived*>(this); }
+        const Derived& Expression() const noexcept { return *static_cast<Derived const*>(this); }
+        Derived& Expression() noexcept { return *static_cast<Derived*>(this); }
+        static constexpr std::size_t Rows() noexcept { return Traits<Derived>::Rows; }
+        static constexpr std::size_t Columns() noexcept { return Traits<Derived>::Columns; }
 
         template<typename OtherDerived>
         CWiseBinaryOp<ScalarAddOp<Scalar>, Derived, OtherDerived> operator+(const MatrixBase<OtherDerived>& other) const
@@ -54,25 +56,36 @@ namespace TG::Math
         }
 
         template<typename BinaryOp>
-        Scalar Redux(BinaryOp functor) const
+        Scalar Reduction(BinaryOp functor) const
         {
-            return CallRedux(Expression(), functor);
+            return CallReduction(Expression(), functor);
         }
 
         Scalar Sum() const
         {
-            return Redux(ScalarAddOp<Scalar>{});
+            return Reduction(ScalarAddOp<Scalar>{});
         }
 
         template<std::size_t StartRow, std::size_t StartColumn, std::size_t BlockRows, std::size_t BlockCols>
-        Block<Derived, StartRow, StartColumn, BlockRows, BlockCols> Block()
+        Math::Block<Derived, StartRow, StartColumn, BlockRows, BlockCols> Block()
         {
             return Math::Block<Derived, StartRow, StartColumn, BlockRows, BlockCols>(Expression());
         }
 
-        Transpose<Derived> Transpose()
+        template<std::size_t StartRow, std::size_t StartColumn, std::size_t BlockRows, std::size_t BlockCols>
+        Math::Block<Derived, StartRow, StartColumn, BlockRows, BlockCols> Block() const
+        {
+            return Math::Block<const Derived, StartRow, StartColumn, BlockRows, BlockCols>(Expression());
+        }
+
+        Math::Transpose<Derived> Transpose()
         {
             return Math::Transpose<Derived>(Expression());
+        }
+
+        Math::Transpose<const Derived> Transpose() const
+        {
+            return Math::Transpose<const Derived>(Expression());
         }
     };
 }

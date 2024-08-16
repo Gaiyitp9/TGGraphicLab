@@ -39,8 +39,8 @@ namespace TG::Math
         NestedXpr& NestedExpression() noexcept { return m_xpr; }
         const NestedXpr& NestedExpression() const noexcept { return m_xpr; }
 
-        static constexpr std::size_t StartRow() { return StartRow_; }
-        static constexpr std::size_t StartColumn() { return StartColumn_; }
+        static constexpr std::size_t StartRow() noexcept { return StartRow_; }
+        static constexpr std::size_t StartColumn() noexcept { return StartColumn_; }
 
     private:
         NestedXpr& m_xpr;

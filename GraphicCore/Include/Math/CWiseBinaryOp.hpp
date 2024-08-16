@@ -62,21 +62,21 @@ namespace TG::Math
     template<typename Scalar>
     struct ScalarAddOp
     {
-        Scalar operator()(Scalar a, Scalar b) const { return a + b; }
+        [[nodiscard]] Scalar operator()(Scalar a, Scalar b) const { return a + b; }
     };
     template<typename Scalar>
     struct ScalarSubtractOp
     {
-        Scalar operator()(Scalar a, Scalar b) const { return a - b; }
+        [[nodiscard]] Scalar operator()(Scalar a, Scalar b) const { return a - b; }
     };
     template<typename Scalar>
     struct ScalarProductOp
     {
-        Scalar operator()(Scalar a, Scalar b) const { return a * b; }
+        [[nodiscard]] Scalar operator()(Scalar a, Scalar b) const { return a * b; }
     };
     template<typename Scalar>
     struct ScalarDivideOp
     {
-        Scalar operator()(Scalar a, Scalar b) const { return a / b; }
+        [[nodiscard]] Scalar operator()(Scalar a, Scalar b) const { return a / b; }
     };
 }
