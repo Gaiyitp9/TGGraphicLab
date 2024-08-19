@@ -14,7 +14,8 @@ namespace TG::Math
         static constexpr std::size_t    Rows = Traits<NestedXpr>::Columns;
         static constexpr std::size_t    Columns = Traits<NestedXpr>::Rows;
         static constexpr std::size_t    Size = Rows * Columns;
-        static constexpr XprFlag        Flags = Traits<NestedXpr>::Flags & ~XprFlag::LinearAccess;
+        // 存储顺序翻转，其他的标志不变
+        static constexpr XprFlag        Flags = Traits<NestedXpr>::Flags ^ XprFlag::RowMajor;
     };
 
     template<typename NestedXpr>
@@ -23,8 +24,15 @@ namespace TG::Math
     public:
         explicit Transpose(NestedXpr& xpr) : m_xpr(xpr) {}
 
+        template<typename Derived>
+        Transpose& operator=(const MatrixBase<Derived>& other)
+        {
+            MatrixBase<Transpose>::operator=(other);
+            return *this;
+        }
+
         NestedXpr& NestedExpression() noexcept { return m_xpr; }
-        const NestedXpr& NestedExpression() const noexcept { return m_xpr; }
+        [[nodiscard]] const NestedXpr& NestedExpression() const noexcept { return m_xpr; }
 
     private:
         NestedXpr& m_xpr;
@@ -64,6 +72,6 @@ namespace TG::Math
         }
 
     private:
-        Evaluator<NestedXpr, IsConst> m_xprEvaluator;
+        Evaluator<std::remove_const_t<NestedXpr>, IsConst> m_xprEvaluator;
     };
 }

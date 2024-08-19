@@ -5,17 +5,20 @@
 *****************************************************************/
 #pragma once
 
+#include "MatrixBase.hpp"
+
 namespace TG::Math
 {
-	template<typename Scalar_, std::size_t Rows_, std::size_t Columns_, StorageOrder Order>
-	struct Traits<Matrix<Scalar_, Rows_, Columns_, Order>>
+	template<typename ScalarT, std::size_t RowsT, std::size_t ColumnsT, StorageOrder Order>
+	struct Traits<Matrix<ScalarT, RowsT, ColumnsT, Order>>
 	{
-		using Scalar = Scalar_;
-        static constexpr std::size_t	Rows = Rows_;
-        static constexpr std::size_t	Columns = Columns_;
+		using Scalar = ScalarT;
+        static constexpr std::size_t	Rows = RowsT;
+        static constexpr std::size_t	Columns = ColumnsT;
         static constexpr std::size_t	Size = Rows * Columns;
         static constexpr XprFlag        Flags = (Order == StorageOrder::RowMajor ? XprFlag::RowMajor : XprFlag::None) |
-                XprFlag::LeftValue | XprFlag::LinearAccess;
+			XprFlag::LeftValue | XprFlag::LinearAccess |
+        	(Rows == 1 || Columns == 1 ? XprFlag::IsVector : XprFlag::None);
 	};
 
 	template<typename Scalar, std::size_t Rows, std::size_t Columns, StorageOrder Order>

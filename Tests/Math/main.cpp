@@ -4,18 +4,22 @@
 
 namespace TG::Math
 {
+    static float gEpsilon = 0.001f;
+    static float gMin = gMin;
+    static float gMax = 100.0f;
+    
     TEST(TestMatrix, Constructor)
     {
         Matrix4f mat;
         for (int i = 0; i < 16; ++i)
-            EXPECT_EQ(mat[i], 0);
+            EXPECT_NEAR(mat[i], 0, gEpsilon);
     }
 
     TEST(TestMatrix, CWiseBinaryOp)
     {
         std::random_device rd;
         std::mt19937 gen(rd());
-        std::uniform_real_distribution urd(1.0f, 1e5f);
+        std::uniform_real_distribution urd(gMin, gMax);
 
         Matrix4f mat1, mat2;
         for (int i = 0; i < 16; ++i)
@@ -25,73 +29,112 @@ namespace TG::Math
         }
         Matrix4f result = mat1 + mat2;
         for (int i = 0; i < 16; ++i)
-            EXPECT_EQ(result[i], mat1[i] + mat2[i]);
+            EXPECT_NEAR(result[i], mat1[i] + mat2[i], gEpsilon);
 
         result = mat1 - mat2;
         for (int i = 0; i < 16; ++i)
-            EXPECT_EQ(result[i], mat1[i] - mat2[i]);
+            EXPECT_NEAR(result[i], mat1[i] - mat2[i], gEpsilon);
 
         result = mat1.CWiseProduct(mat2);
         for (int i = 0; i < 16; ++i)
-            EXPECT_EQ(result[i], mat1[i] * mat2[i]);
+            EXPECT_NEAR(result[i], mat1[i] * mat2[i], gEpsilon);
 
         result = mat1 / mat2;
         for (int i = 0; i < 16; ++i)
-            EXPECT_EQ(result[i], mat1[i] / mat2[i]);
+            EXPECT_NEAR(result[i], mat1[i] / mat2[i], gEpsilon);
     }
 
     TEST(TestMatrix, Block)
     {
         std::random_device rd;
         std::mt19937 gen(rd());
-        std::uniform_real_distribution urd(1.0f, 1e5f);
+        std::uniform_real_distribution urd(gMin, gMax);
 
         Matrix4f mat4;
         for (int i = 0; i < 16; ++i)
             mat4[i] = urd(gen);
 
-        Matrix3f mat3 = mat4.Block<1, 1, 3, 3>();
-        for (int i = 1; i < 4; ++i)
-            for (int j = 1; j < 4; ++j)
-                EXPECT_EQ(mat3(i - 1, j - 1), mat4(i, j));
+        Matrix3f mat3 = mat4.block<1, 1, 3, 3>();
+        for (int i = 0; i < 3; ++i)
+            for (int j = 0; j < 3; ++j)
+                EXPECT_NEAR(mat3(i, j), mat4(i + 1, j + 1), gEpsilon);
+
+        Matrix2f mat2;
+        for (int i = 0; i < 4; ++i)
+            mat2[i] = urd(gen);
+        mat4.block<0, 0, 2, 2>() = mat2;
+        for (int i = 0; i < 2; ++i)
+            for (int j = 0; j < 2; ++j)
+                EXPECT_NEAR(mat4(i, j), mat2(i, j), gEpsilon);
+    }
+
+    TEST(TestMatrix, Transpose)
+    {
+        std::random_device rd;
+        std::mt19937 gen(rd());
+        std::uniform_real_distribution urd(gMin, gMax);
+
+        Matrix4f mat4;
+        for (int i = 0; i < 16; ++i)
+            mat4[i] = urd(gen);
+
+        Matrix4f transpose = mat4.transpose();
+        for (int i = 0; i < 4; ++i)
+            for (int j = 0; j < 4; ++j)
+                EXPECT_NEAR(transpose(i, j), mat4(j, i), gEpsilon);
+
+        Matrix4f transpose1 = mat4.transpose().transpose();
+        for (int i = 0; i < 4; ++i)
+            for (int j = 0; j < 4; ++j)
+                EXPECT_NEAR(transpose1(i, j), mat4(i, j), gEpsilon);
+
+        Matrix4f mat40;
+        for (int i = 0; i < 16; ++i)
+            mat40[i] = urd(gen);
+        mat4.transpose() = mat40;
+        for (int i = 0; i < 4; ++i)
+            for (int j = 0; j < 4; ++j)
+                EXPECT_NEAR(mat4(i, j), mat40(j, i), gEpsilon);
+    }
+
+    TEST(TestMatrix, Reduce)
+    {
+        std::random_device rd;
+        std::mt19937 gen(rd());
+        std::uniform_real_distribution urd(gMin, gMax);
+
+        Matrix4f mat4;
+        for (int i = 0; i < 16; ++i)
+            mat4[i] = urd(gen);
+
+        float temp = mat4.Sum();
+        float sum = 0.0f;
+        for (int i = 0; i < 16; ++i)
+            sum += mat4[i];
+        EXPECT_NEAR(sum, temp, gEpsilon);
+    }
+
+    TEST(TestMatrix, Dot)
+    {
+        std::random_device rd;
+        std::mt19937 gen(rd());
+        std::uniform_real_distribution urd(gMin, gMax);
+
+        Vector4f vec0, vec1;
+        for (int i = 0; i < 4; ++i)
+        {
+            vec0[i] = urd(gen);
+            vec1[i] = urd(gen);
+        }
+
+        float temp = vec0.Dot(vec1);
+        float dot = 0;
+        for (int i = 0; i < 4; ++i)
+            dot += vec0[i] * vec1[i];
+        EXPECT_NEAR(dot, temp, gEpsilon);
     }
 }
 
-//
-// int main()
-// {
-//     TG::Math::Matrix4f v1, v2, v3;
-//     v1(0, 0) = v1(1, 1) = v1(2, 2) = v1(3, 3) = 1;
-//     v2(0, 0) = v2(1, 1) = v2(2, 2) = v2(3, 3) = 3;
-//     v3(0, 0) = v3(1, 1) = v3(2, 2) = v3(3, 3) = 2;
-//     TG::Math::Matrix4f a = v1.CWiseProduct(v2);
-//     TG::Math::Matrix4f b = v1 + v2 - v3;
-//     b(2, 3) = -1;
-//     b(1, 3) = -1;
-//     TG::Math::Matrix3f c;
-//     c = b.Block<3, 3>(1, 1);
-//     TG::Math::Matrix4f d = b.Transpose();
-//
-//     std::cout << "sum of a: " << a.Sum() << '\n';
-//     std::cout << "sum of a block: " << b.Block<3, 3>(1, 1).Sum() << '\n';
-//     for (int i = 0; i < 4; ++i)
-//     {
-//         for (int j = 0; j < 4; ++j)
-//         {
-//             std::cout << d(i, j) << ' ';
-//         }
-//         std::cout << '\n';
-//     }
-//     for (int i = 0; i < 3; ++i)
-//     {
-//         for (int j = 0; j < 3; ++j)
-//         {
-//             std::cout << c(i, j) << ' ';
-//         }
-//         std::cout << '\n';
-//     }
-//     return 0;
-// }
 // #include <format>
 // #include <iostream>
 // #include <iterator>

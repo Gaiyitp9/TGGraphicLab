@@ -5,6 +5,8 @@
 *****************************************************************/
 #pragma once
 
+#include "Declarations.hpp"
+
 namespace TG::Math
 {
     // 赋值运算
@@ -18,7 +20,8 @@ namespace TG::Math
     class Assignment
     {
     	static constexpr Traversal TraverseManner = HasFlag<Dst, XprFlag::LinearAccess> &&
-    	    HasFlag<Src, XprFlag::LinearAccess> ? Traversal::Linear : Traversal::Default;
+    	    HasFlag<Src, XprFlag::LinearAccess> && HasFlag<Dst, XprFlag::RowMajor> == HasFlag<Src, XprFlag::RowMajor>
+                ? Traversal::Linear : Traversal::Default;
 
     public:
         Assignment(Dst& dst, const Src& src, AssignFunctor functor)
