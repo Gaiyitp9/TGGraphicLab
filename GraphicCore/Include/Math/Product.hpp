@@ -21,7 +21,7 @@ namespace TG::Math
 
     // 矩阵乘法表达式
 	template<typename LhsXpr, typename RhsXpr> requires MatrixMultipliable<LhsXpr, RhsXpr>
-	class Product : public MatrixBase<Product<LhsXpr, RhsXpr>>
+	class Product final : public MatrixBase<Product<LhsXpr, RhsXpr>>
 	{
     public:
         Product(const LhsXpr& lhs, const RhsXpr& rhs) : m_lhs(lhs), m_rhs(rhs) {}

@@ -62,7 +62,8 @@ namespace TG::Math
         template<typename BinaryOp>
         [[nodiscard]] Scalar Reduce(BinaryOp functor) const
         {
-            return CallReduction(Expression(), functor);
+            Reduction reduction{Expression(), functor};
+            return reduction.Run();
         }
 
         [[nodiscard]] Scalar Sum() const

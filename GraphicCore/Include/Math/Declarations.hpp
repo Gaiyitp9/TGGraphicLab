@@ -118,9 +118,10 @@ namespace TG::Math
         { evaluator.Entry(row, column) } -> std::same_as<typename Traits<Xpr>::Scalar>;
         requires !HasFlag<Xpr, XprFlag::LinearAccess> ||
             requires { { evaluator.Entry(index) } -> std::same_as<typename Traits<Xpr>::Scalar>; };
-    } && // 可以作为左值的表达式求值器概念
+    } &&
     (
         !HasFlag<Xpr, XprFlag::LeftValue> ||
+        // 左值表达式求值器概念
         requires(Evaluator<Xpr> evaluator, std::size_t index, std::size_t row, std::size_t column)
         {
             requires std::constructible_from<Evaluator<Xpr>, Xpr&>;

@@ -19,7 +19,7 @@ namespace TG::Math
     };
 
     template<typename NestedXpr>
-    class Transpose : public MatrixBase<Transpose<NestedXpr>>
+    class Transpose final : public MatrixBase<Transpose<NestedXpr>>
     {
     public:
         explicit Transpose(NestedXpr& xpr) : m_xpr(xpr) {}
