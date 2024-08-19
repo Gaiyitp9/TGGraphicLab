@@ -5,6 +5,10 @@
 *****************************************************************/
 #pragma once
 
+#include "Declarations.hpp"
+#include "Assignment.hpp"
+#include "Reduction.hpp"
+
 namespace TG::Math
 {
     template<typename Derived> requires IsMatrixExpression<Derived>
@@ -56,36 +60,42 @@ namespace TG::Math
         }
 
         template<typename BinaryOp>
-        Scalar Reduction(BinaryOp functor) const
+        [[nodiscard]] Scalar Reduce(BinaryOp functor) const
         {
             return CallReduction(Expression(), functor);
         }
 
-        Scalar Sum() const
+        [[nodiscard]] Scalar Sum() const
         {
-            return Reduction(ScalarAddOp<Scalar>{});
+            return Reduce(ScalarAddOp<Scalar>{});
+        }
+
+        template<typename OtherDerived> requires HasFlag<Derived, XprFlag::IsVector>
+        [[nodiscard]] Scalar Dot(const MatrixBase<OtherDerived>& other) const
+        {
+            return CWiseProduct(other).Sum();
         }
 
         template<std::size_t StartRow, std::size_t StartColumn, std::size_t BlockRows, std::size_t BlockCols>
-        Math::Block<Derived, StartRow, StartColumn, BlockRows, BlockCols> Block()
+        Block<Derived, StartRow, StartColumn, BlockRows, BlockCols> block()
         {
-            return Math::Block<Derived, StartRow, StartColumn, BlockRows, BlockCols>(Expression());
+            return Block<Derived, StartRow, StartColumn, BlockRows, BlockCols>(Expression());
         }
 
         template<std::size_t StartRow, std::size_t StartColumn, std::size_t BlockRows, std::size_t BlockCols>
-        Math::Block<Derived, StartRow, StartColumn, BlockRows, BlockCols> Block() const
+        Block<const Derived, StartRow, StartColumn, BlockRows, BlockCols> block() const
         {
-            return Math::Block<const Derived, StartRow, StartColumn, BlockRows, BlockCols>(Expression());
+            return Block<const Derived, StartRow, StartColumn, BlockRows, BlockCols>(Expression());
         }
 
-        Math::Transpose<Derived> Transpose()
+        Transpose<Derived> transpose()
         {
-            return Math::Transpose<Derived>(Expression());
+            return Transpose<Derived>(Expression());
         }
 
-        Math::Transpose<const Derived> Transpose() const
+        Transpose<const Derived> transpose() const
         {
-            return Math::Transpose<const Derived>(Expression());
+            return Transpose<const Derived>(Expression());
         }
     };
 }

@@ -5,6 +5,8 @@
 *****************************************************************/
 #pragma once
 
+#include "MatrixBase.hpp"
+
 namespace TG::Math
 {
     template<typename BinaryOp, typename LhsXpr, typename RhsXpr>
@@ -14,7 +16,11 @@ namespace TG::Math
         static constexpr std::size_t	Rows = Traits<LhsXpr>::Rows;
         static constexpr std::size_t	Columns = Traits<LhsXpr>::Columns;
         static constexpr std::size_t	Size = Rows * Columns;
-        static constexpr XprFlag        Flags = Traits<LhsXpr>::Flags & Traits<RhsXpr>::Flags & ~XprFlag::LeftValue;
+        // 非左值；如果两个表达式存储顺序不同，则不能线性访问
+        static constexpr XprFlag        Flags = Traits<LhsXpr>::Flags & Traits<RhsXpr>::Flags &
+            ~XprFlag::LeftValue &
+            (HasFlag<LhsXpr, XprFlag::RowMajor> == HasFlag<RhsXpr, XprFlag::RowMajor> ?
+                ~XprFlag::None : ~XprFlag::LinearAccess);
     };
 
     // 二元表达式

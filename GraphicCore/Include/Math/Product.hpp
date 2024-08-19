@@ -5,6 +5,8 @@
 *****************************************************************/
 #pragma once
 
+#include "MatrixBase.hpp"
+
 namespace TG::Math
 {
     template<typename LhsXpr, typename RhsXpr>

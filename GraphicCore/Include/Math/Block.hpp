@@ -5,11 +5,13 @@
 *****************************************************************/
 #pragma once
 
+#include "MatrixBase.hpp"
+
 namespace TG::Math
 {
-    template<typename NestedXpr, std::size_t StartRow_, std::size_t StartColumn_, std::size_t BlockRows,
+    template<typename NestedXpr, std::size_t StartRow, std::size_t StartColumn, std::size_t BlockRows,
         std::size_t BlockColumns>
-    struct Traits<Block<NestedXpr, StartRow_, StartColumn_, BlockRows, BlockColumns>>
+    struct Traits<Block<NestedXpr, StartRow, StartColumn, BlockRows, BlockColumns>>
     {
     private:
         // Block可以线性访问的条件：
@@ -25,22 +27,30 @@ namespace TG::Math
         static constexpr std::size_t    Rows = BlockRows;
         static constexpr std::size_t    Columns = BlockColumns;
         static constexpr std::size_t    Size = Rows * Columns;
-        static constexpr XprFlag        Flags = Traits<NestedXpr>::Flags & (LinearAccessible ? ~XprFlag::None :
-            ~XprFlag::LinearAccess);
+        static constexpr XprFlag        Flags = Traits<NestedXpr>::Flags &
+            (LinearAccessible ? ~XprFlag::None : ~XprFlag::LinearAccess) |
+            (BlockRows == 1 || BlockColumns == 1 ? XprFlag::IsVector : XprFlag::None);
     };
 
-    template<typename NestedXpr, std::size_t StartRow_, std::size_t StartColumn_, std::size_t BlockRows,
+    template<typename NestedXpr, std::size_t StartRowT, std::size_t StartColumnT, std::size_t BlockRows,
         std::size_t BlockColumns>
-    class Block : public MatrixBase<Block<NestedXpr, StartRow_, StartColumn_, BlockRows, BlockColumns>>
+    class Block : public MatrixBase<Block<NestedXpr, StartRowT, StartColumnT, BlockRows, BlockColumns>>
     {
     public:
         explicit Block(NestedXpr& xpr) : m_xpr(xpr) {}
 
-        NestedXpr& NestedExpression() noexcept { return m_xpr; }
-        const NestedXpr& NestedExpression() const noexcept { return m_xpr; }
+        template<typename Derived>
+        Block& operator=(const MatrixBase<Derived>& other)
+        {
+            MatrixBase<Block>::operator=(other);
+            return *this;
+        }
 
-        static constexpr std::size_t StartRow() noexcept { return StartRow_; }
-        static constexpr std::size_t StartColumn() noexcept { return StartColumn_; }
+        NestedXpr& NestedExpression() noexcept { return m_xpr; }
+        [[nodiscard]] const NestedXpr& NestedExpression() const noexcept { return m_xpr; }
+
+        static constexpr std::size_t StartRow() noexcept { return StartRowT; }
+        static constexpr std::size_t StartColumn() noexcept { return StartColumnT; }
 
     private:
         NestedXpr& m_xpr;
@@ -59,12 +69,12 @@ namespace TG::Math
     public:
         explicit Evaluator(InternalXpr& block) : m_xprEvaluator(block.NestedExpression()) {}
 
-        Scalar Entry(std::size_t index) const requires HasFlag<Xpr, XprFlag::LinearAccess>
+        [[nodiscard]] Scalar Entry(std::size_t index) const requires HasFlag<Xpr, XprFlag::LinearAccess>
         {
             return m_xprEvaluator.Entry(Offset + index);
         }
 
-        Scalar Entry(std::size_t row, std::size_t column) const
+        [[nodiscard]] Scalar Entry(std::size_t row, std::size_t column) const
         {
             return m_xprEvaluator.Entry(StartRow + row, StartColumn + column);
         }
@@ -80,6 +90,6 @@ namespace TG::Math
         }
 
     private:
-        Evaluator<NestedXpr, IsConst> m_xprEvaluator;
+        Evaluator<std::remove_const_t<NestedXpr>, IsConst> m_xprEvaluator;
     };
 }
