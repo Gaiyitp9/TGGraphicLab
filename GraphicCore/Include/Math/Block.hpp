@@ -34,7 +34,7 @@ namespace TG::Math
 
     template<typename NestedXpr, std::size_t StartRowT, std::size_t StartColumnT, std::size_t BlockRows,
         std::size_t BlockColumns>
-    class Block : public MatrixBase<Block<NestedXpr, StartRowT, StartColumnT, BlockRows, BlockColumns>>
+    class Block final : public MatrixBase<Block<NestedXpr, StartRowT, StartColumnT, BlockRows, BlockColumns>>
     {
     public:
         explicit Block(NestedXpr& xpr) : m_xpr(xpr) {}

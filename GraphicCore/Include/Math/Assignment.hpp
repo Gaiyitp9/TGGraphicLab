@@ -29,26 +29,17 @@ namespace TG::Math
         {}
 
 		// 通过行列赋值
-        template<std::size_t Index> requires (TraverseManner == Traversal::Default)
-        void Run()
+        void Run() requires (TraverseManner == Traversal::Default)
         {
-            if constexpr (Index < Traits<Dst>::Size)
-            {
-	            constexpr std::size_t row = Index / Traits<Dst>::Columns;
-	            constexpr std::size_t column = Index % Traits<Dst>::Columns;
-				m_functor(m_dstEvaluator.Entry(row, column), m_srcEvaluator.Entry(row, column));
-                Run<Index + 1>();
-            }
+            for (int i = 0; i < Traits<Dst>::Rows; ++i)
+                for (int j = 0; j < Traits<Src>::Columns; ++j)
+				    m_functor(m_dstEvaluator.Entry(i, j), m_srcEvaluator.Entry(i, j));
         }
     	// 线性赋值
-        template<std::size_t Index> requires (TraverseManner == Traversal::Linear)
-        void Run()
+        void Run() requires (TraverseManner == Traversal::Linear)
         {
-            if constexpr (Index < Traits<Dst>::Size)
-            {
-				m_functor(m_dstEvaluator.Entry(Index), m_srcEvaluator.Entry(Index));
-                Run<Index + 1>();
-            }
+            for (int i = 0; i < Traits<Dst>::Size; ++i)
+				m_functor(m_dstEvaluator.Entry(i), m_srcEvaluator.Entry(i));
         }
 
     private:
@@ -69,7 +60,7 @@ namespace TG::Math
     void CallAssignmentNoAlias(Dst& dst, const Src& src, const AssignFunctor& func = {})
     {
     	Assignment assign(dst, src, func);
-    	assign.template Run<0>();
+    	assign.Run();
     }
 
     template<typename Dst, typename Src, typename AssignFunctor = AssignOp<typename Traits<Dst>::Scalar>>
