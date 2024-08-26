@@ -43,8 +43,8 @@ namespace TG::Math
         }
 
     private:
-        Evaluator<Dst> m_dstEvaluator;
-        ConstEvaluator<Src> m_srcEvaluator;
+        RefEvaluator<Dst> m_dstEvaluator;
+        Evaluator<Src> m_srcEvaluator;
         AssignFunctor m_functor;
     };
 
@@ -52,6 +52,8 @@ namespace TG::Math
     template<typename Dst, typename Src>
     concept Assignable = Traits<Dst>::Rows == Traits<Src>::Rows && Traits<Dst>::Columns == Traits<Src>::Columns &&
             HasFlag<Dst, XprFlag::LeftValue>;
+
+    template <typename T> constexpr bool EvaluatorAssumeAliasing  = false;
 
     // In Eigen, aliasing refers to assignment statement in which the same matrix (or array or vector)
     // appears on the left and on the right of the assignment operators.
@@ -63,10 +65,22 @@ namespace TG::Math
     	assign.Run();
     }
 
-    template<typename Dst, typename Src, typename AssignFunctor = AssignOp<typename Traits<Dst>::Scalar>>
-    void CallAssignment(Dst& dst, const Src& src, const AssignFunctor& func = {})
+    template<typename Dst, typename Src, typename AssignFunctor> requires EvaluatorAssumeAliasing<Src>
+    void CallAssignment(Dst& dst, const Src& src, const AssignFunctor& func)
     {
         typename PlainMatrixType<Src>::Type temp(src);
         CallAssignmentNoAlias(dst, temp, func);
+    }
+
+    template<typename Dst, typename Src, typename AssignFunctor> requires !EvaluatorAssumeAliasing<Src>
+    void CallAssignment(Dst& dst, const Src& src, const AssignFunctor& func)
+    {
+        CallAssignmentNoAlias(dst, src, func);
+    }
+
+    template<typename Dst, typename Src>
+    void CallAssignment(Dst& dst, const Src& src)
+    {
+        CallAssignment(dst, src, AssignOp<typename Traits<Dst>::Scalar>{});
     }
 }

@@ -24,7 +24,7 @@ namespace TG::Math
     };
 
     // 二元表达式
-	template<typename BinaryOp, typename LhsXpr, typename RhsXpr> requires CWiseOperable<LhsXpr, RhsXpr>
+	template<typename BinaryOp, typename LhsXpr, typename RhsXpr>
 	class CWiseBinaryOp final : public MatrixBase<CWiseBinaryOp<BinaryOp, LhsXpr, RhsXpr>>
 	{
     public:
@@ -41,28 +41,34 @@ namespace TG::Math
         const RhsXpr& m_rhs;
 	};
 
-    template<typename BinaryOp, typename LhsXpr, typename RhsXpr>
-    class Evaluator<CWiseBinaryOp<BinaryOp, LhsXpr, RhsXpr>, true>
-    {
-    public:
-        using Xpr = CWiseBinaryOp<BinaryOp, LhsXpr, RhsXpr>;
+    // 矩阵逐元素二元运算，要求矩阵元素类型相同以及行列相等
+    template<typename LhsXpr, typename RhsXpr>
+    concept CWiseOperable = std::is_same_v<typename Traits<LhsXpr>::Scalar, typename Traits<RhsXpr>::Scalar> &&
+            Traits<LhsXpr>::Rows == Traits<RhsXpr>::Rows && Traits<LhsXpr>::Columns == Traits<RhsXpr>::Columns;
 
+    template<typename BinaryOp, typename LhsXpr, typename RhsXpr> requires CWiseOperable<LhsXpr, RhsXpr>
+    class Evaluator<CWiseBinaryOp<BinaryOp, LhsXpr, RhsXpr>>
+    {
+        using Xpr = CWiseBinaryOp<BinaryOp, LhsXpr, RhsXpr>;
+        using Scalar = Traits<Xpr>::Scalar;
+
+    public:
         explicit Evaluator(const Xpr& xpr) : m_functor(xpr.Functor()),
             m_lhsEvaluator(xpr.LhsExpression()), m_rhsEvaluator(xpr.RhsExpression()) {}
 
-        [[nodiscard]] Traits<Xpr>::Scalar Entry(std::size_t index) const requires HasFlag<Xpr, XprFlag::LinearAccess>
+        [[nodiscard]] Scalar Entry(std::size_t index) const requires HasFlag<Xpr, XprFlag::LinearAccess>
         {
             return m_functor(m_lhsEvaluator.Entry(index), m_rhsEvaluator.Entry(index));
         }
-        [[nodiscard]] Traits<Xpr>::Scalar Entry(std::size_t row, std::size_t col) const
+        [[nodiscard]] Scalar Entry(std::size_t row, std::size_t col) const
         {
             return m_functor(m_lhsEvaluator.Entry(row, col), m_rhsEvaluator.Entry(row, col));
         }
 
     private:
         const BinaryOp m_functor;
-        ConstEvaluator<LhsXpr> m_lhsEvaluator;
-        ConstEvaluator<RhsXpr> m_rhsEvaluator;
+        Evaluator<LhsXpr> m_lhsEvaluator;
+        Evaluator<RhsXpr> m_rhsEvaluator;
     };
 
     template<typename Scalar>
@@ -79,10 +85,5 @@ namespace TG::Math
     struct ScalarProductOp
     {
         [[nodiscard]] Scalar operator()(Scalar a, Scalar b) const { return a * b; }
-    };
-    template<typename Scalar>
-    struct ScalarDivideOp
-    {
-        [[nodiscard]] Scalar operator()(Scalar a, Scalar b) const { return a / b; }
     };
 }

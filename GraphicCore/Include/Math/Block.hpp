@@ -6,6 +6,7 @@
 #pragma once
 
 #include "MatrixBase.hpp"
+#include "Assignment.hpp"
 
 namespace TG::Math
 {
@@ -28,8 +29,7 @@ namespace TG::Math
         static constexpr std::size_t    Columns = BlockColumns;
         static constexpr std::size_t    Size = Rows * Columns;
         static constexpr XprFlag        Flags = Traits<NestedXpr>::Flags &
-            (LinearAccessible ? ~XprFlag::None : ~XprFlag::LinearAccess) |
-            (BlockRows == 1 || BlockColumns == 1 ? XprFlag::IsVector : XprFlag::None);
+            (LinearAccessible ? ~XprFlag::None : ~XprFlag::LinearAccess);
     };
 
     template<typename NestedXpr, std::size_t StartRowT, std::size_t StartColumnT, std::size_t BlockRows,
@@ -42,7 +42,7 @@ namespace TG::Math
         template<typename Derived>
         Block& operator=(const MatrixBase<Derived>& other)
         {
-            MatrixBase<Block>::operator=(other);
+            CallAssignment(this->Expression(), other.Expression());
             return *this;
         }
 

@@ -44,7 +44,7 @@ namespace TG::Math
     // https://stackoverflow.com/questions/6006614/c-static-polymorphism-crtp-and-using-typedefs-from-derived-classes
     template<typename Xpr> struct Traits;
     // 表达式求值器，每种表达式都需要特化自己的求值器
-    template<typename Xpr, bool IsConst = false> class Evaluator;
+    template<typename Xpr, bool IsConst = true> class Evaluator;
     // 求值器推导指南(template deduction guide)
     // 分为两种类型的求值器: 1. 根据索引返回值，用于计算 2. 根据索引返回引用，用来修改表达式的值
     // 根据构造函数传入的表达式选择对应求值器。const Xpr&选择第一种求值器，Xpr&选择第二种求值器
@@ -54,7 +54,7 @@ namespace TG::Math
     // Qualifications with const or volatile are ignored, references convert to the referenced type, and raw
     // arrays or functions convert to the corresponding pointer type.
     template<typename Xpr> Evaluator(Xpr&) -> Evaluator<std::remove_const_t<Xpr>, std::is_const_v<Xpr>>;
-    template<typename Xpr> using ConstEvaluator = Evaluator<Xpr, true>;
+    template<typename Xpr> using RefEvaluator = Evaluator<Xpr, false>;
 
     // 矩阵储存顺序
     enum class StorageOrder : unsigned char
@@ -73,10 +73,12 @@ namespace TG::Math
     enum class XprFlag : unsigned char
     {
         None            = 0,
-        RowMajor        = 1,            // 按行储存
-        LeftValue       = 1 << 1,       // 表达式是否可以作为左值
-        LinearAccess    = 1 << 2,       // 是否能以一维向量的方式访问，也就是求值器可以调用Entry(index)函数
-        IsVector        = 1 << 3,       // 是否为向量
+        RowMajor        = 1,        // 按行储存
+        LeftValue       = 1 << 1,   // 表达式是否可以作为左值
+        LinearAccess    = 1 << 2,   // 是否能以一维向量的方式访问，也就是求值器可以调用Entry(index)函数
+        // 下面两个标志用在lazy evaluation中。延迟计算可以避免创建临边矩阵的开销，但是有些表达式不能使用延迟计算，比如矩阵乘法
+        EvaluateBeforeAssigning = 1 << 3,   // 赋值前计算表达式的值，创建一个临时矩阵记录结果
+        EvaluateBeforeNesting   = 1 << 4,   // 创建表达式前计算表达式的值，在表达式内部创建一个矩阵记录结果
     };
 
     // 赋值遍历类型
@@ -112,9 +114,9 @@ namespace TG::Math
         Traits<Xpr>::Size;
         Traits<Xpr>::Flags;
     } &&
-    requires(ConstEvaluator<Xpr> evaluator, std::size_t index, std::size_t row, std::size_t column)
+    requires(Evaluator<Xpr> evaluator, std::size_t index, std::size_t row, std::size_t column)
     {
-        requires std::constructible_from<ConstEvaluator<Xpr>, const Xpr&>;
+        requires std::constructible_from<Evaluator<Xpr>, const Xpr&>;
         { evaluator.Entry(row, column) } -> std::same_as<typename Traits<Xpr>::Scalar>;
         requires !HasFlag<Xpr, XprFlag::LinearAccess> ||
             requires { { evaluator.Entry(index) } -> std::same_as<typename Traits<Xpr>::Scalar>; };
@@ -122,24 +124,14 @@ namespace TG::Math
     (
         !HasFlag<Xpr, XprFlag::LeftValue> ||
         // 左值表达式求值器概念
-        requires(Evaluator<Xpr> evaluator, std::size_t index, std::size_t row, std::size_t column)
+        requires(RefEvaluator<Xpr> evaluator, std::size_t index, std::size_t row, std::size_t column)
         {
-            requires std::constructible_from<Evaluator<Xpr>, Xpr&>;
+            requires std::constructible_from<RefEvaluator<Xpr>, Xpr&>;
             { evaluator.Entry(row, column) } -> std::same_as<typename Traits<Xpr>::Scalar&>;
             requires !HasFlag<Xpr, XprFlag::LinearAccess> ||
                 requires { { evaluator.Entry(index) } -> std::same_as<typename Traits<Xpr>::Scalar&>; };
         }
     );
-
-    // 矩阵逐元素运算，要求矩阵元素类型相同以及行列相等
-    template<typename LhsXpr, typename RhsXpr>
-    concept CWiseOperable = std::is_same_v<typename Traits<LhsXpr>::Scalar, typename Traits<RhsXpr>::Scalar> &&
-            Traits<LhsXpr>::Rows == Traits<RhsXpr>::Rows && Traits<LhsXpr>::Columns == Traits<RhsXpr>::Columns;
-
-    // 两个表达式是否可以执行矩阵乘法，左边表达式的列数要等于右边表达式的行数
-    template<typename LhsXpr, typename RhsXpr>
-    concept MatrixMultipliable = std::is_same_v<typename Traits<LhsXpr>::Scalar, typename Traits<RhsXpr>::Scalar> &&
-            Traits<LhsXpr>::Columns == Traits<RhsXpr>::Rows;
 
     // 表达式基类
     template<typename Derived> requires IsMatrixExpression<Derived>
@@ -148,15 +140,14 @@ namespace TG::Math
 	template<typename Scalar, std::size_t Rows, std::size_t Cols, StorageOrder Order = DefaultOrder>
 	class Matrix;
     // 二元表达式
-    template<typename BinaryOp, typename LhsXpr, typename RhsXpr> requires CWiseOperable<LhsXpr, RhsXpr>
+    template<typename BinaryOp, typename LhsXpr, typename RhsXpr>
     class CWiseBinaryOp;
     // 二元运算
     template<typename Scalar> struct ScalarAddOp;
     template<typename Scalar> struct ScalarSubtractOp;
     template<typename Scalar> struct ScalarProductOp;
-    template<typename Scalar> struct ScalarDivideOp;
     // 矩阵乘法表达式
-    template<typename LhsXpr, typename RhsXpr> requires MatrixMultipliable<LhsXpr, RhsXpr>
+    template<typename LhsXpr, typename RhsXpr>
     class Product;
     // 矩阵块表达式
     template<typename NestedXpr, std::size_t StartRow, std::size_t StartColumn, std::size_t BlockRows,

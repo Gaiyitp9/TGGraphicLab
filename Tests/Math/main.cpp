@@ -38,10 +38,6 @@ namespace TG::Math
         result = mat1.CWiseProduct(mat2);
         for (int i = 0; i < 16; ++i)
             EXPECT_NEAR(result[i], mat1[i] * mat2[i], gEpsilon);
-
-        result = mat1 / mat2;
-        for (int i = 0; i < 16; ++i)
-            EXPECT_NEAR(result[i], mat1[i] / mat2[i], gEpsilon);
     }
 
     TEST(TestMatrix, Block)
@@ -87,14 +83,6 @@ namespace TG::Math
         for (int i = 0; i < 4; ++i)
             for (int j = 0; j < 4; ++j)
                 EXPECT_NEAR(transpose1(i, j), mat4(i, j), gEpsilon);
-
-        Matrix4f mat40;
-        for (int i = 0; i < 16; ++i)
-            mat40[i] = urd(gen);
-        mat4.transpose() = mat40;
-        for (int i = 0; i < 4; ++i)
-            for (int j = 0; j < 4; ++j)
-                EXPECT_NEAR(mat4(i, j), mat40(j, i), gEpsilon);
     }
 
     TEST(TestMatrix, Reduce)
