@@ -14,42 +14,30 @@ namespace TG::Math
         static constexpr std::size_t    Rows = Traits<NestedXpr>::Columns;
         static constexpr std::size_t    Columns = Traits<NestedXpr>::Rows;
         static constexpr std::size_t    Size = Rows * Columns;
-        // 存储顺序翻转，其他的标志不变
-        static constexpr XprFlag        Flags = Traits<NestedXpr>::Flags ^ XprFlag::RowMajor;
+        // 存储顺序翻转，移除左值标志，其他的标志不变
+        static constexpr XprFlag        Flags = (Traits<NestedXpr>::Flags ^ XprFlag::RowMajor) & ~XprFlag::LeftValue;
     };
 
     template<typename NestedXpr>
     class Transpose final : public MatrixBase<Transpose<NestedXpr>>
     {
     public:
-        explicit Transpose(NestedXpr& xpr) : m_xpr(xpr) {}
+        explicit Transpose(const NestedXpr& xpr) : m_xpr(xpr) {}
 
-        template<typename Derived>
-        Transpose& operator=(const MatrixBase<Derived>& other)
-        {
-            MatrixBase<Transpose>::operator=(other);
-            return *this;
-        }
-
-        NestedXpr& NestedExpression() noexcept { return m_xpr; }
         [[nodiscard]] const NestedXpr& NestedExpression() const noexcept { return m_xpr; }
 
     private:
-        NestedXpr& m_xpr;
+        const NestedXpr& m_xpr;
     };
 
-    template<typename NestedXpr, bool IsLeftValue = HasFlag<NestedXpr, XprFlag::LeftValue>>
-    class TransposeEvaluator;
-
-    template<typename NestedXpr, bool IsConst>
-    class Evaluator<Transpose<NestedXpr>, IsConst>
+    template<typename NestedXpr>
+    class Evaluator<Transpose<NestedXpr>>
     {
         using Xpr = Transpose<NestedXpr>;
-        using InternalXpr = std::conditional_t<IsConst, const Xpr, Xpr>;
         using Scalar = Traits<Xpr>::Scalar;
 
     public:
-        explicit Evaluator(InternalXpr& transpose) : m_xprEvaluator(transpose.NestedExpression()) {}
+        explicit Evaluator(const Xpr& transpose) : m_xprEvaluator(transpose.NestedExpression()) {}
 
         [[nodiscard]] Scalar Entry(std::size_t index) const requires HasFlag<Xpr, XprFlag::LinearAccess>
         {
@@ -61,17 +49,7 @@ namespace TG::Math
             return m_xprEvaluator.Entry(column, row);
         }
 
-        Scalar& Entry(std::size_t index) requires (HasFlag<Xpr, XprFlag::LinearAccess> && !IsConst)
-        {
-            return m_xprEvaluator.Entry(index);
-        }
-
-        Scalar& Entry(std::size_t row, std::size_t column) requires !IsConst
-        {
-            return m_xprEvaluator.Entry(column, row);
-        }
-
     private:
-        Evaluator<std::remove_const_t<NestedXpr>, IsConst> m_xprEvaluator;
+        Evaluator<NestedXpr> m_xprEvaluator;
     };
 }

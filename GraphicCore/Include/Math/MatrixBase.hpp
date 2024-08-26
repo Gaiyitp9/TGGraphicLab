@@ -6,7 +6,6 @@
 #pragma once
 
 #include "Declarations.hpp"
-#include "Assignment.hpp"
 #include "Reduction.hpp"
 
 namespace TG::Math
@@ -15,15 +14,9 @@ namespace TG::Math
     class MatrixBase
     {
         using Scalar = Traits<Derived>::Scalar;
+        static constexpr bool IsVector = Traits<Derived>::Rows == 1 || Traits<Derived>::Columns == 1;
 
     public:
-        template<typename OtherDerived>
-        MatrixBase& operator=(const MatrixBase<OtherDerived>& other)
-        {
-            CallAssignment(Expression(), other.Expression());
-            return *this;
-        }
-
         const Derived& Expression() const noexcept { return *static_cast<Derived const*>(this); }
         Derived& Expression() noexcept { return *static_cast<Derived*>(this); }
         static constexpr std::size_t Rows() noexcept { return Traits<Derived>::Rows; }
@@ -37,12 +30,6 @@ namespace TG::Math
 
         template<typename OtherDerived>
         CWiseBinaryOp<ScalarSubtractOp<Scalar>, Derived, OtherDerived> operator-(const MatrixBase<OtherDerived>& other) const
-        {
-            return {Expression(), other.Expression()};
-        }
-
-        template<typename OtherDerived>
-        CWiseBinaryOp<ScalarDivideOp<Scalar>, Derived, OtherDerived> operator/(const MatrixBase<OtherDerived>& other) const
         {
             return {Expression(), other.Expression()};
         }
@@ -71,7 +58,7 @@ namespace TG::Math
             return Reduce(ScalarAddOp<Scalar>{});
         }
 
-        template<typename OtherDerived> requires HasFlag<Derived, XprFlag::IsVector>
+        template<typename OtherDerived> requires IsVector
         [[nodiscard]] Scalar Dot(const MatrixBase<OtherDerived>& other) const
         {
             return CWiseProduct(other).Sum();
@@ -89,14 +76,9 @@ namespace TG::Math
             return Block<const Derived, StartRow, StartColumn, BlockRows, BlockCols>(Expression());
         }
 
-        Transpose<Derived> transpose()
+        Transpose<Derived> transpose() const
         {
             return Transpose<Derived>(Expression());
-        }
-
-        Transpose<const Derived> transpose() const
-        {
-            return Transpose<const Derived>(Expression());
         }
     };
 }

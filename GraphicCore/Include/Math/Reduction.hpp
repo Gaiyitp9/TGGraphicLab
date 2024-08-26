@@ -44,7 +44,7 @@ namespace TG::Math
         }
 
     private:
-        ConstEvaluator<Xpr> m_evaluator;
+        Evaluator<Xpr> m_evaluator;
         ReductionFunctor m_functor;
     };
 }

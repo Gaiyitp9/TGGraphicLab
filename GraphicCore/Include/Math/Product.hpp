@@ -13,14 +13,15 @@ namespace TG::Math
     struct Traits<Product<LhsXpr, RhsXpr>>
     {
         using Scalar = Traits<LhsXpr>::Scalar;
-        static constexpr int	    Rows = Traits<LhsXpr>::Rows;
-        static constexpr int	    Columns = Traits<RhsXpr>::Columns;
-        static constexpr int	    Size = Rows * Columns;
-        static constexpr XprFlag    Flags = (Traits<LhsXpr>::Flags == StorageOrder::RowMajor ? XprFlag::RowMajor : XprFlag::None);
+        static constexpr std::size_t    Rows = Traits<LhsXpr>::Rows;
+        static constexpr std::size_t	Columns = Traits<RhsXpr>::Columns;
+        static constexpr std::size_t	Size = Rows * Columns;
+        static constexpr XprFlag        Flags = (Traits<LhsXpr>::Flags == StorageOrder::RowMajor ?
+            XprFlag::RowMajor : XprFlag::None) | XprFlag::LinearAccess;
     };
 
     // 矩阵乘法表达式
-	template<typename LhsXpr, typename RhsXpr> requires MatrixMultipliable<LhsXpr, RhsXpr>
+	template<typename LhsXpr, typename RhsXpr>
 	class Product final : public MatrixBase<Product<LhsXpr, RhsXpr>>
 	{
     public:
@@ -34,37 +35,41 @@ namespace TG::Math
         const RhsXpr& m_rhs;
 	};
 
-    // 矩阵乘法求值器
+    // 两个表达式是否可以执行矩阵乘法，左边表达式的列数要等于右边表达式的行数
     template<typename LhsXpr, typename RhsXpr>
-    class Evaluator<Product<LhsXpr, RhsXpr>, true>
+    concept MatrixMultipliable = std::is_same_v<typename Traits<LhsXpr>::Scalar, typename Traits<RhsXpr>::Scalar> &&
+            Traits<LhsXpr>::Columns == Traits<RhsXpr>::Rows;
+
+    // 矩阵乘法求值器
+    template<typename LhsXpr, typename RhsXpr>  requires MatrixMultipliable<LhsXpr, RhsXpr>
+    class Evaluator<Product<LhsXpr, RhsXpr>>
     {
-        using Lhs = PlainMatrixType<LhsXpr>::Type;
-        using Rhs = PlainMatrixType<RhsXpr>::Type;
+        using Xpr = Product<LhsXpr, RhsXpr>;
+        using Scalar = Traits<Xpr>::Scalar;
 
     public:
-        using XprType = Product<LhsXpr, RhsXpr>;
-        using Scalar = Traits<XprType>::Scalar;
-
-        explicit Evaluator(const XprType& xpr) : m_lhsEvaluator(xpr.LhsExpression()),
+        explicit Evaluator(const Xpr& xpr) : m_lhsEvaluator(xpr.LhsExpression()),
             m_rhsEvaluator(xpr.RhsExpression()) {}
 
-        Scalar Entry(int index) const
+        Scalar Entry(std::size_t index) const
         {
-            int row = index / Traits<XprType>::Columns;
-            int col = index % Traits<XprType>::Columns;
+            int row = index / Traits<Xpr>::Columns;
+            int col = index % Traits<Xpr>::Columns;
             return Entry(row, col);
         }
 
-        Scalar Entry(int row, int col) const
+        Scalar Entry(std::size_t row, std::size_t col) const
         {
             Scalar coefficient = 0;
-            for (int i = 0; i < Traits<XprType>::Columns; ++i)
+            for (int i = 0; i < Traits<Xpr>::Columns; ++i)
                 coefficient += m_lhsEvaluator.Entry(row, i) * m_rhsEvaluator.Entry(i, col);
             return coefficient;
         }
 
     private:
-        Evaluator<Lhs, true> m_lhsEvaluator;
-        Evaluator<Rhs, true> m_rhsEvaluator;
+        Evaluator<LhsXpr> m_lhsEvaluator;
+        Evaluator<RhsXpr> m_rhsEvaluator;
+        Matrix<typename Traits<Xpr>::Scalar, Traits<Xpr>::Rows, Traits<Xpr>::Columns,
+                HasFlag<Xpr, XprFlag::RowMajor> ? StorageOrder::RowMajor : StorageOrder::ColumnMajor> m_product;
     };
 }

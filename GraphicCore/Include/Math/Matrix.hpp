@@ -6,6 +6,7 @@
 #pragma once
 
 #include "MatrixBase.hpp"
+#include "Assignment.hpp"
 
 namespace TG::Math
 {
@@ -17,8 +18,7 @@ namespace TG::Math
         static constexpr std::size_t	Columns = ColumnsT;
         static constexpr std::size_t	Size = Rows * Columns;
         static constexpr XprFlag        Flags = (Order == StorageOrder::RowMajor ? XprFlag::RowMajor : XprFlag::None) |
-			XprFlag::LeftValue | XprFlag::LinearAccess |
-        	(Rows == 1 || Columns == 1 ? XprFlag::IsVector : XprFlag::None);
+			XprFlag::LeftValue | XprFlag::LinearAccess;
 	};
 
 	template<typename Scalar, std::size_t Rows, std::size_t Columns, StorageOrder Order>
@@ -37,7 +37,7 @@ namespace TG::Math
 		template<typename Derived>
 		Matrix& operator=(const MatrixBase<Derived>& other)
         {
-        	MatrixBase<Matrix>::operator=(other);
+        	CallAssignment(this->Expression(), other.Expression());
 	        return *this;
         }
 
