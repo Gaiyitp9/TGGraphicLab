@@ -35,13 +35,19 @@ namespace TG::Math
         }
 
         template<typename OtherDerived>
+        Product<Derived, OtherDerived, ProductType::Default> operator*(const MatrixBase<OtherDerived>& other) const
+        {
+            return {Expression(), other.Expression()};
+        }
+
+        template<typename OtherDerived>
         CWiseBinaryOp<ScalarProductOp<Scalar>, Derived, OtherDerived> CWiseProduct(const MatrixBase<OtherDerived>& other) const
         {
             return {Expression(), other.Expression()};
         }
 
         template<typename OtherDerived>
-        Product<Derived, OtherDerived> operator*(const MatrixBase<OtherDerived>& other) const
+        Product<Derived, OtherDerived, ProductType::Lazy> LazyProduct(const MatrixBase<OtherDerived>& other) const
         {
             return {Expression(), other.Expression()};
         }
