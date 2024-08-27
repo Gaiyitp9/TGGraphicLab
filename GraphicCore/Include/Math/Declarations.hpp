@@ -76,9 +76,6 @@ namespace TG::Math
         RowMajor        = 1,        // 按行储存
         LeftValue       = 1 << 1,   // 表达式是否可以作为左值
         LinearAccess    = 1 << 2,   // 是否能以一维向量的方式访问，也就是求值器可以调用Entry(index)函数
-        // 下面两个标志用在lazy evaluation中。延迟计算可以避免创建临边矩阵的开销，但是有些表达式不能使用延迟计算，比如矩阵乘法
-        EvaluateBeforeAssigning = 1 << 3,   // 赋值前计算表达式的值，创建一个临时矩阵记录结果
-        EvaluateBeforeNesting   = 1 << 4,   // 创建表达式前计算表达式的值，在表达式内部创建一个矩阵记录结果
     };
 
     // 赋值遍历类型
@@ -87,6 +84,12 @@ namespace TG::Math
         Default,
         Linear,
         Vectorized,
+    };
+
+    enum class ProductType : unsigned char
+    {
+        Default,
+        Lazy,       // 使用延迟求值(Lazy evaluation)矩阵乘法
     };
 
     // 矩阵表达式支持的数据类型，用来限制自定义数据类型
@@ -147,7 +150,7 @@ namespace TG::Math
     template<typename Scalar> struct ScalarSubtractOp;
     template<typename Scalar> struct ScalarProductOp;
     // 矩阵乘法表达式
-    template<typename LhsXpr, typename RhsXpr>
+    template<typename LhsXpr, typename RhsXpr, ProductType Type>
     class Product;
     // 矩阵块表达式
     template<typename NestedXpr, std::size_t StartRow, std::size_t StartColumn, std::size_t BlockRows,
