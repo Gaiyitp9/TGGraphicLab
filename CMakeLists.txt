@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.24)
+cmake_minimum_required(VERSION 3.28)
 
 # 设置toolchain文件，使用vcpkg管理部分三方库
 if (DEFINED ENV{VCPKG_ROOT})
