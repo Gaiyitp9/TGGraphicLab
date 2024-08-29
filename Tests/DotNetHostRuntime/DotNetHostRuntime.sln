@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotNetLib", "DotNetLib\DotNetLib.csproj", "{1B491091-82FC-492C-98F4-972E17251878}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PInvokeExample", "PInvokeExample\PInvokeExample.csproj", "{EE59BEA9-8D07-4562-A2C0-BB49F63F0AC2}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{1B491091-82FC-492C-98F4-972E17251878}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1B491091-82FC-492C-98F4-972E17251878}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1B491091-82FC-492C-98F4-972E17251878}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1B491091-82FC-492C-98F4-972E17251878}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EE59BEA9-8D07-4562-A2C0-BB49F63F0AC2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EE59BEA9-8D07-4562-A2C0-BB49F63F0AC2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EE59BEA9-8D07-4562-A2C0-BB49F63F0AC2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EE59BEA9-8D07-4562-A2C0-BB49F63F0AC2}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
