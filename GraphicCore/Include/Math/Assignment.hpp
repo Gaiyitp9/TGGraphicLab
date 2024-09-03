@@ -19,7 +19,7 @@ namespace TG::Math
     template<typename Dst, typename Src, typename AssignFunctor>
     class Assignment
     {
-    	static constexpr Traversal TraverseManner = HasFlag<Dst, XprFlag::LinearAccess> &&
+    	static constexpr Traversal TraverseMethod = HasFlag<Dst, XprFlag::LinearAccess> &&
     	    HasFlag<Src, XprFlag::LinearAccess> && HasFlag<Dst, XprFlag::RowMajor> == HasFlag<Src, XprFlag::RowMajor>
                 ? Traversal::Linear : Traversal::Default;
 
@@ -29,14 +29,14 @@ namespace TG::Math
         {}
 
 		// 通过行列赋值
-        void Run() requires (TraverseManner == Traversal::Default)
+        void Run() requires (TraverseMethod == Traversal::Default)
         {
             for (int i = 0; i < Traits<Dst>::Rows; ++i)
                 for (int j = 0; j < Traits<Src>::Columns; ++j)
 				    m_functor(m_dstEvaluator.Entry(i, j), m_srcEvaluator.Entry(i, j));
         }
     	// 线性赋值
-        void Run() requires (TraverseManner == Traversal::Linear)
+        void Run() requires (TraverseMethod == Traversal::Linear)
         {
             for (int i = 0; i < Traits<Dst>::Size; ++i)
 				m_functor(m_dstEvaluator.Entry(i), m_srcEvaluator.Entry(i));
@@ -52,8 +52,8 @@ namespace TG::Math
     template<typename Dst, typename Src>
     concept Assignable = Traits<Dst>::Rows == Traits<Src>::Rows && Traits<Dst>::Columns == Traits<Src>::Columns &&
             HasFlag<Dst, XprFlag::LeftValue>;
-
-    template <typename T> constexpr bool EvaluatorAssumeAliasing  = false;
+    // 求值器是否需要考虑Aliasing
+    template<typename T> constexpr bool EvaluatorAssumeAliasing = false;
 
     // In Eigen, aliasing refers to assignment statement in which the same matrix (or array or vector)
     // appears on the left and on the right of the assignment operators.
@@ -83,4 +83,24 @@ namespace TG::Math
     {
         CallAssignment(dst, src, AssignOp<typename Traits<Dst>::Scalar>{});
     }
+
+    template<typename Dst, typename LhsXpr, typename RhsXpr, typename AssignFunctor>
+    class Assignment<Dst, Product<LhsXpr, RhsXpr, ProductType::Default>, AssignFunctor>
+    {
+        using Src = Product<LhsXpr, RhsXpr, ProductType::Default>;
+
+    public:
+        Assignment(Dst& dst, const Src& src, AssignFunctor functor) : m_dst(dst), m_src(src), m_functor(functor)
+        {}
+
+        void Run()
+        {
+            CallAssignmentNoAlias(m_dst, m_src.LhsExpression().LazyProduct(m_src.RhsExpression()), m_functor);
+        }
+
+    private:
+        Dst& m_dst;
+        const Src& m_src;
+        AssignFunctor m_functor;
+    };
 }
