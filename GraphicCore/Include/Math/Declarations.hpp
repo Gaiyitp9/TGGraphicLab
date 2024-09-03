@@ -89,7 +89,7 @@ namespace TG::Math
     enum class ProductType : unsigned char
     {
         Default,
-        Lazy,       // 使用延迟求值(Lazy evaluation)矩阵乘法
+        Lazy,       // 矩阵乘法延迟求值(Lazy evaluation)
     };
 
     // 矩阵表达式支持的数据类型，用来限制自定义数据类型
@@ -153,8 +153,7 @@ namespace TG::Math
     template<typename LhsXpr, typename RhsXpr, ProductType Type>
     class Product;
     // 矩阵块表达式
-    template<typename NestedXpr, std::size_t StartRow, std::size_t StartColumn, std::size_t BlockRows,
-        std::size_t BlockColumns>
+    template<typename NestedXpr, std::size_t BlockRows, std::size_t BlockColumns>
     class Block;
     // 矩阵转置表达式
     template<typename NestedXpr>

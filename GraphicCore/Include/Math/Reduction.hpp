@@ -13,13 +13,13 @@ namespace TG::Math
     class Reduction
     {
         using Scalar = Traits<Xpr>::Scalar;
-        static constexpr Traversal TraverseManner = HasFlag<Xpr, XprFlag::LinearAccess> ?
+        static constexpr Traversal TraverseMethod = HasFlag<Xpr, XprFlag::LinearAccess> ?
             Traversal::Linear : Traversal::Default;
 
     public:
         Reduction(const Xpr& xpr, ReductionFunctor functor) : m_evaluator(xpr), m_functor(functor) {}
 
-        Scalar Run() requires (TraverseManner == Traversal::Default)
+        Scalar Run() requires (TraverseMethod == Traversal::Default)
         {
             Scalar result = m_evaluator.Entry(0, 0);
 
@@ -33,7 +33,7 @@ namespace TG::Math
             return result;
         }
 
-        Scalar Run() requires (TraverseManner == Traversal::Linear)
+        Scalar Run() requires (TraverseMethod == Traversal::Linear)
         {
             Scalar result = m_evaluator.Entry(0);
 

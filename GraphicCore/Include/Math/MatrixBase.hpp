@@ -19,6 +19,7 @@ namespace TG::Math
     public:
         const Derived& Expression() const noexcept { return *static_cast<Derived const*>(this); }
         Derived& Expression() noexcept { return *static_cast<Derived*>(this); }
+
         static constexpr std::size_t Rows() noexcept { return Traits<Derived>::Rows; }
         static constexpr std::size_t Columns() noexcept { return Traits<Derived>::Columns; }
 
@@ -70,21 +71,41 @@ namespace TG::Math
             return CWiseProduct(other).Sum();
         }
 
-        template<std::size_t StartRow, std::size_t StartColumn, std::size_t BlockRows, std::size_t BlockCols>
-        Block<Derived, StartRow, StartColumn, BlockRows, BlockCols> block()
+        template<std::size_t BlockRows, std::size_t BlockCols>
+        Block<Derived, BlockRows, BlockCols> block(std::size_t startRow, std::size_t startColumn)
         {
-            return Block<Derived, StartRow, StartColumn, BlockRows, BlockCols>(Expression());
+            return {Expression(), startRow, startColumn};
         }
 
-        template<std::size_t StartRow, std::size_t StartColumn, std::size_t BlockRows, std::size_t BlockCols>
-        Block<const Derived, StartRow, StartColumn, BlockRows, BlockCols> block() const
+        template<std::size_t BlockRows, std::size_t BlockCols>
+        Block<const Derived, BlockRows, BlockCols> block(std::size_t startRow, std::size_t startColumn) const
         {
-            return Block<const Derived, StartRow, StartColumn, BlockRows, BlockCols>(Expression());
+            return {Expression(), startRow, startColumn};
         }
 
         Transpose<Derived> transpose() const
         {
             return Transpose<Derived>(Expression());
+        }
+
+        Block<Derived, 1, Traits<Derived>::Columns> Row(std::size_t row)
+        {
+            return {Expression(), row, 0};
+        }
+
+        Block<const Derived, 1, Traits<Derived>::Columns> Row(std::size_t row) const
+        {
+            return {Expression(), row, 0};
+        }
+
+        Block<Derived, Traits<Derived>::Rows, 1> Column(std::size_t column)
+        {
+            return {Expression(), 0, column};
+        }
+
+        Block<const Derived, Traits<Derived>::Rows, 1> Column(std::size_t column) const
+        {
+            return {Expression(), 0, column};
         }
     };
 }
