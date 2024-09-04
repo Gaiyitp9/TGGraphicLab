@@ -15,42 +15,40 @@ namespace TG::Math
     {
     private:
         // 因为Block有const和非const两种版本，所以这里要去掉const修饰符来获取无修饰的类型
-        using PureXpr = std::remove_const_t<NestedXpr>;
+        using PlainXpr = std::remove_const_t<NestedXpr>;
         // Block可以线性访问的条件：
         // 1. 内嵌表达式可以线性访问
         // 2. 对于row major的表达式，Block的列数等于内嵌表达式的列数或者Block行数等于1;
         // 对于column major的表达式，Block的行数等于内嵌表达式的行数或者Block列数等于1
-        static constexpr bool LinearAccessible = HasFlag<PureXpr, XprFlag::LinearAccess> &&
-            (HasFlag<PureXpr, XprFlag::RowMajor> ? BlockColumns == Traits<PureXpr>::Columns || BlockRows == 1 :
-                BlockRows == Traits<PureXpr>::Rows || BlockColumns == 1);
+        static constexpr bool LinearAccessible = HasFlag<PlainXpr, XprFlag::LinearAccess> &&
+            (HasFlag<PlainXpr, XprFlag::RowMajor> ? BlockColumns == Traits<PlainXpr>::Columns || BlockRows == 1 :
+                BlockRows == Traits<PlainXpr>::Rows || BlockColumns == 1);
 
     public:
-        using Scalar = Traits<PureXpr>::Scalar;
+        using Scalar = Traits<PlainXpr>::Scalar;
         static constexpr std::size_t    Rows = BlockRows;
         static constexpr std::size_t    Columns = BlockColumns;
         static constexpr std::size_t    Size = Rows * Columns;
-        static constexpr XprFlag        Flags = Traits<PureXpr>::Flags &
+        static constexpr XprFlag        Flags = Traits<PlainXpr>::Flags &
             (LinearAccessible ? ~XprFlag::None : ~XprFlag::LinearAccess);
     };
 
     template<typename NestedXpr, std::size_t BlockRows, std::size_t BlockColumns>
     class Block final : public MatrixBase<Block<NestedXpr, BlockRows, BlockColumns>>
     {
-        using PureXpr = std::remove_const_t<NestedXpr>;
-
     public:
         Block(NestedXpr& xpr, std::size_t startRow, std::size_t startColumn)
             : m_xpr(xpr), m_startRow(startRow), m_startColumn(startColumn) {}
 
-        template<typename Derived>
+        template<typename Derived> requires !std::is_const_v<NestedXpr>
         Block& operator=(const MatrixBase<Derived>& other)
         {
             CallAssignment(this->Expression(), other.Expression());
             return *this;
         }
 
-        PureXpr& NestedExpression() noexcept { return m_xpr; }
-        [[nodiscard]] const PureXpr& NestedExpression() const noexcept { return m_xpr; }
+        NestedXpr& NestedExpression() noexcept { return m_xpr; }
+        [[nodiscard]] const NestedXpr& NestedExpression() const noexcept { return m_xpr; }
 
         [[nodiscard]] std::size_t StartRow() const noexcept { return m_startRow; }
         [[nodiscard]] std::size_t StartColumn() const noexcept { return m_startColumn; }

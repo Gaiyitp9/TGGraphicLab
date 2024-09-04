@@ -22,7 +22,7 @@ namespace TG::Math
         static constexpr std::size_t	Columns = Traits<RhsXpr>::Columns;
         static constexpr std::size_t	Size = Rows * Columns;
         static constexpr XprFlag        Flags = (IsSameOrder ? Traits<LhsXpr>::Flags & XprFlag::RowMajor
-            : Order) | (Type == ProductType::Default ? XprFlag::LinearAccess : XprFlag::None);
+            : Order) | XprFlag::LinearAccess;
     };
 
     // 矩阵乘法表达式
@@ -88,6 +88,22 @@ namespace TG::Math
         explicit Evaluator(const Xpr& xpr) : m_lhs(xpr.LhsExpression()), m_rhs(xpr.RhsExpression())
         {}
 
+        Scalar Entry(std::size_t index) const
+        {
+            std::size_t row, column;
+            if constexpr (HasFlag<Xpr, XprFlag::RowMajor>)
+            {
+                row = index / Traits<Xpr>::Columns;
+                column = index % Traits<Xpr>::Columns;
+            }
+            else
+            {
+                row = index % Traits<Xpr>::Rows;
+                column = index / Traits<Xpr>::Rows;
+            }
+            return Entry(row, column);
+        }
+
         Scalar Entry(std::size_t row, std::size_t column) const
         {
             return m_lhs.Row(row).CWiseProduct(m_rhs.Column(column).transpose()).Sum();
@@ -97,4 +113,12 @@ namespace TG::Math
         const LhsXpr& m_lhs;
         const RhsXpr& m_rhs;
     };
+
+    // 常量乘矩阵
+    template<typename Derived> requires std::derived_from<Derived, MatrixBase<Derived>>
+    Product<Derived, CWiseNullaryOp<ScalarConstantOp<typename Traits<Derived>::Scalar>, PlainMatrix<Derived>>,
+        ProductType::Default> operator*(typename Traits<Derived>::Scalar scalar, const Derived& other)
+    {
+        return other * scalar;
+    }
 }

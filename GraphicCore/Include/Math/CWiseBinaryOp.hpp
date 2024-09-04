@@ -86,4 +86,9 @@ namespace TG::Math
     {
         [[nodiscard]] Scalar operator()(Scalar a, Scalar b) const { return a * b; }
     };
+    template<typename Scalar>
+    struct ScalarDivideOp
+    {
+        [[nodiscard]] Scalar operator()(Scalar a, Scalar b) const { return a / b; }
+    };
 }

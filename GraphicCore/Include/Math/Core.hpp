@@ -12,3 +12,4 @@
 #include "Transpose.hpp"
 #include "Block.hpp"
 #include "Product.hpp"
+#include "CWiseNullaryOp.hpp"

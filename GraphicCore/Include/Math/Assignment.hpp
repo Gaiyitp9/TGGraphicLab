@@ -68,7 +68,7 @@ namespace TG::Math
     template<typename Dst, typename Src, typename AssignFunctor> requires EvaluatorAssumeAliasing<Src>
     void CallAssignment(Dst& dst, const Src& src, const AssignFunctor& func)
     {
-        typename PlainMatrixType<Src>::Type temp(src);
+        PlainMatrix<Src> temp(src);
         CallAssignmentNoAlias(dst, temp, func);
     }
 

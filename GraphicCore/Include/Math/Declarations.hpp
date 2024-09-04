@@ -142,6 +142,10 @@ namespace TG::Math
 	// 矩阵类
 	template<typename Scalar, std::size_t Rows, std::size_t Cols, StorageOrder Order = DefaultOrder>
 	class Matrix;
+    // 表达式对应的矩阵类型
+    template<typename Xpr>
+    using PlainMatrix = Matrix<typename Traits<Xpr>::Scalar, Traits<Xpr>::Rows, Traits<Xpr>::Columns,
+        HasFlag<Xpr, XprFlag::RowMajor> ? StorageOrder::RowMajor : StorageOrder::ColumnMajor>;
     // 二元表达式
     template<typename BinaryOp, typename LhsXpr, typename RhsXpr>
     class CWiseBinaryOp;
@@ -149,6 +153,7 @@ namespace TG::Math
     template<typename Scalar> struct ScalarAddOp;
     template<typename Scalar> struct ScalarSubtractOp;
     template<typename Scalar> struct ScalarProductOp;
+    template<typename Scalar> struct ScalarDivideOp;
     // 矩阵乘法表达式
     template<typename LhsXpr, typename RhsXpr, ProductType Type>
     class Product;
@@ -156,13 +161,12 @@ namespace TG::Math
     template<typename NestedXpr, std::size_t BlockRows, std::size_t BlockColumns>
     class Block;
     // 矩阵转置表达式
-    template<typename NestedXpr>
-    class Transpose;
-
-    template<typename Xpr>
-    struct PlainMatrixType
-    {
-        using Type = Matrix<typename Traits<Xpr>::Scalar, Traits<Xpr>::Rows, Traits<Xpr>::Columns,
-                HasFlag<Xpr, XprFlag::RowMajor> ? StorageOrder::RowMajor : StorageOrder::ColumnMajor>;
-    };
+    template<typename NestedXpr> class Transpose;
+    // 零元运算，不接受任何矩阵表达式的运算符
+    template<typename NullaryOp, typename Matrix>
+    class CWiseNullaryOp;
+    // 生成单位矩阵运算符
+    template<typename Scalar> struct ScalarIdentityOp;
+    // 生成常量矩阵运算符
+    template<typename Scalar> struct ScalarConstantOp;
 }

@@ -27,7 +27,7 @@ namespace TG::Math
 	public:
 		Matrix() = default;
 
-		// 构造时才会调用，可以保证不存在aliasing问题
+		// 构造时才会调用，不存在aliasing问题
         template<typename Derived>
         Matrix(const MatrixBase<Derived>& other)
         {

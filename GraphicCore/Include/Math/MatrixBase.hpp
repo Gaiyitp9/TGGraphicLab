@@ -23,26 +23,59 @@ namespace TG::Math
         static constexpr std::size_t Rows() noexcept { return Traits<Derived>::Rows; }
         static constexpr std::size_t Columns() noexcept { return Traits<Derived>::Columns; }
 
+        static CWiseNullaryOp<ScalarIdentityOp<Scalar>, PlainMatrix<Derived>> Identity()
+        {
+            return CWiseNullaryOp<ScalarIdentityOp<Scalar>, PlainMatrix<Derived>>{{}};
+        }
+
+        static CWiseNullaryOp<ScalarConstantOp<Scalar>, PlainMatrix<Derived>> Constant(Scalar scalar)
+        {
+            return CWiseNullaryOp<ScalarConstantOp<Scalar>, PlainMatrix<Derived>>{
+                ScalarConstantOp<Scalar>{scalar}};
+        }
+
+        static CWiseNullaryOp<ScalarConstantOp<Scalar>, PlainMatrix<Derived>> Zero()
+        {
+            return Constant(Scalar{0});
+        }
+
         template<typename OtherDerived>
-        CWiseBinaryOp<ScalarAddOp<Scalar>, Derived, OtherDerived> operator+(const MatrixBase<OtherDerived>& other) const
+        CWiseBinaryOp<ScalarAddOp<Scalar>, Derived, OtherDerived>
+            operator+(const MatrixBase<OtherDerived>& other) const
         {
             return {Expression(), other.Expression()};
         }
 
         template<typename OtherDerived>
-        CWiseBinaryOp<ScalarSubtractOp<Scalar>, Derived, OtherDerived> operator-(const MatrixBase<OtherDerived>& other) const
+        CWiseBinaryOp<ScalarSubtractOp<Scalar>, Derived, OtherDerived>
+            operator-(const MatrixBase<OtherDerived>& other) const
         {
             return {Expression(), other.Expression()};
         }
 
         template<typename OtherDerived>
-        Product<Derived, OtherDerived, ProductType::Default> operator*(const MatrixBase<OtherDerived>& other) const
+        CWiseBinaryOp<ScalarDivideOp<Scalar>, Derived, OtherDerived>
+            operator/(const MatrixBase<OtherDerived>& other) const
         {
             return {Expression(), other.Expression()};
         }
 
         template<typename OtherDerived>
-        CWiseBinaryOp<ScalarProductOp<Scalar>, Derived, OtherDerived> CWiseProduct(const MatrixBase<OtherDerived>& other) const
+        Product<Derived, OtherDerived, ProductType::Default>
+            operator*(const MatrixBase<OtherDerived>& other) const
+        {
+            return {Expression(), other.Expression()};
+        }
+        // 矩阵乘常量，常量乘矩阵需要单独实现operator*
+        Product<Derived, CWiseNullaryOp<ScalarConstantOp<Scalar>, PlainMatrix<Derived>>, ProductType::Default>
+            operator*(Scalar scalar) const
+        {
+            return {Expression(), Constant(scalar)};
+        }
+
+        template<typename OtherDerived>
+        CWiseBinaryOp<ScalarProductOp<Scalar>, Derived, OtherDerived>
+            CWiseProduct(const MatrixBase<OtherDerived>& other) const
         {
             return {Expression(), other.Expression()};
         }
