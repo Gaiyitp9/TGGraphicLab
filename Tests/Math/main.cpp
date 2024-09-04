@@ -188,6 +188,12 @@ namespace TG::Math
         for (std::size_t i = 0; i < 16; ++i)
             EXPECT_NEAR(mat1[i], constant, gEpsilon);
     }
+
+    TEST(TestMatrix, Determinant)
+    {
+        std::array<std::size_t, 4> arr{4, 2, 3, 1};
+        EXPECT_EQ(InversionNumber(arr), 5);
+    }
 }
 
 // #include <format>

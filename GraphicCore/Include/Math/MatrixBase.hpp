@@ -7,6 +7,7 @@
 
 #include "Declarations.hpp"
 #include "Reduction.hpp"
+#include "Determinant.hpp"
 
 namespace TG::Math
 {
@@ -139,6 +140,11 @@ namespace TG::Math
         Block<const Derived, Traits<Derived>::Rows, 1> Column(std::size_t column) const
         {
             return {Expression(), 0, column};
+        }
+
+        Scalar Determinant() const
+        {
+            return {};
         }
     };
 }
