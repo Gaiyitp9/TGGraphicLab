@@ -154,6 +154,40 @@ namespace TG::Math
         for (std::size_t i = 0; i < 16; ++i)
             EXPECT_NEAR(mat5[i], mat4[i], gEpsilon);
     }
+
+    TEST(TestMatrix, NullaryOp)
+    {
+        Matrix4f mat1 = Matrix4f::Identity();
+        for (std::size_t i = 0; i < 4; ++i)
+        {
+            for (std::size_t j = 0; j < 4; ++j)
+            {
+                if (i == j)
+                    EXPECT_NEAR(mat1(i, j), 1.0f, gEpsilon);
+                else
+                    EXPECT_NEAR(mat1(i, j), 0.0f, gEpsilon);
+            }
+        }
+
+        mat1 = Matrix4f::Zero();
+        for (std::size_t i = 0; i < 16; ++i)
+            EXPECT_NEAR(mat1[i], 0.0f, gEpsilon);
+
+        float constant = 2.0f;
+        mat1 = Matrix4f::Constant(constant);
+        for (std::size_t i = 0; i < 16; ++i)
+            EXPECT_NEAR(mat1[i], constant, gEpsilon);
+
+        constant = 3.0f;
+        mat1 = constant * Matrix4f::Identity();
+        for (std::size_t i = 0; i < 16; ++i)
+            EXPECT_NEAR(mat1[i], constant, gEpsilon);
+
+        constant = 4.0f;
+        mat1 = Matrix4f::Identity() * constant;
+        for (std::size_t i = 0; i < 16; ++i)
+            EXPECT_NEAR(mat1[i], constant, gEpsilon);
+    }
 }
 
 // #include <format>
