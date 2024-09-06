@@ -5,8 +5,12 @@
 namespace TG::Math
 {
     static float gEpsilon = 0.001f;
-    static float gMin = gMin;
+    static float gMin = 0.1f;
     static float gMax = 100.0f;
+
+    std::random_device gRd;
+    std::mt19937 gGen(gRd());
+    std::uniform_real_distribution gUrd(gMin, gMax);
     
     TEST(TestMatrix, Constructor)
     {
@@ -17,15 +21,11 @@ namespace TG::Math
 
     TEST(TestMatrix, CWiseBinaryOp)
     {
-        std::random_device rd;
-        std::mt19937 gen(rd());
-        std::uniform_real_distribution urd(gMin, gMax);
-
         Matrix4f mat1, mat2;
         for (std::size_t i = 0; i < 16; ++i)
         {
-            mat1[i] = urd(gen);
-            mat2[i] = urd(gen);
+            mat1[i] = gUrd(gGen);
+            mat2[i] = gUrd(gGen);
         }
         Matrix4f result = mat1 + mat2;
         for (std::size_t i = 0; i < 16; ++i)
@@ -38,17 +38,17 @@ namespace TG::Math
         result = mat1.CWiseProduct(mat2);
         for (std::size_t i = 0; i < 16; ++i)
             EXPECT_NEAR(result[i], mat1[i] * mat2[i], gEpsilon);
+
+        result = mat1 / mat2;
+        for (std::size_t i = 0; i < 16; ++i)
+            EXPECT_NEAR(result[i], mat1[i] / mat2[i], gEpsilon);
     }
 
     TEST(TestMatrix, Block)
     {
-        std::random_device rd;
-        std::mt19937 gen(rd());
-        std::uniform_real_distribution urd(gMin, gMax);
-
         Matrix4f mat4;
         for (std::size_t i = 0; i < 16; ++i)
-            mat4[i] = urd(gen);
+            mat4[i] = gUrd(gGen);
 
         std::size_t startRow = 1, startCol = 1;
         Matrix3f mat3 = mat4.block<3, 3>(startRow, startCol);
@@ -58,7 +58,7 @@ namespace TG::Math
 
         Matrix2f mat2;
         for (std::size_t i = 0; i < 4; ++i)
-            mat2[i] = urd(gen);
+            mat2[i] = gUrd(gGen);
         mat4.block<2, 2>(0, 0) = mat2;
         for (std::size_t i = 0; i < 2; ++i)
             for (std::size_t j = 0; j < 2; ++j)
@@ -67,13 +67,9 @@ namespace TG::Math
 
     TEST(TestMatrix, Transpose)
     {
-        std::random_device rd;
-        std::mt19937 gen(rd());
-        std::uniform_real_distribution urd(gMin, gMax);
-
         Matrix4f mat4;
         for (std::size_t i = 0; i < 16; ++i)
-            mat4[i] = urd(gen);
+            mat4[i] = gUrd(gGen);
 
         Matrix4f transpose = mat4.transpose();
         for (std::size_t i = 0; i < 4; ++i)
@@ -88,13 +84,9 @@ namespace TG::Math
 
     TEST(TestMatrix, Reduce)
     {
-        std::random_device rd;
-        std::mt19937 gen(rd());
-        std::uniform_real_distribution urd(gMin, gMax);
-
         Matrix4f mat4;
         for (std::size_t i = 0; i < 16; ++i)
-            mat4[i] = urd(gen);
+            mat4[i] = gUrd(gGen);
 
         float temp = mat4.Sum();
         float sum = 0.0f;
@@ -105,15 +97,11 @@ namespace TG::Math
 
     TEST(TestMatrix, Dot)
     {
-        std::random_device rd;
-        std::mt19937 gen(rd());
-        std::uniform_real_distribution urd(gMin, gMax);
-
         Vector4f vec0, vec1;
         for (std::size_t i = 0; i < 4; ++i)
         {
-            vec0[i] = urd(gen);
-            vec1[i] = urd(gen);
+            vec0[i] = gUrd(gGen);
+            vec1[i] = gUrd(gGen);
         }
 
         float temp = vec0.Dot(vec1);
@@ -125,15 +113,11 @@ namespace TG::Math
 
     TEST(TestMatrix, MatrixMultiplication)
     {
-        std::random_device rd;
-        std::mt19937 gen(rd());
-        std::uniform_real_distribution urd(gMin, gMax);
-
         Matrix4f mat1, mat2;
         for (std::size_t i = 0; i < 16; ++i)
         {
-            mat1[i] = urd(gen);
-            mat2[i] = urd(gen);
+            mat1[i] = gUrd(gGen);
+            mat2[i] = gUrd(gGen);
         }
 
         Matrix4f mat3 = mat1 * mat2;
@@ -193,6 +177,25 @@ namespace TG::Math
     {
         std::array<std::size_t, 4> arr{4, 2, 3, 1};
         EXPECT_EQ(InversionNumber(arr), 5);
+
+        Matrix2f mat2;
+        for (std::size_t i = 0; i < 4; ++i)
+            mat2[i] = gUrd(gGen);
+        EXPECT_NEAR(mat2.Determinant(), mat2(0, 0) * mat2(1, 1) - mat2(0, 1) * mat2(1, 0), gEpsilon);
+
+        Matrix3f mat3;
+        for (std::size_t i = 0; i < 9; ++i)
+            mat3[i] = 3.0f;
+        EXPECT_NEAR(mat3.Determinant(), 0, gEpsilon);
+        mat3 = Matrix3f::Identity();
+        EXPECT_NEAR(mat3.Determinant(), 1.0f, gEpsilon);
+
+        Matrix4f mat4;
+        for (std::size_t i = 0; i < 16; ++i)
+            mat4[i] = 4.0f;
+        EXPECT_NEAR(mat4.Determinant(), 0, gEpsilon);
+        mat4 = Matrix4f::Identity();
+        EXPECT_NEAR(mat4.Determinant(), 1.0f, gEpsilon);
     }
 }
 

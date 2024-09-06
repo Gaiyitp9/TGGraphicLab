@@ -9,13 +9,13 @@
 
 namespace TG::Math
 {
-    // 赋值运算
+    // 赋值运算符
     template<typename Scalar> requires requires(Scalar a, Scalar b) { a = b; }
     struct AssignOp
     {
         void operator()(Scalar& a, Scalar b) { a = b; }
     };
-
+    // 赋值运算算法，全部封装在一个类中，方便管理
     template<typename Dst, typename Src, typename AssignFunctor>
     class Assignment
     {
@@ -24,28 +24,38 @@ namespace TG::Math
                 ? Traversal::Linear : Traversal::Default;
 
     public:
-        Assignment(Dst& dst, const Src& src, AssignFunctor functor)
-            : m_dstEvaluator(dst), m_srcEvaluator(src), m_functor(functor)
-        {}
-
 		// 通过行列赋值
-        void Run() requires (TraverseMethod == Traversal::Default)
+        void operator()(Dst& dst, const Src& src, AssignFunctor functor)
+            requires (TraverseMethod == Traversal::Default)
         {
+            RefEvaluator<Dst> dstEvaluator{dst};
+            Evaluator<Src> srcEvaluator{src};
+
             for (int i = 0; i < Traits<Dst>::Rows; ++i)
                 for (int j = 0; j < Traits<Src>::Columns; ++j)
-				    m_functor(m_dstEvaluator.Entry(i, j), m_srcEvaluator.Entry(i, j));
+				    functor(dstEvaluator.Entry(i, j), srcEvaluator.Entry(i, j));
         }
     	// 线性赋值
-        void Run() requires (TraverseMethod == Traversal::Linear)
+        void operator()(Dst& dst, const Src& src, AssignFunctor functor)
+            requires (TraverseMethod == Traversal::Linear)
         {
-            for (int i = 0; i < Traits<Dst>::Size; ++i)
-				m_functor(m_dstEvaluator.Entry(i), m_srcEvaluator.Entry(i));
-        }
+            RefEvaluator<Dst> dstEvaluator{dst};
+            Evaluator<Src> srcEvaluator{src};
 
-    private:
-        RefEvaluator<Dst> m_dstEvaluator;
-        Evaluator<Src> m_srcEvaluator;
-        AssignFunctor m_functor;
+            for (int i = 0; i < Traits<Dst>::Size; ++i)
+				functor(dstEvaluator.Entry(i), srcEvaluator.Entry(i));
+        }
+    };
+    // 默认矩阵乘法的赋值，可以避免创建Evaluator<Product<LhsXpr, RhsXpr, Default>>，即避免创建一个矩阵临时变量
+    template<typename Dst, typename LhsXpr, typename RhsXpr, typename AssignFunctor>
+    class Assignment<Dst, Product<LhsXpr, RhsXpr, ProductType::Default>, AssignFunctor>
+    {
+        using Src = Product<LhsXpr, RhsXpr, ProductType::Default>;
+    public:
+        void operator()(Dst& dst, const Src& src, AssignFunctor functor)
+        {
+            CallAssignmentNoAlias(dst, src.LhsExpression().LazyProduct(src.RhsExpression()), functor);
+        }
     };
 
     // 矩阵表达式赋值概念，目标表达式和源表达式的行列数需要相等，且表达式需要是左值
@@ -61,14 +71,13 @@ namespace TG::Math
         requires Assignable<Dst, Src>
     void CallAssignmentNoAlias(Dst& dst, const Src& src, const AssignFunctor& func = {})
     {
-    	Assignment assign(dst, src, func);
-    	assign.Run();
+    	Assignment<Dst, Src, AssignFunctor>{}(dst, src, func);
     }
 
     template<typename Dst, typename Src, typename AssignFunctor> requires EvaluatorAssumeAliasing<Src>
     void CallAssignment(Dst& dst, const Src& src, const AssignFunctor& func)
     {
-        PlainMatrix<Src> temp(src);
+        PlainMatrix<Src> temp{src};
         CallAssignmentNoAlias(dst, temp, func);
     }
 
@@ -83,24 +92,4 @@ namespace TG::Math
     {
         CallAssignment(dst, src, AssignOp<typename Traits<Dst>::Scalar>{});
     }
-
-    template<typename Dst, typename LhsXpr, typename RhsXpr, typename AssignFunctor>
-    class Assignment<Dst, Product<LhsXpr, RhsXpr, ProductType::Default>, AssignFunctor>
-    {
-        using Src = Product<LhsXpr, RhsXpr, ProductType::Default>;
-
-    public:
-        Assignment(Dst& dst, const Src& src, AssignFunctor functor) : m_dst(dst), m_src(src), m_functor(functor)
-        {}
-
-        void Run()
-        {
-            CallAssignmentNoAlias(m_dst, m_src.LhsExpression().LazyProduct(m_src.RhsExpression()), m_functor);
-        }
-
-    private:
-        Dst& m_dst;
-        const Src& m_src;
-        AssignFunctor m_functor;
-    };
 }
