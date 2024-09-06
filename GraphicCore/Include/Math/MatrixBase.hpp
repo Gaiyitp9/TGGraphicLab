@@ -16,6 +16,7 @@ namespace TG::Math
     {
         using Scalar = Traits<Derived>::Scalar;
         static constexpr bool IsVector = Traits<Derived>::Rows == 1 || Traits<Derived>::Columns == 1;
+        static constexpr bool IsSquare = Traits<Derived>::Rows == Traits<Derived>::Columns;
 
     public:
         const Derived& Expression() const noexcept { return *static_cast<Derived const*>(this); }
@@ -90,8 +91,7 @@ namespace TG::Math
         template<typename BinaryOp>
         [[nodiscard]] Scalar Reduce(BinaryOp functor) const
         {
-            Reduction reduction{Expression(), functor};
-            return reduction.Run();
+            return Reduction<Derived, BinaryOp>{}(Expression(), functor);
         }
 
         [[nodiscard]] Scalar Sum() const
@@ -142,9 +142,9 @@ namespace TG::Math
             return {Expression(), 0, column};
         }
 
-        Scalar Determinant() const
+        Scalar Determinant() const requires IsSquare
         {
-            return {};
+            return DeterminantImpl<Derived, Traits<Derived>::Rows>{}(Expression());
         }
     };
 }

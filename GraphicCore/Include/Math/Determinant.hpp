@@ -44,7 +44,7 @@ namespace TG::Math
 
         return inversionNumber;
     }
-    // 使用归并排序计算逆序数
+    // 使用归并排序计算逆序数，复杂度O(NlogN)
     template<std::size_t N, std::size_t Left, std::size_t Right>
     std::size_t MergeSortAndCount(std::array<std::size_t, N>& permutation)
     {
@@ -58,10 +58,68 @@ namespace TG::Math
         }
         return inversionNumber;
     }
-
+    // 排列的逆序数
     template<std::size_t N>
     std::size_t InversionNumber(std::array<std::size_t, N> permutation)
     {
         return MergeSortAndCount<N, 0, permutation.size() - 1>(permutation);
     }
+
+    template<typename Derived, std::size_t Order>
+    class DeterminantImpl
+    {
+        using Scalar = Traits<Derived>::Scalar;
+
+    public:
+        Scalar operator()(const Derived& mat) requires (Order == 1)
+        {
+            return mat(0, 0);
+        }
+
+        Scalar operator()(const Derived& mat) requires (Order == 2)
+        {
+            return mat(0, 0) * mat(1, 1) - mat(1, 0) * mat(0, 1);
+        }
+
+        Scalar operator()(const Derived& mat) requires (Order == 3)
+        {
+            // ‌代数余子式法
+            return mat(0, 0) * (mat(1, 1) * mat(2, 2) - mat(1, 2) * mat(2, 1))
+                - mat(0, 1) * (mat(1, 0) * mat(2, 2) - mat(1, 2) * mat(2, 0))
+                + mat(0, 2) * (mat(1, 0) * mat(2, 1) - mat(1, 1) * mat(2, 0));
+        }
+
+        Scalar operator()(const Derived& mat) requires (Order == 4)
+        {
+            // ‌代数余子式法
+            Scalar d2_01 = Det2(mat, 0, 1);
+            Scalar d2_02 = Det2(mat, 0, 2);
+            Scalar d2_03 = Det2(mat, 0, 3);
+            Scalar d2_12 = Det2(mat, 1, 2);
+            Scalar d2_13 = Det2(mat, 1, 3);
+            Scalar d2_23 = Det2(mat, 2, 3);
+            Scalar d3_0 = Det3(mat, 1, d2_23, 2, d2_13, 3, d2_12);
+            Scalar d3_1 = Det3(mat, 0, d2_23, 2, d2_03, 3, d2_02);
+            Scalar d3_2 = Det3(mat, 0, d2_13, 1, d2_03, 3, d2_01);
+            Scalar d3_3 = Det3(mat, 0, d2_12, 1, d2_02, 2, d2_01);
+            return -mat(0, 3) * d3_0 + mat(1, 3) * d3_1 - mat(2, 3) * d3_2 + mat(3, 3) * d3_3;
+        }
+
+        Scalar operator()(const Derived& mat)
+        {
+            return {};
+        }
+
+    private:
+        Scalar Det2(const Derived& mat, std::size_t i0, std::size_t i1)
+        {
+            return mat(i0, 0) * mat(i1, 1) - mat(i1, 0) * mat(i0, 1);
+        }
+
+        Scalar Det3(const Derived& mat, std::size_t i0, Scalar d0, std::size_t i1, Scalar d1,
+                                       std::size_t i2, Scalar d2)
+        {
+            return mat(i0, 2) * d0 - mat(i1, 2) * d1 + mat(i2, 2) * d2;
+        }
+    };
 }

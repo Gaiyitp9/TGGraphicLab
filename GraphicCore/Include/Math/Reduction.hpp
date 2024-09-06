@@ -17,34 +17,30 @@ namespace TG::Math
             Traversal::Linear : Traversal::Default;
 
     public:
-        Reduction(const Xpr& xpr, ReductionFunctor functor) : m_evaluator(xpr), m_functor(functor) {}
-
-        Scalar Run() requires (TraverseMethod == Traversal::Default)
+        Scalar operator()(const Xpr& xpr, ReductionFunctor functor) requires (TraverseMethod == Traversal::Default)
         {
-            Scalar result = m_evaluator.Entry(0, 0);
+            Evaluator<Xpr> evaluator{xpr};
+            Scalar result = evaluator.Entry(0, 0);
 
             for (int j = 1; j < Traits<Xpr>::Columns; ++j)
-                result = m_functor(result, m_evaluator.Entry(0, j));
+                result = functor(result, evaluator.Entry(0, j));
 
             for (int i = 1; i < Traits<Xpr>::Rows; ++i)
                 for (int j = 0; j < Traits<Xpr>::Columns; ++j)
-                    result = m_functor(result, m_evaluator.Entry(i, j));
+                    result = functor(result, evaluator.Entry(i, j));
 
             return result;
         }
 
-        Scalar Run() requires (TraverseMethod == Traversal::Linear)
+        Scalar operator()(const Xpr& xpr, ReductionFunctor functor) requires (TraverseMethod == Traversal::Linear)
         {
-            Scalar result = m_evaluator.Entry(0);
+            Evaluator<Xpr> evaluator{xpr};
+            Scalar result = evaluator.Entry(0);
 
             for (int i = 1; i < Traits<Xpr>::Size; ++i)
-                result = m_functor(result, m_evaluator.Entry(i));
+                result = functor(result, evaluator.Entry(i));
 
             return result;
         }
-
-    private:
-        Evaluator<Xpr> m_evaluator;
-        ReductionFunctor m_functor;
     };
 }
