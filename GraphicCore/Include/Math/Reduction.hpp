@@ -17,7 +17,7 @@ namespace TG::Math
             Traversal::Linear : Traversal::Default;
 
     public:
-        Scalar operator()(const Xpr& xpr, ReductionFunctor functor) requires (TraverseMethod == Traversal::Default)
+        Scalar operator()(const Xpr& xpr, ReductionFunctor functor) const requires (TraverseMethod == Traversal::Default)
         {
             Evaluator<Xpr> evaluator{xpr};
             Scalar result = evaluator.Entry(0, 0);
@@ -32,7 +32,7 @@ namespace TG::Math
             return result;
         }
 
-        Scalar operator()(const Xpr& xpr, ReductionFunctor functor) requires (TraverseMethod == Traversal::Linear)
+        Scalar operator()(const Xpr& xpr, ReductionFunctor functor) const requires (TraverseMethod == Traversal::Linear)
         {
             Evaluator<Xpr> evaluator{xpr};
             Scalar result = evaluator.Entry(0);

@@ -175,13 +175,15 @@ namespace TG::Math
 
     TEST(TestMatrix, Determinant)
     {
-        std::array<std::size_t, 4> arr{4, 2, 3, 1};
-        EXPECT_EQ(InversionNumber(arr), 5);
-
-        Matrix2f mat2;
+        Matrix2f mat2a, mat2b;
         for (std::size_t i = 0; i < 4; ++i)
-            mat2[i] = gUrd(gGen);
-        EXPECT_NEAR(mat2.Determinant(), mat2(0, 0) * mat2(1, 1) - mat2(0, 1) * mat2(1, 0), gEpsilon);
+        {
+            mat2a[i] = gUrd(gGen);
+            mat2b[i] = gUrd(gGen);
+        }
+        const float result = (mat2a(0, 0) + mat2b(0, 0)) * (mat2a(1, 1) + mat2b(1, 1))
+                             - (mat2a(0, 1) + mat2b(0, 1)) * (mat2a(1, 0) + mat2b(1, 0));
+        EXPECT_NEAR((mat2a + mat2b).Determinant(), result, gEpsilon);
 
         Matrix3f mat3;
         for (std::size_t i = 0; i < 9; ++i)
@@ -196,6 +198,78 @@ namespace TG::Math
         EXPECT_NEAR(mat4.Determinant(), 0, gEpsilon);
         mat4 = Matrix4f::Identity();
         EXPECT_NEAR(mat4.Determinant(), 1.0f, gEpsilon);
+
+        Matrix<float, 5, 5> mat5;
+        for (std::size_t i = 0; i < 25; ++i)
+            mat5[i] = 5.0f;
+        EXPECT_NEAR(mat5.Determinant(), 0, gEpsilon);
+        mat5 = Matrix<float, 5, 5>::Identity();
+        EXPECT_NEAR(mat5.Determinant(), 1.0f, gEpsilon);
+    }
+
+    TEST(TestMatrix, Inverse)
+    {
+        Matrix2f mat2{
+            0, 1,
+            2, 3
+        };
+        Matrix2f invMat2 = mat2.inverse();
+        EXPECT_NEAR(invMat2[0], -1.5f, gEpsilon);
+        EXPECT_NEAR(invMat2[1],  0.5f, gEpsilon);
+        EXPECT_NEAR(invMat2[2],  1.0f, gEpsilon);
+        EXPECT_NEAR(invMat2[3],  0.0f, gEpsilon);
+
+        Matrix3f mat3{
+            1.0f, 2.0f, 4.0f,
+            1.0f, 3.0f, 5.0f,
+            2.0f, 6.0f, 8.0f,
+        };
+        Matrix3f invMat3 = mat3.inverse();
+        EXPECT_NEAR(invMat3[0],  3.0f, gEpsilon);
+        EXPECT_NEAR(invMat3[1], -4.0f, gEpsilon);
+        EXPECT_NEAR(invMat3[2],  1.0f, gEpsilon);
+        EXPECT_NEAR(invMat3[3], -1.0f, gEpsilon);
+        EXPECT_NEAR(invMat3[4],  0.0f, gEpsilon);
+        EXPECT_NEAR(invMat3[5],  0.5f, gEpsilon);
+        EXPECT_NEAR(invMat3[6],  0.0f, gEpsilon);
+        EXPECT_NEAR(invMat3[7],  1.0f, gEpsilon);
+        EXPECT_NEAR(invMat3[8], -0.5f, gEpsilon);
+
+        Matrix4f mat4{
+            1.0f, 2.0f, 4.0f, 6.0f,
+            1.0f, 3.0f, 5.0f, 7.0f,
+            2.0f, 6.0f, 8.0f, 10.0f,
+            3.0f, 5.0f, 6.0f, 6.0f,
+        };
+        Matrix4f invMat4 = mat4.inverse();
+        EXPECT_NEAR(invMat4[0],  3.0f, gEpsilon);
+        EXPECT_NEAR(invMat4[1], -4.0f, gEpsilon);
+        EXPECT_NEAR(invMat4[2],  1.0f, gEpsilon);
+        EXPECT_NEAR(invMat4[3],  0.0f, gEpsilon);
+        EXPECT_NEAR(invMat4[4],  3.0f, gEpsilon);
+        EXPECT_NEAR(invMat4[5], -6.0f, gEpsilon);
+        EXPECT_NEAR(invMat4[6],  3.0f, gEpsilon);
+        EXPECT_NEAR(invMat4[7], -1.0f, gEpsilon);
+        EXPECT_NEAR(invMat4[8], -8.0f, gEpsilon);
+        EXPECT_NEAR(invMat4[9],  13.0f, gEpsilon);
+        EXPECT_NEAR(invMat4[10], -5.5f, gEpsilon);
+        EXPECT_NEAR(invMat4[11],  2.0f, gEpsilon);
+        EXPECT_NEAR(invMat4[12],  4.0f, gEpsilon);
+        EXPECT_NEAR(invMat4[13], -6.0f, gEpsilon);
+        EXPECT_NEAR(invMat4[14],  2.5f, gEpsilon);
+        EXPECT_NEAR(invMat4[15], -1.0f, gEpsilon);
+    }
+
+    TEST(TestMatrix, Cross)
+    {
+        Vector2f vec2_0{1, 2}, vec2_1{3, 4};
+        EXPECT_NEAR(vec2_0.Cross(vec2_1), -2.0f, gEpsilon);
+
+        Vector3f vec3_0{1, 2, 3}, vec3_1{4, 5, 6};
+        Vector3f vec3c = vec3_0.Cross(vec3_1);
+        EXPECT_NEAR(vec3c[0], -3.0f, gEpsilon);
+        EXPECT_NEAR(vec3c[1],  6.0f, gEpsilon);
+        EXPECT_NEAR(vec3c[2], -3.0f, gEpsilon);
     }
 }
 
