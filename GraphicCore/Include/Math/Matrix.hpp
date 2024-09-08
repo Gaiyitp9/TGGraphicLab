@@ -7,6 +7,7 @@
 
 #include "MatrixBase.hpp"
 #include "Assignment.hpp"
+#include <initializer_list>
 
 namespace TG::Math
 {
@@ -34,6 +35,14 @@ namespace TG::Math
             CallAssignmentNoAlias(this->Expression(), other.Expression());
         }
 
+		Matrix(std::initializer_list<Scalar> values)
+        {
+	        std::size_t count = std::min(values.size(), Rows * Columns);
+        	auto it = values.begin();
+        	for (int i = 0; i < count; ++i)
+        		m_storage[i] = *it++;
+        }
+
 		template<typename Derived>
 		Matrix& operator=(const MatrixBase<Derived>& other)
         {
@@ -42,6 +51,14 @@ namespace TG::Math
         }
 
 		Scalar const* Data() const noexcept { return m_storage; }
+
+		void Set(std::initializer_list<Scalar> values)
+        {
+        	std::size_t count = std::min(values.size(), Rows * Columns);
+        	auto it = values.begin();
+        	for (int i = 0; i < count; ++i)
+        		m_storage[i] = *it++;
+        }
 
 		Scalar operator[](std::size_t index) const
 		{

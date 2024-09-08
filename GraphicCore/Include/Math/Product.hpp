@@ -73,8 +73,7 @@ namespace TG::Math
         }
 
     private:
-        Matrix<Scalar, Traits<Xpr>::Rows, Traits<Xpr>::Columns, HasFlag<Xpr, XprFlag::RowMajor> ?
-            StorageOrder::RowMajor : StorageOrder::ColumnMajor> m_product;
+        PlainMatrix<Xpr> m_product;
     };
 
     // 矩阵乘法求值器
@@ -121,4 +120,16 @@ namespace TG::Math
     {
         return other * scalar;
     }
+
+    // 默认矩阵乘法的赋值，可以避免创建Evaluator<Product<LhsXpr, RhsXpr, Default>>，即避免创建一个矩阵临时变量
+    template<typename Dst, typename LhsXpr, typename RhsXpr, typename AssignFunctor>
+    class Assignment<Dst, Product<LhsXpr, RhsXpr, ProductType::Default>, AssignFunctor>
+    {
+        using Src = Product<LhsXpr, RhsXpr, ProductType::Default>;
+    public:
+        void operator()(Dst& dst, const Src& src, AssignFunctor functor) const
+        {
+            CallAssignmentNoAlias(dst, src.LhsExpression().LazyProduct(src.RhsExpression()), functor);
+        }
+    };
 }

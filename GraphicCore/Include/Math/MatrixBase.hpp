@@ -8,6 +8,7 @@
 #include "Declarations.hpp"
 #include "Reduction.hpp"
 #include "Determinant.hpp"
+#include "OrthoMethod.hpp"
 
 namespace TG::Math
 {
@@ -105,6 +106,12 @@ namespace TG::Math
             return CWiseProduct(other).Sum();
         }
 
+        template<typename OtherDerived> requires IsVector
+        [[nodiscard]] CrossImpl<Derived, OtherDerived>::ReturnType Cross(const MatrixBase<OtherDerived>& other) const
+        {
+            return CrossImpl<Derived, OtherDerived>{}(Expression(), other.Expression());
+        }
+
         template<std::size_t BlockRows, std::size_t BlockCols>
         Block<Derived, BlockRows, BlockCols> block(std::size_t startRow, std::size_t startColumn)
         {
@@ -145,6 +152,11 @@ namespace TG::Math
         Scalar Determinant() const requires IsSquare
         {
             return DeterminantImpl<Derived, Traits<Derived>::Rows>{}(Expression());
+        }
+
+        Inverse<Derived> inverse() const requires IsSquare
+        {
+            return Inverse<Derived>(Expression());
         }
     };
 }

@@ -13,3 +13,4 @@
 #include "Block.hpp"
 #include "Product.hpp"
 #include "CWiseNullaryOp.hpp"
+#include "Inverse.hpp"
