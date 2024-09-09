@@ -33,6 +33,9 @@ endif()
 # 开启使用文件夹选项，vs项目可以分类放在不同文件夹下
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
+include(GNUInstallDirs)
+set(CMAKE_INSTALL_PREFIX ${CMAKE_BINARY_DIR} CACHE PATH "Installation directory" FORCE)
+
 add_subdirectory(ThirdParty)
 add_subdirectory(GraphicCore)
 add_subdirectory(TGRenderer)

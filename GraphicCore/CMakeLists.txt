@@ -15,10 +15,16 @@ set(TG_MATRIX_STORAGE_ORDER "RowMajor" CACHE STRING "Default matrix storage orde
 set_property(CACHE TG_MATRIX_STORAGE_ORDER PROPERTY STRINGS "RowMajor" "ColumnMajor")
 
 add_library(GraphicCore ${HEADERS} ${SOURCES})
-target_include_directories(GraphicCore PUBLIC Include)
+target_include_directories(GraphicCore PUBLIC ${CMAKE_CURRENT_LIST_DIR}/Include)
 target_link_libraries(GraphicCore PRIVATE dxgi d3d11 dxguid dbghelp opengl32 PUBLIC glad spdlog)
 target_compile_definitions(GraphicCore
         PUBLIC $<$<STREQUAL:${TG_MATRIX_STORAGE_ORDER},RowMajor>:TG_ROW_MAJOR_MATRIX>
         # CRT库查找内存泄漏所需定义的宏
         $<$<AND:$<PLATFORM_ID:Windows>,$<CONFIG:DEBUG>>:_CRTDBG_MAP_ALLOC>
+)
+
+install(TARGETS GraphicCore
+        EXPORT GraphicCoreTargets
+        RUNTIME DESTINATION GraphicOut/${CMAKE_INSTALL_BINDIR}
+        ARCHIVE DESTINATION GraphicOut/${CMAKE_INSTALL_LIBDIR}
 )

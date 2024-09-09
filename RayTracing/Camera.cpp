@@ -1,5 +1,5 @@
 #include "Camera.h"
-#include "stb/stb_image_write.h"
+// #include "stb/stb_image_write.h"
 #include "rtweekend.h"
 
 Camera::Camera() = default;
@@ -51,7 +51,7 @@ void Camera::Render(char const* imageFile, const Scene& scene)
         }
     }
 
-    stbi_write_jpg(imageFile, static_cast<int>(imageWidth), static_cast<int>(m_imageHeight), 3, buffer, 100);
+    // stbi_write_jpg(imageFile, static_cast<int>(imageWidth), static_cast<int>(m_imageHeight), 3, buffer, 100);
 
     std::clog << "\nDone\n";
 
