@@ -49,6 +49,7 @@ namespace TG::PAL
         virtual ~Window() = 0;
 
         [[nodiscard]] NativeDisplay GetDisplay() const;
+        [[nodiscard]] bool ReleaseDisplay() const;
         [[nodiscard]] NativeWindowHandle GetWindowHandle() const;
         void SetIcon(std::string_view iconPath) const;
         [[nodiscard]] bool IsDestroyed() const;
