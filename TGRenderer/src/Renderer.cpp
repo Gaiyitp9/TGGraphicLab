@@ -8,8 +8,6 @@
 #include "PAL/Windows/Win32Exception.h"
 #include "Exception/BaseException.h"
 #include "spdlog/spdlog.h"
-#include "glad/wgl.h"
-#include "glad/gles2.h"
 #include <fstream>
 
 namespace TG
@@ -38,11 +36,17 @@ namespace TG
         m_mainWindow.AddInputEventListener(m_input);
         // m_mainWindow.SetStateCallback([&timer=m_timer](){ timer.Start(); }, [&timer=m_timer](){ timer.Pause(); });
 
-		InitialWgl();
-		// 初始化OpenGL ES
-		InitialOpenGLES();
-		// 绘制三角形
+		CreateEGLDisplay();
+		ChooseEGLConfig();
+		CreateEGLSurface();
+		SetupEGLContext();
+		// 查看opengl es版本
+        auto glVersion = reinterpret_cast<char const*>(glGetString(GL_VERSION));
+		spdlog::info(glVersion);
+		// 初始化三角形数据
 		InitialTriangle();
+		// 开启垂直同步
+		eglSwapInterval(m_eglDisplay, 1);
 	}
 
 	Renderer::~Renderer()
@@ -50,13 +54,13 @@ namespace TG
 		glDeleteVertexArrays(1, &m_VAO);
 		glDeleteBuffers(1, &m_VBO);
 		glDeleteProgram(m_shaderProgram);
-		wglDeleteContext(m_hglrc);
+		eglMakeCurrent(m_eglDisplay, EGL_NO_DISPLAY, EGL_NO_SURFACE, EGL_NO_CONTEXT);
+		eglTerminate(m_eglDisplay);
+		m_mainWindow.ReleaseDisplay();
 	}
 
 	int Renderer::Run()
 	{
-		//d3d11Layer = std::make_unique<Graphics::GraphicsLayer>(mainWnd.get());
-
 		while (true)
 		{
 			if (m_mainWindow.IsDestroyed())
@@ -85,123 +89,10 @@ namespace TG
             // Math::Color color = Math::Color::AliceBlue * c;
             // glClearColor(color.r(), color.g(), color.b(), color.a());
             // glClear(GL_COLOR_BUFFER_BIT);
-			// eglSwapBuffers(m_eglDisplay, m_eglSurface);
-			SwapBuffers(m_mainWindow.GetDisplay());
+			eglSwapBuffers(m_eglDisplay, m_eglSurface);
 		}
 
 		return 0;
-	}
-
-	static GLADapiproc GLESGetAddress(const char* name)
-	{
-		static HMODULE openglModule = LoadLibraryA("opengl32.dll");
-		auto result = reinterpret_cast<GLADapiproc>(GetProcAddress(openglModule, name));
-		if (result == nullptr)
-			result = reinterpret_cast<GLADapiproc>(wglGetProcAddress(name));
-		return result;
-	}
-
-	static LRESULT WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
-	{
-		switch(msg)
-		{
-			case WM_CREATE:
-			{
-				PIXELFORMATDESCRIPTOR pfd =
-				{
-					sizeof(PIXELFORMATDESCRIPTOR),
-					1,
-					PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL | PFD_DOUBLEBUFFER,    //Flags
-					PFD_TYPE_RGBA,        // The kind of framebuffer. RGBA or palette.
-					32,                   // Colordepth of the framebuffer.
-					0, 0, 0, 0, 0, 0,
-					0,
-					0,
-					0,
-					0, 0, 0, 0,
-					24,                   // Number of bits for the depthbuffer
-					8,                    // Number of bits for the stencilbuffer
-					0,                    // Number of Aux buffers in the framebuffer.
-					PFD_MAIN_PLANE,
-					0,
-					0, 0, 0
-				};
-
-				HDC hdc = GetDC(hwnd);
-
-				int pixelFormat = ChoosePixelFormat(hdc, &pfd);
-				SetPixelFormat(hdc, pixelFormat, &pfd);
-
-				HGLRC hglrc = wglCreateContext(hdc);
-				wglMakeCurrent(hdc, hglrc);
-
-				gladLoaderLoadWGL(hdc);
-
-				wglDeleteContext(hglrc);
-				PostQuitMessage(0);
-				return 0;
-			}
-
-			default:
-				return DefWindowProc(hwnd, msg, wParam, lParam);
-		}
-	}
-
-	void Renderer::InitialWgl()
-	{
-		MSG msg{};
-		WNDCLASSEXW wc{};
-		wc.cbSize = sizeof(WNDCLASSEXW);
-		wc.style = CS_OWNDC;
-		wc.lpfnWndProc = WndProc;
-		wc.lpszClassName = L"dummy";
-		if (RegisterClassExW(&wc) == 0)
-			PAL::CheckLastError();
-
-		HWND hwnd = CreateWindowExW(0, wc.lpszClassName, nullptr, 0, 0, 0, 0, 0, nullptr, nullptr, nullptr, nullptr);
-		if (hwnd == nullptr)
-			PAL::CheckLastError();
-
-		while(GetMessageW(&msg, nullptr, 0, 0))
-			DispatchMessage(&msg);
-
-		UnregisterClassW(wc.lpszClassName, nullptr);
-
-		int pixelFormat;
-		UINT numFormats;
-		int formatAttribList[] =
-		{
-			WGL_DRAW_TO_WINDOW_ARB, GL_TRUE,
-			WGL_SUPPORT_OPENGL_ARB, GL_TRUE,
-			WGL_DOUBLE_BUFFER_ARB, GL_TRUE,
-			WGL_PIXEL_TYPE_ARB, WGL_TYPE_RGBA_ARB,
-			WGL_COLOR_BITS_ARB, 32,
-			WGL_DEPTH_BITS_ARB, 24,
-			WGL_STENCIL_BITS_ARB, 8,
-			0,
-		};
-		wglChoosePixelFormatARB(m_mainWindow.GetDisplay(), formatAttribList, nullptr, 1, &pixelFormat, &numFormats);
-		SetPixelFormat(m_mainWindow.GetDisplay(), pixelFormat, &m_pfd);
-
-		int contextAttribList[] =
-		{
-			WGL_CONTEXT_MAJOR_VERSION_ARB, 3,
-			WGL_CONTEXT_MINOR_VERSION_ARB, 2,
-			WGL_CONTEXT_PROFILE_MASK_ARB, WGL_CONTEXT_ES2_PROFILE_BIT_EXT,
-			0,
-		};
-		m_hglrc = wglCreateContextAttribsARB(m_mainWindow.GetDisplay(), nullptr, contextAttribList);
-		wglMakeCurrent(m_mainWindow.GetDisplay(), m_hglrc);
-	}
-
-	void Renderer::InitialOpenGLES()
-	{
-		int glesVersion = gladLoadGLES2(GLESGetAddress);
-		if (glesVersion == 0)
-			spdlog::error("Unable to load GLES.");
-		spdlog::info("Loaded GLES {}.{}", GLAD_VERSION_MAJOR(glesVersion), GLAD_VERSION_MINOR(glesVersion));
-		const unsigned char* version = glGetString(GL_VERSION);
-		glViewport(0, 0, m_windowWidth, m_windowHeight);
 	}
 
 	void Renderer::InitialTriangle()
@@ -275,5 +166,90 @@ namespace TG
 		}
 		glDeleteShader(vertexShader);
 		glDeleteShader(fragmentShader);
+	}
+
+	bool Renderer::CreateEGLDisplay()
+	{
+		m_eglDisplay = eglGetDisplay(m_mainWindow.GetDisplay());
+		if (m_eglDisplay == EGL_NO_DISPLAY)
+			m_eglDisplay = eglGetDisplay(EGL_DEFAULT_DISPLAY);
+		if (m_eglDisplay == EGL_NO_DISPLAY)
+		{
+			spdlog::error("Failed to get an EGLDisplay");
+			return false;
+		}
+
+		EGLint eglMajorVersion = 0;
+		EGLint eglMinorVersion = 0;
+		if (eglInitialize(m_eglDisplay, &eglMajorVersion, &eglMinorVersion) != EGL_TRUE)
+		{
+			spdlog::error("Failed to initialize EGLDisplay: {:#x}", eglGetError());
+			return false;
+		}
+		spdlog::info("EGL Version: {}.{}", eglMajorVersion, eglMinorVersion);
+
+		if (eglBindAPI(EGL_OPENGL_ES_API) != EGL_TRUE)
+		{
+			spdlog::error("Failed to bind EGL OpenGL ES: {:#x}", eglGetError());
+			return false;
+		}
+
+		return true;
+	}
+
+	bool Renderer::ChooseEGLConfig()
+	{
+		const EGLint configurationAttributes[] = {
+			EGL_SURFACE_TYPE, EGL_WINDOW_BIT,
+			EGL_RENDERABLE_TYPE, EGL_OPENGL_ES3_BIT,
+			EGL_NONE
+		};
+
+		EGLint numConfigs;
+		if (eglChooseConfig(m_eglDisplay, configurationAttributes, &m_eglConfig, 1, &numConfigs) != GL_TRUE)
+		{
+			spdlog::error("eglChooseConfig failed: {:#x}", eglGetError());
+			return false;
+		}
+		if (numConfigs != 1)
+		{
+			spdlog::error("eglChooseConfig return no config");
+			return false;
+		}
+
+		return true;
+	}
+
+	bool Renderer::CreateEGLSurface()
+	{
+		m_eglSurface = eglCreateWindowSurface(m_eglDisplay, m_eglConfig, m_mainWindow.GetWindowHandle(), nullptr);
+		if (m_eglSurface == EGL_NO_SURFACE)
+		{
+			spdlog::error("Failed to create EGL surface: {:#x}", eglGetError());
+			return false;
+		}
+		return true;
+	}
+
+	bool Renderer::SetupEGLContext()
+	{
+		EGLint contextAttributes[] = {
+			EGL_CONTEXT_MAJOR_VERSION, 3,
+			EGL_CONTEXT_MINOR_VERSION, 2,
+			EGL_NONE
+		};
+		m_eglContext = eglCreateContext(m_eglDisplay, m_eglConfig, nullptr, contextAttributes);
+		if (m_eglContext == EGL_NO_CONTEXT)
+		{
+			spdlog::error("Failed to create EGL context: {:#x}", eglGetError());
+			return false;
+		}
+
+		if (eglMakeCurrent(m_eglDisplay, m_eglSurface, m_eglSurface, m_eglContext) != EGL_TRUE)
+		{
+			spdlog::error("Failed to make EGL current: {:#x}", eglGetError());
+			return false;
+		}
+		return true;
 	}
 }

@@ -73,6 +73,11 @@ namespace TG::PAL
 		return { GetDC(m_nativeWindow->hwnd) };
 	}
 
+	bool Window::ReleaseDisplay() const
+	{
+		return ReleaseDC(m_nativeWindow->hwnd, GetDC(m_nativeWindow->hwnd));
+	}
+
 	NativeWindowHandle Window::GetWindowHandle() const
 	{
 		return m_nativeWindow->hwnd;
