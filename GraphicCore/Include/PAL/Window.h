@@ -5,6 +5,7 @@
 *****************************************************************/
 #pragma once
 
+#include "Platform/Core.h"
 #include "Input.h"
 #include <functional>
 #include <memory>
@@ -12,7 +13,6 @@
 #include <string_view>
 
 #ifdef _WIN64
-#include "Windows/Win32API.h"
 namespace TG::PAL
 {
     using NativeDisplay = HDC;

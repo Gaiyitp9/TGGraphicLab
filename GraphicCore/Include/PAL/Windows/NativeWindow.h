@@ -5,7 +5,7 @@
 *****************************************************************/
 #pragma once
 
-#include "Win32API.h"
+#include "Platform/Core.h"
 #include "PAL/Input.h"
 #include <string>
 

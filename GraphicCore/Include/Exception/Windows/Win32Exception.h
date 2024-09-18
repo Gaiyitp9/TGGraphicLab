@@ -5,12 +5,13 @@
 *****************************************************************/
 #pragma once
 
-#include "Win32API.h"
+#include "Platform/Core.h"
+#include "Exception/BaseException.h"
 #include <stacktrace>
 
-namespace TG::PAL
+namespace TG
 {
-	class Win32Exception final : public std::exception
+	class Win32Exception final : public BaseException
 	{
 	public:
 		explicit Win32Exception(HRESULT hr, std::string_view description = "No Description");

@@ -4,11 +4,11 @@
 * This code is licensed under the MIT License (MIT).			*
 *****************************************************************/
 
-#include "PAL/Windows/Win32Exception.h"
-#include "PAL/Windows/Auxiliary.h"
+#include "Exception/Windows/Win32Exception.h"
+#include "Platform/Windows/Auxiliary.h"
 #include <format>
 
-namespace TG::PAL
+namespace TG
 {
 	Win32Exception::Win32Exception(HRESULT errorCode, std::string_view description)
 	{
@@ -34,7 +34,7 @@ namespace TG::PAL
 		wchar_t msgBuf[256];
 		DWORD msgLen = FormatMessageW(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
 									  nullptr, errorCode, LANG_SYSTEM_DEFAULT, msgBuf, 256, nullptr);
-		std::string errorMsg = msgLen > 0 ? Utf16ToUtf8(msgBuf) : "Unidentified error code";
+		std::string errorMsg = msgLen > 0 ? Platform::Utf16ToUtf8(msgBuf) : "Unidentified error code";
 
 		m_whatBuffer = std::format("Exception type: Windows API Exception\n"
 								 "HRESULT: {:#010x}\nError Message: {}"

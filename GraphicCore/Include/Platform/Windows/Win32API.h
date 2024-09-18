@@ -44,4 +44,3 @@
 
 #include <windows.h>
 #include <windowsx.h>
-#include "PAL/DebugNew.h"

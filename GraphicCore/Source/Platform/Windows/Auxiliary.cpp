@@ -4,11 +4,11 @@
 * This code is licensed under the MIT License (MIT).			*
 *****************************************************************/
 
-#include "PAL/Windows/Auxiliary.h"
-#include "PAL/Windows/Win32API.h"
+#include "Platform/Windows/Auxiliary.h"
+#include "Platform/Core.h"
 #include <chrono>
 
-namespace TG::PAL
+namespace TG::Platform
 {
 	std::wstring Utf8ToUtf16(std::string_view str)
 	{
