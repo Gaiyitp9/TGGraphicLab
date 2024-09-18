@@ -6,8 +6,8 @@
 
 #include "PAL/Window.h"
 #include "PAL/Windows/NativeWindow.h"
-#include "PAL/Windows/Win32Exception.h"
-#include "PAL/Windows/Auxiliary.h"
+#include "Exception/Windows/Win32Exception.h"
+#include "Platform/Windows/Auxiliary.h"
 
 namespace TG::PAL
 {
@@ -34,7 +34,7 @@ namespace TG::PAL
 		// 根据客户区域宽和高计算整个窗口的宽和高
 		if (!AdjustWindowRect(&rect, dwStyle, false))
 			CheckLastError();
-		m_nativeWindow->hwnd = CreateWindowExW(dwExStyle, L"Default", Utf8ToUtf16(name).c_str(), dwStyle,
+		m_nativeWindow->hwnd = CreateWindowExW(dwExStyle, L"Default", Platform::Utf8ToUtf16(name).c_str(), dwStyle,
 							   x, y, rect.right - rect.left, rect.bottom - rect.top,
 							   nullptr, nullptr, nullptr, m_nativeWindow.get());
 		if (m_nativeWindow->hwnd == nullptr)
@@ -59,7 +59,7 @@ namespace TG::PAL
 
 	void Window::SetIcon(std::string_view iconPath) const
 	{
-		HANDLE icon = LoadImageW(nullptr, Utf8ToUtf16(iconPath).c_str(), IMAGE_ICON, 0, 0,
+		HANDLE icon = LoadImageW(nullptr, Platform::Utf8ToUtf16(iconPath).c_str(), IMAGE_ICON, 0, 0,
 			LR_DEFAULTSIZE | LR_LOADFROMFILE);
 		if (icon == nullptr)
 			CheckLastError("Invalid icon source");

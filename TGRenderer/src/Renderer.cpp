@@ -5,8 +5,6 @@
 *****************************************************************/
 
 #include "Renderer.hpp"
-#include "PAL/Windows/Win32Exception.h"
-#include "Exception/BaseException.h"
 #include "spdlog/spdlog.h"
 #include <fstream>
 
@@ -56,7 +54,7 @@ namespace TG
 		glDeleteProgram(m_shaderProgram);
 		eglMakeCurrent(m_eglDisplay, EGL_NO_DISPLAY, EGL_NO_SURFACE, EGL_NO_CONTEXT);
 		eglTerminate(m_eglDisplay);
-		m_mainWindow.ReleaseDisplay();
+		std::ignore = m_mainWindow.ReleaseDisplay();
 	}
 
 	int Renderer::Run()

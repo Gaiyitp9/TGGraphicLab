@@ -7,7 +7,7 @@
 
 #include <string>
 
-namespace TG::PAL
+namespace TG::Platform
 {
     // 注意，运行时字符集必须设置为utf-8才能使用这两个函数
     // 在msvc中需要设置/utf-8选项

@@ -27,7 +27,6 @@ namespace TG
 		int Run();
 
 	private:
-		// Create and Initialize an EGLDisplay from the native display
 		bool CreateEGLDisplay();
 		bool ChooseEGLConfig();
 		bool CreateEGLSurface();
