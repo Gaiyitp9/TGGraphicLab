@@ -134,3 +134,10 @@ namespace ImGui
     void MyFunction(const char* name, MyMatrix44* mtx);
 }
 */
+
+// 后端OpenGL ES
+#define IMGUI_IMPL_OPENGL_ES3
+// 使用自定义加载器
+#define IMGUI_IMPL_OPENGL_LOADER_CUSTOM
+// PowerVR加载器
+#include "DynamicGles.h"

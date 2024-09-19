@@ -7,6 +7,8 @@
 #include "Renderer.hpp"
 #include "spdlog/spdlog.h"
 #include <fstream>
+#include "imgui_impl_win32.h"
+#include "imgui_impl_opengl3.h"
 
 namespace TG
 {
@@ -22,6 +24,10 @@ namespace TG
 		// 为了能在控制台查看日志，需要把控制台的代码页(code page)设置为UTF-8
 		SetConsoleCP(65001);
 		SetConsoleOutputCP(65001);
+
+		// 关闭错误流
+		// FILE* nullFile = nullptr;
+		// freopen_s(&nullFile, "NUL", "w", stderr);
 
 		spdlog::info(Chronometer::Date());
 
@@ -45,10 +51,24 @@ namespace TG
 		InitialTriangle();
 		// 开启垂直同步
 		eglSwapInterval(m_eglDisplay, 1);
+
+		IMGUI_CHECKVERSION();
+		ImGui::CreateContext();
+		ImGuiIO& io = ImGui::GetIO();
+		io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
+
+		ImGui::StyleColorsDark();
+
+		ImGui_ImplWin32_Init(m_mainWindow.GetWindowHandle());
+		ImGui_ImplOpenGL3_Init();
 	}
 
 	Renderer::~Renderer()
 	{
+		ImGui_ImplOpenGL3_Shutdown();
+		ImGui_ImplWin32_Shutdown();
+		ImGui::DestroyContext();
+
 		glDeleteVertexArrays(1, &m_VAO);
 		glDeleteBuffers(1, &m_VBO);
 		glDeleteProgram(m_shaderProgram);
@@ -59,6 +79,11 @@ namespace TG
 
 	int Renderer::Run()
 	{
+		bool showDemoWindow = true;
+		bool showAnotherWindow = false;
+		float clearColor[4]{ 0.2f, 0.3f, 0.3f, 1.0f };
+		ImGuiIO& io = ImGui::GetIO();
+
 		while (true)
 		{
 			if (m_mainWindow.IsDestroyed())
@@ -71,12 +96,54 @@ namespace TG
             if (m_input.GetKeyUp(Input::KeyCode::Space))
                 spdlog::info("space up");
 
-			glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+			ImGui_ImplOpenGL3_NewFrame();
+			ImGui_ImplWin32_NewFrame();
+			ImGui::NewFrame();
+
+			if (showDemoWindow)
+				ImGui::ShowDemoWindow(&showDemoWindow);
+
+			{
+				static float f = 0.0f;
+				static int counter = 0;
+
+				ImGui::Begin("Hello World!");
+
+				ImGui::Text("This is some useful text.");
+				ImGui::Checkbox("Demo Window", &showDemoWindow);
+				ImGui::Checkbox("Another Window", &showAnotherWindow);
+
+				ImGui::SliderFloat("float", &f, 0.0f, 1.0f);
+				ImGui::ColorEdit3("Color", clearColor);
+
+				if (ImGui::Button("Button"))
+					++counter;
+				ImGui::SameLine();
+				ImGui::Text("Counter = %d", counter);
+
+				ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
+				ImGui::End();
+			}
+
+			if (showAnotherWindow)
+			{
+				ImGui::Begin("Another Window", &showAnotherWindow);
+				ImGui::Text("Hello from another window!");
+				if (ImGui::Button("Close Me"))
+					showAnotherWindow = false;
+				ImGui::End();
+			}
+
+			ImGui::Render();
+
+			glClearColor(clearColor[0], clearColor[1], clearColor[2], clearColor[3]);
 			glClear(GL_COLOR_BUFFER_BIT);
 
 			glUseProgram(m_shaderProgram);
 			glBindVertexArray(m_VAO);
 			glDrawArrays(GL_TRIANGLES, 0, 3);
+
+			ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 			// const float c = sin(m_timer.TotalTime() * 0.001f) / 2.0f + 0.5f;
 			//d3d11Layer->ClearBackground(Math::Color::AliceBlue * c);
 			//d3d11Layer->Update();

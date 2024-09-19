@@ -16,7 +16,7 @@ set_property(CACHE TG_MATRIX_STORAGE_ORDER PROPERTY STRINGS "RowMajor" "ColumnMa
 
 add_library(GraphicCore ${HEADERS} ${SOURCES})
 target_include_directories(GraphicCore PUBLIC ${CMAKE_CURRENT_LIST_DIR}/Include)
-target_link_libraries(GraphicCore PRIVATE dxgi d3d11 dxguid dbghelp PUBLIC PowerVR spdlog)
+target_link_libraries(GraphicCore PRIVATE dxgi d3d11 dxguid dbghelp PUBLIC PowerVR spdlog imgui)
 target_compile_definitions(GraphicCore
         PUBLIC $<$<STREQUAL:${TG_MATRIX_STORAGE_ORDER},RowMajor>:TG_ROW_MAJOR_MATRIX>
         # CRT库查找内存泄漏所需定义的宏
