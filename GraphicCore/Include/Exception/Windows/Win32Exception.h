@@ -7,14 +7,13 @@
 
 #include "Platform/Core.h"
 #include "Exception/BaseException.h"
-#include <stacktrace>
 
 namespace TG
 {
 	class Win32Exception final : public BaseException
 	{
 	public:
-		explicit Win32Exception(HRESULT hr, std::string_view description = "No Description");
+		explicit Win32Exception(HRESULT hr, std::string_view description);
 		~Win32Exception() override;
 
 		[[nodiscard]] char const* what() const override;

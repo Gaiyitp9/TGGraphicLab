@@ -12,7 +12,8 @@ namespace TG
     class BaseException : public std::exception
     {
     public:
-        explicit BaseException(std::string_view description = "No Description");
+        BaseException() = default;
+        explicit BaseException(std::string_view description);
         ~BaseException() override = default;
 
         [[nodiscard]] char const* what() const override;

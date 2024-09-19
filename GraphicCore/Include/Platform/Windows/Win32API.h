@@ -5,9 +5,14 @@
 *****************************************************************/
 #pragma once
 
+// 设置最低支持 Windows 10
+#define WINVER 0x0A00
+#define _WIN32_WINNT 0x0A00
 #include <winsdkver.h>
 #include <sdkddkver.h>
 
+// 裁剪windows.h
+// 裁剪分为两步 1) 定义WIN32_LEAN_AND_MEAN 2) 定义一些宏来屏蔽某些功能，可以参考windows.h内部的说明
 #define WIN32_LEAN_AND_MEAN
 
 #define NOGDICAPMASKS
