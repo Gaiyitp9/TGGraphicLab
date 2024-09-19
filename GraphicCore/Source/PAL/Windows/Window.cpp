@@ -374,7 +374,7 @@ namespace TG::PAL
             WORD keyFlags = HIWORD(lParam);
             WORD scanCode = LOBYTE(keyFlags);
 			// extended-key flag, 1 if scancode has 0xE0 prefix
-            if (keyFlags & KF_EXTENDED == KF_EXTENDED)
+            if ((keyFlags & KF_EXTENDED) == KF_EXTENDED)
                 scanCode = MAKEWORD(scanCode, 0xE0);
             switch (vkCode)
             {
@@ -403,7 +403,7 @@ namespace TG::PAL
 		case WM_CHAR:
         {
             if (pWindow->charFunction)
-            	pWindow->charFunction(wParam);
+            	pWindow->charFunction(static_cast<char16_t>(wParam));
 			return 0;
         }
 

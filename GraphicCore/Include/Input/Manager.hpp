@@ -84,7 +84,8 @@ namespace TG::Input
         {
             if constexpr (N < Count)
                 return std::get<N>(m_devices).GetKeyUp(key) || GetKeyUp<N + 1>(key);
-            return false;
+            else
+                return false;
         }
 
 	private:

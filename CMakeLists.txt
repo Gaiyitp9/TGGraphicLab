@@ -20,14 +20,16 @@ project(TGGraphicLab)
 # 使用c++23
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+# 禁用编译器扩展
+set(CMAKE_CXX_EXTENSIONS OFF)
 
-if(WIN32)
+if(MSVC)
 	set(TG_PLATFORM_WINDOWS true)
 	# 文件编码为utf-8，运行时char编码为utf-8，wchar_t编码为utf-16 LE
-	add_compile_options(/utf-8 /arch:AVX2 /fp:precise)
+	# 禁用Spectre 攻击的缓解措施警告warning C5045
+	add_compile_options(/utf-8 /arch:AVX2 /fp:precise /Zc:__cplusplus /MP /Wall /wd5045)
 	# add_library是否默认编译成动态库
 	option(BUILD_SHARED_LIBS "Build using shared libraries" OFF)
-	set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ${BUILD_SHARED_LIBS})
 endif()
 
 # 开启使用文件夹选项，vs项目可以分类放在不同文件夹下

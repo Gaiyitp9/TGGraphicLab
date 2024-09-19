@@ -38,12 +38,12 @@ namespace TG::Input
 			return false;
 		}
 
-        short m_positionX{ 0 };			// 鼠标位置
-        short m_positionY{ 0 };
-		short m_wheelDelta{ 0 };		// 滚轮变化值，正值表示向前滚动，远离使用者；负值表示向后滚动，朝向使用者
-
 		std::bitset<8> m_mouseDown;     // 按键是否刚刚按下
 		std::bitset<8> m_mouseUp;       // 按键是否刚刚松开
 		std::bitset<8> m_mouseHold;     // 按键是否按住
+
+        short m_positionX{ 0 };			// 鼠标位置
+        short m_positionY{ 0 };
+		short m_wheelDelta{ 0 };		// 滚轮变化值，正值表示向前滚动，远离使用者；负值表示向后滚动，朝向使用者
 	};
 }

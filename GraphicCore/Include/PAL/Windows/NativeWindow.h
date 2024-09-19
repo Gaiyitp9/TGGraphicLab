@@ -19,7 +19,7 @@ namespace TG::PAL
         bool        spyMessage{ false };
         bool        destroyed{ false };
         std::function<void(Key key, int scanCode, InputAction action)> keyFunction{};
-        std::function<void(unsigned int c)> charFunction{};
+        std::function<void(char16_t c)> charFunction{};
         std::function<void(MouseButton button, InputAction action)> mouseButtonFunction{};
         std::function<void(int xPos, int yPos)> cursorPosFunction{};
         std::function<void(int xOffset, int yOffset)> scrollFunction{};
