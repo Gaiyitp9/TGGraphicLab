@@ -35,7 +35,7 @@ namespace TG::PAL
     class Window
     {
         using KeyFunction = std::function<void(Key key, int scanCode, InputAction action)>;
-        using CharFunction = std::function<void(unsigned int c)>;
+        using CharFunction = std::function<void(char16_t c)>;
         using MouseButtonFunction = std::function<void(MouseButton button, InputAction action)>;
         using CursorPosFunction = std::function<void(int xPos, int yPos)>;
         using ScrollFunction = std::function<void(int xOffset, int yOffset)>;
