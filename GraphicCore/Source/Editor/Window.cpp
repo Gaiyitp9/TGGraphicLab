@@ -8,5 +8,19 @@
 
 namespace TG
 {
-    Window::~Window() = default;
+    std::optional<int> Window::PollEvents()
+    {
+        MSG msg = { nullptr };
+
+        while (PeekMessageW(&msg, nullptr, 0, 0, PM_REMOVE))
+        {
+            if (msg.message == WM_QUIT)
+                return static_cast<int>(msg.wParam);
+
+            TranslateMessage(&msg);
+            DispatchMessageW(&msg);
+        }
+
+        return std::nullopt;
+    }
 }

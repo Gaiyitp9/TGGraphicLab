@@ -4,8 +4,8 @@
 * This code is licensed under the MIT License (MIT).			*
 *****************************************************************/
 
-#include "Platform/Windows/Auxiliary.h"
-#include "Platform/Core.h"
+#include "Base/Windows/Auxiliary.h"
+#include "Base/Core.h"
 #include <chrono>
 
 namespace TG::Platform
