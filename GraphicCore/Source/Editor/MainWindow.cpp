@@ -10,12 +10,12 @@
 namespace TG
 {
     MainWindow::MainWindow(int x, int y, int width, int height, std::string_view name)
-        : Window(x, y, width, height, name, PAL::WindowType::Default)
+        : Window(x, y, width, height, name, WindowType::Default)
     {
-        SetKeyCallback([&](PAL::Key key, int scanCode, PAL::InputAction action) {
+        SetKeyCallback([&](Input::KeyCode key, int scanCode, Input::Action action) {
             Input::KeyboardEvent keyboardEvent;
-            keyboardEvent.key = Input::ToKeyCode(key);
-            if (action == PAL::InputAction::Press || action == PAL::InputAction::Repeat)
+            keyboardEvent.key = key;
+            if (action == Input::Action::Press || action == Input::Action::Repeat)
                 keyboardEvent.isPressed = true;
             m_eventDispatcher.Dispatch(keyboardEvent);
         });
@@ -24,10 +24,10 @@ namespace TG
             characterEvent.c = c;
             m_eventDispatcher.Dispatch(characterEvent);
         });
-        SetMouseButtonCallback([&](PAL::MouseButton mouseButton, PAL::InputAction action) {
+        SetMouseButtonCallback([&](Input::KeyCode mouseButton, Input::Action action) {
             Input::MouseEvent mouseEvent;
-            mouseEvent.button = Input::ToKeyCode(mouseButton);
-            if (action == PAL::InputAction::Press)
+            mouseEvent.button = mouseButton;
+            if (action == Input::Action::Press)
                 mouseEvent.isPressed = true;
             m_eventDispatcher.Dispatch(mouseEvent);
         });

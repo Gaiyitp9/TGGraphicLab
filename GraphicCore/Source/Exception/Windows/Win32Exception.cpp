@@ -5,7 +5,7 @@
 *****************************************************************/
 
 #include "Exception/Windows/Win32Exception.h"
-#include "Platform/Windows/Auxiliary.h"
+#include "Base/Windows/Auxiliary.h"
 #include <format>
 
 namespace TG

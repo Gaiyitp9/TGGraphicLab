@@ -6,7 +6,7 @@
 #pragma once
 
 #include "Editor/MainWindow.h"
-#include "Chronometer.h"
+#include "Base/Chronometer.h"
 #include "Input/Manager.hpp"
 #include "Input/Mouse.h"
 #include "Input/Keyboard.h"

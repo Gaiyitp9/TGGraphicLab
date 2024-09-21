@@ -36,7 +36,7 @@ namespace TG
         m_screenHeight = GetSystemMetrics(SM_CYSCREEN);
 
         // 主窗口设置
-        m_mainWindow.SetIcon(R"(..\..\TGRenderer\maple-leaf.ico)");
+        m_mainWindow.SetIcon("maple-leaf.ico");
         m_mainWindow.AddInputEventListener(m_input);
         // m_mainWindow.SetStateCallback([&timer=m_timer](){ timer.Start(); }, [&timer=m_timer](){ timer.Pause(); });
 
@@ -74,7 +74,6 @@ namespace TG
 		glDeleteProgram(m_shaderProgram);
 		eglMakeCurrent(m_eglDisplay, EGL_NO_DISPLAY, EGL_NO_SURFACE, EGL_NO_CONTEXT);
 		eglTerminate(m_eglDisplay);
-		std::ignore = m_mainWindow.ReleaseDisplay();
 	}
 
 	int Renderer::Run()
@@ -90,7 +89,7 @@ namespace TG
 				break;
 
             m_input.Update();
-			if (const std::optional<int> code = PAL::PollEvents())
+			if (const std::optional<int> code = Window::PollEvents())
 				return *code;
 
             if (m_input.GetKeyUp(Input::KeyCode::Space))
@@ -178,7 +177,7 @@ namespace TG
 		glEnableVertexAttribArray(0);
 		glBindVertexArray(0);
 
-		std::ifstream vertexFile("../../Source/Shaders/GLSL/simple.vert");
+		std::ifstream vertexFile("../../Shaders/GLSL/simple.vert");
 		if (!vertexFile)
 		{
 			spdlog::error("Load simple vertex file failed!");
@@ -200,7 +199,7 @@ namespace TG
 			spdlog::error("ERROR::SHADER::VERTEX::COMPILATION_FAILED\n{}", infoLog);
 		}
 
-		std::ifstream fragmentFile("../../Source/Shaders/GLSL/simple.frag");
+		std::ifstream fragmentFile("../../Shaders/GLSL/simple.frag");
 		if (!fragmentFile)
 		{
 			spdlog::error("Load simple fragment file failed!");

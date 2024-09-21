@@ -4,15 +4,13 @@
 * This code is licensed under the MIT License (MIT).			*
 *****************************************************************/
 
-#include "PAL/Window.h"
-#include "PAL/Windows/NativeWindow.h"
+#include "Editor/Windows/NativeWindow.h"
 #include "Exception/Windows/Win32Exception.h"
-#include "Platform/Windows/Auxiliary.h"
+#include "Base/Windows/Auxiliary.h"
 
-namespace TG::PAL
+namespace TG
 {
-	Window::Window(int x, int y, int width, int height, std::string_view name, WindowType type)
-		: m_nativeWindow(std::make_unique<NativeWindow>(std::string(name)))
+	NativeWindow::NativeWindow(int x, int y, int width, int height, std::string_view name, WindowType type)
 	{
 		DWORD dwStyle = WS_OVERLAPPEDWINDOW;
 		DWORD dwExStyle = WS_EX_OVERLAPPEDWINDOW;
@@ -34,111 +32,33 @@ namespace TG::PAL
 		// 根据客户区域宽和高计算整个窗口的宽和高
 		if (!AdjustWindowRect(&rect, dwStyle, false))
 			CheckLastError();
-		m_nativeWindow->hwnd = CreateWindowExW(dwExStyle, L"Default", Platform::Utf8ToUtf16(name).c_str(), dwStyle,
+		handle = CreateWindowExW(dwExStyle, L"Default", Platform::Utf8ToUtf16(name).c_str(), dwStyle,
 							   x, y, rect.right - rect.left, rect.bottom - rect.top,
-							   nullptr, nullptr, nullptr, m_nativeWindow.get());
-		if (m_nativeWindow->hwnd == nullptr)
+							   nullptr, nullptr, nullptr, this);
+		if (handle == nullptr)
 			CheckLastError();
 
+		display = GetDC(handle);
+
 		// 显示窗口
-		ShowWindow(m_nativeWindow->hwnd, SW_SHOW);
+		ShowWindow(handle, SW_SHOW);
 	}
 
-	// 需要在这里定义析构函数，防止其变成内联函数，让std::unique_ptr<NativeWindow>能通过编译
-	Window::~Window() = default;
-
-	void Window::SetKeyCallback(const KeyFunction& function) const
+	NativeWindow::~NativeWindow()
 	{
-		m_nativeWindow->keyFunction = function;
+		ReleaseDC(handle, display);
 	}
 
-	bool Window::IsDestroyed() const
-	{
-		return m_nativeWindow->destroyed;
-	}
-
-	void Window::SetIcon(std::string_view iconPath) const
+	void NativeWindow::SetIcon(std::string_view iconPath) const
 	{
 		HANDLE icon = LoadImageW(nullptr, Platform::Utf8ToUtf16(iconPath).c_str(), IMAGE_ICON, 0, 0,
 			LR_DEFAULTSIZE | LR_LOADFROMFILE);
 		if (icon == nullptr)
 			CheckLastError("Invalid icon source");
 
-		SendMessageW(m_nativeWindow->hwnd, WM_SETICON, ICON_BIG, reinterpret_cast<LPARAM>(icon));
-		SendMessageW(m_nativeWindow->hwnd, WM_SETICON, ICON_SMALL, reinterpret_cast<LPARAM>(icon));
+		SendMessageW(handle, WM_SETICON, ICON_BIG, reinterpret_cast<LPARAM>(icon));
+		SendMessageW(handle, WM_SETICON, ICON_SMALL, reinterpret_cast<LPARAM>(icon));
 	}
-
-	NativeDisplay Window::GetDisplay() const
-	{
-		return { GetDC(m_nativeWindow->hwnd) };
-	}
-
-	bool Window::ReleaseDisplay() const
-	{
-		return ReleaseDC(m_nativeWindow->hwnd, GetDC(m_nativeWindow->hwnd));
-	}
-
-	NativeWindowHandle Window::GetWindowHandle() const
-	{
-		return m_nativeWindow->hwnd;
-	}
-
-	void Window::SetCharCallback(const CharFunction &function) const
-	{
-		m_nativeWindow->charFunction = function;
-	}
-
-	void Window::SetMouseButtonCallback(const MouseButtonFunction &function) const
-	{
-		m_nativeWindow->mouseButtonFunction = function;
-	}
-
-	void Window::SetCursorPosCallback(const CursorPosFunction &function) const
-	{
-		m_nativeWindow->cursorPosFunction = function;
-	}
-
-	void Window::SetScrollCallback(const ScrollFunction &function) const
-	{
-		m_nativeWindow->scrollFunction = function;
-	}
-
-	void Window::SetWindowPosCallback(const WindowPosFunction &function) const
-	{
-		m_nativeWindow->windowPosFunction = function;
-	}
-
-	void Window::SetWindowSizeCallback(const WindowSizeFunction &function) const
-	{
-		m_nativeWindow->windowSizeFunction = function;
-	}
-
-	void Window::SetSuspendCallback(const SuspendFunction &function) const
-	{
-		m_nativeWindow->suspendFunction = function;
-	}
-
-	void Window::SetResumeCallback(const ResumeFunction &function) const
-	{
-		m_nativeWindow->resumeFunction = function;
-	}
-
-    // 轮询输入事件
-    std::optional<int> PollEvents()
-    {
-		MSG msg = { nullptr };
-
-		while (PeekMessageW(&msg, nullptr, 0, 0, PM_REMOVE))
-		{
-			if (msg.message == WM_QUIT)
-				return static_cast<int>(msg.wParam);
-
-			TranslateMessage(&msg);
-			DispatchMessageW(&msg);
-		}
-
-		return std::nullopt;
-    }
 
     // 窗口消息转成字符串
     static std::pmr::string WindowMessageToString(UINT msg, WPARAM wp, LPARAM lp)
@@ -346,7 +266,7 @@ namespace TG::PAL
         auto* const pWindow = reinterpret_cast<NativeWindow*>(GetWindowLongPtrW(hwnd, GWLP_USERDATA));
 
 		// 监控窗口消息
-		if (true)
+		if (pWindow->spyMessage)
 		{
 		    std::pmr::string windowMessage;
 		    std::format_to(std::back_inserter(windowMessage), "{:<16} {}\n", pWindow->name, WindowMessageToString(msg, wParam, lParam));
@@ -388,14 +308,14 @@ namespace TG::PAL
                     break;
             }
 			// 确定按键状态，按下、释放还是按住
-			InputAction action = InputAction::Press;
+			Input::Action action = Input::Action::Press;
 			if ((keyFlags & KF_UP) == KF_UP)
-				action = InputAction::Release;
+				action = Input::Action::Release;
 			else if ((keyFlags & KF_REPEAT) == KF_REPEAT)
-				action = InputAction::Repeat;
+				action = Input::Action::Repeat;
 
 			if (pWindow->keyFunction)
-   				pWindow->keyFunction(static_cast<Key>(vkCode), scanCode, action);
+   				pWindow->keyFunction(static_cast<Input::KeyCode>(vkCode), scanCode, action);
 
 			return 0;
 		}
@@ -417,7 +337,7 @@ namespace TG::PAL
 		case WM_LBUTTONDOWN:
 		{
 			if (pWindow->mouseButtonFunction)
-				pWindow->mouseButtonFunction(MouseButton::Left, InputAction::Press);
+				pWindow->mouseButtonFunction(Input::KeyCode::LeftMouseButton, Input::Action::Press);
 			if (pWindow->cursorPosFunction)
 				pWindow->cursorPosFunction(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
 			return 0;
@@ -426,7 +346,7 @@ namespace TG::PAL
 		case WM_LBUTTONUP:
 		{
 			if (pWindow->mouseButtonFunction)
-				pWindow->mouseButtonFunction(MouseButton::Left, InputAction::Release);
+				pWindow->mouseButtonFunction(Input::KeyCode::LeftMouseButton, Input::Action::Release);
 			if (pWindow->cursorPosFunction)
 				pWindow->cursorPosFunction(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
 			return 0;
@@ -435,7 +355,7 @@ namespace TG::PAL
 		case WM_RBUTTONDOWN:
 		{
 			if (pWindow->mouseButtonFunction)
-				pWindow->mouseButtonFunction(MouseButton::Right, InputAction::Press);
+				pWindow->mouseButtonFunction(Input::KeyCode::RightMouseButton, Input::Action::Press);
 			if (pWindow->cursorPosFunction)
 				pWindow->cursorPosFunction(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
 			return 0;
@@ -444,7 +364,7 @@ namespace TG::PAL
 		case WM_RBUTTONUP:
 		{
 			if (pWindow->mouseButtonFunction)
-				pWindow->mouseButtonFunction(MouseButton::Right, InputAction::Release);
+				pWindow->mouseButtonFunction(Input::KeyCode::RightMouseButton, Input::Action::Release);
 			if (pWindow->cursorPosFunction)
 				pWindow->cursorPosFunction(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
 			return 0;
@@ -453,7 +373,7 @@ namespace TG::PAL
 		case WM_MBUTTONDOWN:
 		{
 			if (pWindow->mouseButtonFunction)
-				pWindow->mouseButtonFunction(MouseButton::Middle, InputAction::Press);
+				pWindow->mouseButtonFunction(Input::KeyCode::MiddleMouseButton, Input::Action::Press);
 			if (pWindow->cursorPosFunction)
 				pWindow->cursorPosFunction(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
 			return 0;
@@ -462,7 +382,7 @@ namespace TG::PAL
 		case WM_MBUTTONUP:
 		{
 			if (pWindow->mouseButtonFunction)
-				pWindow->mouseButtonFunction(MouseButton::Middle, InputAction::Release);
+				pWindow->mouseButtonFunction(Input::KeyCode::MiddleMouseButton, Input::Action::Release);
 			if (pWindow->cursorPosFunction)
 				pWindow->cursorPosFunction(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
 			return 0;

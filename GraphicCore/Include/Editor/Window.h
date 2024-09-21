@@ -5,31 +5,56 @@
 *****************************************************************/
 #pragma once
 
-#include "PAL/Window.h"
+#ifdef _WIN32
+#include "Windows/NativeWindow.h"
+#endif
+#include <functional>
+#include <optional>
+#include <string_view>
 
 namespace TG
 {
     // 窗口基类
-    class Window : public PAL::Window
+    class Window
     {
     public:
-        Window(int x, int y, int width, int height, std::string_view name, PAL::WindowType type)
-            : PAL::Window(x, y, width, height, name, type), m_posX(x), m_posY(y), m_width(width),
+        Window(int x, int y, int width, int height, std::string_view name, WindowType type)
+            : m_nativeWindow(x, y, width, height, name, type), m_posX(x), m_posY(y), m_width(width),
                 m_height(height)
         {}
         Window(const Window&) = delete;
         Window& operator=(const Window&) = delete;
         Window(Window&&) = delete;
         Window& operator=(Window&&) = delete;
-        ~Window() override = 0;
+        virtual ~Window() = default;
+
+        // 轮询输入事件，需要每帧调用
+        static std::optional<int> PollEvents();
 
         [[nodiscard]] int PositionX() const noexcept { return m_posX; }
         [[nodiscard]] int PositionY() const noexcept { return m_posY; }
         [[nodiscard]] int Width() const noexcept { return m_width; }
         [[nodiscard]] int Height() const noexcept { return m_height; }
 
-    protected:
-        int m_posX, m_posY;     // 窗口位置
-        int m_width, m_height;  // 窗口尺寸
+        [[nodiscard]] NativeWindowHandle GetWindowHandle() const noexcept { return m_nativeWindow.handle; }
+        [[nodiscard]] NativeDisplay GetDisplay() const noexcept { return m_nativeWindow.display; }
+        [[nodiscard]] bool IsDestroyed() const noexcept { return m_nativeWindow.destroyed; }
+        void SetIcon(std::string_view iconPath) const { m_nativeWindow.SetIcon(iconPath); }
+
+        // 窗口消息事件回调
+        void SetKeyCallback(const KeyFunction& function) { m_nativeWindow.keyFunction = function; }
+        void SetCharCallback(const CharFunction& function) { m_nativeWindow.charFunction = function; }
+        void SetMouseButtonCallback(const MouseButtonFunction& function) { m_nativeWindow.mouseButtonFunction = function; }
+        void SetCursorPosCallback(const CursorPosFunction& function) { m_nativeWindow.cursorPosFunction = function; }
+        void SetScrollCallback(const ScrollFunction& function) { m_nativeWindow.scrollFunction = function; }
+        void SetWindowPosCallback(const WindowPosFunction& function) { m_nativeWindow.windowPosFunction = function; }
+        void SetWindowSizeCallback(const WindowSizeFunction& function) { m_nativeWindow.windowSizeFunction = function; }
+        void SetSuspendCallback(const SuspendFunction& function) { m_nativeWindow.suspendFunction = function; }
+        void SetResumeCallback(const ResumeFunction& function) { m_nativeWindow.resumeFunction = function; }
+
+    private:
+        int m_posX, m_posY;
+        int m_width, m_height;
+        NativeWindow m_nativeWindow;
     };
 }

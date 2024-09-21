@@ -5,7 +5,7 @@
 *****************************************************************/
 #pragma once
 
-#include "Platform/Core.h"
+#include "Base/Core.h"
 #include "Exception/BaseException.h"
 
 namespace TG
