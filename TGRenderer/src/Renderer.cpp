@@ -4,7 +4,7 @@
 * This code is licensed under the MIT License (MIT).			*
 *****************************************************************/
 
-#include "Renderer.hpp"
+#include "Renderer.h"
 #include "spdlog/spdlog.h"
 #include <fstream>
 #include "imgui_impl_win32.h"
@@ -37,7 +37,7 @@ namespace TG
 
         // 主窗口设置
         m_mainWindow.SetIcon("maple-leaf.ico");
-        m_mainWindow.AddInputEventListener(m_input);
+        // m_mainWindow.AddInputEventListener(m_input);
         // m_mainWindow.SetStateCallback([&timer=m_timer](){ timer.Start(); }, [&timer=m_timer](){ timer.Pause(); });
 
 		CreateEGLDisplay();
@@ -88,12 +88,12 @@ namespace TG
 			if (m_mainWindow.IsDestroyed())
 				break;
 
-            m_input.Update();
+            // m_input.Update();
 			if (const std::optional<int> code = Window::PollEvents())
 				return *code;
 
-            if (m_input.GetKeyUp(Input::KeyCode::Space))
-                spdlog::info("space up");
+            // if (m_input.GetKeyUp(Input::KeyCode::Space))
+                // spdlog::info("space up");
 
 			ImGui_ImplOpenGL3_NewFrame();
 			ImGui_ImplWin32_NewFrame();

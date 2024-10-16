@@ -21,23 +21,16 @@ namespace TG::Input
 		~Mouse() = default;
 
 		void Update();
-        void Receive(const Event& e);
-        [[nodiscard]] bool GetKey(KeyCode k) const;
-        [[nodiscard]] bool GetKeyDown(KeyCode k) const;
-        [[nodiscard]] bool GetKeyUp(KeyCode k) const;
+        void Handle(const Event<Mouse>& event);
+        [[nodiscard]] bool GetKey(KeyCode key) const;
+        [[nodiscard]] bool GetKeyDown(KeyCode key) const;
+        [[nodiscard]] bool GetKeyUp(KeyCode key) const;
 
         [[nodiscard]] short PositionX() const noexcept { return m_positionX; }
         [[nodiscard]] short PositionY() const noexcept { return m_positionY; }
         [[nodiscard]] short WheelDelta() const noexcept { return m_wheelDelta; }
 
 	private:
-		static bool IsMouseKey(KeyCode k)
-		{
-			if (const auto key = static_cast<std::size_t>(k); key <= 0x04)
-				return true;
-			return false;
-		}
-
 		std::bitset<8> m_mouseDown;     // 按键是否刚刚按下
 		std::bitset<8> m_mouseUp;       // 按键是否刚刚松开
 		std::bitset<8> m_mouseHold;     // 按键是否按住

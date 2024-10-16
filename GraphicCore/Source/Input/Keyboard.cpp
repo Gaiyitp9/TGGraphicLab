@@ -5,7 +5,7 @@
 *****************************************************************/
 
 #include "Input/Keyboard.h"
-#include <typeinfo>
+#include <cassert>
 
 namespace TG::Input
 {
@@ -15,15 +15,11 @@ namespace TG::Input
 		m_keyUp.reset();
 	}
 
-    void Keyboard::Receive(const Event &e)
+    void Keyboard::Handle(const Event<Keyboard> &event)
     {
-	    // 不处理非键盘事件
-        if (typeid(e) != typeid(KeyboardEvent)) return;
-
 	    // 上面已经判断过类型了，所以这里不用dynamic_cast，提升性能
-	    const auto& keyboardEvent = static_cast<const KeyboardEvent&>(e);
-	    const auto key = static_cast<std::size_t>(keyboardEvent.key);
-	    if (keyboardEvent.isPressed)
+	    const auto key = static_cast<std::size_t>(event.key);
+	    if (event.isPressed)
 	    {
 	    	// 第一次按下，key down为true
 	        if (!m_keyHold.test(key))
@@ -38,24 +34,18 @@ namespace TG::Input
 	    }
     }
 
-    bool Keyboard::GetKey(KeyCode k) const
+    bool Keyboard::GetKey(KeyCode key) const
     {
-        if (!IsKeyBoardKey(k)) return false;
-
-        return m_keyHold.test(static_cast<std::size_t>(k));
+        return key >= KeyCode::Backspace && key <= KeyCode::Quote && m_keyHold.test(static_cast<std::size_t>(key));
     }
 
-    bool Keyboard::GetKeyDown(KeyCode k) const
+    bool Keyboard::GetKeyDown(KeyCode key) const
     {
-        if (!IsKeyBoardKey(k)) return false;
-
-        return m_keyDown.test(static_cast<std::size_t>(k));
+        return key >= KeyCode::Backspace && key <= KeyCode::Quote && m_keyDown.test(static_cast<std::size_t>(key));
     }
 
-    bool Keyboard::GetKeyUp(KeyCode k) const
+    bool Keyboard::GetKeyUp(KeyCode key) const
     {
-        if (!IsKeyBoardKey(k)) return false;
-
-        return m_keyUp.test(static_cast<std::size_t>(k));
+        return key >= KeyCode::Backspace && key <= KeyCode::Quote && m_keyUp.test(static_cast<std::size_t>(key));
     }
 }

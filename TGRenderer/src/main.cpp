@@ -4,7 +4,7 @@
 * This code is licensed under the MIT License (MIT).			*
 *****************************************************************/
 
-#include "Renderer.hpp"
+#include "Renderer.h"
 #include "spdlog/spdlog.h"
 
 int CALLBACK main()

@@ -5,7 +5,7 @@
 *****************************************************************/
 
 #include "Input/Mouse.h"
-#include <typeinfo>
+#include <cassert>
 
 namespace TG::Input
 {
@@ -15,17 +15,12 @@ namespace TG::Input
 		m_mouseUp.reset();
 	}
 
-    void Mouse::Receive(const Event& e)
+    void Mouse::Handle(const Event<Mouse>& event)
     {
-        // 不处理非鼠标事件
-        if (typeid(e) != typeid(MouseEvent)) return;
-
-		// 上面已经判断过类型了，所以这里不用dynamic_cast，提升性能
-        const auto& mouseEvent = static_cast<const MouseEvent&>(e);
-		if (mouseEvent.button != KeyCode::None)
+		if (event.key != KeyCode::None)
 		{
-	        const auto key = static_cast<std::size_t>(mouseEvent.button);
-			if (mouseEvent.isPressed)
+	        const auto key = static_cast<std::size_t>(event.key);
+			if (event.isPressed)
 			{
 				if (!m_mouseHold.test(key))
 					m_mouseDown[key] = true;
@@ -38,29 +33,23 @@ namespace TG::Input
 			}
 		}
 
-		m_positionX = mouseEvent.x;
-		m_positionY = mouseEvent.y;
-		m_wheelDelta = mouseEvent.wheelDelta;
+		m_positionX = event.x;
+		m_positionY = event.y;
+		m_wheelDelta = event.wheelDelta;
     }
 
-    bool Mouse::GetKey(KeyCode k) const
+    bool Mouse::GetKey(KeyCode key) const
     {
-        if (!IsMouseKey(k)) return false;
-
-        return m_mouseHold.test(static_cast<std::size_t>(k));
+        return key <= KeyCode::MiddleMouseButton && m_mouseHold.test(static_cast<std::size_t>(key));
     }
 
-    bool Mouse::GetKeyDown(KeyCode k) const
+    bool Mouse::GetKeyDown(KeyCode key) const
     {
-        if (!IsMouseKey(k)) return false;
-
-        return m_mouseDown.test(static_cast<std::size_t>(k));
+        return key <= KeyCode::MiddleMouseButton && m_mouseDown.test(static_cast<std::size_t>(key));
     }
 
-    bool Mouse::GetKeyUp(KeyCode k) const
+    bool Mouse::GetKeyUp(KeyCode key) const
     {
-        if (!IsMouseKey(k)) return false;
-
-        return m_mouseUp.test(static_cast<std::size_t>(k));
+        return key <= KeyCode::MiddleMouseButton && m_mouseUp.test(static_cast<std::size_t>(key));
     }
 }

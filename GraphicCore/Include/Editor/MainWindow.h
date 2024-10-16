@@ -6,7 +6,8 @@
 #pragma once
 
 #include "Window.h"
-#include "Input/EventDispatcher.h"
+#include "Base/EventHandler.hpp"
+#include "Input/Event.h"
 
 namespace TG
 {
@@ -19,12 +20,5 @@ namespace TG
         MainWindow& operator=(const MainWindow&) = delete;
         MainWindow& operator=(MainWindow&&) = delete;
         ~MainWindow() override = default;
-
-        // 添加输入事件监听器(比如记录输入状态的管理器)
-        void AddInputEventListener(Input::IEventHandler& handler);
-        void RemoveInputEventListener(const Input::IEventHandler& handler);
-
-    private:
-        Input::EventDispatcher m_eventDispatcher;
     };
 }
