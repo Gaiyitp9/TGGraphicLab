@@ -1,15 +1,17 @@
 /****************************************************************
-* TianGong GraphicLab										*
+* TianGong GraphicLab											*
 * Copyright (c) Gaiyitp9. All rights reserved.					*
 * This code is licensed under the MIT License (MIT).			*
 *****************************************************************/
 #pragma once
 
-namespace TG::Reflection
+namespace TG
 {
-    template<typename... Types>
-    class TypeList
+    class Module
     {
-        constexpr static std::size_t Size = sizeof...(Types);
+    public:
+        virtual ~Module() = default;
+
+        virtual void Update() = 0;
     };
 }

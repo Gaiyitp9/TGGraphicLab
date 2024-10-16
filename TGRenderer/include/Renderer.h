@@ -7,7 +7,6 @@
 
 #include "Editor/MainWindow.h"
 #include "Base/Chronometer.h"
-#include "Input/Manager.hpp"
 #include "Input/Mouse.h"
 #include "Input/Keyboard.h"
 #include "DynamicGles.h"
@@ -40,7 +39,6 @@ namespace TG
 		MainWindow m_mainWindow;	// 主窗口
 
         Chronometer m_timer;		// 高精度计时器
-        Input::Manager<Input::Mouse, Input::Keyboard> m_input;	// 输入管理器，使用鼠标和键盘输入
 
 		EGLDisplay m_eglDisplay{};
 		EGLConfig m_eglConfig{};

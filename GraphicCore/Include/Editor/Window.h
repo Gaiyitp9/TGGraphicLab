@@ -19,8 +19,8 @@ namespace TG
     {
     public:
         Window(int x, int y, int width, int height, std::string_view name, WindowType type)
-            : m_nativeWindow(x, y, width, height, name, type), m_posX(x), m_posY(y), m_width(width),
-                m_height(height)
+            : m_posX(x), m_posY(y), m_width(width), m_height(height),
+                m_nativeWindow(x, y, width, height, name, type)
         {}
         Window(const Window&) = delete;
         Window& operator=(const Window&) = delete;
@@ -42,15 +42,15 @@ namespace TG
         void SetIcon(std::string_view iconPath) const { m_nativeWindow.SetIcon(iconPath); }
 
         // 窗口消息事件回调
+        void SetWindowPosCallback(const WindowPosFunction& function) { m_nativeWindow.windowPosFunction = function; }
+        void SetWindowSizeCallback(const WindowSizeFunction& function) { m_nativeWindow.windowSizeFunction = function; }
+        void SetSuspendCallback(const SuspendFunction& function) { m_nativeWindow.suspendFunction = function; }
+        void SetResumeCallback(const ResumeFunction& function) { m_nativeWindow.resumeFunction = function; }
         void SetKeyCallback(const KeyFunction& function) { m_nativeWindow.keyFunction = function; }
         void SetCharCallback(const CharFunction& function) { m_nativeWindow.charFunction = function; }
         void SetMouseButtonCallback(const MouseButtonFunction& function) { m_nativeWindow.mouseButtonFunction = function; }
         void SetCursorPosCallback(const CursorPosFunction& function) { m_nativeWindow.cursorPosFunction = function; }
         void SetScrollCallback(const ScrollFunction& function) { m_nativeWindow.scrollFunction = function; }
-        void SetWindowPosCallback(const WindowPosFunction& function) { m_nativeWindow.windowPosFunction = function; }
-        void SetWindowSizeCallback(const WindowSizeFunction& function) { m_nativeWindow.windowSizeFunction = function; }
-        void SetSuspendCallback(const SuspendFunction& function) { m_nativeWindow.suspendFunction = function; }
-        void SetResumeCallback(const ResumeFunction& function) { m_nativeWindow.resumeFunction = function; }
 
     private:
         int m_posX, m_posY;

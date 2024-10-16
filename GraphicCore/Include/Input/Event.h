@@ -9,28 +9,26 @@
 
 namespace TG::Input
 {
-	struct Event
-	{
-		virtual ~Event() = default;
-	};
+	class Mouse;
+	class Keyboard;
 
-	struct CharacterEvent final : Event
-	{
-		// 字符的Unicode码，只支持基本多文种平面(BMP)
-		char16_t c{ 0 };
-	};
+	template<typename Device> struct Event;
 
-	struct KeyboardEvent final : Event
+	template<>
+	struct Event<Mouse>
 	{
 		KeyCode key{ KeyCode::None };
 		bool isPressed{ false };
+		short x{ 0 };
+		short y{ 0 };
+		short wheelDelta{ 0 };
 	};
 
-	struct MouseEvent final : Event
+	template<>
+	struct Event<Keyboard>
 	{
-		KeyCode button{ KeyCode::None };
+		KeyCode key{ KeyCode::None };
 		bool isPressed{ false };
-		short x{ 0 }, y{ 0 };
-		short wheelDelta{ 0 };
+		char16_t c{ '\0' };		// 字符的Unicode码，只支持基本多文种平面(BMP)
 	};
 }
