@@ -40,50 +40,50 @@ namespace TG
             m_windowWidth, m_windowHeight, m_windowTitle);
         m_mainWindow->SetIcon("maple-leaf.ico");
 
-        m_mainWindow->SetKeyCallback([&](Input::KeyCode key, int scanCode, Input::Action action) {
-            Input::Event<Input::Keyboard> event;
-            event.key = key;
-            if (action == Input::Action::Press || action == Input::Action::Repeat)
-                event.isPressed = true;
-            m_eventDispatcher.Dispatch(event);
-        });
-        m_mainWindow->SetCharCallback([&](char16_t c) {
+        m_mainWindow->SetKeyCallback(
+            [&eventDispatcher = m_eventDispatcher](Input::KeyCode key, int scanCode, Input::Action action) {
+                Input::Event<Input::Keyboard> event;
+                event.key = key;
+                if (action == Input::Action::Press || action == Input::Action::Repeat)
+                    event.isPressed = true;
+                eventDispatcher.Dispatch(event);
+            }
+        );
+        m_mainWindow->SetCharCallback([&eventDispatcher = m_eventDispatcher](char16_t c) {
             Input::Event<Input::Keyboard> event;
             event.c = c;
-            m_eventDispatcher.Dispatch(event);
+            eventDispatcher.Dispatch(event);
         });
-        m_mainWindow->SetMouseButtonCallback([&](Input::KeyCode mouseButton, Input::Action action) {
-            Input::Event<Input::Mouse> event;
-            event.key = mouseButton;
-            if (action == Input::Action::Press)
-                event.isPressed = true;
-            m_eventDispatcher.Dispatch(event);
-        });
-        m_mainWindow->SetScrollCallback([&](int xOffset, int yOffset) {
+        m_mainWindow->SetMouseButtonCallback(
+            [&eventDispatcher = m_eventDispatcher](Input::KeyCode mouseButton, Input::Action action) {
+                Input::Event<Input::Mouse> event;
+                event.key = mouseButton;
+                if (action == Input::Action::Press)
+                    event.isPressed = true;
+                eventDispatcher.Dispatch(event);
+            }
+        );
+        m_mainWindow->SetScrollCallback([&eventDispatcher = m_eventDispatcher](int xOffset, int yOffset) {
             Input::Event<Input::Mouse> event;
             event.wheelDelta = static_cast<short>(yOffset);
-            m_eventDispatcher.Dispatch(event);
+            eventDispatcher.Dispatch(event);
         });
-        m_mainWindow->SetCursorPosCallback([&](int posX, int posY) {
+        m_mainWindow->SetCursorPosCallback([&eventDispatcher = m_eventDispatcher](int posX, int posY) {
             Input::Event<Input::Mouse> event;
             event.x = static_cast<short>(posX);
             event.y = static_cast<short>(posY);
-            m_eventDispatcher.Dispatch(event);
+            eventDispatcher.Dispatch(event);
         });
         m_mainWindow->SetWindowPosCallback([](int xPos, int yPos){});
         m_mainWindow->SetWindowSizeCallback([](unsigned int w, unsigned int h){});
-        m_mainWindow->SetSuspendCallback([]{});
-        m_mainWindow->SetResumeCallback([]{});
+        m_mainWindow->SetSuspendCallback([&timer = m_timer]{ timer.Pause(); });
+        m_mainWindow->SetResumeCallback([&timer = m_timer]{ timer.Start(); });
     }
 
     PlatformModule::~PlatformModule() = default;
 
     void PlatformModule::Update()
     {
-        while (true)
-		{
-			if (m_mainWindow->IsDestroyed() || Window::PollEvents())
-				break;
-		}
+        m_exitCode = Window::PollEvents();
     }
 }

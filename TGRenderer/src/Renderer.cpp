@@ -12,34 +12,8 @@
 
 namespace TG
 {
-	Renderer::Renderer() : m_mainWindow(200, 100, m_windowWidth, m_windowHeight, "天工渲染器")
+	Renderer::Renderer()
 	{
-        // 注：使用CRT library检测内存泄漏时，文件的行分隔符要设置为CRLF(\r\n)，否则_CrtSetDbgFlag函数不起作用
-		// 开启内存泄漏检测
-		_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
-		// 设置内存泄漏消息输出到控制台
-		_CrtSetReportMode(_CRT_WARN, _CRTDBG_MODE_FILE);
-		_CrtSetReportFile(_CRT_WARN, _CRTDBG_FILE_STDOUT);
-
-		// 为了能在控制台查看日志，需要把控制台的代码页(code page)设置为UTF-8
-		SetConsoleCP(65001);
-		SetConsoleOutputCP(65001);
-
-		// 关闭错误流
-		// FILE* nullFile = nullptr;
-		// freopen_s(&nullFile, "NUL", "w", stderr);
-
-		spdlog::info(Chronometer::Date());
-
-		// 获取当前显示器的宽和高
-		m_screenWidth = GetSystemMetrics(SM_CXSCREEN);
-        m_screenHeight = GetSystemMetrics(SM_CYSCREEN);
-
-        // 主窗口设置
-        m_mainWindow.SetIcon("maple-leaf.ico");
-        // m_mainWindow.AddInputEventListener(m_input);
-        // m_mainWindow.SetStateCallback([&timer=m_timer](){ timer.Start(); }, [&timer=m_timer](){ timer.Pause(); });
-
 		CreateEGLDisplay();
 		ChooseEGLConfig();
 		CreateEGLSurface();
@@ -59,7 +33,7 @@ namespace TG
 
 		ImGui::StyleColorsDark();
 
-		ImGui_ImplWin32_Init(m_mainWindow.GetWindowHandle());
+		ImGui_ImplWin32_Init(m_platformModule.GetWindow().GetWindowHandle());
 		ImGui_ImplOpenGL3_Init();
 	}
 
@@ -85,15 +59,13 @@ namespace TG
 
 		while (true)
 		{
-			if (m_mainWindow.IsDestroyed())
-				break;
-
             // m_input.Update();
-			if (const std::optional<int> code = Window::PollEvents())
-				return *code;
 
             // if (m_input.GetKeyUp(Input::KeyCode::Space))
                 // spdlog::info("space up");
+			if (m_platformModule.ShouldExit())
+				return m_platformModule.ExitCode();
+			m_platformModule.Update();
 
 			ImGui_ImplOpenGL3_NewFrame();
 			ImGui_ImplWin32_NewFrame();
@@ -234,7 +206,7 @@ namespace TG
 
 	bool Renderer::CreateEGLDisplay()
 	{
-		m_eglDisplay = eglGetDisplay(m_mainWindow.GetDisplay());
+		m_eglDisplay = eglGetDisplay(m_platformModule.GetWindow().GetDisplay());
 		if (m_eglDisplay == EGL_NO_DISPLAY)
 			m_eglDisplay = eglGetDisplay(EGL_DEFAULT_DISPLAY);
 		if (m_eglDisplay == EGL_NO_DISPLAY)
@@ -286,7 +258,7 @@ namespace TG
 
 	bool Renderer::CreateEGLSurface()
 	{
-		m_eglSurface = eglCreateWindowSurface(m_eglDisplay, m_eglConfig, m_mainWindow.GetWindowHandle(), nullptr);
+		m_eglSurface = eglCreateWindowSurface(m_eglDisplay, m_eglConfig, m_platformModule.GetWindow().GetWindowHandle(), nullptr);
 		if (m_eglSurface == EGL_NO_SURFACE)
 		{
 			spdlog::error("Failed to create EGL surface: {:#x}", eglGetError());

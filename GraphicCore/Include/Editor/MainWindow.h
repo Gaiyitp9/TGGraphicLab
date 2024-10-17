@@ -6,8 +6,6 @@
 #pragma once
 
 #include "Window.h"
-#include "Base/EventHandler.hpp"
-#include "Input/Event.h"
 
 namespace TG
 {

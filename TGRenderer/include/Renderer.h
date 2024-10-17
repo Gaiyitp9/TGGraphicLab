@@ -5,10 +5,7 @@
 *****************************************************************/
 #pragma once
 
-#include "Editor/MainWindow.h"
-#include "Base/Chronometer.h"
-#include "Input/Mouse.h"
-#include "Input/Keyboard.h"
+#include "PlatformModule.h"
 #include "DynamicGles.h"
 
 namespace TG
@@ -32,13 +29,7 @@ namespace TG
 		bool SetupEGLContext();
 		void InitialTriangle();
 
-		int m_screenWidth;			// 主显示器的尺寸
-		int m_screenHeight;
-		int m_windowWidth = 800;	// 主窗口的尺寸
-		int m_windowHeight = 600;
-		MainWindow m_mainWindow;	// 主窗口
-
-        Chronometer m_timer;		// 高精度计时器
+		PlatformModule m_platformModule;
 
 		EGLDisplay m_eglDisplay{};
 		EGLConfig m_eglConfig{};
