@@ -12,6 +12,6 @@ namespace TG
     template<typename... Types>
     struct TypeList
     {
-        constexpr static std::size_t Size = sizeof...(Types);
+        static constexpr std::size_t Size = sizeof...(Types);
     };
 }
