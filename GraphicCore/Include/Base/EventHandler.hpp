@@ -77,6 +77,7 @@ namespace TG
     // TypeList转换成EventDispatcher
     template<typename... Events>
     EventDispatcher<Events...> ConstructEventDispatcherFromTypeList(TypeList<Events...>) { return {}; }
-    template<typename EventList>
+    // 传入事件的TypeList
+    template<typename EventList> requires IsInstanceOfV<EventList, TypeList>
     using EventDispatcherFromEventList = decltype(ConstructEventDispatcherFromTypeList(std::declval<EventList>()));
 }

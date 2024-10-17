@@ -6,11 +6,12 @@
 #pragma once
 
 #include "Event.h"
+#include "Base/EventHandler.hpp"
 #include <bitset>
 
 namespace TG::Input
 {
-	class Keyboard
+	class Keyboard : public IEventHandler<Event<Keyboard>>
 	{
 	public:
 		Keyboard() = default;
@@ -18,10 +19,10 @@ namespace TG::Input
 		Keyboard& operator=(const Keyboard&) = delete;
 		Keyboard(Keyboard&&) = delete;
 		Keyboard& operator=(Keyboard&&) = delete;
-		~Keyboard() = default;
+		~Keyboard() override = default;
 
 		void Update();
-        void Handle(const Event<Keyboard>& event);
+        void Handle(const Event<Keyboard>& event) override;
 		[[nodiscard]] bool GetKey(KeyCode key) const;
 		[[nodiscard]] bool GetKeyDown(KeyCode key) const;
 		[[nodiscard]] bool GetKeyUp(KeyCode key) const;

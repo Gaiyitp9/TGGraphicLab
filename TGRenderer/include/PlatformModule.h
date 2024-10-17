@@ -16,13 +16,10 @@
 namespace TG
 {
     // Platform模块输出的事件列表
-    // · 鼠标事件
-    // · 键盘事件
-    // · 窗口状态事件
+    // 鼠标事件
+    // 键盘事件
+    // 窗口状态事件
     using PlatformEventList = TypeList<Input::Event<Input::Mouse>, Input::Event<Input::Keyboard>>;
-
-    // template<typename Event>
-    // constexpr bool IsPlatformSupportedEvent = std::is_same_v<E
 
     class PlatformModule
     {
@@ -38,9 +35,13 @@ namespace TG
 
         void Update();
 
-        template<typename Event>
+        [[nodiscard]] bool ShouldExit() const { return m_mainWindow->IsDestroyed(); }
+        [[nodiscard]] int ExitCode() const { return *m_exitCode; }
+        [[nodiscard]] const Window& GetWindow() const { return *m_mainWindow; }
+
+        template<typename Event> requires PlatformEventList::Contains<Event>
         void AddEventListener(IEventHandler<Event>& handler) { m_eventDispatcher.Register(handler); }
-        template<typename Event>
+        template<typename Event> requires PlatformEventList::Contains<Event>
         void RemoveEventListener(const IEventHandler<Event>& handler) { m_eventDispatcher.UnRegister(handler); }
 
     private:
@@ -57,6 +58,7 @@ namespace TG
         std::string_view m_windowTitle{ "天工渲染器" };
         // 主窗口
         std::unique_ptr<MainWindow> m_mainWindow;
+        std::optional<int> m_exitCode = std::nullopt;
         // 事件分发器
         EventDispatcher m_eventDispatcher;
         // 高精度计时器
