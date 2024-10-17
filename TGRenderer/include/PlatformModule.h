@@ -8,14 +8,26 @@
 #include "Editor/MainWindow.h"
 #include "Base/Chronometer.h"
 #include "Base/EventHandler.hpp"
+#include "Base/TypeList.hpp"
 #include "Input/Event.h"
 #include <memory>
 #include <string_view>
 
 namespace TG
 {
+    // Platform模块输出的事件列表
+    // · 鼠标事件
+    // · 键盘事件
+    // · 窗口状态事件
+    using PlatformEventList = TypeList<Input::Event<Input::Mouse>, Input::Event<Input::Keyboard>>;
+
+    // template<typename Event>
+    // constexpr bool IsPlatformSupportedEvent = std::is_same_v<E
+
     class PlatformModule
     {
+        using EventDispatcher = EventDispatcherFromEventList<PlatformEventList>;
+
     public:
         PlatformModule();
         PlatformModule(const PlatformModule&) = delete;
@@ -45,8 +57,9 @@ namespace TG
         std::string_view m_windowTitle{ "天工渲染器" };
         // 主窗口
         std::unique_ptr<MainWindow> m_mainWindow;
-        // 事件分发器，
-        // 1.鼠标事件 2.键盘事件 3.窗口状态事件
-        EventDispatcher<Input::Event<Input::Mouse>, Input::Event<Input::Keyboard>> m_eventDispatcher;
+        // 事件分发器
+        EventDispatcher m_eventDispatcher;
+        // 高精度计时器
+        Chronometer m_timer;
     };
 }

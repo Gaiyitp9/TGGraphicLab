@@ -10,14 +10,6 @@
 
 namespace TG
 {
-    // 事件处理器
-    template<typename Event>
-    struct IEventHandler
-    {
-        virtual ~IEventHandler() = default;
-        virtual void Handle(const Event& event) = 0;
-    };
-
     // 类型列表中所有类型是否唯一
     template<typename T, typename... Types>
     constexpr bool AreTypesUnique = (!std::is_same_v<T, Types> && ...) && AreTypesUnique<Types...>;
@@ -28,12 +20,17 @@ namespace TG
     template<typename T, typename... Types>
     constexpr bool IsInTypes = (std::is_same_v<T, Types> || ...);
 
-    // TypeList转换成EventDispatcher
-
-
     // 至少支持一种事件，且不存在重复事件
     template<typename... Events>
     concept UniqueEvents = sizeof...(Events) > 0 && AreTypesUnique<Events...>;
+
+    // 事件处理器
+    template<typename Event>
+    struct IEventHandler
+    {
+        virtual ~IEventHandler() = default;
+        virtual void Handle(const Event& event) = 0;
+    };
 
     // 事件分发器
     template<UniqueEvents... Events>
@@ -76,4 +73,10 @@ namespace TG
         // 多个事件的处理器集合
         std::tuple<EventHandlers<Events>...> m_allEventHandlers;
     };
+
+    // TypeList转换成EventDispatcher
+    template<typename... Events>
+    EventDispatcher<Events...> ConstructEventDispatcherFromTypeList(TypeList<Events...>) { return {}; }
+    template<typename EventList>
+    using EventDispatcherFromEventList = decltype(ConstructEventDispatcherFromTypeList(std::declval<EventList>()));
 }
