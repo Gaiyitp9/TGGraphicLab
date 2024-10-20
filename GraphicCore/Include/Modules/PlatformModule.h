@@ -5,13 +5,12 @@
 *****************************************************************/
 #pragma once
 
-#include "Editor/MainWindow.h"
+#include "Module.h"
+#include "Base/MainWindow.h"
 #include "Base/Chronometer.h"
 #include "Base/EventHandler.hpp"
 #include "Base/TypeList.hpp"
 #include "Input/Event.h"
-#include <memory>
-#include <string_view>
 
 namespace TG
 {
@@ -21,7 +20,7 @@ namespace TG
     // 窗口状态事件
     using PlatformEventList = TypeList<Input::Event<Input::Mouse>, Input::Event<Input::Keyboard>>;
 
-    class PlatformModule
+    class PlatformModule final : public Module
     {
         using EventDispatcher = EventDispatcherFromEventList<PlatformEventList>;
 
@@ -31,13 +30,13 @@ namespace TG
         PlatformModule(PlatformModule&&) = delete;
         PlatformModule& operator=(const PlatformModule&) = delete;
         PlatformModule& operator=(PlatformModule&&) = delete;
-        ~PlatformModule();
+        ~PlatformModule() override;
 
-        void Update();
+        void Update() override;
 
-        [[nodiscard]] bool ShouldExit() const { return m_mainWindow->IsDestroyed(); }
+        [[nodiscard]] bool ShouldExit() const { return m_mainWindow.IsDestroyed(); }
         [[nodiscard]] int ExitCode() const { return *m_exitCode; }
-        [[nodiscard]] const Window& GetWindow() const { return *m_mainWindow; }
+        [[nodiscard]] const Window& GetWindow() const { return m_mainWindow; }
 
         template<typename Event> requires PlatformEventList::Contains<Event>
         void AddEventListener(IEventHandler<Event>& handler) { m_eventDispatcher.Register(handler); }
@@ -48,17 +47,9 @@ namespace TG
         // 主显示器的尺寸
         int m_screenWidth{ 0 };
         int m_screenHeight{ 0 };
-        // 主窗口的位置
-        int m_windowPosX{ 0 };
-        int m_windowPosY{ 0 };
-        // 主窗口的尺寸
-        int m_windowWidth{ 0 };
-        int m_windowHeight{ 0 };
-        // 窗口标题
-        std::string_view m_windowTitle{ "天工渲染器" };
         // 主窗口
-        std::unique_ptr<MainWindow> m_mainWindow;
-        std::optional<int> m_exitCode = std::nullopt;
+        MainWindow m_mainWindow;
+        std::optional<int> m_exitCode;
         // 事件分发器
         EventDispatcher m_eventDispatcher;
         // 高精度计时器

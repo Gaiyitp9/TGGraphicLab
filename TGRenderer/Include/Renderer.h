@@ -5,7 +5,8 @@
 *****************************************************************/
 #pragma once
 
-#include "PlatformModule.h"
+#include "Modules/PlatformModule.h"
+#include "Modules/InputModule.h"
 #include "DynamicGles.h"
 
 namespace TG
@@ -30,6 +31,7 @@ namespace TG
 		void InitialTriangle();
 
 		PlatformModule m_platformModule;
+		InputModule m_inputModule;
 
 		EGLDisplay m_eglDisplay{};
 		EGLConfig m_eglConfig{};

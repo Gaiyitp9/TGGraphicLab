@@ -6,7 +6,7 @@
 #pragma once
 
 #ifdef _WIN32
-#include "Windows/NativeWindow.h"
+#include "Base/Windows/NativeWindow.h"
 #endif
 #include <functional>
 #include <optional>
@@ -39,7 +39,10 @@ namespace TG
         [[nodiscard]] NativeWindowHandle GetWindowHandle() const noexcept { return m_nativeWindow.handle; }
         [[nodiscard]] NativeDisplay GetDisplay() const noexcept { return m_nativeWindow.display; }
         [[nodiscard]] bool IsDestroyed() const noexcept { return m_nativeWindow.destroyed; }
-        void SetIcon(std::string_view iconPath) const { m_nativeWindow.SetIcon(iconPath); }
+        void SetIcon(std::string_view iconPath) const;
+        void SetPosition(int x, int y);
+        void SetSize(int width, int height);
+        void Show(bool show) const;
 
         // 窗口消息事件回调
         void SetWindowPosCallback(const WindowPosFunction& function) { m_nativeWindow.windowPosFunction = function; }

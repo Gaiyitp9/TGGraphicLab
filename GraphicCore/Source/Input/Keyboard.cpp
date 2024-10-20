@@ -36,16 +36,19 @@ namespace TG::Input
 
     bool Keyboard::GetKey(KeyCode key) const
     {
-        return key >= KeyCode::Backspace && key <= KeyCode::Quote && m_keyHold.test(static_cast<std::size_t>(key));
+		assert(key >= KeyCode::Backspace && key <= KeyCode::Quote);
+        return m_keyHold.test(static_cast<std::size_t>(key));
     }
 
     bool Keyboard::GetKeyDown(KeyCode key) const
     {
-        return key >= KeyCode::Backspace && key <= KeyCode::Quote && m_keyDown.test(static_cast<std::size_t>(key));
+		assert(key >= KeyCode::Backspace && key <= KeyCode::Quote);
+        return m_keyDown.test(static_cast<std::size_t>(key));
     }
 
     bool Keyboard::GetKeyUp(KeyCode key) const
     {
-        return key >= KeyCode::Backspace && key <= KeyCode::Quote && m_keyUp.test(static_cast<std::size_t>(key));
+		assert(key >= KeyCode::Backspace && key <= KeyCode::Quote);
+        return m_keyUp.test(static_cast<std::size_t>(key));
     }
 }

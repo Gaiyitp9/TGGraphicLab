@@ -95,7 +95,7 @@ namespace TG::Math
             Scalar c10 = Cofactor3X3(src, 1, 0);
             Scalar c11 = Cofactor3X3(src, 1, 1);
             Scalar c20 = Cofactor3X3(src, 2, 0);
-            // 更新这三个值不会造成alasing问题
+            // 更新这三个值不会造成aliasing问题
             dstEvaluator.Entry(1, 2) = Cofactor3X3(src, 2, 1) * invDet;
             dstEvaluator.Entry(2, 1) = Cofactor3X3(src, 1, 2) * invDet;
             dstEvaluator.Entry(2, 2) = Cofactor3X3(src, 2, 2) * invDet;
