@@ -4,7 +4,7 @@ source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${SRCS})
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${INCS})
 
 add_executable(TGRenderer ${SRCS} ${INCS})
-target_include_directories(TGRenderer PRIVATE include)
+target_include_directories(TGRenderer PRIVATE Include)
 target_link_libraries(TGRenderer PRIVATE GraphicCore)
 
 set(PowerVRResources ${CMAKE_SOURCE_DIR}/ThirdParty/PowerVR/lib/Windows)

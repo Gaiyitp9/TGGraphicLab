@@ -39,21 +39,23 @@ namespace TG
         ~NativeWindow();
 
         void SetIcon(std::string_view iconPath) const;
+        void SetPosition(int x, int y) const;
+        void SetSize(int width, int height) const;
+        void Show(bool show) const;
 
         std::string name;
         HWND    handle{ nullptr };
         HDC     display{ nullptr };
-        bool    spyMessage{ true };
         bool    destroyed{ false };
 
-        std::function<void(Input::KeyCode key, int scanCode, Input::Action action)> keyFunction{};
+        std::function<void(Input::KeyCode key, int scanCode, Input::Action action)> keyFunction;
         std::function<void(char16_t c)> charFunction{};
-        std::function<void(Input::KeyCode button, Input::Action action)> mouseButtonFunction{};
-        std::function<void(int xPos, int yPos)> cursorPosFunction{};
-        std::function<void(int xOffset, int yOffset)> scrollFunction{};
-        std::function<void(int xPos, int yPos)> windowPosFunction{};
-        std::function<void(unsigned int width, unsigned int height)> windowSizeFunction{};
-        std::function<void()> suspendFunction{};
-        std::function<void()> resumeFunction{};
+        std::function<void(Input::KeyCode button, Input::Action action)> mouseButtonFunction;
+        std::function<void(int xPos, int yPos)> cursorPosFunction;
+        std::function<void(int xOffset, int yOffset)> scrollFunction;
+        std::function<void(int xPos, int yPos)> windowPosFunction;
+        std::function<void(unsigned int width, unsigned int height)> windowSizeFunction;
+        std::function<void()> suspendFunction;
+        std::function<void()> resumeFunction;
     };
 }

@@ -4,7 +4,7 @@
 * This code is licensed under the MIT License (MIT).			*
 *****************************************************************/
 
-#include "Editor/Window.h"
+#include "Base/Window.h"
 
 namespace TG
 {
@@ -22,5 +22,29 @@ namespace TG
         }
 
         return std::nullopt;
+    }
+
+    void Window::SetIcon(std::string_view iconPath) const
+    {
+        m_nativeWindow.SetIcon(iconPath);
+    }
+
+    void Window::SetPosition(int x, int y)
+    {
+        m_posX = x;
+        m_posY = y;
+        m_nativeWindow.SetPosition(x, y);
+    }
+
+    void Window::SetSize(int width, int height)
+    {
+        m_width = width;
+        m_height = height;
+        m_nativeWindow.SetSize(width, height);
+    }
+
+    void Window::Show(bool show) const
+    {
+        m_nativeWindow.Show(show);
     }
 }

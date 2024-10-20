@@ -4,13 +4,15 @@
 * This code is licensed under the MIT License (MIT).			*
 *****************************************************************/
 
-#include "Editor/Windows/NativeWindow.h"
-#include "Exception/Windows/Win32Exception.h"
 #include "Base/Windows/Auxiliary.h"
+#include "Base/Windows/NativeWindow.h"
+#include "Exception/Windows/Win32Exception.h"
+#include <memory_resource>
 
 namespace TG
 {
 	NativeWindow::NativeWindow(int x, int y, int width, int height, std::string_view name, WindowType type)
+		: name(name)
 	{
 		DWORD dwStyle = WS_OVERLAPPEDWINDOW;
 		DWORD dwExStyle = WS_EX_OVERLAPPEDWINDOW;
@@ -39,9 +41,6 @@ namespace TG
 			CheckLastError();
 
 		display = GetDC(handle);
-
-		// 显示窗口
-		ShowWindow(handle, SW_SHOW);
 	}
 
 	NativeWindow::~NativeWindow()
@@ -60,6 +59,23 @@ namespace TG
 		SendMessageW(handle, WM_SETICON, ICON_SMALL, reinterpret_cast<LPARAM>(icon));
 	}
 
+	void NativeWindow::SetPosition(int x, int y) const
+	{
+		SetWindowPos(handle, HWND_TOP, x, y, 0, 0, SWP_NOSIZE);
+	}
+
+	void NativeWindow::SetSize(int width, int height) const
+	{
+		SetWindowPos(handle, HWND_TOP, 0, 0, width, height, SWP_NOMOVE);
+	}
+
+	void NativeWindow::Show(bool show) const
+	{
+		ShowWindow(handle, show ? SW_SHOW : SW_HIDE);
+	}
+
+	// 用于窗口消息字符串的内存池，因为打印窗口消息需要频繁创建string，小字符串优化(SSO)不适用，所以使用内存池避免频繁分配内存
+	static std::pmr::unsynchronized_pool_resource gPool;
     // 窗口消息转成字符串
     static std::pmr::string WindowMessageToString(UINT msg, WPARAM wp, LPARAM lp)
     {
@@ -248,16 +264,16 @@ namespace TG
         };
 
         const auto it = windowMessage.find(msg);
-        std::pmr::string msgName;
+        std::pmr::string msgName{ &gPool };
         if (it == windowMessage.end())
             std::format_to(std::back_inserter(msgName), "Unknown message: {:#x}", msg);
         else
             msgName.append(it->second);
 
-        std::pmr::string message;
+        std::pmr::string message{ &gPool };
         std::format_to(std::back_inserter(message), "{:<25} LP: {:#018x}   WP: {:#018x}", msgName, lp, wp);
 
-        return message;
+        return std::pmr::string{ message, &gPool };
     }
 
     static LRESULT WindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
@@ -266,12 +282,10 @@ namespace TG
         auto* const pWindow = reinterpret_cast<NativeWindow*>(GetWindowLongPtrW(hwnd, GWLP_USERDATA));
 
 		// 监控窗口消息
-		if (pWindow->spyMessage)
-		{
-		    std::pmr::string windowMessage;
-		    std::format_to(std::back_inserter(windowMessage), "{:<16} {}\n", pWindow->name, WindowMessageToString(msg, wParam, lParam));
-			OutputDebugStringA(windowMessage.data());
-		}
+	    std::pmr::string windowMessage{ &gPool };
+	    std::format_to(std::back_inserter(windowMessage), "{:<16} {}\n", pWindow->name,
+	    	WindowMessageToString(msg, wParam, lParam));
+		OutputDebugStringA(windowMessage.data());
 
 		switch (msg)
 		{
@@ -472,5 +486,5 @@ namespace TG
     }
 
     // 在main之前调用RegisterWindow函数
-    [[maybe_unused]] static char gIgnore = RegisterWindow();
+    [[maybe_unused]] static char placeHolder = RegisterWindow();
 }

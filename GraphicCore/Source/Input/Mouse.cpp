@@ -40,16 +40,19 @@ namespace TG::Input
 
     bool Mouse::GetKey(KeyCode key) const
     {
-        return key <= KeyCode::MiddleMouseButton && m_mouseHold.test(static_cast<std::size_t>(key));
+		assert(key <= KeyCode::MiddleMouseButton);
+        return m_mouseHold.test(static_cast<std::size_t>(key));
     }
 
     bool Mouse::GetKeyDown(KeyCode key) const
     {
-        return key <= KeyCode::MiddleMouseButton && m_mouseDown.test(static_cast<std::size_t>(key));
+		assert(key <= KeyCode::MiddleMouseButton);
+        return m_mouseDown.test(static_cast<std::size_t>(key));
     }
 
     bool Mouse::GetKeyUp(KeyCode key) const
     {
-        return key <= KeyCode::MiddleMouseButton && m_mouseUp.test(static_cast<std::size_t>(key));
+		assert(key <= KeyCode::MiddleMouseButton);
+        return m_mouseUp.test(static_cast<std::size_t>(key));
     }
 }
