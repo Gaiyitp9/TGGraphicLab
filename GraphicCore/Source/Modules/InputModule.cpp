@@ -21,34 +21,16 @@ namespace TG
 
     bool InputModule::GetKey(Input::KeyCode key) const
     {
-        if (key <= Input::KeyCode::MiddleMouseButton)
-            return m_mouse.GetKey(key);
-
-        if (key >= Input::KeyCode::Backspace && key <= Input::KeyCode::Quote)
-            return m_keyboard.GetKey(key);
-
-        return false;
+        return m_mouse.GetKey(key) || m_keyboard.GetKey(key);
     }
 
     bool InputModule::GetKeyDown(Input::KeyCode key) const
     {
-        if (key <= Input::KeyCode::MiddleMouseButton)
-            return m_mouse.GetKeyDown(key);
-
-        if (key >= Input::KeyCode::Backspace && key <= Input::KeyCode::Quote)
-            return m_keyboard.GetKeyDown(key);
-
-        return false;
+        return m_mouse.GetKeyDown(key) || m_keyboard.GetKeyDown(key);
     }
 
     bool InputModule::GetKeyUp(Input::KeyCode key) const
     {
-        if (key <= Input::KeyCode::MiddleMouseButton)
-            return m_mouse.GetKeyUp(key);
-
-        if (key >= Input::KeyCode::Backspace && key <= Input::KeyCode::Quote)
-            return m_keyboard.GetKeyUp(key);
-
-        return false;
+        return m_mouse.GetKeyUp(key) || m_keyboard.GetKeyUp(key);
     }
 }
