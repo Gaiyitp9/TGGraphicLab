@@ -35,6 +35,10 @@ namespace TG
 
 		ImGui_ImplWin32_Init(m_platformModule.GetWindow().GetWindowHandle());
 		ImGui_ImplOpenGL3_Init();
+
+		// 输入模块监听输入事件
+		m_platformModule.AddEventListener(m_inputModule.GetMouseEventHandler());
+		m_platformModule.AddEventListener(m_inputModule.GetKeyboardEventHandler());
 	}
 
 	Renderer::~Renderer()
@@ -59,13 +63,14 @@ namespace TG
 
 		while (true)
 		{
-            // m_input.Update();
-
-            // if (m_input.GetKeyUp(Input::KeyCode::Space))
-                // spdlog::info("space up");
 			if (m_platformModule.ShouldExit())
 				return m_platformModule.ExitCode();
+
+			m_inputModule.Update();
 			m_platformModule.Update();
+
+            if (m_inputModule.GetKeyUp(Input::KeyCode::Space))
+                spdlog::info("space up");
 
 			ImGui_ImplOpenGL3_NewFrame();
 			ImGui_ImplWin32_NewFrame();

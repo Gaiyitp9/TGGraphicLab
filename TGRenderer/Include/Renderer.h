@@ -7,6 +7,7 @@
 
 #include "Modules/PlatformModule.h"
 #include "Modules/InputModule.h"
+#include "Modules/EditorModule.h"
 #include "DynamicGles.h"
 
 namespace TG
@@ -30,9 +31,6 @@ namespace TG
 		bool SetupEGLContext();
 		void InitialTriangle();
 
-		PlatformModule m_platformModule;
-		InputModule m_inputModule;
-
 		EGLDisplay m_eglDisplay{};
 		EGLConfig m_eglConfig{};
 		EGLSurface m_eglSurface{};
@@ -41,5 +39,9 @@ namespace TG
 		GLuint m_shaderProgram{};
 		GLuint m_VAO{};
 		GLuint m_VBO{};
+
+		PlatformModule m_platformModule;
+		InputModule m_inputModule;
+		// EditorModule m_editorModule;
 	};
 }

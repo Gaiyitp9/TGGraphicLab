@@ -27,6 +27,9 @@ namespace TG
         [[nodiscard]] bool GetKeyDown(Input::KeyCode key) const;
         [[nodiscard]] bool GetKeyUp(Input::KeyCode key) const;
 
+        IEventHandler<Input::Event<Input::Mouse>>& GetMouseEventHandler() { return m_mouse; }
+        IEventHandler<Input::Event<Input::Keyboard>>& GetKeyboardEventHandler() { return m_keyboard; }
+
     private:
         Input::Mouse m_mouse;
         Input::Keyboard m_keyboard;
