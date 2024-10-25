@@ -19,7 +19,7 @@ namespace TG
         Load,
     };
 
-    using NativeDisplay = HDC;
+    using NativeDeviceContext = HDC;
     using NativeWindowHandle = HWND;
 
     using KeyFunction = std::function<void(Input::KeyCode key, int scanCode, Input::Action action)>;

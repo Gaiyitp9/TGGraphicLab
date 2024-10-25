@@ -5,7 +5,7 @@
 *****************************************************************/
 #pragma once
 
-#ifdef _WIN32
+#ifdef TG_WINDOWS
 #include "Base/Windows/NativeWindow.h"
 #endif
 #include <functional>
@@ -14,8 +14,17 @@
 
 namespace TG
 {
+    // 显示接口
+    struct IVideoDisplay
+    {
+        virtual ~IVideoDisplay() = default;
+
+        [[nodiscard]] virtual NativeWindowHandle GetHandle() const noexcept = 0;
+        [[nodiscard]] virtual NativeDeviceContext GetContext() const noexcept = 0;
+    };
+
     // 窗口基类
-    class Window
+    class Window : public IVideoDisplay
     {
     public:
         Window(int x, int y, int width, int height, std::string_view name, WindowType type)
@@ -26,19 +35,20 @@ namespace TG
         Window& operator=(const Window&) = delete;
         Window(Window&&) = delete;
         Window& operator=(Window&&) = delete;
-        virtual ~Window() = default;
+        ~Window() override = default;
 
         // 轮询输入事件，需要每帧调用
         static std::optional<int> PollEvents();
+
+        [[nodiscard]] NativeWindowHandle GetHandle() const noexcept override  { return m_nativeWindow.handle; }
+        [[nodiscard]] NativeDeviceContext GetContext() const noexcept override { return m_nativeWindow.display; }
 
         [[nodiscard]] int PositionX() const noexcept { return m_posX; }
         [[nodiscard]] int PositionY() const noexcept { return m_posY; }
         [[nodiscard]] int Width() const noexcept { return m_width; }
         [[nodiscard]] int Height() const noexcept { return m_height; }
-
-        [[nodiscard]] NativeWindowHandle GetWindowHandle() const noexcept { return m_nativeWindow.handle; }
-        [[nodiscard]] NativeDisplay GetDisplay() const noexcept { return m_nativeWindow.display; }
         [[nodiscard]] bool IsDestroyed() const noexcept { return m_nativeWindow.destroyed; }
+
         void SetIcon(std::string_view iconPath) const;
         void SetPosition(int x, int y);
         void SetSize(int width, int height);

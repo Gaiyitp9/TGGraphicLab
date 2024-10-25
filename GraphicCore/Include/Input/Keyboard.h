@@ -11,7 +11,7 @@
 
 namespace TG::Input
 {
-	class Keyboard : public IEventHandler<Event<Keyboard>>
+	class Keyboard final : public IEventHandler<Event<Keyboard>>
 	{
 	public:
 		Keyboard() = default;

@@ -7,6 +7,7 @@
 
 #include "Module.h"
 #include "DynamicGles.h"
+#include "Base/Window.h"
 
 namespace TG
 {
@@ -22,17 +23,15 @@ namespace TG
 
         void Update() override;
 
+        bool PlugInVideoDisplay(const IVideoDisplay& display);
+
     private:
-        bool CreateEGLDisplay();
-        bool ChooseEGLConfig();
-        bool CreateEGLSurface();
-        bool SetupEGLContext();
         void InitialTriangle();
 
-        EGLDisplay m_eglDisplay{};
-        EGLConfig m_eglConfig{};
-        EGLSurface m_eglSurface{};
-        EGLContext m_eglContext{};
+        EGLDisplay m_eglDisplay{ nullptr };
+        EGLConfig m_eglConfig{ nullptr };
+        EGLSurface m_eglSurface{ nullptr };
+        EGLContext m_eglContext{ nullptr };
 
         GLuint m_shaderProgram{};
         GLuint m_VAO{};

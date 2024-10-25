@@ -29,6 +29,7 @@ namespace TG
     struct IEventHandler
     {
         virtual ~IEventHandler() = default;
+
         virtual void Handle(const Event& event) = 0;
     };
 
