@@ -11,25 +11,9 @@
 
 namespace TG
 {
-    EditorModule::EditorModule()
-    {
-        IMGUI_CHECKVERSION();
-        ImGui::CreateContext();
-        ImGuiIO& io = ImGui::GetIO();
-        io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
+    EditorModule::EditorModule() = default;
 
-        ImGui::StyleColorsDark();
-
-        // ImGui_ImplWin32_Init(m_platformModule.GetWindow().GetWindowHandle());
-        ImGui_ImplOpenGL3_Init();
-    }
-
-    EditorModule::~EditorModule()
-    {
-        ImGui_ImplOpenGL3_Shutdown();
-        ImGui_ImplWin32_Shutdown();
-        ImGui::DestroyContext();
-    }
+    EditorModule::~EditorModule() = default;
 
     void EditorModule::Update()
     {

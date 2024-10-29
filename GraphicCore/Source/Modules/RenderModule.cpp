@@ -4,25 +4,78 @@
 * This code is licensed under the MIT License (MIT).			*
 *****************************************************************/
 
+#include <fstream>
 #include "Modules/RenderModule.h"
 #include "spdlog/spdlog.h"
-#include <fstream>
+#include "imgui_impl_win32.h"
+
+extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 namespace TG
 {
     RenderModule::RenderModule() = default;
     RenderModule::~RenderModule()
     {
+    	ImGui_ImplOpenGL3_Shutdown();
+    	ImGui_ImplWin32_Shutdown();
+    	ImGui::DestroyContext();
+
     	glDeleteVertexArrays(1, &m_VAO);
     	glDeleteBuffers(1, &m_VBO);
     	glDeleteProgram(m_shaderProgram);
-    	eglMakeCurrent(m_eglDisplay, EGL_NO_DISPLAY, EGL_NO_SURFACE, EGL_NO_CONTEXT);
+
+    	eglDestroySurface(m_eglDisplay, m_eglSurface);
+    	eglMakeCurrent(m_eglDisplay, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT);
+    	eglDestroyContext(m_eglDisplay, m_eglContext);
     	eglTerminate(m_eglDisplay);
     }
 
     void RenderModule::Update()
     {
+    	bool showDemoWindow = true;
+    	bool showAnotherWindow = false;
     	float clearColor[4]{ 0.2f, 0.3f, 0.3f, 1.0f };
+    	ImGuiIO& io = ImGui::GetIO();
+
+    	ImGui_ImplOpenGL3_NewFrame();
+    	ImGui_ImplWin32_NewFrame();
+    	ImGui::NewFrame();
+
+    	if (showDemoWindow)
+    		ImGui::ShowDemoWindow(&showDemoWindow);
+
+	    {
+    		static float f = 0.0f;
+    		static int counter = 0;
+
+    		ImGui::Begin("Hello World!");
+
+    		ImGui::Text("This is some useful text.");
+    		ImGui::Checkbox("Demo Window", &showDemoWindow);
+    		ImGui::Checkbox("Another Window", &showAnotherWindow);
+
+    		ImGui::SliderFloat("float", &f, 0.0f, 1.0f);
+    		ImGui::ColorEdit3("Color", clearColor);
+
+    		if (ImGui::Button("Button"))
+    			++counter;
+    		ImGui::SameLine();
+    		ImGui::Text("Counter = %d", counter);
+
+    		ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
+    		ImGui::End();
+	    }
+
+    	if (showAnotherWindow)
+    	{
+    		ImGui::Begin("Another Window", &showAnotherWindow);
+    		ImGui::Text("Hello from another window!");
+    		if (ImGui::Button("Close Me"))
+    			showAnotherWindow = false;
+    		ImGui::End();
+    	}
+
+    	ImGui::Render();
 
     	glClearColor(clearColor[0], clearColor[1], clearColor[2], clearColor[3]);
     	glClear(GL_COLOR_BUFFER_BIT);
@@ -31,6 +84,13 @@ namespace TG
     	glBindVertexArray(m_VAO);
     	glDrawArrays(GL_TRIANGLES, 0, 3);
 
+    	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
+    	ImGui::UpdatePlatformWindows();
+    	ImGui::RenderPlatformWindowsDefault();
+
+    	// 从ImGui的egl surface切换到主窗口的egl surface
+    	eglMakeCurrent(m_eglDisplay, m_eglSurface, m_eglSurface, m_eglContext);
     	eglSwapBuffers(m_eglDisplay, m_eglSurface);
     }
 
@@ -108,18 +168,51 @@ namespace TG
             return false;
         }
 
+    	// 开启垂直同步
+    	eglSwapInterval(m_eglDisplay, 1);
+
     	// 查看opengl es版本
     	auto glVersion = reinterpret_cast<char const*>(glGetString(GL_VERSION));
     	spdlog::info(glVersion);
+
+    	// 窗口程序插入ImGui处理输入事件的代码
+    	PrevWndProc = reinterpret_cast<Win32Proc>(GetWindowLongPtrW(display.GetHandle(), GWLP_WNDPROC));
+    	SetWindowLongPtrW(display.GetHandle(), GWLP_WNDPROC, reinterpret_cast<LONG_PTR>(WindowProc));
+
     	// 初始化三角形数据
     	InitialTriangle();
-    	// 开启垂直同步
-    	eglSwapInterval(m_eglDisplay, 1);
+
+    	// 初始化IMGUI
+    	IMGUI_CHECKVERSION();
+    	ImGui::CreateContext();
+    	ImGuiIO& io = ImGui::GetIO();
+    	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
+    	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+    	io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
+
+    	ImGui::StyleColorsDark();
+
+    	ImGuiStyle& style = ImGui::GetStyle();
+		style.WindowRounding = 0.0f;
+    	style.Colors[ImGuiCol_WindowBg].w = 1.0f;
+
+    	ImGui_ImplWin32_InitForOpenGL(display.GetHandle());
+    	ImGui_ImplOpenGL3_Init();
+
+    	ImGuiPlatformIO& platformIO = ImGui::GetPlatformIO();
+		IM_ASSERT(platformIO.Renderer_CreateWindow == nullptr);
+    	IM_ASSERT(platformIO.Renderer_DestroyWindow == nullptr);
+    	IM_ASSERT(platformIO.Renderer_SwapBuffers == nullptr);
+    	IM_ASSERT(platformIO.Platform_RenderWindow == nullptr);
+    	platformIO.Renderer_CreateWindow = HookRendererCreateWindow;
+    	platformIO.Renderer_DestroyWindow = HookRendererDestroyWindow;
+    	platformIO.Renderer_SwapBuffers = HookRendererSwapBuffers;
+    	platformIO.Platform_RenderWindow = HookPlatformRenderWindow;
 
         return true;
     }
 
-    void RenderModule::InitialTriangle()
+	void RenderModule::InitialTriangle()
     {
         float vertices[] = {
 			-0.5f, -0.5f, 0.0f,
@@ -191,4 +284,62 @@ namespace TG
 		glDeleteShader(vertexShader);
 		glDeleteShader(fragmentShader);
     }
+
+	void RenderModule::HookRendererCreateWindow(ImGuiViewport* viewport)
+    {
+    	IM_ASSERT(viewport->RendererUserData == nullptr);
+
+    	auto* data = TG_NEW(EGLData);
+    	// 创建EGLSurface
+    	EGLSurface eglSurface = eglCreateWindowSurface(m_eglDisplay, m_eglConfig,
+    		static_cast<HWND>(viewport->PlatformHandle), nullptr);
+    	if (eglSurface == EGL_NO_SURFACE)
+    	{
+    		spdlog::error("Failed to create EGL surface: {:#x}", eglGetError());
+    		return;
+    	}
+
+    	data->display = m_eglDisplay;
+    	data->context = m_eglContext;
+    	data->surface = eglSurface;
+    	viewport->RendererUserData = data;
+    }
+
+	void RenderModule::HookRendererDestroyWindow(ImGuiViewport* viewport)
+	{
+		if (viewport->RendererUserData != nullptr)
+		{
+			auto* data = static_cast<EGLData *>(viewport->RendererUserData);
+			eglMakeCurrent(data->display, EGL_NO_DISPLAY, EGL_NO_SURFACE, EGL_NO_CONTEXT);
+			eglDestroySurface(data->display, data->surface);
+			delete data;
+			viewport->RendererUserData = nullptr;
+		}
+	}
+
+	void RenderModule::HookPlatformRenderWindow(ImGuiViewport* viewport, void*)
+	{
+		if (auto* data = static_cast<EGLData*>(viewport->RendererUserData))
+			eglMakeCurrent(data->display, data->surface, data->surface, data->context);
+	}
+
+	void RenderModule::HookRendererSwapBuffers(ImGuiViewport* viewport, void*)
+	{
+    	if (auto* data = static_cast<EGLData*>(viewport->RendererUserData))
+    		eglSwapBuffers(data->display, data->surface);
+	}
+
+	RenderModule::Win32Proc RenderModule::PrevWndProc = nullptr;
+	EGLDisplay RenderModule::m_eglDisplay = nullptr;
+	EGLConfig RenderModule::m_eglConfig = nullptr;
+	EGLContext RenderModule::m_eglContext = nullptr;
+	LRESULT RenderModule::WindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
+	{
+		assert(PrevWndProc != nullptr);
+
+		if (ImGui_ImplWin32_WndProcHandler(hwnd, msg, wParam, lParam))
+			return true;
+
+		return PrevWndProc(hwnd, msg, wParam, lParam);
+	}
 }

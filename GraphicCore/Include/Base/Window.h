@@ -41,7 +41,7 @@ namespace TG
         static std::optional<int> PollEvents();
 
         [[nodiscard]] NativeWindowHandle GetHandle() const noexcept override  { return m_nativeWindow.handle; }
-        [[nodiscard]] NativeDeviceContext GetContext() const noexcept override { return m_nativeWindow.display; }
+        [[nodiscard]] NativeDeviceContext GetContext() const noexcept override { return m_nativeWindow.deviceContext; }
 
         [[nodiscard]] int PositionX() const noexcept { return m_posX; }
         [[nodiscard]] int PositionY() const noexcept { return m_posY; }

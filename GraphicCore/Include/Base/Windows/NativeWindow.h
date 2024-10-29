@@ -45,7 +45,7 @@ namespace TG
 
         std::string name;
         HWND    handle{ nullptr };
-        HDC     display{ nullptr };
+        HDC     deviceContext{ nullptr };
         bool    destroyed{ false };
 
         std::function<void(Input::KeyCode key, int scanCode, Input::Action action)> keyFunction;

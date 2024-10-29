@@ -40,12 +40,12 @@ namespace TG
 		if (handle == nullptr)
 			CheckLastError();
 
-		display = GetDC(handle);
+		deviceContext = GetDC(handle);
 	}
 
 	NativeWindow::~NativeWindow()
 	{
-		ReleaseDC(handle, display);
+		ReleaseDC(handle, deviceContext);
 	}
 
 	void NativeWindow::SetIcon(std::string_view iconPath) const
