@@ -1,19 +1,19 @@
 cmake_minimum_required(VERSION 3.29)
 
 # 设置toolchain文件，使用vcpkg管理部分三方库
-if (DEFINED ENV{VCPKG_ROOT})
-	set(VCPKG_ROOT $ENV{VCPKG_ROOT} CACHE PATH "vcpkg root path")
-else()
-	set(VCPKG_ROOT "" CACHE PATH "vcpkg root path")
-endif()
-
-if (EXISTS ${VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake)
-	message(STATUS "vcpkg root path: ${VCPKG_ROOT}")
-else()
-	message(FATAL_ERROR "VCPKG_ROOT is not a valid vcpkg root path")
-endif()
-
-set(CMAKE_TOOLCHAIN_FILE "${VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake")
+#if (DEFINED ENV{VCPKG_ROOT})
+#	set(VCPKG_ROOT $ENV{VCPKG_ROOT} CACHE PATH "vcpkg root path")
+#else()
+#	set(VCPKG_ROOT "" CACHE PATH "vcpkg root path")
+#endif()
+#
+#if (EXISTS ${VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake)
+#	message(STATUS "vcpkg root path: ${VCPKG_ROOT}")
+#else()
+#	message(FATAL_ERROR "VCPKG_ROOT is not a valid vcpkg root path")
+#endif()
+#
+#set(CMAKE_TOOLCHAIN_FILE "${VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake")
 
 project(TGGraphicLab)
 
