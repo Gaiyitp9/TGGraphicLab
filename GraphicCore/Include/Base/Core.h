@@ -12,7 +12,7 @@
 
 #ifdef _DEBUG
 #include <crtdbg.h>
-#define TG_NEW(TYPE) new(_NORMAL_BLOCK, __FILE__, __LINE__) TYPE
+#define TG_NEW new(_NORMAL_BLOCK, __FILE__, __LINE__)
 #else
 #define TG_NEW new
 #endif

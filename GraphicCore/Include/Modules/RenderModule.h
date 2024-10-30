@@ -8,17 +8,9 @@
 #include "Module.h"
 #include "DynamicGles.h"
 #include "Base/Window.h"
-#include "imgui_impl_opengl3.h"
 
 namespace TG
 {
-    struct EGLData
-    {
-        EGLDisplay display;
-        EGLContext context;
-        EGLSurface surface;
-    };
-
     class RenderModule final : public Module
     {
     public:
@@ -36,18 +28,9 @@ namespace TG
     private:
         void InitialTriangle();
 
-        static void HookRendererCreateWindow(ImGuiViewport* viewport);
-        static void HookRendererDestroyWindow(ImGuiViewport* viewport);
-        static void HookPlatformRenderWindow(ImGuiViewport* viewport, void*);
-        static void HookRendererSwapBuffers(ImGuiViewport* viewport, void*);
-
-        using Win32Proc = LRESULT (WINAPI*)(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
-        static LRESULT WINAPI WindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
-        static Win32Proc PrevWndProc;
-
-        static EGLDisplay m_eglDisplay;
-        static EGLConfig m_eglConfig;
-        static EGLContext m_eglContext;
+        EGLDisplay m_eglDisplay{ nullptr };
+        EGLConfig m_eglConfig{ nullptr };
+        EGLContext m_eglContext{ nullptr };
         EGLSurface m_eglSurface{ nullptr };
 
         GLuint m_shaderProgram{};

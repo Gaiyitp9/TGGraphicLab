@@ -8,6 +8,7 @@
 #include "Modules/RenderModule.h"
 #include "spdlog/spdlog.h"
 #include "imgui_impl_win32.h"
+#include "imgui_impl_opengl3.h"
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
@@ -94,6 +95,25 @@ namespace TG
     	eglSwapBuffers(m_eglDisplay, m_eglSurface);
     }
 
+	using Win32Proc = LRESULT (WINAPI*)(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
+	static Win32Proc gPrevWndProc = nullptr;
+	static LRESULT ImGuiWindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
+	{
+		assert(gPrevWndProc != nullptr);
+
+		if (ImGui_ImplWin32_WndProcHandler(hwnd, msg, wParam, lParam))
+			return true;
+
+		return gPrevWndProc(hwnd, msg, wParam, lParam);
+	}
+
+	struct EGLData
+	{
+		EGLDisplay display;
+		EGLContext context;
+		EGLSurface surface;
+	};
+
     bool RenderModule::PlugInVideoDisplay(const IVideoDisplay& display)
     {
         // 初始化egl
@@ -176,11 +196,8 @@ namespace TG
     	spdlog::info(glVersion);
 
     	// 窗口程序插入ImGui处理输入事件的代码
-    	PrevWndProc = reinterpret_cast<Win32Proc>(GetWindowLongPtrW(display.GetHandle(), GWLP_WNDPROC));
-    	SetWindowLongPtrW(display.GetHandle(), GWLP_WNDPROC, reinterpret_cast<LONG_PTR>(WindowProc));
-
-    	// 初始化三角形数据
-    	InitialTriangle();
+    	gPrevWndProc = reinterpret_cast<Win32Proc>(GetWindowLongPtrW(display.GetHandle(), GWLP_WNDPROC));
+    	SetWindowLongPtrW(display.GetHandle(), GWLP_WNDPROC, reinterpret_cast<LONG_PTR>(ImGuiWindowProc));
 
     	// 初始化IMGUI
     	IMGUI_CHECKVERSION();
@@ -200,14 +217,67 @@ namespace TG
     	ImGui_ImplOpenGL3_Init();
 
     	ImGuiPlatformIO& platformIO = ImGui::GetPlatformIO();
-		IM_ASSERT(platformIO.Renderer_CreateWindow == nullptr);
-    	IM_ASSERT(platformIO.Renderer_DestroyWindow == nullptr);
-    	IM_ASSERT(platformIO.Renderer_SwapBuffers == nullptr);
-    	IM_ASSERT(platformIO.Platform_RenderWindow == nullptr);
-    	platformIO.Renderer_CreateWindow = HookRendererCreateWindow;
-    	platformIO.Renderer_DestroyWindow = HookRendererDestroyWindow;
-    	platformIO.Renderer_SwapBuffers = HookRendererSwapBuffers;
-    	platformIO.Platform_RenderWindow = HookPlatformRenderWindow;
+		assert(platformIO.Renderer_CreateWindow == nullptr);
+    	assert(platformIO.Renderer_DestroyWindow == nullptr);
+    	assert(platformIO.Renderer_SwapBuffers == nullptr);
+    	assert(platformIO.Platform_RenderWindow == nullptr);
+    	platformIO.Renderer_CreateWindow = [](ImGuiViewport* viewport) {
+    		assert(viewport->RendererUserData == nullptr);
+
+    		auto* data = TG_NEW EGLData;
+    		data->display = eglGetCurrentDisplay();
+    		data->context = eglGetCurrentContext();
+
+    		// ChooseEGLConfig
+			EGLConfig eglConfig;
+    		const EGLint configurationAttributes[] = {
+    			EGL_SURFACE_TYPE, EGL_WINDOW_BIT,
+				EGL_RENDERABLE_TYPE, EGL_OPENGL_ES3_BIT,
+				EGL_NONE
+			};
+    		EGLint numConfigs;
+    		if (eglChooseConfig(data->display, configurationAttributes, &eglConfig, 1, &numConfigs) != GL_TRUE)
+    		{
+    			spdlog::error("eglChooseConfig failed: {:#x}", eglGetError());
+    			return;
+    		}
+    		if (numConfigs != 1)
+    		{
+    			spdlog::error("eglChooseConfig return no config");
+    			return;
+    		}
+    		// 创建EGLSurface
+    		data->surface = eglCreateWindowSurface(data->display, eglConfig,
+				static_cast<HWND>(viewport->PlatformHandle), nullptr);
+    		if (data->surface == EGL_NO_SURFACE)
+    		{
+    			spdlog::error("Failed to create EGL surface: {:#x}", eglGetError());
+    			return;
+    		}
+
+    		viewport->RendererUserData = data;
+    	};
+    	platformIO.Renderer_DestroyWindow = [](ImGuiViewport* viewport) {
+    		if (viewport->RendererUserData != nullptr)
+    		{
+    			auto* data = static_cast<EGLData *>(viewport->RendererUserData);
+    			eglMakeCurrent(data->display, EGL_NO_DISPLAY, EGL_NO_SURFACE, EGL_NO_CONTEXT);
+    			eglDestroySurface(data->display, data->surface);
+    			delete data;
+    			viewport->RendererUserData = nullptr;
+    		}
+    	};
+    	platformIO.Renderer_SwapBuffers = [](ImGuiViewport* viewport, void*) {
+    		if (auto* data = static_cast<EGLData*>(viewport->RendererUserData))
+    			eglSwapBuffers(data->display, data->surface);
+    	};
+    	platformIO.Platform_RenderWindow = [](ImGuiViewport* viewport, void*) {
+    		if (auto* data = static_cast<EGLData*>(viewport->RendererUserData))
+    			eglMakeCurrent(data->display, data->surface, data->surface, data->context);
+    	};
+
+    	// 初始化三角形数据
+    	InitialTriangle();
 
         return true;
     }
@@ -284,62 +354,4 @@ namespace TG
 		glDeleteShader(vertexShader);
 		glDeleteShader(fragmentShader);
     }
-
-	void RenderModule::HookRendererCreateWindow(ImGuiViewport* viewport)
-    {
-    	IM_ASSERT(viewport->RendererUserData == nullptr);
-
-    	auto* data = TG_NEW(EGLData);
-    	// 创建EGLSurface
-    	EGLSurface eglSurface = eglCreateWindowSurface(m_eglDisplay, m_eglConfig,
-    		static_cast<HWND>(viewport->PlatformHandle), nullptr);
-    	if (eglSurface == EGL_NO_SURFACE)
-    	{
-    		spdlog::error("Failed to create EGL surface: {:#x}", eglGetError());
-    		return;
-    	}
-
-    	data->display = m_eglDisplay;
-    	data->context = m_eglContext;
-    	data->surface = eglSurface;
-    	viewport->RendererUserData = data;
-    }
-
-	void RenderModule::HookRendererDestroyWindow(ImGuiViewport* viewport)
-	{
-		if (viewport->RendererUserData != nullptr)
-		{
-			auto* data = static_cast<EGLData *>(viewport->RendererUserData);
-			eglMakeCurrent(data->display, EGL_NO_DISPLAY, EGL_NO_SURFACE, EGL_NO_CONTEXT);
-			eglDestroySurface(data->display, data->surface);
-			delete data;
-			viewport->RendererUserData = nullptr;
-		}
-	}
-
-	void RenderModule::HookPlatformRenderWindow(ImGuiViewport* viewport, void*)
-	{
-		if (auto* data = static_cast<EGLData*>(viewport->RendererUserData))
-			eglMakeCurrent(data->display, data->surface, data->surface, data->context);
-	}
-
-	void RenderModule::HookRendererSwapBuffers(ImGuiViewport* viewport, void*)
-	{
-    	if (auto* data = static_cast<EGLData*>(viewport->RendererUserData))
-    		eglSwapBuffers(data->display, data->surface);
-	}
-
-	RenderModule::Win32Proc RenderModule::PrevWndProc = nullptr;
-	EGLDisplay RenderModule::m_eglDisplay = nullptr;
-	EGLConfig RenderModule::m_eglConfig = nullptr;
-	EGLContext RenderModule::m_eglContext = nullptr;
-	LRESULT RenderModule::WindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
-	{
-		assert(PrevWndProc != nullptr);
-
-		if (ImGui_ImplWin32_WndProcHandler(hwnd, msg, wParam, lParam))
-			return true;
-
-		return PrevWndProc(hwnd, msg, wParam, lParam);
-	}
 }
