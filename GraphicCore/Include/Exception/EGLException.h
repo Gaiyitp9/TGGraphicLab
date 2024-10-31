@@ -5,21 +5,16 @@
 *****************************************************************/
 #pragma once
 
-#include <stacktrace>
+#include "BaseException.h"
 
 namespace TG
 {
-    class BaseException : public std::exception
+    class EGLException final : public BaseException
     {
     public:
-        BaseException() = default;
-        explicit BaseException(std::string_view description);
-        ~BaseException() override = default;
+        explicit EGLException(std::string_view description = "");
+        ~EGLException() override = default;
 
         [[nodiscard]] char const* what() const override;
-
-    protected:
-        std::string m_whatBuffer;
-        std::stacktrace m_stackTrace{ std::stacktrace::current() };
     };
 }

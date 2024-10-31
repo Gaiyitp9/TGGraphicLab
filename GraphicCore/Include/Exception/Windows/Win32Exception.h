@@ -13,14 +13,10 @@ namespace TG
 	class Win32Exception final : public BaseException
 	{
 	public:
-		explicit Win32Exception(HRESULT hr, std::string_view description);
-		~Win32Exception() override;
+		Win32Exception(HRESULT hr, std::string_view description);
+		~Win32Exception() override = default;
 
 		[[nodiscard]] char const* what() const override;
-
-	private:
-		std::stacktrace m_stackTrace{std::stacktrace::current()};
-		std::string m_whatBuffer;
 	};
 
     inline void CheckHResult(HRESULT hr, std::string_view description = "")

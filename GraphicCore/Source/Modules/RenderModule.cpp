@@ -6,7 +6,9 @@
 
 #include <fstream>
 #include "Modules/RenderModule.h"
+#include "Base/Utility.h"
 #include "spdlog/spdlog.h"
+#include "Exception/EGLException.h"
 #include "imgui_impl_win32.h"
 #include "imgui_impl_opengl3.h"
 
@@ -114,7 +116,7 @@ namespace TG
 		EGLSurface surface;
 	};
 
-    bool RenderModule::PlugInVideoDisplay(const IVideoDisplay& display)
+    void RenderModule::PlugInVideoDisplay(const IVideoDisplay& display)
     {
         // 初始化egl
         // 1. CreateEGLDisplay
@@ -122,74 +124,58 @@ namespace TG
         if (m_eglDisplay == EGL_NO_DISPLAY)
             m_eglDisplay = eglGetDisplay(EGL_DEFAULT_DISPLAY);
         if (m_eglDisplay == EGL_NO_DISPLAY)
-        {
-            spdlog::error("Failed to get an EGLDisplay");
-            return false;
-        }
+        	throw BaseException("Failed to get an EGLDisplay");
 
         EGLint eglMajorVersion = 0;
         EGLint eglMinorVersion = 0;
         if (eglInitialize(m_eglDisplay, &eglMajorVersion, &eglMinorVersion) != EGL_TRUE)
-        {
-            spdlog::error("Failed to initialize EGLDisplay: {:#x}", eglGetError());
-            return false;
-        }
-        spdlog::info("EGL Version: {}.{}", eglMajorVersion, eglMinorVersion);
+        	throw EGLException("Failed to initialize EGLDisplay");
+
+    	const char* version = eglQueryString(m_eglDisplay, EGL_VERSION);
+    	spdlog::info("EGL version: {}", version);
+
+    	const char* extensions = eglQueryString(m_eglDisplay, EGL_EXTENSIONS);
+    	std::vector<std::string_view> splitExtensions = SplitString(extensions, " ");
+    	spdlog::info("EGL extensions:");
+    	for (std::string_view splitExtension : splitExtensions)
+    		spdlog::info("{}", splitExtension);
 
         if (eglBindAPI(EGL_OPENGL_ES_API) != EGL_TRUE)
-        {
-            spdlog::error("Failed to bind EGL OpenGL ES: {:#x}", eglGetError());
-            return false;
-        }
+        	throw EGLException("Failed to bind EGL_OPENGL_ES_API");
 
         // 2. ChooseEGLConfig
-        const EGLint configurationAttributes[] = {
-            EGL_SURFACE_TYPE, EGL_WINDOW_BIT,
-            EGL_RENDERABLE_TYPE, EGL_OPENGL_ES3_BIT,
-            EGL_NONE
-        };
-
-        EGLint numConfigs;
-        if (eglChooseConfig(m_eglDisplay, configurationAttributes, &m_eglConfig, 1, &numConfigs) != GL_TRUE)
-        {
-            spdlog::error("eglChooseConfig failed: {:#x}", eglGetError());
-            return false;
-        }
-        if (numConfigs != 1)
-        {
-            spdlog::error("eglChooseConfig return no config");
-            return false;
-        }
+    	const EGLint configurationAttributes[] = {
+        	EGL_SURFACE_TYPE, EGL_WINDOW_BIT,
+			EGL_RENDERABLE_TYPE, EGL_OPENGL_ES3_BIT,
+			EGL_NONE
+		};
+        EGLint numConfigs = 0;
+    	EGLConfig eglConfig;
+        if (eglChooseConfig(m_eglDisplay, configurationAttributes, &eglConfig, 1, &numConfigs) != GL_TRUE)
+        	throw EGLException("Failed to choose EGLConfig");
 
         // 3. Create EGL Surface
-        m_eglSurface = eglCreateWindowSurface(m_eglDisplay, m_eglConfig, display.GetHandle(), nullptr);
+        m_eglSurface = eglCreateWindowSurface(m_eglDisplay, eglConfig, display.GetHandle(), nullptr);
         if (m_eglSurface == EGL_NO_SURFACE)
-        {
-            spdlog::error("Failed to create EGL surface: {:#x}", eglGetError());
-            return false;
-        }
+        	throw EGLException("Failed to create EGLSurface");
 
         // 4. Setup EGL context
-        EGLint contextAttributes[] = {
-            EGL_CONTEXT_MAJOR_VERSION, 3,
-            EGL_CONTEXT_MINOR_VERSION, 2,
-            EGL_NONE
-        };
-        m_eglContext = eglCreateContext(m_eglDisplay, m_eglConfig, nullptr, contextAttributes);
+    	const EGLint contextAttributes[] = {
+        	EGL_CONTEXT_MAJOR_VERSION, 3,
+			EGL_CONTEXT_MINOR_VERSION, 2,
+    		EGL_CONTEXT_FLAGS_KHR, EGL_CONTEXT_OPENGL_DEBUG_BIT_KHR,
+			EGL_NONE
+		};
+        m_eglContext = eglCreateContext(m_eglDisplay, eglConfig, EGL_NO_CONTEXT, contextAttributes);
         if (m_eglContext == EGL_NO_CONTEXT)
-        {
-            spdlog::error("Failed to create EGL context: {:#x}", eglGetError());
-            return false;
-        }
+        	throw EGLException("Failed to create EGLContext");
 
         if (eglMakeCurrent(m_eglDisplay, m_eglSurface, m_eglSurface, m_eglContext) != EGL_TRUE)
-        {
-            spdlog::error("Failed to make EGL current: {:#x}", eglGetError());
-            return false;
-        }
+        	throw EGLException("Failed to make EGL current");
 
     	// 开启垂直同步
-    	eglSwapInterval(m_eglDisplay, 1);
+    	if (eglSwapInterval(m_eglDisplay, 1) != EGL_TRUE)
+    		throw EGLException("Failed to set EGL swap interval");
 
     	// 查看opengl es版本
     	auto glVersion = reinterpret_cast<char const*>(glGetString(GL_VERSION));
@@ -229,13 +215,13 @@ namespace TG
     		data->context = eglGetCurrentContext();
 
     		// ChooseEGLConfig
-			EGLConfig eglConfig;
     		const EGLint configurationAttributes[] = {
     			EGL_SURFACE_TYPE, EGL_WINDOW_BIT,
 				EGL_RENDERABLE_TYPE, EGL_OPENGL_ES3_BIT,
 				EGL_NONE
 			};
     		EGLint numConfigs;
+			EGLConfig eglConfig;
     		if (eglChooseConfig(data->display, configurationAttributes, &eglConfig, 1, &numConfigs) != GL_TRUE)
     		{
     			spdlog::error("eglChooseConfig failed: {:#x}", eglGetError());
@@ -278,8 +264,6 @@ namespace TG
 
     	// 初始化三角形数据
     	InitialTriangle();
-
-        return true;
     }
 
 	void RenderModule::InitialTriangle()

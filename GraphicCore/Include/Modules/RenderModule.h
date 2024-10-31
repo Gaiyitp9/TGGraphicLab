@@ -23,15 +23,14 @@ namespace TG
 
         void Update() override;
 
-        bool PlugInVideoDisplay(const IVideoDisplay& display);
+        void PlugInVideoDisplay(const IVideoDisplay& display);
 
     private:
         void InitialTriangle();
 
-        EGLDisplay m_eglDisplay{ nullptr };
-        EGLConfig m_eglConfig{ nullptr };
-        EGLContext m_eglContext{ nullptr };
-        EGLSurface m_eglSurface{ nullptr };
+        EGLDisplay m_eglDisplay{ EGL_NO_DISPLAY };
+        EGLContext m_eglContext{ EGL_NO_CONTEXT };
+        EGLSurface m_eglSurface{ EGL_NO_SURFACE };
 
         GLuint m_shaderProgram{};
         GLuint m_VAO{};

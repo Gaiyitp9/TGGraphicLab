@@ -38,11 +38,9 @@ namespace TG
 
 		m_whatBuffer = std::format("Exception type: Windows API Exception\n"
 								 "HRESULT: {:#010x}\nError Message: {}"
-								 "{}\n\n"
+								 "{}"
 								 "{}\n", errorCode, errorMsg, description, m_stackTrace);
 	}
-
-	Win32Exception::~Win32Exception() = default;
 
 	char const* Win32Exception::what() const
 	{
