@@ -5,7 +5,7 @@
 *****************************************************************/
 
 #include "Exception/Windows/Win32Exception.h"
-#include "Base/Windows/Auxiliary.h"
+#include "Base/Utility.h"
 #include <format>
 
 namespace TG
@@ -34,7 +34,7 @@ namespace TG
 		wchar_t msgBuf[256];
 		DWORD msgLen = FormatMessageW(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
 									  nullptr, errorCode, LANG_SYSTEM_DEFAULT, msgBuf, 256, nullptr);
-		std::string errorMsg = msgLen > 0 ? Platform::Utf16ToUtf8(msgBuf) : "Unidentified error code";
+		std::string errorMsg = msgLen > 0 ? WideCharsToMultiBytes(msgBuf) : "Unidentified error code";
 
 		m_whatBuffer = std::format("Exception type: Windows API Exception\n"
 								 "HRESULT: {:#010x}\nError Message: {}"

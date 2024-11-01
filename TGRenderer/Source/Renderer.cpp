@@ -16,6 +16,9 @@ namespace TG
 		m_platformModule.AddEventListener(m_inputModule.GetKeyboardEventHandler());
 		// 渲染模块接入窗口
 		m_renderModule.PlugInVideoDisplay(m_platformModule.GetWindow());
+
+		// std::string_view mbstr = "z\u00df\u6c34\U0001f34c";
+		// std::wstring_view wcstr = L"z\u00df\u6c34\U0001f34c";
 	}
 
 	Renderer::~Renderer() = default;

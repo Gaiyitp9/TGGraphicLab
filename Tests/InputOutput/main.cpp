@@ -1,5 +1,4 @@
 #include <print>
-#include <iostream>
 #include <thread>
 #include <chrono>
 #include <corecrt_io.h>
@@ -27,16 +26,19 @@ int main()
     // For some systems, this mode provides line buffering. However,
     // for Win32, the behavior is the same as _IOFBF - Full Buffering.
     // https://learn.microsoft.com/en-us/cpp/c-runtime-library/reference/setvbuf?view=msvc-170
-    // setvbuf(stdout, NULL, _IOFBF, 1024);
-    setvbuf(stdout, nullptr, _IONBF, 0);
+    // setvbuf(stdout, NULL, _IOLBF, 1024);
+    setvbuf(stdout, NULL, _IOFBF, 1024);
+    // setvbuf(stdout, nullptr, _IONBF, 0);
 
-    if (IsConsoleStream(stdout)) {
-        std::cout << "stdout is connected to a console.\n";
-    } else {
-        std::cout << "stdout is not connected to a console.\n";
-    }
+    if (IsConsoleStream(stdout))
+        std::println("stdout is connected to a console.");
+    else
+        std::println("stdout is not connected to a console.");
 
-    std::cout << "Hello, without flush";
+    // 测试发现Clion的控制台可以设置buffer模式
+    // Windows的cmd和powershell无法设置，默认没有buffering，即_IONBF
+    std::println("Hello, with flush");
+    std::fflush(stdout);
     std::print("Hello, without flush");
     std::this_thread::sleep_for(std::chrono::seconds(2));
     return 0;
