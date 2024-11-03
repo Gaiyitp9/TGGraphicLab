@@ -25,25 +25,45 @@ namespace TG
 
     std::wstring MultiBytesToWideChars(std::string_view str)
     {
-        std::setlocale(LC_ALL, ".utf-8");
-        std::size_t len = 0;
-        mbstowcs_s(&len, nullptr, 0, str.data(), 0);
-        std::wstring wstr(len, L' ');
-        mbstowcs_s(&len, wstr.data(), len, str.data(), len);
+        std::setlocale(LC_ALL, "zh_CN.utf-8");
+        // Windows上用安全的版本，Linux没有这个版本，所以用旧版本
+#ifdef TG_WINDOWS
+        std::size_t length = 0;
+        mbstowcs_s(&length, nullptr, 0, str.data(), 0);
+        auto* data = static_cast<wchar_t*>(malloc(length * sizeof(wchar_t)));
+        mbstowcs_s(&length, data, length, str.data(), length);
+#else
+        // 计算出的长度不包含'/0'，所以要加1
+        std::size_t length = std::mbstowcs(nullptr, str.data(), 0) + 1;
+        auto* data = static_cast<wchar_t*>(malloc(length * sizeof(wchar_t)));
+        std::mbstowcs(data, str.data(), length);
+#endif
+        std::wstring wstr(data);
+        free(data);
         return wstr;
     }
 
     std::string WideCharsToMultiBytes(std::wstring_view wstr)
     {
-        std::setlocale(LC_ALL, ".utf-8");
-        std::size_t len = 0;
-        wcstombs_s(&len, nullptr, 0, wstr.data(), 0);
-        std::string str(len, ' ');
-        wcstombs_s(&len, str.data(), len, wstr.data(), len);
+        std::setlocale(LC_ALL, "zh_CN.utf-8");
+        // Windows上用安全的版本，Linux没有这个版本，所以用旧版本
+#ifdef TG_WINDOWS
+        std::size_t length = 0;
+        wcstombs_s(&length, nullptr, 0, wstr.data(), 0);
+        auto* data = static_cast<char*>(malloc(length * sizeof(char)));
+        wcstombs_s(&length, data, length, wstr.data(), length);
+#else
+        // 计算出的长度不包含'/0'，所以要加1
+        std::size_t length = std::wcstombs(nullptr, wstr.data(), 0) + 1;
+        auto* data = static_cast<char*>(malloc(length * sizeof(char)));
+        std::wcstombs(data, wstr.data(), length);
+#endif
+        std::string str(data);
+        free(data);
         return str;
     }
 
-    // 这里仅留作记录
+    // Win32 API 窄字符转宽字符。这里仅留作记录。
     // std::wstring Utf8ToUtf16(std::string_view str)
     // {
     //     int length = MultiByteToWideChar(CP_UTF8, 0, str.data(), -1, nullptr, 0);

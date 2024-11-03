@@ -8,7 +8,6 @@
 #include "Exception/Windows/Win32Exception.h"
 #include "Base/Utility.h"
 #include <memory_resource>
-#include <chrono>
 
 namespace TG
 {
@@ -488,17 +487,4 @@ namespace TG
 
     // 在main之前调用RegisterWindow函数
     [[maybe_unused]] static char placeHolder = RegisterWindow();
-
-	// 在Windows平台上调用std::chrono::current_zone()后会产生内存泄漏
-	// https://developercommunity.visualstudio.com/t/std::chrono::current_zone-produces-a/1513362
-	class ChronoMemoryLeakHelper
-	{
-	public:
-		ChronoMemoryLeakHelper() { std::ignore = std::chrono::current_zone(); }
-		// 解决chrono中current_zone在Windows平台上内存泄漏问题 https://github.com/microsoft/STL/issues/2504
-		// 注意，不推荐直接调用析构函数。这里用这种方法移除这个内存泄漏报告，因为在Windows平台上开启CRT memory checking时
-		// tzdb会泄漏内存，具体原因看帖子，
-		~ChronoMemoryLeakHelper() { std::chrono::get_tzdb_list().~tzdb_list(); }
-	};
-	static ChronoMemoryLeakHelper gIgnore;
 }

@@ -5,8 +5,8 @@
 *****************************************************************/
 
 #include <fstream>
+#include <regex>
 #include "Modules/RenderModule.h"
-#include "Base/Utility.h"
 #include "spdlog/spdlog.h"
 #include "Exception/EGLException.h"
 #include "imgui_impl_win32.h"
@@ -35,8 +35,6 @@ namespace TG
 
     void RenderModule::Update()
     {
-    	bool showDemoWindow = true;
-    	bool showAnotherWindow = false;
     	float clearColor[4]{ 0.2f, 0.3f, 0.3f, 1.0f };
     	ImGuiIO& io = ImGui::GetIO();
 
@@ -44,8 +42,8 @@ namespace TG
     	ImGui_ImplWin32_NewFrame();
     	ImGui::NewFrame();
 
-    	if (showDemoWindow)
-    		ImGui::ShowDemoWindow(&showDemoWindow);
+    	if (m_showDemoWindow)
+    		ImGui::ShowDemoWindow(&m_showDemoWindow);
 
 	    {
     		static float f = 0.0f;
@@ -54,8 +52,8 @@ namespace TG
     		ImGui::Begin("Hello World!");
 
     		ImGui::Text("This is some useful text.");
-    		ImGui::Checkbox("Demo Window", &showDemoWindow);
-    		ImGui::Checkbox("Another Window", &showAnotherWindow);
+    		ImGui::Checkbox("Demo Window", &m_showDemoWindow);
+    		ImGui::Checkbox("Another Window", &m_showAnotherWindow);
 
     		ImGui::SliderFloat("float", &f, 0.0f, 1.0f);
     		ImGui::ColorEdit3("Color", clearColor);
@@ -69,12 +67,12 @@ namespace TG
     		ImGui::End();
 	    }
 
-    	if (showAnotherWindow)
+    	if (m_showAnotherWindow)
     	{
-    		ImGui::Begin("Another Window", &showAnotherWindow);
+    		ImGui::Begin("Another Window", &m_showAnotherWindow);
     		ImGui::Text("Hello from another window!");
     		if (ImGui::Button("Close Me"))
-    			showAnotherWindow = false;
+    			m_showAnotherWindow = false;
     		ImGui::End();
     	}
 
@@ -135,10 +133,9 @@ namespace TG
     	spdlog::info("EGL version: {}", version);
 
     	const char* extensions = eglQueryString(m_eglDisplay, EGL_EXTENSIONS);
-    	std::vector<std::string_view> splitExtensions = SplitString(extensions, " ");
-    	spdlog::info("EGL extensions:");
-    	for (std::string_view splitExtension : splitExtensions)
-    		spdlog::info("{}", splitExtension);
+    	std::regex whiteRex("\\s");
+    	std::string outputExtensions = std::regex_replace(extensions, whiteRex, "\n");
+    	spdlog::info("EGL extensions:\n{}", outputExtensions);
 
         if (eglBindAPI(EGL_OPENGL_ES_API) != EGL_TRUE)
         	throw EGLException("Failed to bind EGL_OPENGL_ES_API");
@@ -247,7 +244,6 @@ namespace TG
     		if (viewport->RendererUserData != nullptr)
     		{
     			auto* data = static_cast<EGLData *>(viewport->RendererUserData);
-    			eglMakeCurrent(data->display, EGL_NO_DISPLAY, EGL_NO_SURFACE, EGL_NO_CONTEXT);
     			eglDestroySurface(data->display, data->surface);
     			delete data;
     			viewport->RendererUserData = nullptr;
@@ -280,7 +276,7 @@ namespace TG
 		// 把顶点数据传入显存
 		glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
 		glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), reinterpret_cast<void*>(0));
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), nullptr);
 		glEnableVertexAttribArray(0);
 		glBindVertexArray(0);
 

@@ -35,5 +35,8 @@ namespace TG
         GLuint m_shaderProgram{};
         GLuint m_VAO{};
         GLuint m_VBO{};
+
+        bool m_showDemoWindow{ true };
+        bool m_showAnotherWindow{ false };
     };
 }
