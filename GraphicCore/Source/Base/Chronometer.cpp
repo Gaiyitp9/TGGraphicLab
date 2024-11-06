@@ -94,6 +94,6 @@ namespace TG
 		// tzdb会泄漏内存，具体原因看帖子，
 		~ChronoMemoryLeakHelper() { std::chrono::get_tzdb_list().~tzdb_list(); }
 	};
-	static ChronoMemoryLeakHelper gIgnore;
+	static ChronoMemoryLeakHelper g_ignore;
 #endif
 }

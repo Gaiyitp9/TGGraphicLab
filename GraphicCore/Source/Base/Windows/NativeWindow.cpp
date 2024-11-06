@@ -75,7 +75,7 @@ namespace TG
 	}
 
 	// 用于窗口消息字符串的内存池，因为打印窗口消息需要频繁创建string，小字符串优化(SSO)不适用，所以使用内存池避免频繁分配内存
-	static std::pmr::unsynchronized_pool_resource gPool;
+	static std::pmr::unsynchronized_pool_resource g_pool;
     // 窗口消息转成字符串
     static std::pmr::string WindowMessageToString(UINT msg, WPARAM wp, LPARAM lp)
     {
@@ -486,5 +486,5 @@ namespace TG
     }
 
     // 在main之前调用RegisterWindow函数
-    [[maybe_unused]] static char placeHolder = RegisterWindow();
+    [[maybe_unused]] static char g_placeHolder = RegisterWindow();
 }
