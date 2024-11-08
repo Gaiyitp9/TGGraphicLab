@@ -30,7 +30,7 @@ namespace TG
 #ifdef TG_WINDOWS
         std::size_t length = 0;
         mbstowcs_s(&length, nullptr, 0, str.data(), 0);
-        auto* data = static_cast<wchar_t*>(malloc(length * sizeof(wchar_t)));
+        auto* data = static_cast<wchar_t*>(std::malloc(length * sizeof(wchar_t)));
         mbstowcs_s(&length, data, length, str.data(), length);
 #else
         // 计算出的长度不包含'/0'，所以要加1
@@ -39,7 +39,7 @@ namespace TG
         std::mbstowcs(data, str.data(), length);
 #endif
         std::wstring wstr(data);
-        free(data);
+        std::free(data);
         return wstr;
     }
 
@@ -50,7 +50,7 @@ namespace TG
 #ifdef TG_WINDOWS
         std::size_t length = 0;
         wcstombs_s(&length, nullptr, 0, wstr.data(), 0);
-        auto* data = static_cast<char*>(malloc(length * sizeof(char)));
+        auto* data = static_cast<char*>(std::malloc(length * sizeof(char)));
         wcstombs_s(&length, data, length, wstr.data(), length);
 #else
         // 计算出的长度不包含'/0'，所以要加1
@@ -59,7 +59,7 @@ namespace TG
         std::wcstombs(data, wstr.data(), length);
 #endif
         std::string str(data);
-        free(data);
+        std::free(data);
         return str;
     }
 

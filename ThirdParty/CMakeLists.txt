@@ -3,5 +3,6 @@ set(ThirdPartyFolderName ThirdParty)
 # 添加所有测试项目
 add_subdirectory(googletest)
 add_subdirectory(imgui)
+add_subdirectory(mimalloc)
 add_subdirectory(PowerVR)
 add_subdirectory(spdlog)

@@ -6,9 +6,11 @@
 
 #include "Renderer.h"
 #include "spdlog/spdlog.h"
+#include "mimalloc.h"
 
 int CALLBACK main()
 {
+	mi_version();
 	try
 	{
 		TG::Renderer app;

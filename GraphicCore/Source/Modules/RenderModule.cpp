@@ -96,15 +96,15 @@ namespace TG
     }
 
 	using Win32Proc = LRESULT (WINAPI*)(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
-	static Win32Proc gPrevWndProc = nullptr;
+	static Win32Proc g_prevWndProc = nullptr;
 	static LRESULT ImGuiWindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	{
-		assert(gPrevWndProc != nullptr);
+		assert(g_prevWndProc != nullptr);
 
 		if (ImGui_ImplWin32_WndProcHandler(hwnd, msg, wParam, lParam))
 			return true;
 
-		return gPrevWndProc(hwnd, msg, wParam, lParam);
+		return g_prevWndProc(hwnd, msg, wParam, lParam);
 	}
 
 	struct EGLData
@@ -179,7 +179,7 @@ namespace TG
     	spdlog::info(glVersion);
 
     	// 窗口程序插入ImGui处理输入事件的代码
-    	gPrevWndProc = reinterpret_cast<Win32Proc>(GetWindowLongPtrW(display.GetHandle(), GWLP_WNDPROC));
+    	g_prevWndProc = reinterpret_cast<Win32Proc>(GetWindowLongPtrW(display.GetHandle(), GWLP_WNDPROC));
     	SetWindowLongPtrW(display.GetHandle(), GWLP_WNDPROC, reinterpret_cast<LONG_PTR>(ImGuiWindowProc));
 
     	// 初始化IMGUI
