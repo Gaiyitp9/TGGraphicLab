@@ -264,16 +264,16 @@ namespace TG
         };
 
         const auto it = windowMessage.find(msg);
-        std::pmr::string msgName{ &gPool };
+        std::pmr::string msgName{ &g_pool };
         if (it == windowMessage.end())
             std::format_to(std::back_inserter(msgName), "Unknown message: {:#x}", msg);
         else
             msgName.append(it->second);
 
-        std::pmr::string message{ &gPool };
+        std::pmr::string message{ &g_pool };
         std::format_to(std::back_inserter(message), "{:<25} LP: {:#018x}   WP: {:#018x}", msgName, lp, wp);
 
-        return std::pmr::string{ message, &gPool };
+        return std::pmr::string{ message, &g_pool };
     }
 
     static LRESULT WindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
@@ -282,7 +282,7 @@ namespace TG
         auto* const pWindow = reinterpret_cast<NativeWindow*>(GetWindowLongPtrW(hwnd, GWLP_USERDATA));
 
 		// 监控窗口消息
-	    std::pmr::string windowMessage{ &gPool };
+	    std::pmr::string windowMessage{ &g_pool };
 	    std::format_to(std::back_inserter(windowMessage), "{:<16} {}\n", pWindow->name,
 	    	WindowMessageToString(msg, wParam, lParam));
 		OutputDebugStringA(windowMessage.data());
