@@ -1,8 +1,59 @@
+cmake_minimum_required(VERSION 3.29)
+
+set(PROJECT_NAME ImGui)
+
+project(${PROJECT_NAME} VERSION 1.91.4)
+message(STATUS "ImGui version: ${PROJECT_VERSION}")
+
+include(GNUInstallDirs)
+
+# 使用c++23
+set(CMAKE_CXX_STANDARD 23)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+# 禁用编译器扩展
+set(CMAKE_CXX_EXTENSIONS OFF)
+# 使用utf-8编码，开启并行编译
+if(MSVC)
+    add_compile_options(/utf-8 /MP)
+endif()
+
 file(GLOB_RECURSE HEADERS *.h)
 file(GLOB_RECURSE SOURCES *.cpp)
 
-add_library(imgui ${HEADERS} ${SOURCES})
-target_include_directories(imgui SYSTEM PUBLIC ${CMAKE_CURRENT_LIST_DIR} ${CMAKE_CURRENT_LIST_DIR}/backends)
-target_link_libraries(imgui PUBLIC PowerVR)
+add_library(${PROJECT_NAME} STATIC ${HEADERS} ${SOURCES})
+add_library(TG::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
 
-set_target_properties(imgui PROPERTIES FOLDER ${ThirdPartyFolderName})
+set_target_properties(${PROJECT_NAME} PROPERTIES DEBUG_POSTFIX d)
+
+target_include_directories(${PROJECT_NAME} SYSTEM PUBLIC
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/backends>
+        $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}//${PROJECT_NAME}>
+)
+if (NOT TARGET PowerVR)
+    find_package(PowerVR 5.13 REQUIRED)
+endif()
+target_link_libraries(${PROJECT_NAME} PUBLIC TG::PowerVR)
+
+set(PROJECT_CONFIG_IN "${CMAKE_CURRENT_SOURCE_DIR}/cmake/${PROJECT_NAME}Config.cmake.in")
+set(PROJECT_CONFIG_OUT "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake")
+set(CONFIG_TARGETS_FILE "${PROJECT_NAME}ConfigTargets.cmake")
+set(VERSION_CONFIG_FILE "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake")
+set(EXPORT_DEST_DIR "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}")
+install(FILES ${HEADERS} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_NAME})
+install(TARGETS ${PROJECT_NAME}
+        EXPORT ${PROJECT_NAME}
+        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+)
+export(TARGETS ${PROJECT_NAME} NAMESPACE TG:: FILE ${CMAKE_CURRENT_BINARY_DIR}/${CONFIG_TARGETS_FILE})
+install(EXPORT ${PROJECT_NAME} FILE ${CONFIG_TARGETS_FILE} NAMESPACE TG:: DESTINATION ${EXPORT_DEST_DIR})
+include(CMakePackageConfigHelpers)
+configure_package_config_file(${PROJECT_CONFIG_IN} ${PROJECT_CONFIG_OUT} INSTALL_DESTINATION ${EXPORT_DEST_DIR})
+write_basic_package_version_file(
+        ${VERSION_CONFIG_FILE}
+        VERSION ${PROJECT_VERSION}
+        COMPATIBILITY ExactVersion
+)
+install(FILES ${PROJECT_CONFIG_OUT} ${VERSION_CONFIG_FILE} DESTINATION ${EXPORT_DEST_DIR})

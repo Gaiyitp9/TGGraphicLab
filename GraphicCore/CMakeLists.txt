@@ -18,7 +18,7 @@ set_property(CACHE TG_MATRIX_STORAGE_ORDER PROPERTY STRINGS "RowMajor" "ColumnMa
 
 add_library(${PROJECT_NAME} ${HEADERS} ${SOURCES})
 target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_LIST_DIR}/Include)
-target_link_libraries(${PROJECT_NAME} PRIVATE dxgi d3d11 dxguid dbghelp PUBLIC PowerVR spdlog imgui)
+target_link_libraries(${PROJECT_NAME} PRIVATE dxgi d3d11 dxguid dbghelp PUBLIC PowerVR spdlog ImGui)
 
 target_compile_definitions(${PROJECT_NAME}
         PUBLIC $<$<STREQUAL:${TG_MATRIX_STORAGE_ORDER},RowMajor>:TG_ROW_MAJOR_MATRIX>

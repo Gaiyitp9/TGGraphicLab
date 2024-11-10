@@ -17,11 +17,12 @@ add_custom_command(
     COMMENT "Copying EGL and GLES dynamic libraries to executable output directory"
 )
 
-set(mimallocLibraries ${CMAKE_SOURCE_DIR}/ThirdParty/mimalloc/lib/Windows/$<CONFIG>)
+set(mimallocLibraryName ${CMAKE_BINARY_DIR}/ThirdParty/mimalloc/mimalloc$<$<CONFIG:DEBUG>:-debug>)
 add_custom_command(
         TARGET ${PROJECT_NAME}
-        POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_directory
-        ${mimallocLibraries} $<TARGET_FILE_DIR:${PROJECT_NAME}>
+        POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy ${mimallocLibraryName}.dll $<TARGET_FILE_DIR:${PROJECT_NAME}>
+        COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/ThirdParty/mimalloc/mimalloc-redirect.dll $<TARGET_FILE_DIR:${PROJECT_NAME}>
         COMMENT "Copying mimalloc dynamic libraries to executable output directory"
 )
 

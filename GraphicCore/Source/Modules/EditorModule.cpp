@@ -6,8 +6,6 @@
 #pragma once
 
 #include "Modules/EditorModule.h"
-#include "imgui_impl_win32.h"
-#include "imgui_impl_opengl3.h"
 
 namespace TG
 {

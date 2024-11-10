@@ -1,8 +1,10 @@
-# 设置三方库目录名称
-set(ThirdPartyFolderName ThirdParty)
-# 添加所有测试项目
+cmake_minimum_required(VERSION 3.29)
+
+project(TGThirdParty)
+
+# 添加所有三方库
 add_subdirectory(googletest)
+add_subdirectory(PowerVR)
 add_subdirectory(imgui)
 add_subdirectory(mimalloc)
-add_subdirectory(PowerVR)
 add_subdirectory(spdlog)

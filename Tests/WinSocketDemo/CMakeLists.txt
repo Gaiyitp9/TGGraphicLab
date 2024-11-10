@@ -20,5 +20,3 @@ install(TARGETS WinSocketTCPServer WinSocketTCPClient WinSocketUDPServer WinSock
     EXPORT WinSocketTargets
     RUNTIME DESTINATION WinSocket/${CMAKE_INSTALL_BINDIR}
 )
-
-install(EXPORT WinSocketTargets FILE WinSocketTargets.cmake DESTINATION WinSocket)
