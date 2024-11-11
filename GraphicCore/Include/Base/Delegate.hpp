@@ -16,14 +16,18 @@ namespace TG
     template<typename ReturnType, typename... Args>
     class Delegate<ReturnType(Args...)>
     {
+        using Function = ReturnType(Args...);
+
     public:
+        void BindRaw();
+
         ReturnType Execute(Args&&... args)
         {
             return m_function(std::forward<Args>(args)...);
         }
 
     private:
-        std::function<ReturnType(Args...)> m_function;
+        std::function<Function> m_function;
     };
 
     template<typename DelegateSignature>
@@ -33,6 +37,7 @@ namespace TG
     class MulticastDelegate<ReturnType(Args...)>
     {
     public:
+        void AddRaw();
 
         void Broadcast(Args&&... args)
         {

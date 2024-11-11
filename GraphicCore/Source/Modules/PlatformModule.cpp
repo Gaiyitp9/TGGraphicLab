@@ -6,7 +6,7 @@
 #pragma once
 
 #include "Modules/PlatformModule.h"
-#include "spdlog/spdlog.h"
+#include "Diagnostic/Log.h"
 
 namespace TG
 {
@@ -30,7 +30,7 @@ namespace TG
         // freopen_s(&nullFile, "NUL", "w", stderr);
 
         // 打印日期
-        spdlog::info(Chronometer::Date());
+        Log::Instance().Info(Chronometer::Date());
 
         int windowWidth = m_screenWidth * 3 / 4;
         int windowHeight = m_screenHeight * 4 / 5;

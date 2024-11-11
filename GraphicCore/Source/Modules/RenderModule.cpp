@@ -7,8 +7,8 @@
 #include <fstream>
 #include <regex>
 #include "Modules/RenderModule.h"
-#include "spdlog/spdlog.h"
 #include "Exception/EGLException.h"
+#include "Diagnostic/Log.h"
 #include "imgui_impl_win32.h"
 #include "imgui_impl_opengl3.h"
 
@@ -130,12 +130,12 @@ namespace TG
         	throw EGLException("Failed to initialize EGLDisplay");
 
     	const char* version = eglQueryString(m_eglDisplay, EGL_VERSION);
-    	spdlog::info("EGL version: {}", version);
+    	Log::Instance().Info("EGL version: {}", version);
 
     	const char* extensions = eglQueryString(m_eglDisplay, EGL_EXTENSIONS);
     	std::regex whiteRex("\\s");
     	std::string outputExtensions = std::regex_replace(extensions, whiteRex, "\n");
-    	spdlog::info("EGL extensions:\n{}", outputExtensions);
+    	Log::Instance().Info("EGL extensions:\n{}", outputExtensions);
 
         if (eglBindAPI(EGL_OPENGL_ES_API) != EGL_TRUE)
         	throw EGLException("Failed to bind EGL_OPENGL_ES_API");
@@ -176,7 +176,7 @@ namespace TG
 
     	// 查看opengl es版本
     	auto glVersion = reinterpret_cast<char const*>(glGetString(GL_VERSION));
-    	spdlog::info(glVersion);
+    	Log::Instance().Info(glVersion);
 
     	// 窗口程序插入ImGui处理输入事件的代码
     	g_prevWndProc = reinterpret_cast<Win32Proc>(GetWindowLongPtrW(display.GetHandle(), GWLP_WNDPROC));
@@ -220,23 +220,15 @@ namespace TG
     		EGLint numConfigs;
 			EGLConfig eglConfig;
     		if (eglChooseConfig(data->display, configurationAttributes, &eglConfig, 1, &numConfigs) != GL_TRUE)
-    		{
-    			spdlog::error("eglChooseConfig failed: {:#x}", eglGetError());
-    			return;
-    		}
+    			throw EGLException("Failed to choose EGLConfig");
     		if (numConfigs != 1)
-    		{
-    			spdlog::error("eglChooseConfig return no config");
-    			return;
-    		}
+    			throw EGLException("eglChooseConfig return no config");
+
     		// 创建EGLSurface
     		data->surface = eglCreateWindowSurface(data->display, eglConfig,
-				static_cast<HWND>(viewport->PlatformHandle), nullptr);
+				static_cast<EGLNativeWindowType>(viewport->PlatformHandle), nullptr);
     		if (data->surface == EGL_NO_SURFACE)
-    		{
-    			spdlog::error("Failed to create EGL surface: {:#x}", eglGetError());
-    			return;
-    		}
+    			throw EGLException("Failed to create EGLSurface");
 
     		viewport->RendererUserData = data;
     	};
@@ -244,18 +236,28 @@ namespace TG
     		if (viewport->RendererUserData != nullptr)
     		{
     			auto* data = static_cast<EGLData *>(viewport->RendererUserData);
-    			eglDestroySurface(data->display, data->surface);
+    			if (eglDestroySurface(data->display, data->surface) != EGL_TRUE)
+    			{
+    				delete data;
+    				throw EGLException("Failed to destroy EGLSurface");
+    			}
     			delete data;
     			viewport->RendererUserData = nullptr;
     		}
     	};
     	platformIO.Renderer_SwapBuffers = [](ImGuiViewport* viewport, void*) {
     		if (auto* data = static_cast<EGLData*>(viewport->RendererUserData))
-    			eglSwapBuffers(data->display, data->surface);
+    		{
+    			if (eglSwapBuffers(data->display, data->surface) != EGL_TRUE)
+    				throw EGLException("Failed to swap buffers");
+    		}
     	};
     	platformIO.Platform_RenderWindow = [](ImGuiViewport* viewport, void*) {
     		if (auto* data = static_cast<EGLData*>(viewport->RendererUserData))
-    			eglMakeCurrent(data->display, data->surface, data->surface, data->context);
+    		{
+    			if (eglMakeCurrent(data->display, data->surface, data->surface, data->context) != EGL_TRUE)
+    				throw EGLException("Failed to make current surface");
+    		}
     	};
 
     	// 初始化三角形数据
@@ -299,13 +301,13 @@ namespace TG
 		if (!success)
 		{
 			glGetShaderInfoLog(vertexShader, 512, nullptr, infoLog);
-			spdlog::error("ERROR::SHADER::VERTEX::COMPILATION_FAILED\n{}", infoLog);
+			Log::Instance().Error("ERROR::SHADER::VERTEX::COMPILATION_FAILED\n{}", infoLog);
 		}
 
 		std::ifstream fragmentFile("../../Shaders/GLSL/simple.frag");
 		if (!fragmentFile)
 		{
-			spdlog::error("Load simple fragment file failed!");
+			Log::Instance().Error("Load simple fragment file failed!");
 			return;
 		}
 		std::stringstream fragBuffer;
@@ -319,7 +321,7 @@ namespace TG
 		if (!success)
 		{
 			glGetShaderInfoLog(fragmentShader, 512, nullptr, infoLog);
-			spdlog::error("ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n {}", infoLog);
+			Log::Instance().Error("ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n {}", infoLog);
 		}
 
 		m_shaderProgram = glCreateProgram();
@@ -329,7 +331,7 @@ namespace TG
 		glGetProgramiv(m_shaderProgram, GL_LINK_STATUS, &success);
 		if (!success) {
 			glGetProgramInfoLog(m_shaderProgram, 512, nullptr, infoLog);
-			spdlog::error("ERROR::SHADER::PROGRAM::LINKING_FAILED\n {}", infoLog);
+			Log::Instance().Error("ERROR::SHADER::PROGRAM::LINKING_FAILED\n {}", infoLog);
 		}
 		glDeleteShader(vertexShader);
 		glDeleteShader(fragmentShader);

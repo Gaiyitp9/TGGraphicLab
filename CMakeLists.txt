@@ -39,10 +39,9 @@ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
 # 安装目录设置为Install
 set(CMAKE_INSTALL_PREFIX ${CMAKE_CURRENT_SOURCE_DIR}/Install CACHE PATH "Installation directory" FORCE)
-
 message(STATUS "Third party install path: ${CMAKE_INSTALL_PREFIX}")
+
 add_subdirectory(ThirdParty)
 add_subdirectory(GraphicCore)
 add_subdirectory(TGRenderer)
 add_subdirectory(Tests)
-add_subdirectory(RayTracing)

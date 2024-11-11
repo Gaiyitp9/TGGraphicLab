@@ -18,7 +18,6 @@ target_include_directories(PowerVR SYSTEM INTERFACE
 )
 target_compile_definitions(PowerVR INTERFACE DYNAMICGLES_NO_NAMESPACE DYNAMICEGL_NO_NAMESPACE)
 
-include(GNUInstallDirs)
 set(PROJECT_CONFIG_IN "${CMAKE_CURRENT_SOURCE_DIR}/cmake/${PROJECT_NAME}Config.cmake.in")
 set(PROJECT_CONFIG_OUT "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake")
 set(CONFIG_TARGETS_FILE "${PROJECT_NAME}ConfigTargets.cmake")

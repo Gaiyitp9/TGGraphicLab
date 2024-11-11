@@ -11,7 +11,7 @@ namespace TG
     EGLException::EGLException(std::string_view description)
     {
         EGLint error = eglGetError();
-        char const* errorMsg = "";
+        char const* errorMsg = nullptr;
         switch (error)
         {
             case EGL_SUCCESS:

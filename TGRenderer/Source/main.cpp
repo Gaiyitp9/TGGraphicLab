@@ -5,7 +5,7 @@
 *****************************************************************/
 
 #include "Renderer.h"
-#include "spdlog/spdlog.h"
+#include "Diagnostic/Log.h"
 #include "mimalloc.h"
 
 int CALLBACK main()
@@ -18,11 +18,11 @@ int CALLBACK main()
 	}
 	catch (const std::exception& e)
 	{
-		spdlog::error(e.what());
+		TG::Log::Instance().Error(e.what());
 	}
 	catch (...)
 	{
-		spdlog::error("Unknown Exception");
+		TG::Log::Instance().Error("Unknown Exception");
 	}
 
 	return -1;
