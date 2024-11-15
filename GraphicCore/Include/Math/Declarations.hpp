@@ -6,35 +6,33 @@
 #pragma once
 
 #include <concepts>
+#include <utility>
 
 namespace TG::Math
 {
     // 给枚举添加逻辑运算
     template<typename Enum> requires std::is_enum_v<Enum>
-    constexpr auto UnderlyingTypeCast(Enum e) { return static_cast<std::underlying_type_t<Enum>>(e); }
-
-    template<typename Enum> requires std::is_enum_v<Enum>
     constexpr Enum operator|(Enum left, Enum right)
     {
-        return static_cast<Enum>(UnderlyingTypeCast(left) | UnderlyingTypeCast(right));
+        return static_cast<Enum>(std::to_underlying(left) | std::to_underlying(right));
     }
 
     template<typename Enum> requires std::is_enum_v<Enum>
     constexpr Enum operator^(Enum left, Enum right)
     {
-        return static_cast<Enum>(UnderlyingTypeCast(left) ^ UnderlyingTypeCast(right));
+        return static_cast<Enum>(std::to_underlying(left) ^ std::to_underlying(right));
     }
 
     template<typename Enum> requires std::is_enum_v<Enum>
     constexpr Enum operator&(Enum left, Enum right)
     {
-        return static_cast<Enum>(UnderlyingTypeCast(left) & UnderlyingTypeCast(right));
+        return static_cast<Enum>(std::to_underlying(left) & std::to_underlying(right));
     }
 
     template<typename Enum> requires std::is_enum_v<Enum>
     constexpr Enum operator~(Enum e)
     {
-        return static_cast<Enum>(~UnderlyingTypeCast(e));
+        return static_cast<Enum>(~std::to_underlying(e));
     }
 
     // 表达式特性，每种表达式都需要特化该类

@@ -9,6 +9,7 @@
 #include "Input/KeyCode.h"
 #include <string>
 #include <functional>
+#include <optional>
 
 namespace TG
 {
@@ -37,6 +38,9 @@ namespace TG
     {
         NativeWindow(int x, int y, int width, int height, std::string_view name, WindowType type);
         ~NativeWindow();
+
+        // 轮询输入事件，需要每帧调用
+        static std::optional<int> PollEvents();
 
         void SetIcon(std::string_view iconPath) const;
         void SetPosition(int x, int y) const;

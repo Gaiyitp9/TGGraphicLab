@@ -10,18 +10,22 @@ namespace TG
 {
     std::optional<int> Window::PollEvents()
     {
-        MSG msg = { nullptr };
+        return NativeWindow::PollEvents();
+    }
 
-        while (PeekMessageW(&msg, nullptr, 0, 0, PM_REMOVE))
-        {
-            if (msg.message == WM_QUIT)
-                return static_cast<int>(msg.wParam);
+    NativeWindowHandle Window::GetHandle() const noexcept
+    {
+        return m_nativeWindow.handle;
+    }
 
-            TranslateMessage(&msg);
-            DispatchMessageW(&msg);
-        }
+    NativeDeviceContext Window::GetContext() const noexcept
+    {
+        return m_nativeWindow.deviceContext;
+    }
 
-        return std::nullopt;
+    bool Window::IsDestroyed() const noexcept
+    {
+        return m_nativeWindow.destroyed;
     }
 
     void Window::SetIcon(std::string_view iconPath) const
@@ -46,5 +50,50 @@ namespace TG
     void Window::Show(bool show) const
     {
         m_nativeWindow.Show(show);
+    }
+
+    void Window::SetWindowPosCallback(const WindowPosFunction& function)
+    {
+        m_nativeWindow.windowPosFunction = function;
+    }
+
+    void Window::SetWindowSizeCallback(const WindowSizeFunction& function)
+    {
+        m_nativeWindow.windowSizeFunction = function;
+    }
+
+    void Window::SetSuspendCallback(const SuspendFunction& function)
+    {
+        m_nativeWindow.suspendFunction = function;
+    }
+
+    void Window::SetResumeCallback(const ResumeFunction& function)
+    {
+        m_nativeWindow.resumeFunction = function;
+    }
+
+    void Window::SetKeyCallback(const KeyFunction& function)
+    {
+        m_nativeWindow.keyFunction = function;
+    }
+
+    void Window::SetCharCallback(const CharFunction& function)
+    {
+        m_nativeWindow.charFunction = function;
+    }
+
+    void Window::SetMouseButtonCallback(const MouseButtonFunction& function)
+    {
+        m_nativeWindow.mouseButtonFunction = function;
+    }
+
+    void Window::SetCursorPosCallback(const CursorPosFunction& function)
+    {
+        m_nativeWindow.cursorPosFunction = function;
+    }
+
+    void Window::SetScrollCallback(const ScrollFunction& function)
+    {
+        m_nativeWindow.scrollFunction = function;
     }
 }

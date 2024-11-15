@@ -48,6 +48,22 @@ namespace TG
 		ReleaseDC(handle, deviceContext);
 	}
 
+	std::optional<int> NativeWindow::PollEvents()
+	{
+		MSG msg = { nullptr };
+
+		while (PeekMessageW(&msg, nullptr, 0, 0, PM_REMOVE))
+		{
+			if (msg.message == WM_QUIT)
+				return static_cast<int>(msg.wParam);
+
+			TranslateMessage(&msg);
+			DispatchMessageW(&msg);
+		}
+
+		return std::nullopt;
+	}
+
 	void NativeWindow::SetIcon(std::string_view iconPath) const
 	{
 		HANDLE icon = LoadImageW(nullptr, MultiBytesToWideChars(iconPath).c_str(), IMAGE_ICON, 0, 0,

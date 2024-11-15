@@ -8,9 +8,6 @@
 #ifdef TG_WINDOWS
 #include "Base/Windows/NativeWindow.h"
 #endif
-#include <functional>
-#include <optional>
-#include <string_view>
 
 namespace TG
 {
@@ -40,14 +37,13 @@ namespace TG
         // 轮询输入事件，需要每帧调用
         static std::optional<int> PollEvents();
 
-        [[nodiscard]] NativeWindowHandle GetHandle() const noexcept override  { return m_nativeWindow.handle; }
-        [[nodiscard]] NativeDeviceContext GetContext() const noexcept override { return m_nativeWindow.deviceContext; }
-
+        [[nodiscard]] NativeWindowHandle GetHandle() const noexcept override;
+        [[nodiscard]] NativeDeviceContext GetContext() const noexcept override;
+        [[nodiscard]] bool IsDestroyed() const noexcept;
         [[nodiscard]] int PositionX() const noexcept { return m_posX; }
         [[nodiscard]] int PositionY() const noexcept { return m_posY; }
         [[nodiscard]] int Width() const noexcept { return m_width; }
         [[nodiscard]] int Height() const noexcept { return m_height; }
-        [[nodiscard]] bool IsDestroyed() const noexcept { return m_nativeWindow.destroyed; }
 
         void SetIcon(std::string_view iconPath) const;
         void SetPosition(int x, int y);
@@ -55,15 +51,15 @@ namespace TG
         void Show(bool show) const;
 
         // 窗口消息事件回调
-        void SetWindowPosCallback(const WindowPosFunction& function) { m_nativeWindow.windowPosFunction = function; }
-        void SetWindowSizeCallback(const WindowSizeFunction& function) { m_nativeWindow.windowSizeFunction = function; }
-        void SetSuspendCallback(const SuspendFunction& function) { m_nativeWindow.suspendFunction = function; }
-        void SetResumeCallback(const ResumeFunction& function) { m_nativeWindow.resumeFunction = function; }
-        void SetKeyCallback(const KeyFunction& function) { m_nativeWindow.keyFunction = function; }
-        void SetCharCallback(const CharFunction& function) { m_nativeWindow.charFunction = function; }
-        void SetMouseButtonCallback(const MouseButtonFunction& function) { m_nativeWindow.mouseButtonFunction = function; }
-        void SetCursorPosCallback(const CursorPosFunction& function) { m_nativeWindow.cursorPosFunction = function; }
-        void SetScrollCallback(const ScrollFunction& function) { m_nativeWindow.scrollFunction = function; }
+        void SetWindowPosCallback(const WindowPosFunction& function);
+        void SetWindowSizeCallback(const WindowSizeFunction& function);
+        void SetSuspendCallback(const SuspendFunction& function);
+        void SetResumeCallback(const ResumeFunction& function);
+        void SetKeyCallback(const KeyFunction& function);
+        void SetCharCallback(const CharFunction& function);
+        void SetMouseButtonCallback(const MouseButtonFunction& function);
+        void SetCursorPosCallback(const CursorPosFunction& function);
+        void SetScrollCallback(const ScrollFunction& function);
 
     private:
         int m_posX, m_posY;
