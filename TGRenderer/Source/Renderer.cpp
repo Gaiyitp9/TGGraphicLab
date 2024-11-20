@@ -11,11 +11,23 @@ namespace TG
 {
 	Renderer::Renderer()
 	{
+		m_platformModule = std::make_shared<PlatformModule>();
+		m_inputModule = std::make_shared<InputModule>();
+		m_renderModule = std::make_shared<RenderModule>();
+		m_editorModule  = std::make_shared<EditorModule>();
+
 		// 输入模块监听输入事件
-		m_platformModule.AddEventListener(m_inputModule.GetMouseEventHandler());
-		m_platformModule.AddEventListener(m_inputModule.GetKeyboardEventHandler());
+		m_inputModule->Subscribe(m_platformModule->OnMouseEvent());
+		m_inputModule->Subscribe(m_platformModule->OnKeyboardEvent());
 		// 渲染模块接入窗口
-		m_renderModule.PlugInVideoDisplay(m_platformModule.GetWindow());
+		m_renderModule->PlugInVideoDisplay(m_platformModule->GetWindow());
+		// 编辑器模块接入窗口
+		m_editorModule->PlugInVideoPlay(m_platformModule->GetWindow());
+
+		m_modules.emplace_back(m_platformModule);
+		m_modules.emplace_back(m_inputModule);
+		m_modules.emplace_back(m_renderModule);
+		m_modules.emplace_back(m_editorModule);
 
 		// std::string_view mbstr = "z\u00df\u6c34\U0001f34c";
 		// std::wstring_view wcstr = L"z\u00df\u6c34\U0001f34c";
@@ -27,15 +39,20 @@ namespace TG
 	{
 		while (true)
 		{
-			m_inputModule.Update();
-			m_platformModule.Update();
-			if (m_platformModule.ShouldExit())
-				return m_platformModule.ExitCode();
+			for (const auto& module : m_modules)
+				module->PreUpdate();
 
-            if (m_inputModule.GetKeyUp(Input::KeyCode::Space))
+			if (m_platformModule->ShouldExit())
+				return m_platformModule->ExitCode();
+
+			for (const auto& module : m_modules)
+				module->Update();
+
+            if (m_inputModule->GetKeyUp(Input::KeyCode::Space))
                 spdlog::info("space up");
 
-			m_renderModule.Update();
+			for (const auto& module : m_modules)
+				module->PostUpdate();
 
 			// const float c = sin(m_timer.TotalTime() * 0.001f) / 2.0f + 0.5f;
 			//d3d11Layer->ClearBackground(Math::Color::AliceBlue * c);

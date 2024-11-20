@@ -13,7 +13,31 @@ namespace TG
 
     InputModule::~InputModule() = default;
 
+    void InputModule::Subscribe(std::function<void(const Input::Event<Input::Mouse>&)>& mouseEventDelegate)
+    {
+        mouseEventDelegate = [&mouse = m_mouse](const Input::Event<Input::Mouse>& event) {
+            mouse.Handle(event);
+        };
+    }
+
+    void InputModule::Subscribe(std::function<void(const Input::Event<Input::Keyboard>&)>& keyboardEventDelegate)
+    {
+        keyboardEventDelegate = [&keyboard = m_keyboard](const Input::Event<Input::Keyboard>& event) {
+            keyboard.Handle(event);
+        };
+    }
+
+    void InputModule::PreUpdate()
+    {
+
+    }
+
     void InputModule::Update()
+    {
+
+    }
+
+    void InputModule::PostUpdate()
     {
         m_mouse.Update();
         m_keyboard.Update();

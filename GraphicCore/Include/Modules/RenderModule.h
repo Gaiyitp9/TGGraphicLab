@@ -21,7 +21,9 @@ namespace TG
         RenderModule& operator=(RenderModule&&) = delete;
         ~RenderModule() override;
 
+        void PreUpdate() override;
         void Update() override;
+        void PostUpdate() override;
 
         void PlugInVideoDisplay(const IVideoDisplay& display);
 
@@ -35,8 +37,5 @@ namespace TG
         GLuint m_shaderProgram{};
         GLuint m_VAO{};
         GLuint m_VBO{};
-
-        bool m_showDemoWindow{ true };
-        bool m_showAnotherWindow{ false };
     };
 }

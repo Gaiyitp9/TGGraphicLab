@@ -9,6 +9,7 @@
 #include "Modules/InputModule.h"
 #include "Modules/RenderModule.h"
 #include "Modules/EditorModule.h"
+#include <vector>
 
 namespace TG
 {
@@ -25,9 +26,10 @@ namespace TG
 		int Run();
 
 	private:
-		PlatformModule m_platformModule;
-		InputModule m_inputModule;
-		RenderModule m_renderModule;
-		// EditorModule m_editorModule;
+		std::shared_ptr<PlatformModule> m_platformModule;
+		std::shared_ptr<InputModule> m_inputModule;
+		std::shared_ptr<RenderModule> m_renderModule;
+		std::shared_ptr<EditorModule> m_editorModule;
+		std::vector<std::shared_ptr<Module>> m_modules;
 	};
 }

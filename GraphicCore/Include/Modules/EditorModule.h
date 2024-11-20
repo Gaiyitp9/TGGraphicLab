@@ -6,6 +6,7 @@
 #pragma once
 
 #include "Module.h"
+#include "Base/Window.h"
 
 namespace TG
 {
@@ -19,8 +20,14 @@ namespace TG
         EditorModule& operator=(EditorModule&&) = delete;
         ~EditorModule() override;
 
+        void PreUpdate() override;
         void Update() override;
+        void PostUpdate() override;
+
+        void PlugInVideoPlay(const IVideoDisplay& display);
 
     private:
+        bool m_showDemoWindow{ true };
+        bool m_showAnotherWindow{ false };
     };
 }

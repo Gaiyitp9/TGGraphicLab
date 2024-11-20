@@ -12,6 +12,8 @@ namespace TG
     public:
         virtual ~Module() = default;
 
+        virtual void PreUpdate() = 0;
         virtual void Update() = 0;
+        virtual void PostUpdate() = 0;
     };
 }

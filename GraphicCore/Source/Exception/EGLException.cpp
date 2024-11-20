@@ -70,8 +70,8 @@ namespace TG
         }
 
         m_whatBuffer = std::format("Exception type: EGL Exception\n"
-                                 "Error: {:#04x}\nError Message: {}"
-                                 "{}"
+                                 "Error: {:#04x}\nError Message: {}\n"
+                                 "{}\n"
                                  "{}\n", error, errorMsg, description, m_stackTrace);
     }
 

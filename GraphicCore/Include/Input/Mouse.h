@@ -6,12 +6,11 @@
 #pragma once
 
 #include "Event.h"
-#include "Base/EventHandler.hpp"
 #include <bitset>
 
 namespace TG::Input
 {
-	class Mouse final : public IEventHandler<Event<Mouse>>
+	class Mouse
 	{
 	public:
 		Mouse() = default;
@@ -19,10 +18,10 @@ namespace TG::Input
 		Mouse& operator=(const Mouse&) = delete;
 		Mouse(Mouse&&) = delete;
 		Mouse& operator=(Mouse&&) = delete;
-		~Mouse() override = default;
+		~Mouse() = default;
 
 		void Update();
-        void Handle(const Event<Mouse>& event) override;
+        void Handle(const Event<Mouse>& event);
         [[nodiscard]] bool GetKey(KeyCode key) const;
         [[nodiscard]] bool GetKeyDown(KeyCode key) const;
         [[nodiscard]] bool GetKeyUp(KeyCode key) const;

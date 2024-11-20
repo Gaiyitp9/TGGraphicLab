@@ -1,8 +1,8 @@
-file(GLOB_RECURSE SRCS *.cpp *.c)
-file(GLOB_RECURSE INCS *.hpp *.h)
+file(GLOB_RECURSE SOURCES *.cpp)
+file(GLOB_RECURSE INCLUDES *.hpp *.h)
 
-source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${SRCS})
-source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${INCS})
+source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${SOURCES})
+source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${INCLUDES})
 
-add_executable(RayTracing ${SRCS} ${INCS})
-target_include_directories(RayTracing PRIVATE ../ThirdParty)
+add_executable(RayTracing ${SOURCES} ${INCLUDES})
+target_link_libraries(RayTracing PRIVATE stb)
