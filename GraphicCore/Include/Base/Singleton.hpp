@@ -25,6 +25,6 @@ namespace TG
 
     protected:
         Singleton() = default;
-        ~Singleton() = default;
+        virtual ~Singleton() = default;
     };
 }

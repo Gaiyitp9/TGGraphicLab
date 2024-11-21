@@ -9,6 +9,7 @@
 #include "Exception/EGLException.h"
 #include "imgui_impl_win32.h"
 #include "imgui_impl_opengl3.h"
+#include "Exception/Windows/Win32Exception.h"
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
@@ -32,11 +33,38 @@ namespace TG
     {
     	float clearColor[4]{ 0.2f, 0.3f, 0.3f, 1.0f };
 
-    	ImGuiIO& io = ImGui::GetIO();
-
     	ImGui_ImplOpenGL3_NewFrame();
     	ImGui_ImplWin32_NewFrame();
     	ImGui::NewFrame();
+
+    	ImGuiIO& io = ImGui::GetIO();
+
+    	// 确保 ImGui 正在一个窗口中
+    	// ImGui::Begin("Main DockSpace", nullptr, ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoDocking);
+
+    	// 获取窗口大小，确保填充整个区域
+    	ImGuiViewport* viewport = ImGui::GetMainViewport();
+    	ImGui::SetNextWindowPos(viewport->WorkPos);
+    	ImGui::SetNextWindowSize(viewport->WorkSize);
+    	ImGui::SetNextWindowViewport(viewport->ID);
+    	ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
+    	ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
+    	ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0.0f, 0.0f, 0.0f, 0.0f));
+
+    	// 设置窗口标志，避免窗口被 DockSpace 操作干扰
+    	ImGuiWindowFlags windowFlags = ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize |
+    		ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus;
+
+    	ImGui::Begin("Main DockSpace", nullptr, windowFlags);
+
+    	// 创建 DockSpace
+    	ImGuiID dockspaceId = ImGui::GetID("MainDockSpace");
+    	ImGui::DockSpace(dockspaceId, ImVec2(0.0f, 0.0f), ImGuiDockNodeFlags_PassthruCentralNode);
+
+    	ImGui::End();
+    	ImGui::PopStyleVar(2);
+    	ImGui::PopStyleColor();
+    	// ImGui::End();
 
     	if (m_showDemoWindow)
     		ImGui::ShowDemoWindow(&m_showDemoWindow);
@@ -91,10 +119,8 @@ namespace TG
 	{
 		assert(g_prevWndProc != nullptr);
 
-		if (ImGui_ImplWin32_WndProcHandler(hwnd, msg, wParam, lParam))
-			return true;
-
-		return g_prevWndProc(hwnd, msg, wParam, lParam);
+		return ImGui_ImplWin32_WndProcHandler(hwnd, msg, wParam, lParam) ||
+			g_prevWndProc(hwnd, msg, wParam, lParam);
 	}
 
 	struct EGLData
@@ -106,26 +132,32 @@ namespace TG
 
     void EditorModule::PlugInVideoPlay(const IVideoDisplay& display)
     {
-        // 窗口程序插入ImGui处理输入事件的代码
-    	g_prevWndProc = reinterpret_cast<Win32Proc>(GetWindowLongPtrW(display.GetHandle(), GWLP_WNDPROC));
-    	SetWindowLongPtrW(display.GetHandle(), GWLP_WNDPROC, reinterpret_cast<LONG_PTR>(ImGuiWindowProc));
-
     	// 初始化IMGUI
     	IMGUI_CHECKVERSION();
     	ImGui::CreateContext();
+    	ImGui_ImplWin32_InitForOpenGL(display.GetHandle());
+    	ImGui_ImplOpenGL3_Init();
+
+        // 窗口程序插入ImGui处理输入事件的代码
+    	g_prevWndProc = reinterpret_cast<Win32Proc>(GetWindowLongPtrW(display.GetHandle(), GWLP_WNDPROC));
+    	if (!g_prevWndProc)
+    		CheckLastError("Failed to get window procedure");
+    	SetLastError(0);
+	    if (SetWindowLongPtrW(display.GetHandle(), GWLP_WNDPROC, reinterpret_cast<LONG_PTR>(ImGuiWindowProc)) == 0
+	    	&& GetLastError() != 0)
+	    {
+    		CheckLastError("Failed to set window procedure");
+	    }
+
     	ImGuiIO& io = ImGui::GetIO();
     	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
     	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
     	io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
 
     	ImGui::StyleColorsDark();
-
     	ImGuiStyle& style = ImGui::GetStyle();
 		style.WindowRounding = 0.0f;
     	style.Colors[ImGuiCol_WindowBg].w = 1.0f;
-
-    	ImGui_ImplWin32_InitForOpenGL(display.GetHandle());
-    	ImGui_ImplOpenGL3_Init();
 
     	ImGuiPlatformIO& platformIO = ImGui::GetPlatformIO();
 		assert(platformIO.Renderer_CreateWindow == nullptr);
@@ -136,6 +168,8 @@ namespace TG
     		assert(viewport->RendererUserData == nullptr);
 
     		auto* data = TG_NEW EGLData;
+    		viewport->RendererUserData = data;
+
     		data->display = eglGetCurrentDisplay();
     		data->context = eglGetCurrentContext();
 
@@ -157,20 +191,16 @@ namespace TG
 				static_cast<EGLNativeWindowType>(viewport->PlatformHandle), nullptr);
     		if (data->surface == EGL_NO_SURFACE)
     			throw EGLException("Failed to create EGLSurface");
-
-    		viewport->RendererUserData = data;
     	};
     	platformIO.Renderer_DestroyWindow = [](ImGuiViewport* viewport) {
-    		if (viewport->RendererUserData != nullptr)
+    		if (auto* data = static_cast<EGLData*>(viewport->RendererUserData))
     		{
-    			auto* data = static_cast<EGLData *>(viewport->RendererUserData);
-    			if (eglDestroySurface(data->display, data->surface) != EGL_TRUE)
-    			{
-    				delete data;
-    				throw EGLException("Failed to destroy EGLSurface");
-    			}
-    			delete data;
     			viewport->RendererUserData = nullptr;
+    			EGLDisplay display = data->display;
+    			EGLSurface surface = data->surface;
+    			delete data;
+    			if (eglDestroySurface(display, surface) != EGL_TRUE)
+    				throw EGLException("Failed to destroy EGLSurface");
     		}
     	};
     	platformIO.Renderer_SwapBuffers = [](ImGuiViewport* viewport, void*) {

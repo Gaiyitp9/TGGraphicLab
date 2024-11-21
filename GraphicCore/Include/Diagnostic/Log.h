@@ -14,11 +14,8 @@ namespace TG
     class TG_API Log final : public Singleton<Log>
     {
     public:
-        Log();
-        ~Log();
-
         template <typename... Args>
-        void Info(std::format_string<Args...> fmt, Args &&...args)
+        void Info(std::format_string<Args...> fmt, Args&&...args)
         {
             m_logger->info(fmt, std::forward<Args>(args)...);
         }
@@ -29,7 +26,7 @@ namespace TG
         }
 
         template <typename... Args>
-        void Warn(std::format_string<Args...> fmt, Args &&...args)
+        void Warn(std::format_string<Args...> fmt, Args&&...args)
         {
             m_logger->warn(fmt, std::forward<Args>(args)...);
         }
@@ -40,7 +37,7 @@ namespace TG
         }
 
         template <typename... Args>
-        void Error(std::format_string<Args...> fmt, Args &&...args)
+        void Error(std::format_string<Args...> fmt, Args&&...args)
         {
             m_logger->error(fmt, std::forward<Args>(args)...);
         }
@@ -51,6 +48,10 @@ namespace TG
         }
 
     private:
+        friend class Singleton;
+        Log();
+        ~Log() override;
+
         std::shared_ptr<spdlog::logger> m_logger;
     };
 }
