@@ -39,32 +39,43 @@ namespace TG
 
     	ImGuiIO& io = ImGui::GetIO();
 
-    	// 确保 ImGui 正在一个窗口中
-    	// ImGui::Begin("Main DockSpace", nullptr, ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoDocking);
+	    static ImGuiDockNodeFlags dockspaceFlags = ImGuiDockNodeFlags_None | ImGuiDockNodeFlags_PassthruCentralNode;
 
-    	// 获取窗口大小，确保填充整个区域
-    	ImGuiViewport* viewport = ImGui::GetMainViewport();
-    	ImGui::SetNextWindowPos(viewport->WorkPos);
-    	ImGui::SetNextWindowSize(viewport->WorkSize);
-    	ImGui::SetNextWindowViewport(viewport->ID);
-    	ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
-    	ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
-    	ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0.0f, 0.0f, 0.0f, 0.0f));
+    	ImGuiWindowFlags windowFlags = ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoDocking |
+    		ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize |
+    		ImGuiWindowFlags_NoMove| ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus |
+    		ImGuiWindowFlags_NoBackground;;
+        const ImGuiViewport* viewport = ImGui::GetMainViewport();
+        ImGui::SetNextWindowPos(viewport->WorkPos);
+        ImGui::SetNextWindowSize(viewport->WorkSize);
+        ImGui::SetNextWindowViewport(viewport->ID);
+        ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
+        ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
+	    ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
+    	ImGui::Begin("DockSpace Demo", nullptr, windowFlags);
+		ImGui::PopStyleVar(3);
 
-    	// 设置窗口标志，避免窗口被 DockSpace 操作干扰
-    	ImGuiWindowFlags windowFlags = ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize |
-    		ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus;
+	    // Submit the DockSpace
+	    ImGuiID dockspaceId = ImGui::GetID("MyDockSpace");
+	    ImGui::DockSpace(dockspaceId, ImVec2(0.0f, 0.0f), dockspaceFlags);
 
-    	ImGui::Begin("Main DockSpace", nullptr, windowFlags);
+	    if (ImGui::BeginMenuBar())
+	    {
+	        if (ImGui::BeginMenu("Options"))
+	        {
+	            if (ImGui::MenuItem("Flag: NoDockingOverCentralNode", "", (dockspaceFlags & ImGuiDockNodeFlags_NoDockingOverCentralNode) != 0)) { dockspaceFlags ^= ImGuiDockNodeFlags_NoDockingOverCentralNode; }
+	            if (ImGui::MenuItem("Flag: NoDockingSplit",         "", (dockspaceFlags & ImGuiDockNodeFlags_NoDockingSplit) != 0))             { dockspaceFlags ^= ImGuiDockNodeFlags_NoDockingSplit; }
+	            if (ImGui::MenuItem("Flag: NoUndocking",            "", (dockspaceFlags & ImGuiDockNodeFlags_NoUndocking) != 0))                { dockspaceFlags ^= ImGuiDockNodeFlags_NoUndocking; }
+	            if (ImGui::MenuItem("Flag: NoResize",               "", (dockspaceFlags & ImGuiDockNodeFlags_NoResize) != 0))                   { dockspaceFlags ^= ImGuiDockNodeFlags_NoResize; }
+	            if (ImGui::MenuItem("Flag: AutoHideTabBar",         "", (dockspaceFlags & ImGuiDockNodeFlags_AutoHideTabBar) != 0))             { dockspaceFlags ^= ImGuiDockNodeFlags_AutoHideTabBar; }
+	            ImGui::Separator();
 
-    	// 创建 DockSpace
-    	ImGuiID dockspaceId = ImGui::GetID("MainDockSpace");
-    	ImGui::DockSpace(dockspaceId, ImVec2(0.0f, 0.0f), ImGuiDockNodeFlags_PassthruCentralNode);
+	            ImGui::EndMenu();
+	        }
+	        ImGui::EndMenuBar();
+	    }
 
-    	ImGui::End();
-    	ImGui::PopStyleVar(2);
-    	ImGui::PopStyleColor();
-    	// ImGui::End();
+	    ImGui::End();
 
     	if (m_showDemoWindow)
     		ImGui::ShowDemoWindow(&m_showDemoWindow);
@@ -155,9 +166,9 @@ namespace TG
     	io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
 
     	ImGui::StyleColorsDark();
-    	ImGuiStyle& style = ImGui::GetStyle();
-		style.WindowRounding = 0.0f;
-    	style.Colors[ImGuiCol_WindowBg].w = 1.0f;
+    	// ImGuiStyle& style = ImGui::GetStyle();
+		// style.WindowRounding = 0.0f;
+    	// style.Colors[ImGuiCol_WindowBg].w = 1.0f;
 
     	ImGuiPlatformIO& platformIO = ImGui::GetPlatformIO();
 		assert(platformIO.Renderer_CreateWindow == nullptr);
