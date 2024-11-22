@@ -8,6 +8,7 @@
 #include <regex>
 #include "Modules/RenderModule.h"
 #include "Exception/EGLException.h"
+#include "Exception/OpenGLException.h"
 #include "Diagnostic/Log.h"
 
 namespace TG
@@ -58,7 +59,7 @@ namespace TG
         if (m_eglDisplay == EGL_NO_DISPLAY)
             m_eglDisplay = eglGetDisplay(EGL_DEFAULT_DISPLAY);
         if (m_eglDisplay == EGL_NO_DISPLAY)
-        	throw BaseException("Failed to get an EGLDisplay");
+        	throw BaseException("No display connection matching native_display is available");
 
         EGLint eglMajorVersion = 0;
         EGLint eglMinorVersion = 0;
@@ -66,9 +67,13 @@ namespace TG
         	throw EGLException("Failed to initialize EGLDisplay");
 
     	const char* version = eglQueryString(m_eglDisplay, EGL_VERSION);
+    	if (!version)
+    		throw EGLException("Failed to query EGL_VERSION");
     	Log::Instance().Info("EGL version: {}", version);
 
     	const char* extensions = eglQueryString(m_eglDisplay, EGL_EXTENSIONS);
+    	if (!extensions)
+    		throw EGLException("Failed to query EGL_EXTENSIONS");
     	std::regex whiteRex("\\s");
     	std::string outputExtensions = std::regex_replace(extensions, whiteRex, "\n");
     	Log::Instance().Info("EGL extensions:\n{}", outputExtensions);
@@ -112,7 +117,21 @@ namespace TG
 
     	// 查看opengl es版本
     	auto glVersion = reinterpret_cast<char const*>(glGetString(GL_VERSION));
-    	Log::Instance().Info(glVersion);
+    	if (!glVersion)
+    		throw OpenGLException("Failed to get glGetString");
+    	Log::Instance().Info("OpenGL version: {}", glVersion);
+    	auto glVendor = reinterpret_cast<char const*>(glGetString(GL_VENDOR));
+    	if (!glVendor)
+    		throw OpenGLException("Failed to get glGetString");
+    	Log::Instance().Info("Company for the OpenGL implementation: {} ", glVendor);
+    	auto glRenderer = reinterpret_cast<char const*>(glGetString(GL_RENDERER));
+    	if (!glRenderer)
+    		throw OpenGLException("Failed to get glGetString");
+    	Log::Instance().Info("Name of the OpenGL renderer: {}", glRenderer);
+    	auto glShadingLanguageVersion = reinterpret_cast<char const*>(glGetString(GL_SHADING_LANGUAGE_VERSION));
+    	if (!glShadingLanguageVersion)
+    		throw OpenGLException("Failed to get glGetString");
+    	Log::Instance().Info("Shading language version: {}", glShadingLanguageVersion);
 
     	// 初始化三角形数据
     	InitialTriangle();

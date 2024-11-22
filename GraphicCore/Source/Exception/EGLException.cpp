@@ -14,9 +14,6 @@ namespace TG
         char const* errorMsg = nullptr;
         switch (error)
         {
-            case EGL_SUCCESS:
-                errorMsg = "The last function succeeded without error.";
-                break;
             case EGL_NOT_INITIALIZED:
                 errorMsg = "EGL is not initialized, or could not be initialized, "
                            "for the specified EGL display connection.";
@@ -38,7 +35,8 @@ namespace TG
                 errorMsg = "An EGLConfig argument does not name a valid EGL frame buffer configuration.";
                 break;
             case EGL_BAD_CURRENT_SURFACE:
-                errorMsg = "An EGLConfig argument does not name a valid EGL frame buffer configuration.";
+                errorMsg = "The current surface of the calling thread is a window, pixel buffer or pixmap that "
+                           "is no longer valid.";
                 break;
             case EGL_BAD_DISPLAY:
                 errorMsg = "An EGLDisplay argument does not name a valid EGL display connection.";
