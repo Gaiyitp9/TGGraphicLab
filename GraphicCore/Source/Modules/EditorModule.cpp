@@ -19,9 +19,12 @@ namespace TG
 
     EditorModule::~EditorModule()
     {
-    	ImGui_ImplOpenGL3_Shutdown();
-    	ImGui_ImplWin32_Shutdown();
-    	ImGui::DestroyContext();
+    	if (m_isInitialized)
+    	{
+    		ImGui_ImplOpenGL3_Shutdown();
+    		ImGui_ImplWin32_Shutdown();
+    		ImGui::DestroyContext();
+    	}
     }
 
 	void EditorModule::PreUpdate()
@@ -141,13 +144,14 @@ namespace TG
 		EGLSurface surface;
 	};
 
-    void EditorModule::PlugInVideoPlay(const IVideoDisplay& display)
+    void EditorModule::ConnectToVideoPlay(const IVideoDisplay& display)
     {
     	// 初始化IMGUI
     	IMGUI_CHECKVERSION();
     	ImGui::CreateContext();
     	ImGui_ImplWin32_InitForOpenGL(display.GetHandle());
     	ImGui_ImplOpenGL3_Init();
+    	m_isInitialized = true;
 
         // 窗口程序插入ImGui处理输入事件的代码
     	g_prevWndProc = reinterpret_cast<Win32Proc>(GetWindowLongPtrW(display.GetHandle(), GWLP_WNDPROC));

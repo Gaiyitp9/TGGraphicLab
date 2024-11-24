@@ -20,9 +20,9 @@ namespace TG
 		m_inputModule->Subscribe(m_platformModule->OnMouseEvent());
 		m_inputModule->Subscribe(m_platformModule->OnKeyboardEvent());
 		// 渲染模块接入窗口
-		m_renderModule->PlugInVideoDisplay(m_platformModule->GetWindow());
+		m_renderModule->ConnectToVideoDisplay(m_platformModule->GetWindow());
 		// 编辑器模块接入窗口
-		m_editorModule->PlugInVideoPlay(m_platformModule->GetWindow());
+		m_editorModule->ConnectToVideoPlay(m_platformModule->GetWindow());
 
 		m_modules.emplace_back(m_platformModule);
 		m_modules.emplace_back(m_inputModule);

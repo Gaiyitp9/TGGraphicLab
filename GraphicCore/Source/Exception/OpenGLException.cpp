@@ -47,7 +47,7 @@ namespace TG
 
             m_whatBuffer += std::format("Exception type: OpenGL Exception\n"
                                      "Error: {:#04x}\nError Message: {}\n"
-                                     "{}\n"
+                                     "[OpenGL] {}\n"
                                      "{}\n", error, errorMsg, description, m_stackTrace);
         }
     }

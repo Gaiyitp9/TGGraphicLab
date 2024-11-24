@@ -18,7 +18,7 @@ namespace TG
         // https://github.com/gabime/spdlog/wiki/Error-handling
         try
         {
-            m_logger = spdlog::basic_logger_mt("AsyncLogger", "AsyncLog.txt", true);
+            m_logger = spdlog::basic_logger_mt("AsyncLogger", "DefaultLog.txt", true);
             auto consoleSink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
             m_logger->sinks().emplace_back(consoleSink);
         }

@@ -24,10 +24,11 @@ namespace TG
         void Update() override;
         void PostUpdate() override;
 
-        void PlugInVideoPlay(const IVideoDisplay& display);
+        void ConnectToVideoPlay(const IVideoDisplay& display);
 
     private:
         bool m_showDemoWindow{ true };
         bool m_showAnotherWindow{ false };
+        bool m_isInitialized{ false };
     };
 }

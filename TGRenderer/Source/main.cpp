@@ -11,9 +11,9 @@
 int CALLBACK main()
 {
 	mi_version();
-	TG::Renderer app;
 	try
 	{
+		TG::Renderer app;
 		return app.Run();
 	}
 	catch (const std::exception& e)
