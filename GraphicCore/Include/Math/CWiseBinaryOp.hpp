@@ -91,4 +91,13 @@ namespace TG::Math
     {
         [[nodiscard]] Scalar operator()(Scalar a, Scalar b) const { return a / b; }
     };
+
+    // 常量左乘矩阵
+    template<typename Derived> requires std::derived_from<Derived, MatrixBase<Derived>>
+    CWiseBinaryOp<ScalarProductOp<typename Traits<Derived>::Scalar>, Derived,
+        CWiseNullaryOp<ScalarConstantOp<typename Traits<Derived>::Scalar>, Derived>>
+    operator*(typename Traits<Derived>::Scalar scalar, const Derived& other)
+    {
+        return other * scalar;
+    }
 }

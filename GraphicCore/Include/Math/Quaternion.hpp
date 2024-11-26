@@ -5,6 +5,8 @@
 *****************************************************************/
 #pragma once
 
+#include "Core.hpp"
+
 namespace TG::Math
 {
 	template<typename Scalar>
@@ -19,7 +21,7 @@ namespace TG::Math
             m_elements[2] = z;
             m_elements[3] = w;
 		}
-		Quaternion(Vector<Scalar, 4> v)
+		explicit Quaternion(Vector<Scalar, 4> v)
 		{
             m_elements[0] = v.x();
             m_elements[1] = v.y();

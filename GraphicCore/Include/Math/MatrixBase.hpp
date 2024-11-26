@@ -9,6 +9,7 @@
 #include "Reduction.hpp"
 #include "Determinant.hpp"
 #include "OrthoMethod.hpp"
+#include <cmath>
 
 namespace TG::Math
 {
@@ -26,20 +27,20 @@ namespace TG::Math
         static constexpr std::size_t Rows() noexcept { return Traits<Derived>::Rows; }
         static constexpr std::size_t Columns() noexcept { return Traits<Derived>::Columns; }
 
-        static CWiseNullaryOp<ScalarIdentityOp<Scalar>, PlainMatrix<Derived>> Identity()
+        static CWiseNullaryOp<ScalarIdentityOp<Scalar>, Derived> Identity()
         {
-            return CWiseNullaryOp<ScalarIdentityOp<Scalar>, PlainMatrix<Derived>>{{}};
+            return CWiseNullaryOp<ScalarIdentityOp<Scalar>, Derived>{{}};
         }
 
-        static CWiseNullaryOp<ScalarConstantOp<Scalar>, PlainMatrix<Derived>> Constant(Scalar scalar)
+        static CWiseNullaryOp<ScalarConstantOp<Scalar>, Derived> Constant(Scalar scalar)
         {
-            return CWiseNullaryOp<ScalarConstantOp<Scalar>, PlainMatrix<Derived>>{
+            return CWiseNullaryOp<ScalarConstantOp<Scalar>, Derived>{
                 ScalarConstantOp<Scalar>{scalar}};
         }
 
-        static CWiseNullaryOp<ScalarConstantOp<Scalar>, PlainMatrix<Derived>> Zero()
+        static CWiseNullaryOp<ScalarConstantOp<Scalar>, Derived> Zero()
         {
-            return Constant(Scalar{0});
+            return Constant(static_cast<Scalar>(0));
         }
 
         template<typename OtherDerived>
@@ -63,14 +64,13 @@ namespace TG::Math
             return {Expression(), other.Expression()};
         }
 
-        template<typename OtherDerived>
-        Product<Derived, OtherDerived, ProductType::Default>
-            operator*(const MatrixBase<OtherDerived>& other) const
+        CWiseBinaryOp<ScalarDivideOp<Scalar>, Derived, CWiseNullaryOp<ScalarConstantOp<Scalar>, Derived>>
+            operator/(Scalar scalar) const
         {
-            return {Expression(), other.Expression()};
+            return {Expression(), Constant(scalar)};
         }
-        // 矩阵乘常量，常量乘矩阵需要单独实现operator*
-        Product<Derived, CWiseNullaryOp<ScalarConstantOp<Scalar>, PlainMatrix<Derived>>, ProductType::Default>
+
+        CWiseBinaryOp<ScalarProductOp<Scalar>, Derived, CWiseNullaryOp<ScalarConstantOp<Scalar>, Derived>>
             operator*(Scalar scalar) const
         {
             return {Expression(), Constant(scalar)};
@@ -79,6 +79,13 @@ namespace TG::Math
         template<typename OtherDerived>
         CWiseBinaryOp<ScalarProductOp<Scalar>, Derived, OtherDerived>
             CWiseProduct(const MatrixBase<OtherDerived>& other) const
+        {
+            return {Expression(), other.Expression()};
+        }
+
+        template<typename OtherDerived>
+        Product<Derived, OtherDerived, ProductType::Default>
+            operator*(const MatrixBase<OtherDerived>& other) const
         {
             return {Expression(), other.Expression()};
         }
@@ -100,7 +107,7 @@ namespace TG::Math
             return Reduce(ScalarAddOp<Scalar>{});
         }
 
-        template<typename OtherDerived> requires IsVector
+        template<typename OtherDerived>
         [[nodiscard]] Scalar Dot(const MatrixBase<OtherDerived>& other) const
         {
             return CWiseProduct(other).Sum();
@@ -110,6 +117,17 @@ namespace TG::Math
         [[nodiscard]] CrossImpl<Derived, OtherDerived>::ReturnType Cross(const MatrixBase<OtherDerived>& other) const
         {
             return CrossImpl<Derived, OtherDerived>{}(Expression(), other.Expression());
+        }
+
+        Scalar Length() const
+        {
+            // Frobenius范数（矩阵的欧几里得范数），对应向量在欧几里得空间中的直线距离
+            return std::sqrt(Dot(Expression()));
+        }
+
+        void Normalize()
+        {
+            Expression() = Expression() / Length();
         }
 
         template<std::size_t BlockRows, std::size_t BlockCols>
@@ -126,7 +144,7 @@ namespace TG::Math
 
         Transpose<Derived> transpose() const
         {
-            return Transpose<Derived>(Expression());
+            return Math::Transpose<Derived>(Expression());
         }
 
         Block<Derived, 1, Traits<Derived>::Columns> Row(std::size_t row)

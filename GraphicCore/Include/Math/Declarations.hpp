@@ -42,16 +42,8 @@ namespace TG::Math
     // https://stackoverflow.com/questions/6006614/c-static-polymorphism-crtp-and-using-typedefs-from-derived-classes
     template<typename Xpr> struct Traits;
     // 表达式求值器，每种表达式都需要特化自己的求值器
-    template<typename Xpr, bool IsConst = true> class Evaluator;
-    // 求值器推导指南(template deduction guide)
     // 分为两种类型的求值器: 1. 根据索引返回值，用于计算 2. 根据索引返回引用，用来修改表达式的值
-    // 根据构造函数传入的表达式选择对应求值器。const Xpr&选择第一种求值器，Xpr&选择第二种求值器
-    // 注: 这里使用Xpr&作为构造函数的参数，不能使用Xpr，因为值传递会产生decay，即推倒的参数会忽略所有修饰符
-    //《C++ Templates The Complete Guide》Second Edition. Page 43
-    // When declaring call parameters by value, only trivial conversions that decay are supported:
-    // Qualifications with const or volatile are ignored, references convert to the referenced type, and raw
-    // arrays or functions convert to the corresponding pointer type.
-    template<typename Xpr> Evaluator(Xpr&) -> Evaluator<std::remove_const_t<Xpr>, std::is_const_v<Xpr>>;
+    template<typename Xpr, bool IsConst = true> class Evaluator;
     template<typename Xpr> using RefEvaluator = Evaluator<Xpr, false>;
 
     // 矩阵储存顺序

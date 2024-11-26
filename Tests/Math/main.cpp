@@ -8,9 +8,9 @@ namespace TG::Math
     static float gMin = 0.1f;
     static float gMax = 100.0f;
 
-    std::random_device gRd;
-    std::mt19937 gGen(gRd());
-    std::uniform_real_distribution gUrd(gMin, gMax);
+    static std::random_device gRd;
+    static std::mt19937 gGen(gRd());
+    static std::uniform_real_distribution gUrd(gMin, gMax);
     
     TEST(TestMatrix, Constructor)
     {
@@ -164,13 +164,29 @@ namespace TG::Math
 
         constant = 3.0f;
         mat1 = constant * Matrix4f::Identity();
-        for (std::size_t i = 0; i < 16; ++i)
-            EXPECT_NEAR(mat1[i], constant, gEpsilon);
+        for (std::size_t i = 0; i < 4; ++i)
+        {
+            for (std::size_t j = 0; j < 4; ++j)
+            {
+                if (i == j)
+                    EXPECT_NEAR(mat1(i, j), constant, gEpsilon);
+                else
+                    EXPECT_NEAR(mat1(i, j), 0, gEpsilon);
+            }
+        }
 
         constant = 4.0f;
         mat1 = Matrix4f::Identity() * constant;
-        for (std::size_t i = 0; i < 16; ++i)
-            EXPECT_NEAR(mat1[i], constant, gEpsilon);
+        for (std::size_t i = 0; i < 4; ++i)
+        {
+            for (std::size_t j = 0; j < 4; ++j)
+            {
+                if (i == j)
+                    EXPECT_NEAR(mat1(i, j), constant, gEpsilon);
+                else
+                    EXPECT_NEAR(mat1(i, j), 0, gEpsilon);
+            }
+        }
     }
 
     TEST(TestMatrix, Determinant)
@@ -270,6 +286,12 @@ namespace TG::Math
         EXPECT_NEAR(vec3c[0], -3.0f, gEpsilon);
         EXPECT_NEAR(vec3c[1],  6.0f, gEpsilon);
         EXPECT_NEAR(vec3c[2], -3.0f, gEpsilon);
+    }
+
+    TEST(TestMatrix, Normalize)
+    {
+        Vector4f vec4{1, 2, 3, 4};
+        vec4.Normalize();
     }
 }
 
