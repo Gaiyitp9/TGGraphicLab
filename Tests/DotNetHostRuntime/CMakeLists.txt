@@ -1,6 +1,6 @@
 add_executable(DotNetHostRuntime main.cpp)
 
-set(DotNetPath "C:/Program Files/dotnet/packs/Microsoft.NETCore.App.Host.win-x64/8.0.10/runtimes/win-x64/native")
+set(DotNetPath "C:/Program Files/dotnet/packs/Microsoft.NETCore.App.Host.win-x64/9.0.0/runtimes/win-x64/native")
 
 target_include_directories(DotNetHostRuntime PRIVATE ${DotNetPath})
 target_link_directories(DotNetHostRuntime PRIVATE ${DotNetPath})
