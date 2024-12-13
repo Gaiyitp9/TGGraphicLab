@@ -40,7 +40,7 @@ namespace TG::Math
         Block(NestedXpr& xpr, std::size_t startRow, std::size_t startColumn)
             : m_xpr(xpr), m_startRow(startRow), m_startColumn(startColumn) {}
 
-        template<typename Derived> requires !std::is_const_v<NestedXpr>
+        template<typename Derived> requires (!std::is_const_v<NestedXpr> && HasFlag<Block, XprFlag::LeftValue>)
         Block& operator=(const MatrixBase<Derived>& other)
         {
             CallAssignment(this->Expression(), other.Expression());

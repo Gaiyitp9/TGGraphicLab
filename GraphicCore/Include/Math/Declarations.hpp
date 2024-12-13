@@ -153,8 +153,7 @@ namespace TG::Math
     // 矩阵转置表达式
     template<typename NestedXpr> class Transpose;
     // 零元运算，不接受任何矩阵表达式的运算符
-    template<typename NullaryOp, typename Matrix>
-    class CWiseNullaryOp;
+    template<typename NullaryOp, typename Matrix> class CWiseNullaryOp;
     // 生成单位矩阵运算符
     template<typename Scalar> struct ScalarIdentityOp;
     // 生成常量矩阵运算符

@@ -25,6 +25,9 @@ namespace TG::Math
 	template<typename Scalar, std::size_t Rows, std::size_t Columns, StorageOrder Order>
 	class Matrix final : public MatrixBase<Matrix<Scalar, Rows, Columns, Order>>
 	{
+		static constexpr bool IsVector = Rows == 1 || Columns == 1;
+		static constexpr std::size_t Size = Rows * Columns;
+
 	public:
 		Matrix() = default;
 
@@ -60,6 +63,15 @@ namespace TG::Math
         		m_storage[i] = *it++;
         }
 
+		Scalar X() const requires (IsVector && Size > 0) { return m_storage[0]; }
+		Scalar Y() const requires (IsVector && Size > 1) { return m_storage[1]; }
+		Scalar Z() const requires (IsVector && Size > 2) { return m_storage[2]; }
+		Scalar W() const requires (IsVector && Size > 3) { return m_storage[3]; }
+		Scalar& X() requires (IsVector && Size > 0) { return m_storage[0]; }
+		Scalar& Y() requires (IsVector && Size > 1) { return m_storage[1]; }
+		Scalar& Z() requires (IsVector && Size > 2) { return m_storage[2]; }
+		Scalar& W() requires (IsVector && Size > 3) { return m_storage[3]; }
+
 		Scalar operator[](std::size_t index) const
 		{
 			return m_storage[index];
@@ -90,25 +102,25 @@ namespace TG::Math
 	template<typename Scalar, std::size_t Size> using Vector = Matrix<Scalar, Size, 1>;
 	template<typename Scalar, std::size_t Size> using RowVector = Matrix<Scalar, 1, Size>;
 
-	using Vector2f = Vector<float, 2>;
-	using Vector3f = Vector<float, 3>;
-	using Vector4f = Vector<float, 4>;
-	using RowVector2f = RowVector<float, 2>;
-	using RowVector3f = RowVector<float, 3>;
-	using RowVector4f = RowVector<float, 4>;
-	using Matrix2f = Matrix<float, 2, 2>;
-	using Matrix3f = Matrix<float, 3, 3>;
-	using Matrix4f = Matrix<float, 4, 4>;
+	using Vector2F = Vector<float, 2>;
+	using Vector3F = Vector<float, 3>;
+	using Vector4F = Vector<float, 4>;
+	using RowVector2F = RowVector<float, 2>;
+	using RowVector3F = RowVector<float, 3>;
+	using RowVector4F = RowVector<float, 4>;
+	using Matrix2F = Matrix<float, 2, 2>;
+	using Matrix3F = Matrix<float, 3, 3>;
+	using Matrix4F = Matrix<float, 4, 4>;
 
-	using Vector2d = Vector<double, 2>;
-	using Vector3d = Vector<double, 3>;
-	using Vector4d = Vector<double, 4>;
-	using RowVector2d = RowVector<double, 2>;
-	using RowVector3d = RowVector<double, 3>;
-	using RowVector4d = RowVector<double, 4>;
-	using Matrix2d = Matrix<double, 2, 2>;
-	using Matrix3d = Matrix<double, 3, 3>;
-	using Matrix4d = Matrix<double, 4, 4>;
+	using Vector2D = Vector<double, 2>;
+	using Vector3D = Vector<double, 3>;
+	using Vector4D = Vector<double, 4>;
+	using RowVector2D = RowVector<double, 2>;
+	using RowVector3D = RowVector<double, 3>;
+	using RowVector4D = RowVector<double, 4>;
+	using Matrix2D = Matrix<double, 2, 2>;
+	using Matrix3D = Matrix<double, 3, 3>;
+	using Matrix4D = Matrix<double, 4, 4>;
 
     template<typename Scalar, std::size_t Rows, std::size_t Columns, StorageOrder Order, bool IsConst>
     class Evaluator<Matrix<Scalar, Rows, Columns, Order>, IsConst>

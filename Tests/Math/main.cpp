@@ -14,20 +14,20 @@ namespace TG::Math
     
     TEST(TestMatrix, Constructor)
     {
-        Matrix4f mat;
+        Matrix4F mat;
         for (std::size_t i = 0; i < 16; ++i)
             EXPECT_NEAR(mat[i], 0, gEpsilon);
     }
 
     TEST(TestMatrix, CWiseBinaryOp)
     {
-        Matrix4f mat1, mat2;
+        Matrix4F mat1, mat2;
         for (std::size_t i = 0; i < 16; ++i)
         {
             mat1[i] = gUrd(gGen);
             mat2[i] = gUrd(gGen);
         }
-        Matrix4f result = mat1 + mat2;
+        Matrix4F result = mat1 + mat2;
         for (std::size_t i = 0; i < 16; ++i)
             EXPECT_NEAR(result[i], mat1[i] + mat2[i], gEpsilon);
 
@@ -46,20 +46,20 @@ namespace TG::Math
 
     TEST(TestMatrix, Block)
     {
-        Matrix4f mat4;
+        Matrix4F mat4;
         for (std::size_t i = 0; i < 16; ++i)
             mat4[i] = gUrd(gGen);
 
         std::size_t startRow = 1, startCol = 1;
-        Matrix3f mat3 = mat4.block<3, 3>(startRow, startCol);
+        Matrix3F mat3 = mat4.SubMatrix<3, 3>(startRow, startCol);
         for (std::size_t i = 0; i < 3; ++i)
             for (std::size_t j = 0; j < 3; ++j)
                 EXPECT_NEAR(mat3(i, j), mat4(startRow + i, startCol + j), gEpsilon);
 
-        Matrix2f mat2;
+        Matrix2F mat2;
         for (std::size_t i = 0; i < 4; ++i)
             mat2[i] = gUrd(gGen);
-        mat4.block<2, 2>(0, 0) = mat2;
+        mat4.SubMatrix<2, 2>(0, 0) = mat2;
         for (std::size_t i = 0; i < 2; ++i)
             for (std::size_t j = 0; j < 2; ++j)
                 EXPECT_NEAR(mat4(i, j), mat2(i, j), gEpsilon);
@@ -67,16 +67,16 @@ namespace TG::Math
 
     TEST(TestMatrix, Transpose)
     {
-        Matrix4f mat4;
+        Matrix4F mat4;
         for (std::size_t i = 0; i < 16; ++i)
             mat4[i] = gUrd(gGen);
 
-        Matrix4f transpose = mat4.transpose();
+        Matrix4F transpose = mat4.Transposed();
         for (std::size_t i = 0; i < 4; ++i)
             for (std::size_t j = 0; j < 4; ++j)
                 EXPECT_NEAR(transpose(i, j), mat4(j, i), gEpsilon);
 
-        Matrix4f transpose1 = mat4.transpose().transpose();
+        Matrix4F transpose1 = mat4.Transposed().Transposed();
         for (std::size_t i = 0; i < 4; ++i)
             for (std::size_t j = 0; j < 4; ++j)
                 EXPECT_NEAR(transpose1(i, j), mat4(i, j), gEpsilon);
@@ -84,7 +84,7 @@ namespace TG::Math
 
     TEST(TestMatrix, Reduce)
     {
-        Matrix4f mat4;
+        Matrix4F mat4;
         for (std::size_t i = 0; i < 16; ++i)
             mat4[i] = gUrd(gGen);
 
@@ -97,7 +97,7 @@ namespace TG::Math
 
     TEST(TestMatrix, Dot)
     {
-        Vector4f vec0, vec1;
+        Vector4F vec0, vec1;
         for (std::size_t i = 0; i < 4; ++i)
         {
             vec0[i] = gUrd(gGen);
@@ -113,15 +113,15 @@ namespace TG::Math
 
     TEST(TestMatrix, MatrixMultiplication)
     {
-        Matrix4f mat1, mat2;
+        Matrix4F mat1, mat2;
         for (std::size_t i = 0; i < 16; ++i)
         {
             mat1[i] = gUrd(gGen);
             mat2[i] = gUrd(gGen);
         }
 
-        Matrix4f mat3 = mat1 * mat2;
-        Matrix4f mat4;
+        Matrix4F mat3 = mat1 * mat2;
+        Matrix4F mat4;
         for (std::size_t i = 0; i < 4; ++i)
         {
             for (std::size_t j = 0; j < 4; ++j)
@@ -134,14 +134,14 @@ namespace TG::Math
         for (std::size_t i = 0; i < 16; ++i)
             EXPECT_NEAR(mat3[i], mat4[i], gEpsilon);
 
-        Matrix4f mat5 = mat1.LazyProduct(mat2);
+        Matrix4F mat5 = mat1.LazyProduct(mat2);
         for (std::size_t i = 0; i < 16; ++i)
             EXPECT_NEAR(mat5[i], mat4[i], gEpsilon);
     }
 
     TEST(TestMatrix, NullaryOp)
     {
-        Matrix4f mat1 = Matrix4f::Identity();
+        Matrix4F mat1 = Matrix4F::Identity();
         for (std::size_t i = 0; i < 4; ++i)
         {
             for (std::size_t j = 0; j < 4; ++j)
@@ -153,17 +153,17 @@ namespace TG::Math
             }
         }
 
-        mat1 = Matrix4f::Zero();
+        mat1 = Matrix4F::Zero();
         for (std::size_t i = 0; i < 16; ++i)
             EXPECT_NEAR(mat1[i], 0.0f, gEpsilon);
 
         float constant = 2.0f;
-        mat1 = Matrix4f::Constant(constant);
+        mat1 = Matrix4F::Constant(constant);
         for (std::size_t i = 0; i < 16; ++i)
             EXPECT_NEAR(mat1[i], constant, gEpsilon);
 
         constant = 3.0f;
-        mat1 = constant * Matrix4f::Identity();
+        mat1 = constant * Matrix4F::Identity();
         for (std::size_t i = 0; i < 4; ++i)
         {
             for (std::size_t j = 0; j < 4; ++j)
@@ -176,7 +176,7 @@ namespace TG::Math
         }
 
         constant = 4.0f;
-        mat1 = Matrix4f::Identity() * constant;
+        mat1 = Matrix4F::Identity() * constant;
         for (std::size_t i = 0; i < 4; ++i)
         {
             for (std::size_t j = 0; j < 4; ++j)
@@ -191,7 +191,7 @@ namespace TG::Math
 
     TEST(TestMatrix, Determinant)
     {
-        Matrix2f mat2a, mat2b;
+        Matrix2F mat2a, mat2b;
         for (std::size_t i = 0; i < 4; ++i)
         {
             mat2a[i] = gUrd(gGen);
@@ -201,18 +201,18 @@ namespace TG::Math
                              - (mat2a(0, 1) + mat2b(0, 1)) * (mat2a(1, 0) + mat2b(1, 0));
         EXPECT_NEAR((mat2a + mat2b).Determinant(), result, gEpsilon);
 
-        Matrix3f mat3;
+        Matrix3F mat3;
         for (std::size_t i = 0; i < 9; ++i)
             mat3[i] = 3.0f;
         EXPECT_NEAR(mat3.Determinant(), 0, gEpsilon);
-        mat3 = Matrix3f::Identity();
+        mat3 = Matrix3F::Identity();
         EXPECT_NEAR(mat3.Determinant(), 1.0f, gEpsilon);
 
-        Matrix4f mat4;
+        Matrix4F mat4;
         for (std::size_t i = 0; i < 16; ++i)
             mat4[i] = 4.0f;
         EXPECT_NEAR(mat4.Determinant(), 0, gEpsilon);
-        mat4 = Matrix4f::Identity();
+        mat4 = Matrix4F::Identity();
         EXPECT_NEAR(mat4.Determinant(), 1.0f, gEpsilon);
 
         Matrix<float, 5, 5> mat5;
@@ -225,22 +225,22 @@ namespace TG::Math
 
     TEST(TestMatrix, Inverse)
     {
-        Matrix2f mat2{
+        Matrix2F mat2{
             0, 1,
             2, 3
         };
-        Matrix2f invMat2 = mat2.inverse();
+        Matrix2F invMat2 = mat2.Inversed();
         EXPECT_NEAR(invMat2[0], -1.5f, gEpsilon);
         EXPECT_NEAR(invMat2[1],  0.5f, gEpsilon);
         EXPECT_NEAR(invMat2[2],  1.0f, gEpsilon);
         EXPECT_NEAR(invMat2[3],  0.0f, gEpsilon);
 
-        Matrix3f mat3{
+        Matrix3F mat3{
             1.0f, 2.0f, 4.0f,
             1.0f, 3.0f, 5.0f,
             2.0f, 6.0f, 8.0f,
         };
-        Matrix3f invMat3 = mat3.inverse();
+        Matrix3F invMat3 = mat3.Inversed();
         EXPECT_NEAR(invMat3[0],  3.0f, gEpsilon);
         EXPECT_NEAR(invMat3[1], -4.0f, gEpsilon);
         EXPECT_NEAR(invMat3[2],  1.0f, gEpsilon);
@@ -251,13 +251,13 @@ namespace TG::Math
         EXPECT_NEAR(invMat3[7],  1.0f, gEpsilon);
         EXPECT_NEAR(invMat3[8], -0.5f, gEpsilon);
 
-        Matrix4f mat4{
+        Matrix4F mat4{
             1.0f, 2.0f, 4.0f, 6.0f,
             1.0f, 3.0f, 5.0f, 7.0f,
             2.0f, 6.0f, 8.0f, 10.0f,
             3.0f, 5.0f, 6.0f, 6.0f,
         };
-        Matrix4f invMat4 = mat4.inverse();
+        Matrix4F invMat4 = mat4.Inversed();
         EXPECT_NEAR(invMat4[0],  3.0f, gEpsilon);
         EXPECT_NEAR(invMat4[1], -4.0f, gEpsilon);
         EXPECT_NEAR(invMat4[2],  1.0f, gEpsilon);
@@ -278,11 +278,11 @@ namespace TG::Math
 
     TEST(TestMatrix, Cross)
     {
-        Vector2f vec2_0{1, 2}, vec2_1{3, 4};
+        Vector2F vec2_0{1, 2}, vec2_1{3, 4};
         EXPECT_NEAR(vec2_0.Cross(vec2_1), -2.0f, gEpsilon);
 
-        Vector3f vec3_0{1, 2, 3}, vec3_1{4, 5, 6};
-        Vector3f vec3c = vec3_0.Cross(vec3_1);
+        Vector3F vec3_0{1, 2, 3}, vec3_1{4, 5, 6};
+        Vector3F vec3c = vec3_0.Cross(vec3_1);
         EXPECT_NEAR(vec3c[0], -3.0f, gEpsilon);
         EXPECT_NEAR(vec3c[1],  6.0f, gEpsilon);
         EXPECT_NEAR(vec3c[2], -3.0f, gEpsilon);
@@ -290,7 +290,7 @@ namespace TG::Math
 
     TEST(TestMatrix, Normalize)
     {
-        Vector4f vec4{1, 2, 3, 4};
+        Vector4F vec4{1, 2, 3, 4};
         vec4.Normalize();
     }
 }

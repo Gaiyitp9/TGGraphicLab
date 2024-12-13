@@ -105,7 +105,7 @@ namespace TG::Math
 
         Scalar Entry(std::size_t row, std::size_t column) const
         {
-            return m_lhs.Row(row).CWiseProduct(m_rhs.Column(column).transpose()).Sum();
+            return m_lhs.Row(row).CWiseProduct(m_rhs.Column(column).Transposed()).Sum();
         }
 
     private:

@@ -44,7 +44,7 @@ namespace TG::Math
 		}
 
 	private:
-		Vector4f m_channels;
+		Vector4F m_channels;
 
 	public:
 		static Color AliceBlue;				// 爱丽丝蓝

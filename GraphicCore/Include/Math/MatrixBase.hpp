@@ -19,6 +19,7 @@ namespace TG::Math
         using Scalar = Traits<Derived>::Scalar;
         static constexpr bool IsVector = Traits<Derived>::Rows == 1 || Traits<Derived>::Columns == 1;
         static constexpr bool IsSquare = Traits<Derived>::Rows == Traits<Derived>::Columns;
+        static constexpr bool IsLeftValue = HasFlag<Derived, XprFlag::LeftValue>;
 
     public:
         const Derived& Expression() const noexcept { return *static_cast<Derived const*>(this); }
@@ -119,30 +120,35 @@ namespace TG::Math
             return CrossImpl<Derived, OtherDerived>{}(Expression(), other.Expression());
         }
 
-        Scalar Length() const
+        Scalar Length()
         {
             // Frobenius范数（矩阵的欧几里得范数），对应向量在欧几里得空间中的直线距离
             return std::sqrt(Dot(Expression()));
         }
 
-        void Normalize()
+        void Normalize() requires IsLeftValue
         {
             Expression() = Expression() / Length();
         }
 
+        PlainMatrix<Derived> Normalized()
+        {
+            return Expression() / Length();
+        }
+
         template<std::size_t BlockRows, std::size_t BlockCols>
-        Block<Derived, BlockRows, BlockCols> block(std::size_t startRow, std::size_t startColumn)
+        Block<Derived, BlockRows, BlockCols> SubMatrix(std::size_t startRow, std::size_t startColumn)
         {
             return {Expression(), startRow, startColumn};
         }
 
         template<std::size_t BlockRows, std::size_t BlockCols>
-        Block<const Derived, BlockRows, BlockCols> block(std::size_t startRow, std::size_t startColumn) const
+        Block<const Derived, BlockRows, BlockCols> SubMatrix(std::size_t startRow, std::size_t startColumn) const
         {
             return {Expression(), startRow, startColumn};
         }
 
-        Transpose<Derived> transpose() const
+        Transpose<Derived> Transposed() const
         {
             return Math::Transpose<Derived>(Expression());
         }
@@ -172,7 +178,7 @@ namespace TG::Math
             return DeterminantImpl<Derived, Traits<Derived>::Rows>{}(Expression());
         }
 
-        Inverse<Derived> inverse() const requires IsSquare
+        Inverse<Derived> Inversed() const requires IsSquare
         {
             return Inverse<Derived>(Expression());
         }
