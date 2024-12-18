@@ -5,7 +5,7 @@
 *****************************************************************/
 
 #include "Renderer.h"
-#include "spdlog/spdlog.h"
+#include "Diagnostic/Log.h"
 
 namespace TG
 {
@@ -49,7 +49,7 @@ namespace TG
 				module->Update();
 
             if (m_inputModule->GetKeyUp(Input::KeyCode::Space))
-                spdlog::info("space up");
+	            Log::Instance().Info("space up");
 
 			for (const auto& module : m_modules)
 				module->PostUpdate();

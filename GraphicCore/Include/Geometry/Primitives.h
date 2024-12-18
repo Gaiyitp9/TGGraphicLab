@@ -3,12 +3,21 @@
 * Copyright (c) Gaiyitp9. All rights reserved.					*
 * This code is licensed under the MIT License (MIT).			*
 *****************************************************************/
+#pragma once
 
-#include "Base/MainWindow.h"
+#include "Geometry/Mesh.h"
 
-namespace TG
+namespace TG::Geometry
 {
-    MainWindow::MainWindow(int x, int y, int width, int height, std::string_view name)
-        : Window(x, y, width, height, name, WindowType::Default)
-    {}
+    enum class PrimitiveType : unsigned char
+    {
+        Quad,
+        Plane,
+        Sphere,
+        Cube,
+        Capsule,
+        Cylinder,
+    };
+
+    template<PrimitiveType T> Mesh CreatePrimitive();
 }

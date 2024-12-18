@@ -10,13 +10,13 @@
 
 namespace TG::Math
 {
-    template<std::floating_point T> inline constexpr T Rad2DegV = static_cast<T>(57.2957795130823);
-    template<std::floating_point T> inline constexpr T Deg2RadV = static_cast<T>(0.0174532925199433);
+    template<std::floating_point T> inline constexpr T Rad2Deg = static_cast<T>(57.2957795130823);
+    template<std::floating_point T> inline constexpr T Deg2Rad = static_cast<T>(0.0174532925199433);
 
-    inline constexpr double Rad2Degd = Rad2DegV<double>;
-    inline constexpr double Deg2Radd = Deg2RadV<double>;
-    inline constexpr double Rad2Degf = Rad2DegV<float>;
-    inline constexpr double Deg2Radf = Deg2RadV<float>;
+    inline constexpr double Rad2DegD = Rad2Deg<double>;
+    inline constexpr double Deg2RadD = Deg2Rad<double>;
+    inline constexpr float Rad2DegF = Rad2Deg<float>;
+    inline constexpr float Deg2RadF = Deg2Rad<float>;
 
     constexpr long double operator""_deg_to_rad(long double degree)
     {

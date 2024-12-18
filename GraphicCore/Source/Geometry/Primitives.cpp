@@ -4,11 +4,15 @@
 * This code is licensed under the MIT License (MIT).			*
 *****************************************************************/
 
-#include "Base/MainWindow.h"
+#include "Geometry/Primitives.h"
 
-namespace TG
+namespace TG::Geometry
 {
-    MainWindow::MainWindow(int x, int y, int width, int height, std::string_view name)
-        : Window(x, y, width, height, name, WindowType::Default)
-    {}
+
+    template<>
+    Mesh CreatePrimitive<PrimitiveType::Sphere>()
+    {
+        Mesh mesh;
+        return mesh;
+    }
 }
