@@ -1,10 +1,11 @@
-set(PROJECT_NAME TGRenderer)
-
 file(GLOB_RECURSE SRCS *.cpp *.c)
 file(GLOB_RECURSE INCS *.h *.hpp)
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${SRCS})
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${INCS})
 
+find_package(mimalloc 2.1.7 REQUIRED)
+
+set(PROJECT_NAME TGRenderer)
 add_executable(${PROJECT_NAME} ${SRCS} ${INCS})
 target_include_directories(${PROJECT_NAME} PRIVATE Include)
 target_link_libraries(${PROJECT_NAME} PRIVATE GraphicCore mimalloc)

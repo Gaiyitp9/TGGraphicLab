@@ -1,6 +1,8 @@
 enable_testing()
 
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES main.cpp)
+
+find_package(GTest REQUIRED)
 add_executable(MathTest main.cpp)
 # vs项目放在Tests目录下
 set_target_properties(MathTest PROPERTIES FOLDER ${TestsFolderName})

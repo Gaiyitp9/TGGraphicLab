@@ -37,11 +37,12 @@ option(BUILD_SHARED_LIBS "Build using shared libraries" OFF)
 # 开启使用文件夹选项，vs项目可以分类放在不同文件夹下
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
-# 安装目录设置为Install
-set(CMAKE_INSTALL_PREFIX ${CMAKE_CURRENT_SOURCE_DIR}/Install CACHE PATH "Installation directory" FORCE)
+# 安装目录设置为install
+set(CMAKE_INSTALL_PREFIX ${CMAKE_CURRENT_SOURCE_DIR}/install CACHE PATH "Installation directory" FORCE)
 message(STATUS "Third party install path: ${CMAKE_INSTALL_PREFIX}")
+# 三方库查找目录
+set(CMAKE_PREFIX_PATH ${CMAKE_CURRENT_SOURCE_DIR}/install)
 
-add_subdirectory(ThirdParty)
 add_subdirectory(GraphicCore)
 add_subdirectory(TGRenderer)
 add_subdirectory(Tests)
