@@ -38,10 +38,10 @@ option(BUILD_SHARED_LIBS "Build using shared libraries" OFF)
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
 # 安装目录设置为install
-set(CMAKE_INSTALL_PREFIX ${CMAKE_CURRENT_SOURCE_DIR}/install CACHE PATH "Installation directory" FORCE)
+set(CMAKE_INSTALL_PREFIX ${CMAKE_SOURCE_DIR}/install CACHE PATH "Installation directory" FORCE)
 message(STATUS "Third party install path: ${CMAKE_INSTALL_PREFIX}")
 # 三方库查找目录
-set(CMAKE_PREFIX_PATH ${CMAKE_CURRENT_SOURCE_DIR}/install)
+set(CMAKE_PREFIX_PATH ${CMAKE_SOURCE_DIR}/install)
 
 add_subdirectory(GraphicCore)
 add_subdirectory(TGRenderer)
