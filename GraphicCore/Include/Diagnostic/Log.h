@@ -6,12 +6,11 @@
 #pragma once
 
 #include "Base/Singleton.hpp"
-#include "Base/CommonDef.h"
 #include "spdlog/spdlog.h"
 
 namespace TG
 {
-    class TG_API Log final : public Singleton<Log>
+    class Log final : public Singleton<Log>
     {
     public:
         template <typename... Args>
@@ -54,4 +53,40 @@ namespace TG
 
         std::shared_ptr<spdlog::logger> m_logger;
     };
+
+    template<typename... Args>
+    void LogInfo(std::format_string<Args...> fmt, Args&&... args)
+    {
+        Log::Instance().Info(fmt, std::forward<Args>(args)...);
+    }
+
+    template<typename T>
+    void LogInfo(const T& msg)
+    {
+        Log::Instance().Info(msg);
+    }
+
+    template<typename... Args>
+    void LogWarn(std::format_string<Args...> fmt, Args&&... args)
+    {
+        Log::Instance().Warn(fmt, std::forward<Args>(args)...);
+    }
+
+    template<typename T>
+    void LogWarn(const T& msg)
+    {
+        Log::Instance().Warn(msg);
+    }
+
+    template<typename... Args>
+    void LogError(std::format_string<Args...> fmt, Args&&... args)
+    {
+        Log::Instance().Error(fmt, std::forward<Args>(args)...);
+    }
+
+    template<typename T>
+    void LogError(const T& msg)
+    {
+        Log::Instance().Error(msg);
+    }
 }

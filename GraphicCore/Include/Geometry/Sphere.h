@@ -7,6 +7,9 @@
 
 namespace TG::Geometry
 {
+    class Sphere
+    {
 
+    };
 }
 

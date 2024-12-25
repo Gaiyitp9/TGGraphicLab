@@ -26,7 +26,8 @@ $cmakeOptions = @(
 
 function BuildLibrary
 {
-   param(
+   param
+   (
       [string]$buildType
    )
 

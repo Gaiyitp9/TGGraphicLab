@@ -15,8 +15,3 @@ set_target_properties(WinSocketTCPClient PROPERTIES FOLDER ${TestsFolderName})
 set_target_properties(WinSocketTCPServer PROPERTIES FOLDER ${TestsFolderName})
 set_target_properties(WinSocketUDPClient PROPERTIES FOLDER ${TestsFolderName})
 set_target_properties(WinSocketUDPServer PROPERTIES FOLDER ${TestsFolderName})
-
-install(TARGETS WinSocketTCPServer WinSocketTCPClient WinSocketUDPServer WinSocketUDPClient
-    EXPORT WinSocketTargets
-    RUNTIME DESTINATION WinSocket/${CMAKE_INSTALL_BINDIR}
-)

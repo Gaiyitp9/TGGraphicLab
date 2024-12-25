@@ -18,11 +18,11 @@ int CALLBACK main()
 	}
 	catch (const std::exception& e)
 	{
-		TG::Log::Instance().Error(e.what());
+		TG::LogError(e.what());
 	}
 	catch (...)
 	{
-		TG::Log::Instance().Error("Unknown Exception");
+		TG::LogError("Unknown Exception");
 	}
 
 	return -1;

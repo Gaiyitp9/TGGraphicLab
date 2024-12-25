@@ -33,12 +33,12 @@ namespace TG
 		RECT rect = { 0, 0, width, height };
 		// 根据客户区域宽和高计算整个窗口的宽和高
 		if (!AdjustWindowRect(&rect, dwStyle, false))
-			CheckLastError();
+			throw Win32Exception::Create();
 		handle = CreateWindowExW(dwExStyle, L"Default", MultiBytesToWideChars(name).c_str(), dwStyle,
 							   x, y, rect.right - rect.left, rect.bottom - rect.top,
 							   nullptr, nullptr, nullptr, this);
 		if (handle == nullptr)
-			CheckLastError();
+			throw Win32Exception::Create();
 
 		deviceContext = GetDC(handle);
 	}
@@ -69,7 +69,7 @@ namespace TG
 		HANDLE icon = LoadImageW(nullptr, MultiBytesToWideChars(iconPath).c_str(), IMAGE_ICON, 0, 0,
 			LR_DEFAULTSIZE | LR_LOADFROMFILE);
 		if (icon == nullptr)
-			CheckLastError("Invalid icon source");
+			throw Win32Exception::Create("Invalid icon source");
 
 		SendMessageW(handle, WM_SETICON, ICON_BIG, reinterpret_cast<LPARAM>(icon));
 		SendMessageW(handle, WM_SETICON, ICON_SMALL, reinterpret_cast<LPARAM>(icon));
@@ -496,7 +496,7 @@ namespace TG
         wc.lpszClassName = L"Default";
 
         if (RegisterClassExW(&wc) == 0)
-            CheckLastError();
+            throw Win32Exception::Create();
 
         return {};
     }

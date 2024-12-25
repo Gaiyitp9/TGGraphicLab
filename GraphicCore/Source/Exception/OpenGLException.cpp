@@ -6,12 +6,17 @@
 
 #include "Exception/OpenGLException.h"
 #include "DynamicGles.h"
+#include <format>
+#include <stacktrace>
 
 namespace TG
 {
-    OpenGLException::OpenGLException(std::string_view description)
+    OpenGLException::OpenGLException(std::string_view description) : BaseException(description) {}
+
+    OpenGLException OpenGLException::Create(std::string_view message)
     {
         GLenum error;
+        std::string whatBuffer;
         while ((error = glGetError()) != GL_NO_ERROR)
         {
             char const* errorMsg = nullptr;
@@ -19,41 +24,37 @@ namespace TG
             {
                 case GL_INVALID_ENUM:
                     errorMsg = "An unacceptable value is specified for an enumerated argument.";
-                    break;
+                break;
                 case GL_INVALID_VALUE:
                     errorMsg = "A numeric argument is out of range.";
-                    break;
+                break;
                 case GL_INVALID_OPERATION:
                     errorMsg = "The specified operation is not allowed in the current state.";
-                    break;
+                break;
                 case GL_INVALID_FRAMEBUFFER_OPERATION:
                     errorMsg = "The framebuffer object is not complete.";
-                    break;
+                break;
                 case GL_OUT_OF_MEMORY:
                     errorMsg = "There is not enough memory left to execute the command.";
-                    break;
+                break;
                 case GL_STACK_UNDERFLOW:
                     errorMsg = "An attempt has been made to perform an operation that "
                                "would cause an internal stack to underflow.";
-                    break;
+                break;
                 case GL_STACK_OVERFLOW:
                     errorMsg = "An attempt has been made to perform an operation that "
                                "would cause an internal stack to overflow.";
-                    break;
+                break;
                 default:
                     errorMsg = "Unknown error.";
-                    break;
+                break;
             }
 
-            m_whatBuffer += std::format("Exception type: OpenGL Exception\n"
+            whatBuffer += std::format("Exception type: OpenGL Exception\n"
                                      "Error: {:#04x}\nError Message: {}\n"
                                      "[OpenGL] {}\n"
-                                     "{}\n", error, errorMsg, description, m_stackTrace);
+                                     "{}\n", error, errorMsg, message, std::stacktrace::current());
         }
-    }
-
-    char const* OpenGLException::what() const
-    {
-        return m_whatBuffer.c_str();
+        return OpenGLException(whatBuffer);
     }
 }

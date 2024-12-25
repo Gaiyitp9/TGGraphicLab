@@ -155,12 +155,12 @@ namespace TG
         // 窗口程序插入ImGui处理输入事件的代码
     	g_prevWndProc = reinterpret_cast<Win32Proc>(GetWindowLongPtrW(display.GetHandle(), GWLP_WNDPROC));
     	if (!g_prevWndProc)
-    		CheckLastError("Failed to get window procedure");
+    		throw Win32Exception::Create("Failed to get window procedure");
     	SetLastError(0);
 	    if (SetWindowLongPtrW(display.GetHandle(), GWLP_WNDPROC, reinterpret_cast<LONG_PTR>(ImGuiWindowProc)) == 0
 	    	&& GetLastError() != 0)
 	    {
-    		CheckLastError("Failed to set window procedure");
+    		throw Win32Exception::Create("Failed to set window procedure");
 	    }
 
     	ImGuiIO& io = ImGui::GetIO();
@@ -196,15 +196,15 @@ namespace TG
     		EGLint numConfigs;
 			EGLConfig eglConfig;
     		if (eglChooseConfig(data->display, configurationAttributes, &eglConfig, 1, &numConfigs) != GL_TRUE)
-    			throw EGLException("Failed to choose EGLConfig");
+    			throw EGLException::Create("Failed to choose EGLConfig");
     		if (numConfigs != 1)
-    			throw EGLException("eglChooseConfig return no config");
+    			throw EGLException::Create("eglChooseConfig return no config");
 
     		// 创建EGLSurface
     		data->surface = eglCreateWindowSurface(data->display, eglConfig,
 				static_cast<EGLNativeWindowType>(viewport->PlatformHandle), nullptr);
     		if (data->surface == EGL_NO_SURFACE)
-    			throw EGLException("Failed to create EGLSurface");
+    			throw EGLException::Create("Failed to create EGLSurface");
     	};
     	platformIO.Renderer_DestroyWindow = [](ImGuiViewport* viewport) {
     		if (auto* data = static_cast<EGLData*>(viewport->RendererUserData))
@@ -214,21 +214,21 @@ namespace TG
     			EGLSurface surface = data->surface;
     			delete data;
     			if (eglDestroySurface(display, surface) != EGL_TRUE)
-    				throw EGLException("Failed to destroy EGLSurface");
+    				throw EGLException::Create("Failed to destroy EGLSurface");
     		}
     	};
     	platformIO.Renderer_SwapBuffers = [](ImGuiViewport* viewport, void*) {
     		if (auto* data = static_cast<EGLData*>(viewport->RendererUserData))
     		{
     			if (eglSwapBuffers(data->display, data->surface) != EGL_TRUE)
-    				throw EGLException("Failed to swap buffers");
+    				throw EGLException::Create("Failed to swap buffers");
     		}
     	};
     	platformIO.Platform_RenderWindow = [](ImGuiViewport* viewport, void*) {
     		if (auto* data = static_cast<EGLData*>(viewport->RendererUserData))
     		{
     			if (eglMakeCurrent(data->display, data->surface, data->surface, data->context) != EGL_TRUE)
-    				throw EGLException("Failed to make current surface");
+    				throw EGLException::Create("Failed to make current surface");
     		}
     	};
     }

@@ -5,16 +5,18 @@
 *****************************************************************/
 #pragma once
 
-#include "BaseException.h"
+#include "Exception/BaseException.h"
 
 namespace TG
 {
     class OpenGLException : public BaseException
     {
     public:
-        explicit OpenGLException(std::string_view description = "");
         ~OpenGLException() override = default;
 
-        [[nodiscard]] char const* what() const override;
+        static OpenGLException Create(std::string_view message = "");
+
+    private:
+        explicit OpenGLException(std::string_view description);
     };
 }

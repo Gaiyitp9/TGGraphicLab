@@ -5,7 +5,7 @@
 *****************************************************************/
 #pragma once
 
-#include "Core.hpp"
+#include "Math/Core.hpp"
 
 namespace TG::Math
 {

@@ -29,7 +29,7 @@ namespace TG
         // freopen_s(&nullFile, "NUL", "w", stderr);
 
         // 打印日期
-        Log::Instance().Info(Chronometer::Date());
+        LogInfo(Chronometer::Date());
 
         int windowWidth = m_screenWidth * 3 / 4;
         int windowHeight = m_screenHeight * 4 / 5;

@@ -7,10 +7,13 @@
 #include "Exception/Windows/Win32Exception.h"
 #include "Base/Utility.h"
 #include <format>
+#include <stacktrace>
 
 namespace TG
 {
-	Win32Exception::Win32Exception(HRESULT errorCode, std::string_view description)
+	Win32Exception::Win32Exception(std::string_view description) : BaseException(description) {}
+
+	Win32Exception Win32Exception::Create(HRESULT hr, std::string_view description)
 	{
 		// 提取错误码中的信息
 		/*
@@ -33,17 +36,17 @@ namespace TG
 		所以要做一个看上去很奇怪的转换：取wchar_t指针的地址，再强转为whar_t指针*/
 		wchar_t msgBuf[256];
 		DWORD msgLen = FormatMessageW(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
-									  nullptr, errorCode, LANG_SYSTEM_DEFAULT, msgBuf, 256, nullptr);
+									  nullptr, hr, LANG_SYSTEM_DEFAULT, msgBuf, 256, nullptr);
 		std::string errorMsg = msgLen > 0 ? WideCharsToMultiBytes(msgBuf) : "Unidentified error code";
-
-		m_whatBuffer = std::format("Exception type: Windows API Exception\n"
-								 "HRESULT: {:#010x}\nError Message: {}"
-								 "{}"
-								 "{}\n", errorCode, errorMsg, description, m_stackTrace);
+		std::string whatBuffer = std::format("Exception type: Windows API Exception\n"
+										 "HRESULT: {:#010x}\nError Message: {}"
+										 "{}"
+										 "{}\n", hr, errorMsg, description, std::stacktrace::current());
+		return Win32Exception(whatBuffer);
 	}
 
-	char const* Win32Exception::what() const
+	Win32Exception Win32Exception::Create(std::string_view description)
 	{
-		return m_whatBuffer.c_str();
+		return Create(static_cast<HRESULT>(GetLastError()), description);
 	}
 }

@@ -5,21 +5,19 @@
 *****************************************************************/
 #pragma once
 
-#include <stacktrace>
+#include <exception>
+#include <string_view>
 
 namespace TG
 {
     class BaseException : public std::exception
     {
     public:
-        BaseException() = default;
-        explicit BaseException(std::string_view description);
         ~BaseException() override = default;
 
-        [[nodiscard]] char const* what() const override;
+        static BaseException Create(std::string_view message = "");
 
     protected:
-        std::string m_whatBuffer;
-        std::stacktrace m_stackTrace{ std::stacktrace::current() };
+        explicit BaseException(std::string_view message);
     };
 }

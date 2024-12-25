@@ -5,16 +5,18 @@
 *****************************************************************/
 #pragma once
 
-#include "BaseException.h"
+#include "Exception/BaseException.h"
 
 namespace TG
 {
     class EGLException final : public BaseException
     {
     public:
-        explicit EGLException(std::string_view description = "");
         ~EGLException() override = default;
 
-        [[nodiscard]] char const* what() const override;
+        static EGLException Create(std::string_view message = "");
+
+    private:
+        explicit EGLException(std::string_view description);
     };
 }

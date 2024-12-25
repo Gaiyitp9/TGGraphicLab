@@ -6,10 +6,13 @@
 
 #include "Exception/EGLException.h"
 #include "DynamicEgl.h"
+#include <stacktrace>
 
 namespace TG
 {
-    EGLException::EGLException(std::string_view description)
+    EGLException::EGLException(std::string_view message) : BaseException(message) {}
+
+    EGLException EGLException::Create(std::string_view message)
     {
         EGLint error = eglGetError();
         char const* errorMsg = nullptr;
@@ -68,14 +71,11 @@ namespace TG
                 break;
         }
 
-        m_whatBuffer = std::format("Exception type: EGL Exception\n"
+        std::string whatBuffer = std::format("Exception type: EGL Exception\n"
                                  "Error: {:#04x}\nError Message: {}\n"
                                  "[EGL] {}\n"
-                                 "{}\n", error, errorMsg, description, m_stackTrace);
-    }
+                                 "{}\n", error, errorMsg, message, std::stacktrace::current());
 
-    char const* EGLException::what() const
-    {
-        return m_whatBuffer.c_str();
+        return EGLException(whatBuffer);
     }
 }

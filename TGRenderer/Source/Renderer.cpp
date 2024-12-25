@@ -49,7 +49,7 @@ namespace TG
 				module->Update();
 
             if (m_inputModule->GetKeyUp(Input::KeyCode::Space))
-	            Log::Instance().Info("space up");
+	            LogInfo("space up");
 
 			for (const auto& module : m_modules)
 				module->PostUpdate();

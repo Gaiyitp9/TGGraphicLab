@@ -5,18 +5,17 @@
 *****************************************************************/
 
 #include "Exception/BaseException.h"
+#include <stacktrace>
 
 namespace TG
 {
-    BaseException::BaseException(std::string_view description)
-    {
-        m_whatBuffer = std::format("Exception type: Base Exception\n"
-                                 "{}\n"
-                                 "{}\n", description, m_stackTrace);
-    }
+    BaseException::BaseException(std::string_view message) : std::exception(message.data()) {}
 
-    char const* BaseException::what() const
+    BaseException BaseException::Create(std::string_view message)
     {
-        return m_whatBuffer.c_str();
+        std::string whatBuffer = std::format("Exception type: Base Exception\n"
+                                 "{}\n"
+                                 "{}\n", message, std::stacktrace::current());
+        return BaseException(whatBuffer);
     }
 }
