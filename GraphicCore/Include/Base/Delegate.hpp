@@ -11,6 +11,10 @@
 
 namespace TG
 {
+    // 委托
+    template<typename DelegateSignature>
+    class Delegate;
+
     // 多播委托
     template<typename DelegateSignature>
     class MulticastDelegate;

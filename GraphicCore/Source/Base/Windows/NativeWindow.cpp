@@ -18,15 +18,15 @@ namespace TG
 		DWORD dwExStyle = WS_EX_OVERLAPPEDWINDOW;
 		switch (type)
 		{
-		case WindowType::Default:
-			dwStyle = WS_OVERLAPPEDWINDOW;
-			dwExStyle = WS_EX_OVERLAPPEDWINDOW;
-			break;
-		case WindowType::Load:
-			dwStyle = WS_POPUP;
-			dwExStyle = WS_EX_TOOLWINDOW;
-			dwExStyle &= ~WS_EX_APPWINDOW;
-			break;
+			case WindowType::Default:
+				dwStyle = WS_OVERLAPPEDWINDOW;
+				dwExStyle = WS_EX_OVERLAPPEDWINDOW;
+				break;
+			case WindowType::Load:
+				dwStyle = WS_POPUP;
+				dwExStyle = WS_EX_TOOLWINDOW;
+				dwExStyle &= ~WS_EX_APPWINDOW;
+				break;
 		}
 
 		// 客户端区域大小
@@ -41,6 +41,21 @@ namespace TG
 			throw Win32Exception::Create();
 
 		deviceContext = GetDC(handle);
+
+		RAWINPUTDEVICE rid[2];
+		// 鼠标
+		rid[0].usUsagePage = 0x01;
+		rid[0].usUsage = 0x02;
+		rid[0].dwFlags = 0;
+		rid[0].hwndTarget = handle;
+		// 键盘
+		rid[1].usUsagePage = 0x01;
+		rid[1].usUsage = 0x06;
+		rid[1].dwFlags = 0;
+		rid[1].hwndTarget = handle;
+		// 注册输入设备
+		if (!RegisterRawInputDevices(rid, 2, sizeof(rid[0])))
+			throw Win32Exception::Create("Register mouse and keyboard failed");
 	}
 
 	NativeWindow::~NativeWindow()
@@ -277,6 +292,7 @@ namespace TG
             { WM_EXITSIZEMOVE,          "WM_EXITSIZEMOVE" },
             { WM_DWMNCRENDERINGCHANGED, "WM_DWMNCRENDERINGCHANGED" },
             { WM_ENTERSIZEMOVE,         "WM_ENTERSIZEMOVE" },
+        	{ WM_INPUT,					"WM_INPUT" },
         };
 
         const auto it = windowMessage.find(msg);
@@ -305,160 +321,173 @@ namespace TG
 
 		switch (msg)
 		{
-		case WM_DESTROY:
-		{
-            // 窗口被销毁后，窗口类也需要被销毁
-            pWindow->destroyed = true;
-			// 基础窗口一般作为主窗口，销毁后要退出线程
-			PostQuitMessage(0);
-			return 0;
+			case WM_DESTROY:
+			{
+	            // 窗口被销毁后，窗口类也需要被销毁
+	            pWindow->destroyed = true;
+				// 基础窗口一般作为主窗口，销毁后要退出线程
+				PostQuitMessage(0);
+				return 0;
+			}
+
+			case WM_INPUT:
+			{
+				RAWINPUT rawInput;
+				UINT dwSize = sizeof(RAWINPUT);
+				GetRawInputData(reinterpret_cast<HRAWINPUT>(lParam), RID_INPUT, &rawInput, &dwSize, sizeof(RAWINPUTHEADER));
+				if (rawInput.header.dwType == RIM_TYPEMOUSE)
+					OutputDebugStringA("Mouse\n");
+				else if (rawInput.header.dwType == RIM_TYPEKEYBOARD)
+					OutputDebugStringA("Keyboard\n");
+				return 0;
+			}
+
+			case WM_KEYDOWN:
+			case WM_SYSKEYDOWN:
+	        case WM_KEYUP:
+	        case WM_SYSKEYUP:
+			{
+	            // https://learn.microsoft.com/en-us/windows/win32/inputdev/about-keyboard-input
+	            WORD vkCode = LOWORD(wParam);
+	            WORD keyFlags = HIWORD(lParam);
+	            WORD scanCode = LOBYTE(keyFlags);
+				// extended-key flag, 1 if scancode has 0xE0 prefix
+	            if ((keyFlags & KF_EXTENDED) == KF_EXTENDED)
+	                scanCode = MAKEWORD(scanCode, 0xE0);
+	            switch (vkCode)
+	            {
+	                case VK_SHIFT:   // converts to VK_LSHIFT or VK_RSHIFT
+	                case VK_CONTROL: // converts to VK_LCONTROL or VK_RCONTROL
+	                case VK_MENU:    // converts to VK_LMENU or VK_RMENU
+	                    vkCode = LOWORD(MapVirtualKeyW(scanCode, MAPVK_VSC_TO_VK_EX));
+	                    break;
+
+	                default:
+	                    break;
+	            }
+				// 确定按键状态，按下、释放还是按住
+				Input::Action action = Input::Action::Press;
+				if ((keyFlags & KF_UP) == KF_UP)
+					action = Input::Action::Release;
+				else if ((keyFlags & KF_REPEAT) == KF_REPEAT)
+					action = Input::Action::Repeat;
+
+				if (pWindow->keyFunction)
+   					pWindow->keyFunction(static_cast<Input::KeyCode>(vkCode), scanCode, action);
+
+				return 0;
+			}
+
+			case WM_CHAR:
+	        {
+	            if (pWindow->charFunction)
+            		pWindow->charFunction(static_cast<char16_t>(wParam));
+				return 0;
+	        }
+
+			case WM_MOUSEMOVE:
+			{
+				if (pWindow->cursorPosFunction)
+					pWindow->cursorPosFunction(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+				return 0;
+			}
+
+			case WM_LBUTTONDOWN:
+			{
+				if (pWindow->mouseButtonFunction)
+					pWindow->mouseButtonFunction(Input::KeyCode::LeftMouseButton, Input::Action::Press);
+				if (pWindow->cursorPosFunction)
+					pWindow->cursorPosFunction(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+				return 0;
+			}
+
+			case WM_LBUTTONUP:
+			{
+				if (pWindow->mouseButtonFunction)
+					pWindow->mouseButtonFunction(Input::KeyCode::LeftMouseButton, Input::Action::Release);
+				if (pWindow->cursorPosFunction)
+					pWindow->cursorPosFunction(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+				return 0;
+			}
+
+			case WM_RBUTTONDOWN:
+			{
+				if (pWindow->mouseButtonFunction)
+					pWindow->mouseButtonFunction(Input::KeyCode::RightMouseButton, Input::Action::Press);
+				if (pWindow->cursorPosFunction)
+					pWindow->cursorPosFunction(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+				return 0;
+			}
+
+			case WM_RBUTTONUP:
+			{
+				if (pWindow->mouseButtonFunction)
+					pWindow->mouseButtonFunction(Input::KeyCode::RightMouseButton, Input::Action::Release);
+				if (pWindow->cursorPosFunction)
+					pWindow->cursorPosFunction(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+				return 0;
+			}
+
+			case WM_MBUTTONDOWN:
+			{
+				if (pWindow->mouseButtonFunction)
+					pWindow->mouseButtonFunction(Input::KeyCode::MiddleMouseButton, Input::Action::Press);
+				if (pWindow->cursorPosFunction)
+					pWindow->cursorPosFunction(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+				return 0;
+			}
+
+			case WM_MBUTTONUP:
+			{
+				if (pWindow->mouseButtonFunction)
+					pWindow->mouseButtonFunction(Input::KeyCode::MiddleMouseButton, Input::Action::Release);
+				if (pWindow->cursorPosFunction)
+					pWindow->cursorPosFunction(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+				return 0;
+			}
+
+			case WM_MOUSEWHEEL:
+	        {
+				// 每帧只会产生一个WM_MOUSEWHEEL
+				if (pWindow->scrollFunction)
+					pWindow->scrollFunction(0, GET_WHEEL_DELTA_WPARAM(wParam) / WHEEL_DELTA);
+				if (pWindow->cursorPosFunction)
+					pWindow->cursorPosFunction(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+				return 0;
+	        }
+
+			case WM_MOVE:
+			{
+				if (pWindow->windowPosFunction)
+					pWindow->windowPosFunction(LOWORD(lParam), HIWORD(lParam));
+				return 0;
+			}
+
+			case WM_SIZE:
+			{
+				if (pWindow->windowSizeFunction)
+					pWindow->windowSizeFunction(LOWORD(lParam), HIWORD(lParam));
+				if (pWindow->suspendFunction && wParam == SIZE_MINIMIZED)
+					pWindow->suspendFunction();
+				if (pWindow->resumeFunction && wParam == SIZE_RESTORED)
+					pWindow->resumeFunction();
+				return 0;
+			}
+
+			case WM_ENTERSIZEMOVE:
+	            if (pWindow->suspendFunction)
+	                pWindow->suspendFunction();
+				return 0;
+
+			case WM_EXITSIZEMOVE:
+	            if (pWindow->resumeFunction)
+	                pWindow->resumeFunction();
+				return 0;
+
+	        default:
+	        	break;
 		}
-
-		case WM_KEYDOWN:
-		case WM_SYSKEYDOWN:
-        case WM_KEYUP:
-        case WM_SYSKEYUP:
-		{
-            // https://learn.microsoft.com/en-us/windows/win32/inputdev/about-keyboard-input
-            WORD vkCode = LOWORD(wParam);
-            WORD keyFlags = HIWORD(lParam);
-            WORD scanCode = LOBYTE(keyFlags);
-			// extended-key flag, 1 if scancode has 0xE0 prefix
-            if ((keyFlags & KF_EXTENDED) == KF_EXTENDED)
-                scanCode = MAKEWORD(scanCode, 0xE0);
-            switch (vkCode)
-            {
-                case VK_SHIFT:   // converts to VK_LSHIFT or VK_RSHIFT
-                case VK_CONTROL: // converts to VK_LCONTROL or VK_RCONTROL
-                case VK_MENU:    // converts to VK_LMENU or VK_RMENU
-                    vkCode = LOWORD(MapVirtualKeyW(scanCode, MAPVK_VSC_TO_VK_EX));
-                    break;
-
-                default:
-                    break;
-            }
-			// 确定按键状态，按下、释放还是按住
-			Input::Action action = Input::Action::Press;
-			if ((keyFlags & KF_UP) == KF_UP)
-				action = Input::Action::Release;
-			else if ((keyFlags & KF_REPEAT) == KF_REPEAT)
-				action = Input::Action::Repeat;
-
-			if (pWindow->keyFunction)
-   				pWindow->keyFunction(static_cast<Input::KeyCode>(vkCode), scanCode, action);
-
-			return 0;
-		}
-
-		case WM_CHAR:
-        {
-            if (pWindow->charFunction)
-            	pWindow->charFunction(static_cast<char16_t>(wParam));
-			return 0;
-        }
-
-		case WM_MOUSEMOVE:
-		{
-			if (pWindow->cursorPosFunction)
-				pWindow->cursorPosFunction(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
-			return 0;
-		}
-
-		case WM_LBUTTONDOWN:
-		{
-			if (pWindow->mouseButtonFunction)
-				pWindow->mouseButtonFunction(Input::KeyCode::LeftMouseButton, Input::Action::Press);
-			if (pWindow->cursorPosFunction)
-				pWindow->cursorPosFunction(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
-			return 0;
-		}
-
-		case WM_LBUTTONUP:
-		{
-			if (pWindow->mouseButtonFunction)
-				pWindow->mouseButtonFunction(Input::KeyCode::LeftMouseButton, Input::Action::Release);
-			if (pWindow->cursorPosFunction)
-				pWindow->cursorPosFunction(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
-			return 0;
-		}
-
-		case WM_RBUTTONDOWN:
-		{
-			if (pWindow->mouseButtonFunction)
-				pWindow->mouseButtonFunction(Input::KeyCode::RightMouseButton, Input::Action::Press);
-			if (pWindow->cursorPosFunction)
-				pWindow->cursorPosFunction(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
-			return 0;
-		}
-
-		case WM_RBUTTONUP:
-		{
-			if (pWindow->mouseButtonFunction)
-				pWindow->mouseButtonFunction(Input::KeyCode::RightMouseButton, Input::Action::Release);
-			if (pWindow->cursorPosFunction)
-				pWindow->cursorPosFunction(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
-			return 0;
-		}
-
-		case WM_MBUTTONDOWN:
-		{
-			if (pWindow->mouseButtonFunction)
-				pWindow->mouseButtonFunction(Input::KeyCode::MiddleMouseButton, Input::Action::Press);
-			if (pWindow->cursorPosFunction)
-				pWindow->cursorPosFunction(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
-			return 0;
-		}
-
-		case WM_MBUTTONUP:
-		{
-			if (pWindow->mouseButtonFunction)
-				pWindow->mouseButtonFunction(Input::KeyCode::MiddleMouseButton, Input::Action::Release);
-			if (pWindow->cursorPosFunction)
-				pWindow->cursorPosFunction(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
-			return 0;
-		}
-
-		case WM_MOUSEWHEEL:
-        {
-			// 每帧只会产生一个WM_MOUSEWHEEL
-			if (pWindow->scrollFunction)
-				pWindow->scrollFunction(0, GET_WHEEL_DELTA_WPARAM(wParam) / WHEEL_DELTA);
-			if (pWindow->cursorPosFunction)
-				pWindow->cursorPosFunction(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
-			return 0;
-        }
-
-		case WM_MOVE:
-		{
-			if (pWindow->windowPosFunction)
-				pWindow->windowPosFunction(LOWORD(lParam), HIWORD(lParam));
-			return 0;
-		}
-
-		case WM_SIZE:
-		{
-			if (pWindow->windowSizeFunction)
-				pWindow->windowSizeFunction(LOWORD(lParam), HIWORD(lParam));
-			if (pWindow->suspendFunction && wParam == SIZE_MINIMIZED)
-				pWindow->suspendFunction();
-			if (pWindow->resumeFunction && wParam == SIZE_RESTORED)
-				pWindow->resumeFunction();
-			return 0;
-		}
-
-		case WM_ENTERSIZEMOVE:
-            if (pWindow->suspendFunction)
-                pWindow->suspendFunction();
-			return 0;
-
-		case WM_EXITSIZEMOVE:
-            if (pWindow->resumeFunction)
-                pWindow->resumeFunction();
-			return 0;
-
-        default:
-		    return DefWindowProcW(hwnd, msg, wParam, lParam);
-		}
+    	return DefWindowProcW(hwnd, msg, wParam, lParam);
 	}
 
     static LRESULT WindowProcSetup(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
@@ -494,7 +523,6 @@ namespace TG
         wc.hIconSm = nullptr;
         wc.lpszMenuName = nullptr;
         wc.lpszClassName = L"Default";
-
         if (RegisterClassExW(&wc) == 0)
             throw Win32Exception::Create();
 
