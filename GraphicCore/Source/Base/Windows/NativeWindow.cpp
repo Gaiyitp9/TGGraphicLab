@@ -334,11 +334,14 @@ namespace TG
 			{
 				RAWINPUT rawInput;
 				UINT dwSize = sizeof(RAWINPUT);
-				GetRawInputData(reinterpret_cast<HRAWINPUT>(lParam), RID_INPUT, &rawInput, &dwSize, sizeof(RAWINPUTHEADER));
-				if (rawInput.header.dwType == RIM_TYPEMOUSE)
-					OutputDebugStringA("Mouse\n");
-				else if (rawInput.header.dwType == RIM_TYPEKEYBOARD)
-					OutputDebugStringA("Keyboard\n");
+				if (GetRawInputData(reinterpret_cast<HRAWINPUT>(lParam), RID_INPUT, &rawInput,
+					&dwSize, sizeof(RAWINPUTHEADER)) != -1)
+				{
+					if (rawInput.header.dwType == RIM_TYPEMOUSE)
+						OutputDebugStringA("Mouse\n");
+					else if (rawInput.header.dwType == RIM_TYPEKEYBOARD)
+						OutputDebugStringA("Keyboard\n");
+				}
 				return 0;
 			}
 

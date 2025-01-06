@@ -36,6 +36,8 @@ namespace TG
     	float clearColor[4]{ 0.2f, 0.3f, 0.3f, 1.0f };
 
     	ImGui_ImplOpenGL3_NewFrame();
+    	// ImGui_ImplWin32_NewFrame->ImGui_ImplWin32_UpdateMouseData->::WindowFromPoint，
+    	// WindowFromPoint会触发WM_NCHITTEST消息，所以主窗口每帧会收到WM_NCHITTEST消息
     	ImGui_ImplWin32_NewFrame();
     	ImGui::NewFrame();
 
