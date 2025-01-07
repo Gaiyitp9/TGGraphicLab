@@ -1,12 +1,12 @@
 file(GLOB_RECURSE HEADERS *.hpp *.h)
 file(GLOB_RECURSE SOURCES *.cpp *.c)
-list(FILTER HEADERS EXCLUDE REGEX Include/RHI)
-list(FILTER SOURCES EXCLUDE REGEX Source/RHI)
+list(FILTER HEADERS EXCLUDE REGEX Public/RHI)
+list(FILTER SOURCES EXCLUDE REGEX Private/RHI)
 
 if (NOT TG_WINDOWS)
     # 剔除Windows目录下的代码
-    list(FILTER HEADERS EXCLUDE REGEX "Include(/.*)+/Windows")
-    list(FILTER SOURCES EXCLUDE REGEX "Source(/.*)+/Windows")
+    list(FILTER HEADERS EXCLUDE REGEX "Public(/.*)+/Windows")
+    list(FILTER SOURCES EXCLUDE REGEX "Private(/.*)+/Windows")
 endif()
 
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${HEADERS} ${SOURCES})
@@ -22,7 +22,8 @@ find_package(stb 1.0 REQUIRED)
 set(PROJECT_NAME GraphicCore)
 
 add_library(${PROJECT_NAME} ${HEADERS} ${SOURCES})
-target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_LIST_DIR}/Include)
+target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_LIST_DIR}/Public
+        PRIVATE ${CMAKE_CURRENT_LIST_DIR}/Private)
 target_link_libraries(${PROJECT_NAME} PUBLIC TG::PowerVR spdlog::spdlog TG::ImGui TG::stb)
 target_compile_definitions(${PROJECT_NAME}
         PUBLIC $<$<STREQUAL:${TG_MATRIX_STORAGE_ORDER},RowMajor>:TG_ROW_MAJOR_MATRIX>

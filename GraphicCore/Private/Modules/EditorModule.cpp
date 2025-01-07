@@ -37,7 +37,7 @@ namespace TG
 
     	ImGui_ImplOpenGL3_NewFrame();
     	// ImGui_ImplWin32_NewFrame->ImGui_ImplWin32_UpdateMouseData->::WindowFromPoint，
-    	// WindowFromPoint会触发WM_NCHITTEST消息，所以主窗口每帧会收到WM_NCHITTEST消息
+    	// WindowFromPoint会触发WM_NCHITTEST消息，所以主窗口每帧都会收到WM_NCHITTEST消息
     	ImGui_ImplWin32_NewFrame();
     	ImGui::NewFrame();
 

@@ -7,14 +7,18 @@ find_package(mimalloc 2.1.7 REQUIRED)
 
 set(PROJECT_NAME TGRenderer)
 add_executable(${PROJECT_NAME} ${SRCS} ${INCS})
-target_include_directories(${PROJECT_NAME} PRIVATE Include)
+target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_LIST_DIR}/Public
+        PRIVATE ${CMAKE_CURRENT_LIST_DIR}/Private)
 target_link_libraries(${PROJECT_NAME} PRIVATE GraphicCore mimalloc)
 
-set(PowerVRResources ${CMAKE_SOURCE_DIR}/ThirdParty/PowerVR/lib/Windows)
+include(GNUInstallDirs)
+set(EGLLib ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_BINDIR}/LibEGL.dll)
+set(GLESLib ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_BINDIR}/LibGLESv2.dll)
 add_custom_command(
     TARGET ${PROJECT_NAME}
-    POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_directory
-    ${PowerVRResources} $<TARGET_FILE_DIR:${PROJECT_NAME}>
+    POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy ${EGLLib} $<TARGET_FILE_DIR:${PROJECT_NAME}>
+    COMMAND ${CMAKE_COMMAND} -E copy ${GLESLib} $<TARGET_FILE_DIR:${PROJECT_NAME}>
     COMMENT "Copying EGL and GLES dynamic libraries to executable output directory"
 )
 
