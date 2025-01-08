@@ -3,6 +3,7 @@
 #include <tuple>
 #include "Base/ConstString.hpp"
 #include "ExpressionTemplate.hpp"
+#include "ReflectionTest.hpp"
 
 //-----------------------------------------------------------------
 // 测试模板参数推导
@@ -235,6 +236,8 @@ constexpr auto addLambda = [](T a, T b) -> T {
 
 int main()
 {
+    std::cout << cnt<Man>() << std::endl;
+
     MiniMatrix matrix;
     int myii = 2;
     const TestConstFunction fffff(myii, matrix);
