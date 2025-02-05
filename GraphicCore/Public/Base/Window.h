@@ -12,16 +12,16 @@
 namespace TG
 {
     // 显示接口
-    struct IVideoDisplay
+    struct IVideoPort
     {
-        virtual ~IVideoDisplay() = default;
+        virtual ~IVideoPort() = default;
 
         [[nodiscard]] virtual NativeWindowHandle GetHandle() const noexcept = 0;
         [[nodiscard]] virtual NativeDeviceContext GetContext() const noexcept = 0;
     };
 
     // 窗口基类
-    class Window : public IVideoDisplay
+    class Window : public IVideoPort
     {
     public:
         Window(int x, int y, int width, int height, std::string_view name, WindowType type)

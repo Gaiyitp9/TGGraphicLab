@@ -8,7 +8,7 @@
 
 namespace TG::Geometry
 {
-    template<> Mesh CreatePrimitive<PrimitiveType::Quad>()
+    Mesh CreateQuad()
     {
         Mesh mesh;
         mesh.vertices.assign({
@@ -42,7 +42,7 @@ namespace TG::Geometry
         return mesh;
     }
 
-    template<> Mesh CreatePrimitive<PrimitiveType::Cube>()
+    Mesh CreateCube()
     {
         Mesh mesh;
         mesh.vertices.assign({
@@ -164,5 +164,18 @@ namespace TG::Geometry
             {  1.0f,  0.0f,  0.0f },
         });
         return mesh;
+    }
+
+    Mesh CreatePrimitive(PrimitiveType type)
+    {
+        switch (type)
+        {
+            case PrimitiveType::Quad:
+                return CreateQuad();
+            case PrimitiveType::Cube:
+                return CreateCube();
+            default:
+                return {};
+        }
     }
 }

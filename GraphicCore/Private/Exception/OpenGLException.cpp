@@ -11,7 +11,7 @@
 
 namespace TG
 {
-    OpenGLException::OpenGLException(std::string_view description) : BaseException(description) {}
+    OpenGLException::OpenGLException(std::string_view message) : BaseException(message) {}
 
     OpenGLException OpenGLException::Create(std::string_view message)
     {

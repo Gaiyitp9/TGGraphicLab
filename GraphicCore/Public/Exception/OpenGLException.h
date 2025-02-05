@@ -17,6 +17,6 @@ namespace TG
         static OpenGLException Create(std::string_view message = "");
 
     private:
-        explicit OpenGLException(std::string_view description);
+        explicit OpenGLException(std::string_view message);
     };
 }

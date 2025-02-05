@@ -81,11 +81,6 @@ namespace TG
 
     PlatformModule::~PlatformModule() = default;
 
-    void PlatformModule::PreUpdate()
-    {
-        m_exitCode = Window::PollEvents();
-    }
-
     void PlatformModule::Update()
     {
 
@@ -93,7 +88,7 @@ namespace TG
 
     void PlatformModule::PostUpdate()
     {
-
+        m_exitCode = Window::PollEvents();
     }
 
     bool PlatformModule::ShouldExit() const

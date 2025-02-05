@@ -26,11 +26,6 @@ namespace TG
         };
     }
 
-    void InputModule::PreUpdate()
-    {
-
-    }
-
     void InputModule::Update()
     {
 

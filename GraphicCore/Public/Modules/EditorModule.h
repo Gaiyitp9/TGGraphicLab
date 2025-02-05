@@ -7,6 +7,8 @@
 
 #include "Module.h"
 #include "Base/Window.h"
+#include "Rendering/Renderer.h"
+#include <memory>
 
 namespace TG
 {
@@ -20,13 +22,14 @@ namespace TG
         EditorModule& operator=(EditorModule&&) = delete;
         ~EditorModule() override;
 
-        void PreUpdate() override;
+        void SetRenderer(const std::shared_ptr<Renderer>& renderer);
+        void PlugInVideoPort(const IVideoPort& display);
+
         void Update() override;
         void PostUpdate() override;
 
-        void ConnectToVideoPlay(const IVideoDisplay& display);
-
     private:
+        std::weak_ptr<Renderer> m_renderer;
         bool m_showDemoWindow{ true };
         bool m_showAnotherWindow{ false };
         bool m_isInitialized{ false };

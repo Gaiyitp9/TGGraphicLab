@@ -13,15 +13,15 @@
 
 namespace TG
 {
-	class Renderer
+	class Application
 	{
 	public:
-		Renderer();
-		Renderer(const Renderer&) = delete;
-		Renderer& operator=(const Renderer&) = delete;
-		Renderer(Renderer&&) = delete;
-		Renderer& operator=(Renderer&&) = delete;
-		~Renderer();
+		Application();
+		Application(const Application&) = delete;
+		Application& operator=(const Application&) = delete;
+		Application(Application&&) = delete;
+		Application& operator=(Application&&) = delete;
+		~Application();
 
 		int Run();
 

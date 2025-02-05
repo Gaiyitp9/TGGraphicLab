@@ -4,7 +4,7 @@
 * This code is licensed under the MIT License (MIT).			*
 *****************************************************************/
 
-#include "Renderer.h"
+#include "Application.h"
 #include "Diagnostic/Log.h"
 #include "mimalloc.h"
 
@@ -13,7 +13,7 @@ int CALLBACK main()
 	mi_version();
 	try
 	{
-		TG::Renderer app;
+		TG::Application app;
 		return app.Run();
 	}
 	catch (const std::exception& e)

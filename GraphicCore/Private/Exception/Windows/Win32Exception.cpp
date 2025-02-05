@@ -11,9 +11,9 @@
 
 namespace TG
 {
-	Win32Exception::Win32Exception(std::string_view description) : BaseException(description) {}
+	Win32Exception::Win32Exception(std::string_view message) : BaseException(message) {}
 
-	Win32Exception Win32Exception::Create(HRESULT hr, std::string_view description)
+	Win32Exception Win32Exception::Create(HRESULT hr, std::string_view message)
 	{
 		// 提取错误码中的信息
 		/*
@@ -41,12 +41,12 @@ namespace TG
 		std::string whatBuffer = std::format("Exception type: Windows API Exception\n"
 										 "HRESULT: {:#010x}\nError Message: {}"
 										 "{}"
-										 "{}\n", hr, errorMsg, description, std::stacktrace::current());
+										 "{}\n", hr, errorMsg, message, std::stacktrace::current());
 		return Win32Exception(whatBuffer);
 	}
 
-	Win32Exception Win32Exception::Create(std::string_view description)
+	Win32Exception Win32Exception::Create(std::string_view message)
 	{
-		return Create(static_cast<HRESULT>(GetLastError()), description);
+		return Create(static_cast<HRESULT>(GetLastError()), message);
 	}
 }

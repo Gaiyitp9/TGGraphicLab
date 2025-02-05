@@ -19,6 +19,6 @@ namespace TG
 		static Win32Exception Create(std::string_view message = "");
 
 	private:
-		explicit Win32Exception(std::string_view description);
+		explicit Win32Exception(std::string_view message);
 	};
 }

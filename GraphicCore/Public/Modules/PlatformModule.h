@@ -22,7 +22,6 @@ namespace TG
         PlatformModule& operator=(PlatformModule&&) = delete;
         ~PlatformModule() override;
 
-        void PreUpdate() override;
         void Update() override;
         void PostUpdate() override;
 

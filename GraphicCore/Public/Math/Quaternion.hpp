@@ -26,7 +26,9 @@ namespace TG::Math
             m_elements.Z() = sinHalfAngle * axis.Z();
             m_elements.W() = std::cos(halfAngle);
 		}
-		// 欧拉角环绕顺序为heading-pitch-bank(yaw-pitch-roll)
+		// 注：欧拉角计算四元数或矩阵需要指定旋转顺序和参考坐标系
+		// 当按局部坐标系旋转和按世界坐标系旋转的轴旋转矩阵相乘顺序相反时，这两种旋转等价
+		// 欧拉角环绕顺序为heading-pitch-bank(yaw-pitch-roll，局部坐标系)
 		// Y-X-Z(Object Space)或Z-X-Y(World Space 或 Parent Space)
 		explicit Quaternion(const Vector<Scalar, 3>& euler)
 		{

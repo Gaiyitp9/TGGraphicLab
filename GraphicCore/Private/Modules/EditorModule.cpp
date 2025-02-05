@@ -26,9 +26,9 @@ namespace TG
     	}
     }
 
-	void EditorModule::PreUpdate()
+	void EditorModule::SetRenderer(const std::shared_ptr<Renderer>& renderer)
 	{
-
+		m_renderer = renderer;
 	}
 
     void EditorModule::Update()
@@ -145,7 +145,7 @@ namespace TG
 		EGLSurface surface;
 	};
 
-    void EditorModule::ConnectToVideoPlay(const IVideoDisplay& display)
+    void EditorModule::PlugInVideoPort(const IVideoPort& display)
     {
     	// 初始化IMGUI
     	IMGUI_CHECKVERSION();

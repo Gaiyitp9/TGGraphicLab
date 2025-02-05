@@ -19,5 +19,5 @@ namespace TG::Geometry
         Cylinder,
     };
 
-    template<PrimitiveType T> Mesh CreatePrimitive();
+    Mesh CreatePrimitive(PrimitiveType type);
 }

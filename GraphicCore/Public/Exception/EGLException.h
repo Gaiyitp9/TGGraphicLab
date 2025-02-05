@@ -17,6 +17,6 @@ namespace TG
         static EGLException Create(std::string_view message = "");
 
     private:
-        explicit EGLException(std::string_view description);
+        explicit EGLException(std::string_view message);
     };
 }

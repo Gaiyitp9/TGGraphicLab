@@ -25,7 +25,6 @@ namespace TG
         void Subscribe(std::function<void(const Input::Event<Input::Mouse>&)>& mouseEventDelegate);
         void Subscribe(std::function<void(const Input::Event<Input::Keyboard>&)>& keyboardEventDelegate);
 
-        void PreUpdate() override;
         void Update() override;
         void PostUpdate() override;
 

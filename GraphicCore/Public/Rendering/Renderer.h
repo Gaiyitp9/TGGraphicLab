@@ -4,13 +4,23 @@
 * This code is licensed under the MIT License (MIT).			*
 *****************************************************************/
 #pragma once
-#include "Win32Lean.h"
-#include "Graphics/GraphicsBase.hpp"
 
-namespace TG::Graphics
+namespace TG
 {
-	struct CreateInfoD3D11 : public ICreateInfo
-	{
+    enum class GraphicsAPI : unsigned char
+    {
+        OpenGLES,
+        Vulkan,
+        DirectX11,
+        DirectX12,
+    };
 
-	};
+    class Renderer
+    {
+    public:
+        virtual ~Renderer() = default;
+
+        virtual void Render() = 0;
+        virtual void Present() = 0;
+    };
 }
