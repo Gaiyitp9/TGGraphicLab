@@ -5,7 +5,9 @@
 *****************************************************************/
 
 #include "Base/Utility.h"
+#include "Exception/BaseException.h"
 #include <locale>
+#include <fstream>
 
 namespace TG
 {
@@ -82,4 +84,20 @@ namespace TG
     //     free(ansi);
     //     return str;
     // }
+
+    std::vector<char> ReadBinaryFile(std::string_view fileName)
+    {
+        std::ifstream file(fileName.data(), std::ios::ate | std::ios::binary);
+
+        if (!file.is_open())
+            throw BaseException::Create("Failed to open binary file");
+
+        const std::streamsize fileSize = file.tellg();
+        std::vector<char> buffer(fileSize);
+        file.seekg(0);
+        file.read(buffer.data(), fileSize);
+        file.close();
+
+        return buffer;
+    }
 }

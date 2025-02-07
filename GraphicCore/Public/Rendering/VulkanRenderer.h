@@ -8,6 +8,7 @@
 #include "Renderer.h"
 #include "Base/Window.h"
 #include "vulkan/vulkan.h"
+#include <unordered_set>
 
 namespace TG
 {
@@ -42,6 +43,17 @@ namespace TG
         void SelectPhysicalDevice();
         bool IsDeviceSuitable(VkPhysicalDevice device);
         void CreateLogicalDevice();
+        void CreateSwapChain();
+        VkSurfaceFormatKHR ChooseSwapSurfaceFormat();
+        VkPresentModeKHR ChooseSwapPresentMode();
+        void CleanupSwapChain();
+        void CreateImageViews();
+        void CreateRenderPass();
+        void CreateGraphicsPipeline();
+        VkShaderModule CreateShaderModule(const std::vector<char>& code);
+        void CreateFramebuffers();
+        void CreateCommandPool();
+        void CreateCommandBuffer();
 
         bool m_enableValidationLayer { true };
         std::vector<char const*> m_globalExtensions;    // 需要使用到的vulkan扩展
@@ -51,11 +63,31 @@ namespace TG
         VkSurfaceKHR m_surface{};
 
         std::vector<char const*> m_deviceExtensions;
+        VkPhysicalDeviceFeatures m_deviceFeatures{};
         std::vector<VkQueueType> m_queueFamilies;
         VkPhysicalDevice m_physicalDevice{ VK_NULL_HANDLE };
         std::unordered_map<VkQueueType, uint32_t> m_familyIndices;
 
         VkDevice m_device{ VK_NULL_HANDLE };
         std::unordered_map<VkQueueType, VkQueue> m_queues;
+
+        VkSurfaceCapabilitiesKHR m_capabilities{};
+        std::vector<VkSurfaceFormatKHR> m_swapChainFormats;
+        std::vector<VkPresentModeKHR> m_presentModes;
+        VkSwapchainKHR m_swapChain{ VK_NULL_HANDLE };
+        VkSwapchainKHR m_oldSwapChain{ VK_NULL_HANDLE };
+        std::vector<VkImage> m_swapChainImages;
+        VkFormat m_swapChainImageFormat{ VK_FORMAT_UNDEFINED };
+        VkExtent2D m_swapChainExtent{};
+        std::vector<VkImageView> m_swapChainImageViews;
+
+        VkRenderPass m_renderPass{ VK_NULL_HANDLE };
+        VkPipelineLayout m_pipelineLayout{ VK_NULL_HANDLE };
+        VkPipeline m_graphicsPipeline{ VK_NULL_HANDLE };
+        std::vector<VkFramebuffer> m_swapChainFrameBuffers;
+
+        const int MAX_FRAMES_IN_FLIGHT = 3;
+        VkCommandPool m_cmdPoll{ VK_NULL_HANDLE };
+        std::vector<VkCommandBuffer> m_cmdBuffers;
     };
 }
