@@ -51,9 +51,12 @@ namespace TG
         void CreateRenderPass();
         void CreateGraphicsPipeline();
         VkShaderModule CreateShaderModule(const std::vector<char>& code);
-        void CreateFramebuffers();
+        void CreateFrameBuffers();
         void CreateCommandPool();
         void CreateCommandBuffer();
+        void RecordCommandBuffer(uint32_t commandIndex, uint32_t imageIndex);
+        void CreateSyncObjects();
+        void DrawFrame();
 
         bool m_enableValidationLayer { true };
         std::vector<char const*> m_globalExtensions;    // 需要使用到的vulkan扩展
@@ -86,8 +89,14 @@ namespace TG
         VkPipeline m_graphicsPipeline{ VK_NULL_HANDLE };
         std::vector<VkFramebuffer> m_swapChainFrameBuffers;
 
-        const int MAX_FRAMES_IN_FLIGHT = 3;
-        VkCommandPool m_cmdPoll{ VK_NULL_HANDLE };
+        const uint32_t MAX_FRAMES_IN_FLIGHT = 3;
+        VkCommandPool m_cmdPool{ VK_NULL_HANDLE };
         std::vector<VkCommandBuffer> m_cmdBuffers;
+
+        std::vector<VkSemaphore> m_imageAvailableSemaphores;
+        std::vector<VkSemaphore> m_renderFinishedSemaphores;
+        std::vector<VkFence> m_inFlightFences;
+        uint32_t m_currentFrame { 0 };
+        uint32_t m_imageIndex{ 0 };
     };
 }
