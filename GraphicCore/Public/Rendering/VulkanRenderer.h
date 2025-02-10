@@ -8,7 +8,6 @@
 #include "Renderer.h"
 #include "Base/Window.h"
 #include "vulkan/vulkan.h"
-#include <unordered_set>
 
 namespace TG
 {
@@ -20,7 +19,7 @@ namespace TG
         SparseBinding = VK_QUEUE_SPARSE_BINDING_BIT,
         Present,
     };
-
+    
     class VulkanRenderer final : public Renderer
     {
     public:

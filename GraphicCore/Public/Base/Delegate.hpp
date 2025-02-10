@@ -5,7 +5,7 @@
 *****************************************************************/
 #pragma once
 
-#include <vector>
+#include <unordered_map>
 #include <functional>
 #include <mutex>
 
@@ -25,14 +25,17 @@ namespace TG
         using Delegate = std::function<ReturnType(Args...)>;
 
     public:
-        void Add(Delegate delegate)
+        unsigned long long Add(Delegate delegate)
         {
-            m_delegates.emplace_back(delegate);
+            if (auto result = m_delegates.try_emplace(delegate); result.second)
+                return m_id++;
+
+            return -1;
         }
 
-        void Remove()
+        bool Remove(unsigned long long id)
         {
-
+            return m_delegates.erase(id) > 0;
         }
 
         void Clear()
@@ -47,7 +50,8 @@ namespace TG
         }
 
     private:
-        std::vector<Delegate> m_delegates;
+        inline static unsigned long long m_id{ 0 };
+        std::unordered_map<unsigned long long, Delegate> m_delegates;
     };
 
     // 线程安全多播委托

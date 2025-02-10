@@ -6,7 +6,7 @@
 #pragma once
 
 #ifdef TG_WINDOWS
-#include "Base/Windows/NativeWindow.h"
+    #include "Base/Windows/NativeWindow.h"
 #endif
 
 namespace TG

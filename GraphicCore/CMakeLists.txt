@@ -1,7 +1,5 @@
 file(GLOB_RECURSE HEADERS *.hpp *.h)
 file(GLOB_RECURSE SOURCES *.cpp *.c)
-list(FILTER HEADERS EXCLUDE REGEX Public/RHI)
-list(FILTER SOURCES EXCLUDE REGEX Private/RHI)
 
 if (NOT TG_WINDOWS)
     # 剔除Windows目录下的代码
