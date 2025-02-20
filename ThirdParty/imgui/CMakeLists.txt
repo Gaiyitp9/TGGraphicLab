@@ -1,8 +1,6 @@
 cmake_minimum_required(VERSION 3.29)
 
-set(PROJECT_NAME ImGui)
-
-project(${PROJECT_NAME} VERSION 1.91.4)
+project(ImGui VERSION 1.91.4)
 message(STATUS "ImGui version: ${PROJECT_VERSION}")
 
 include(GNUInstallDirs)
@@ -16,6 +14,11 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 if(MSVC)
     add_compile_options(/utf-8 /MP)
 endif()
+
+if (NOT TARGET PowerVR)
+    find_package(PowerVR 5.13 REQUIRED)
+endif()
+find_package(Vulkan REQUIRED)
 
 file(GLOB_RECURSE HEADERS *.h)
 file(GLOB_RECURSE SOURCES *.cpp)
@@ -32,10 +35,7 @@ target_include_directories(${PROJECT_NAME} SYSTEM
         PRIVATE
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/Private>
 )
-if (NOT TARGET PowerVR)
-    find_package(PowerVR 5.13 REQUIRED)
-endif()
-target_link_libraries(${PROJECT_NAME} PUBLIC TG::PowerVR)
+target_link_libraries(${PROJECT_NAME} PUBLIC TG::PowerVR Vulkan::Vulkan)
 
 set(PROJECT_CONFIG_IN "${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}Config.cmake.in")
 set(PROJECT_CONFIG_OUT "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake")

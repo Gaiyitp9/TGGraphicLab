@@ -1,8 +1,6 @@
 cmake_minimum_required(VERSION 3.29)
 
-set(PROJECT_NAME PowerVR)
-
-project(${PROJECT_NAME} VERSION 5.13)
+project(PowerVR VERSION 5.13)
 message(STATUS "PowerVR version: ${PROJECT_VERSION}")
 
 include(GNUInstallDirs)

@@ -15,9 +15,9 @@ namespace TG
     public:
         ~BaseException() override = default;
 
-        static BaseException Create(std::string_view description = "");
+        static BaseException Create(std::string_view message = "");
 
     protected:
-        explicit BaseException(std::string_view description);
+        explicit BaseException(std::string_view message);
     };
 }

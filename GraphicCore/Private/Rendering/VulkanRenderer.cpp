@@ -10,6 +10,7 @@
 #include "Exception/BaseException.h"
 #include "vulkan/vulkan_win32.h"
 #include <ranges>
+#include <unordered_set>
 
 namespace TG
 {
@@ -575,7 +576,7 @@ namespace TG
     void VulkanRenderer::CreateGraphicsPipeline()
     {
         // 创建顶点着色器
-        std::vector<char> vertShaderCode = ReadBinaryFile("../../Shaders/GLSL/first_vert.spv");
+        std::vector<char> vertShaderCode = ReadBinaryFile("Shaders/GLSL/first_vert.spv");
         VkShaderModule vertShaderModule = CreateShaderModule(vertShaderCode);
         VkPipelineShaderStageCreateInfo vertShaderStageCreateInfo = {};
         vertShaderStageCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
@@ -583,7 +584,7 @@ namespace TG
         vertShaderStageCreateInfo.module = vertShaderModule;
         vertShaderStageCreateInfo.pName = "main";
         // 创建片元着色器
-        std::vector<char> fragShaderCode = ReadBinaryFile("../../Shaders/GLSL/first_frag.spv");
+        std::vector<char> fragShaderCode = ReadBinaryFile("Shaders/GLSL/first_frag.spv");
         VkShaderModule fragShaderModule = CreateShaderModule(fragShaderCode);
         VkPipelineShaderStageCreateInfo fragShaderStageCreateInfo = {};
         fragShaderStageCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;

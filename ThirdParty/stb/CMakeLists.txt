@@ -1,8 +1,6 @@
 cmake_minimum_required(VERSION 3.29)
 
-set(PROJECT_NAME stb)
-
-project(${PROJECT_NAME} VERSION 1.0)
+project(stb VERSION 1.0)
 message(STATUS "stb version: ${PROJECT_VERSION}")
 
 include(GNUInstallDirs)
