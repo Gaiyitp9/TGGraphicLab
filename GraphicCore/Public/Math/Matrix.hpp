@@ -76,7 +76,7 @@ namespace TG::Math
 		{
 			return m_storage[index];
 		}
-		Scalar operator()(std::size_t row, std::size_t column) const
+		Scalar operator[](std::size_t row, std::size_t column) const
 		{
 			if constexpr (HasFlag<Matrix, XprFlag::RowMajor>)
 				return m_storage[column + row * Columns];
@@ -87,7 +87,7 @@ namespace TG::Math
 		{
 			return m_storage[index];
 		}
-		Scalar& operator()(std::size_t row, std::size_t column)
+		Scalar& operator[](std::size_t row, std::size_t column)
 		{
             if constexpr (HasFlag<Matrix, XprFlag::RowMajor>)
 				return m_storage[column + row * Columns];
@@ -138,7 +138,7 @@ namespace TG::Math
 
         [[nodiscard]] Scalar Entry(std::size_t row, std::size_t column) const
         {
-            return m_matrix(row, column);
+            return m_matrix[row, column];
         }
 
     	Scalar& Entry(std::size_t index) requires !IsConst
@@ -148,7 +148,7 @@ namespace TG::Math
 
     	Scalar& Entry(std::size_t row, std::size_t column) requires !IsConst
         {
-        	return m_matrix(row, column);
+        	return m_matrix[row, column];
         }
 
     private:

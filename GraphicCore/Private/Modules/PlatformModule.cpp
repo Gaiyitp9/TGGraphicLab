@@ -5,7 +5,7 @@
 *****************************************************************/
 
 #include "Modules/PlatformModule.h"
-#include "Diagnostic/Log.h"
+#include "Diagnostic/Log.hpp"
 
 namespace TG
 {

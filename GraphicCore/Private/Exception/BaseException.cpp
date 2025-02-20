@@ -5,6 +5,7 @@
 *****************************************************************/
 
 #include "Exception/BaseException.h"
+#include <format>
 #include <stacktrace>
 
 namespace TG

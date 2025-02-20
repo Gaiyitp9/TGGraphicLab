@@ -1,5 +1,3 @@
-add_compile_options(/utf-8)
-
 add_executable(WinSocketTCPClient TCPClient.cpp)
 add_executable(WinSocketTCPServer TCPServer.cpp)
 add_executable(WinSocketUDPClient UDPClient.cpp)

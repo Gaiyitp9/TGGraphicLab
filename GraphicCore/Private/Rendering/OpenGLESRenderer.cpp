@@ -8,7 +8,7 @@
 #include "Exception/BaseException.h"
 #include "Exception/EGLException.h"
 #include "Exception/OpenGLException.h"
-#include "Diagnostic/Log.h"
+#include "Diagnostic/Log.hpp"
 #include "Geometry/Primitives.h"
 #include "Color/StandardColors.h"
 #include <fstream>

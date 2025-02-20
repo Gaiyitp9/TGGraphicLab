@@ -77,11 +77,11 @@ namespace TG::Math
             RefEvaluator<Dst> dstEvaluator(dst);
             Scalar invDet = static_cast<Scalar>(1) / src.Determinant();
             // 避免aliasing问题
-            Scalar temp = src(0, 0);
+            Scalar temp = src[0, 0];
             // 逆矩阵的伴随矩阵除以行列式
-            dstEvaluator.Entry(0, 0) = src(1, 1) * invDet;
-            dstEvaluator.Entry(1, 0) = -src(1, 0) * invDet;
-            dstEvaluator.Entry(0, 1) = -src(0, 1) * invDet;
+            dstEvaluator.Entry(0, 0) = src[1, 1] * invDet;
+            dstEvaluator.Entry(1, 0) = -src[1, 0] * invDet;
+            dstEvaluator.Entry(0, 1) = -src[0, 1] * invDet;
             dstEvaluator.Entry(1, 1) = temp * invDet;
         }
 
@@ -147,15 +147,15 @@ namespace TG::Math
             // 交换行列式的两行（或两列），行列式的值会改变符号。
             // 结合这个性质去理解，row0和column0并不是一定是第一行，比如row等于1时, row0等于2, row1等于0，相当于交换了两行，
             // 所以此时计算的行列式是负的，正好等于(-1)^(row + column)
-            return mat(row0, column0) * mat(row1, column1) - mat(row0, column1) * mat(row1, column0);
+            return mat[row0, column0] * mat[row1, column1] - mat[row0, column1] * mat[row1, column0];
         }
 
         static Scalar Det3Helper(const Matrix& mat, std::size_t row0, std::size_t row1, std::size_t row2,
             std::size_t column0, std::size_t Column1, std::size_t Column2)
         {
             // 代数余子式求行列式公式的一部分。计算过程中考虑了(-1)^(row0 + column0)，可参考Cofactor3X3的分析
-            return mat(row0, column0) *
-                (mat(row1, Column1) * mat(row2, Column2) - mat(row1, Column2) * mat(row2, Column1));
+            return mat[row0, column0] *
+                (mat[row1, Column1] * mat[row2, Column2] - mat[row1, Column2] * mat[row2, Column1]);
         }
         // 第row行第column列的余子式
         static Scalar Minor4X4(const Matrix& mat, std::size_t row, std::size_t column)

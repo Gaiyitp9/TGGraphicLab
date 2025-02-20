@@ -6,6 +6,7 @@
 
 #include "Exception/EGLException.h"
 #include "DynamicEgl.h"
+#include <format>
 #include <stacktrace>
 
 namespace TG

@@ -6,7 +6,7 @@
 
 #include "Rendering/VulkanRenderer.h"
 #include "Base/Utility.h"
-#include "Diagnostic/Log.h"
+#include "Diagnostic/Log.hpp"
 #include "Exception/BaseException.h"
 #include "vulkan/vulkan_win32.h"
 #include <ranges>

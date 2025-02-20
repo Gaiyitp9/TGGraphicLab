@@ -8,6 +8,7 @@
 #include "Exception/Windows/Win32Exception.h"
 #include "Base/Utility.h"
 #include <memory_resource>
+#include <format>
 
 namespace TG
 {

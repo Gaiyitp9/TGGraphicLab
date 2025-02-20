@@ -12,22 +12,47 @@
 namespace TG
 {
     // 委托
-    template<typename DelegateSignature>
-    class Delegate;
+    template<typename ReturnType = void, typename... Args>
+    class Delegate
+    {
+    public:
+        void Bind(ReturnType(*function)(Args...))
+        {
+            m_delegate = function;
+        }
+
+        template<typename T>
+        void Bind(T* object, ReturnType(T::*method)(Args...))
+        {
+            m_delegate = [object, method](Args... args) {
+                return (object->*method)(args...);
+            };
+        }
+        // 绑定lambda表达式
+        void Bind(const std::function<ReturnType(Args...)>& lambda)
+        {
+            m_delegate = lambda;
+        }
+
+        ReturnType Execute(Args&&... args)
+        {
+            if (m_delegate)
+                return m_delegate(std::forward<Args>(args)...);
+            return {};
+        }
+
+    private:
+        std::function<ReturnType(Args...)> m_delegate;
+    };
 
     // 多播委托
-    template<typename DelegateSignature>
-    class MulticastDelegate;
-
-    template<typename ReturnType, typename... Args>
-    class MulticastDelegate<ReturnType(Args...)>
+    template<typename... Args>
+    class MulticastDelegate
     {
-        using Delegate = std::function<ReturnType(Args...)>;
-
     public:
-        unsigned long long Add(Delegate delegate)
+        unsigned long long Add(void(*function)(Args...))
         {
-            if (auto result = m_delegates.try_emplace(delegate); result.second)
+            if (auto result = m_delegates.try_emplace(function); result.second)
                 return m_id++;
 
             return -1;
@@ -51,15 +76,12 @@ namespace TG
 
     private:
         inline static unsigned long long m_id{ 0 };
-        std::unordered_map<unsigned long long, Delegate> m_delegates;
+        std::unordered_map<unsigned long long, std::function<void(Args...)>> m_delegates;
     };
 
     // 线程安全多播委托
-    template<typename DelegateSignature>
-    class TSMulticastDelegate;
-
     template<typename ReturnType, typename... Args>
-    class TSMulticastDelegate<ReturnType(Args...)> : public MulticastDelegate<ReturnType(Args...)>
+    class TSMulticastDelegate : public MulticastDelegate<ReturnType(Args...)>
     {
         using Super = MulticastDelegate<ReturnType(Args...)>;
 

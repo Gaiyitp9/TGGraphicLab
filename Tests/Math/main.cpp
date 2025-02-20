@@ -11,7 +11,7 @@ namespace TG::Math
     static std::random_device gRd;
     static std::mt19937 gGen(gRd());
     static std::uniform_real_distribution gUrd(gMin, gMax);
-    
+
     TEST(TestMatrix, Constructor)
     {
         Matrix4F mat;
@@ -54,7 +54,9 @@ namespace TG::Math
         Matrix3F mat3 = mat4.SubMatrix<3, 3>(startRow, startCol);
         for (std::size_t i = 0; i < 3; ++i)
             for (std::size_t j = 0; j < 3; ++j)
-                EXPECT_NEAR(mat3(i, j), mat4(startRow + i, startCol + j), gEpsilon);
+            {
+                EXPECT_NEAR((mat3[i, j]), (mat4[startRow + i, startCol + j]), gEpsilon);
+            }
 
         Matrix2F mat2;
         for (std::size_t i = 0; i < 4; ++i)
@@ -62,7 +64,7 @@ namespace TG::Math
         mat4.SubMatrix<2, 2>(0, 0) = mat2;
         for (std::size_t i = 0; i < 2; ++i)
             for (std::size_t j = 0; j < 2; ++j)
-                EXPECT_NEAR(mat4(i, j), mat2(i, j), gEpsilon);
+                EXPECT_NEAR((mat4[i, j]), (mat2[i, j]), gEpsilon);
     }
 
     TEST(TestMatrix, Transpose)
@@ -74,12 +76,12 @@ namespace TG::Math
         Matrix4F transpose = mat4.Transposed();
         for (std::size_t i = 0; i < 4; ++i)
             for (std::size_t j = 0; j < 4; ++j)
-                EXPECT_NEAR(transpose(i, j), mat4(j, i), gEpsilon);
+                EXPECT_NEAR((transpose[i, j]), (mat4[j, i]), gEpsilon);
 
         Matrix4F transpose1 = mat4.Transposed().Transposed();
         for (std::size_t i = 0; i < 4; ++i)
             for (std::size_t j = 0; j < 4; ++j)
-                EXPECT_NEAR(transpose1(i, j), mat4(i, j), gEpsilon);
+                EXPECT_NEAR((transpose1[i, j]), (mat4[i, j]), gEpsilon);
     }
 
     TEST(TestMatrix, Reduce)
@@ -126,9 +128,9 @@ namespace TG::Math
         {
             for (std::size_t j = 0; j < 4; ++j)
             {
-                mat4(i, j) = 0;
+                mat4[i, j] = 0;
                 for (std::size_t k = 0; k < 4; ++k)
-                    mat4(i, j) += mat1(i, k) * mat2(k, j);
+                    mat4[i, j] += mat1[i, k] * mat2[k, j];
             }
         }
         for (std::size_t i = 0; i < 16; ++i)
@@ -147,9 +149,9 @@ namespace TG::Math
             for (std::size_t j = 0; j < 4; ++j)
             {
                 if (i == j)
-                    EXPECT_NEAR(mat1(i, j), 1.0f, gEpsilon);
+                    EXPECT_NEAR((mat1[i, j]), 1.0f, gEpsilon);
                 else
-                    EXPECT_NEAR(mat1(i, j), 0.0f, gEpsilon);
+                    EXPECT_NEAR((mat1[i, j]), 0.0f, gEpsilon);
             }
         }
 
@@ -169,9 +171,9 @@ namespace TG::Math
             for (std::size_t j = 0; j < 4; ++j)
             {
                 if (i == j)
-                    EXPECT_NEAR(mat1(i, j), constant, gEpsilon);
+                    EXPECT_NEAR((mat1[i, j]), constant, gEpsilon);
                 else
-                    EXPECT_NEAR(mat1(i, j), 0, gEpsilon);
+                    EXPECT_NEAR((mat1[i, j]), 0, gEpsilon);
             }
         }
 
@@ -182,9 +184,9 @@ namespace TG::Math
             for (std::size_t j = 0; j < 4; ++j)
             {
                 if (i == j)
-                    EXPECT_NEAR(mat1(i, j), constant, gEpsilon);
+                    EXPECT_NEAR((mat1[i, j]), constant, gEpsilon);
                 else
-                    EXPECT_NEAR(mat1(i, j), 0, gEpsilon);
+                    EXPECT_NEAR((mat1[i, j]), 0, gEpsilon);
             }
         }
     }
@@ -197,8 +199,8 @@ namespace TG::Math
             mat2a[i] = gUrd(gGen);
             mat2b[i] = gUrd(gGen);
         }
-        const float result = (mat2a(0, 0) + mat2b(0, 0)) * (mat2a(1, 1) + mat2b(1, 1))
-                             - (mat2a(0, 1) + mat2b(0, 1)) * (mat2a(1, 0) + mat2b(1, 0));
+        const float result = (mat2a[0, 0] + mat2b[0, 0]) * (mat2a[1, 1] + mat2b[1, 1])
+                             - (mat2a[0, 1] + mat2b[0, 1]) * (mat2a[1, 0] + mat2b[1, 0]);
         EXPECT_NEAR((mat2a + mat2b).Determinant(), result, gEpsilon);
 
         Matrix3F mat3;

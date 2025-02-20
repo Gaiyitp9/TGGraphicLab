@@ -1,16 +1,16 @@
 set(EXECUTABLE_NAME TGRenderer)
 
-file(GLOB_RECURSE SRCS *.cpp *.c)
-file(GLOB_RECURSE INCS *.h *.hpp)
-source_group(TREE ${CMAKE_CURRENT_LIST_DIR} FILES ${SRCS})
-source_group(TREE ${CMAKE_CURRENT_LIST_DIR} FILES ${INCS})
+file(GLOB_RECURSE SOURCES *.cpp *.c)
+file(GLOB_RECURSE HEADERS *.h *.hpp)
+source_group(TREE ${CMAKE_CURRENT_LIST_DIR} FILES ${HEADERS} ${SOURCES})
 
-add_executable(${EXECUTABLE_NAME} ${SRCS} ${INCS})
+add_executable(${EXECUTABLE_NAME} ${SOURCES} ${HEADERS})
 target_include_directories(${EXECUTABLE_NAME} PUBLIC ${CMAKE_CURRENT_LIST_DIR}/Public
         PRIVATE ${CMAKE_CURRENT_LIST_DIR}/Private)
 target_link_libraries(${EXECUTABLE_NAME} PRIVATE GraphicCore)
 
 include(GNUInstallDirs)
+
 set(EGLLib ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_BINDIR}/LibEGL.dll)
 set(GLESLib ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_BINDIR}/LibGLESv2.dll)
 add_custom_command(
@@ -20,8 +20,6 @@ add_custom_command(
     COMMAND ${CMAKE_COMMAND} -E copy ${GLESLib} $<TARGET_FILE_DIR:${EXECUTABLE_NAME}>
     COMMENT "Copying EGL and GLES dynamic libraries to executable output directory"
 )
-
-include(GNUInstallDirs)
 
 set(mimallocLib ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_BINDIR}/mimalloc$<$<CONFIG:DEBUG>:-debug>.dll)
 set(mimallocRedirectLib ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_BINDIR}/mimalloc-redirect.dll)

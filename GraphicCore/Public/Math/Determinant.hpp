@@ -20,20 +20,20 @@ namespace TG::Math
     public:
         Scalar operator()(const Matrix& mat) const requires (Order == 1)
         {
-            return mat(0, 0);
+            return mat[0, 0];
         }
 
         Scalar operator()(const Matrix& mat) const requires (Order == 2)
         {
-            return mat(0, 0) * mat(1, 1) - mat(1, 0) * mat(0, 1);
+            return mat[0, 0] * mat[1, 1] - mat[1, 0] * mat[0, 1];
         }
 
         Scalar operator()(const Matrix& mat) const requires (Order == 3)
         {
             // ‌代数余子式法
-            return mat(0, 0) * (mat(1, 1) * mat(2, 2) - mat(1, 2) * mat(2, 1))
-                - mat(0, 1) * (mat(1, 0) * mat(2, 2) - mat(1, 2) * mat(2, 0))
-                + mat(0, 2) * (mat(1, 0) * mat(2, 1) - mat(1, 1) * mat(2, 0));
+            return mat[0, 0] * (mat[1, 1] * mat[2, 2] - mat[1, 2] * mat[2, 1])
+                - mat[0, 1] * (mat[1, 0] * mat[2, 2] - mat[1, 2] * mat[2, 0])
+                + mat[0, 2] * (mat[1, 0] * mat[2, 1] - mat[1, 1] * mat[2, 0]);
         }
 
         Scalar operator()(const Matrix& mat) const requires (Order == 4)
@@ -43,7 +43,7 @@ namespace TG::Math
             Scalar minor01 = Minor4X4(mat, 0, 1);
             Scalar minor02 = Minor4X4(mat, 0, 2);
             Scalar minor03 = Minor4X4(mat, 0, 3);
-            return mat(0, 0) * minor00 - mat(0, 1) * minor01 + mat(0, 2) * minor02 - mat(0, 3) * minor03;
+            return mat[0, 0] * minor00 - mat[0, 1] * minor01 + mat[0, 2] * minor02 - mat[0, 3] * minor03;
         }
 
         Scalar operator()(const Matrix& mat) const
@@ -61,7 +61,7 @@ namespace TG::Math
                 for (std::size_t i = 0; i < inversionNumber; ++i)
                     result *= -1;
                 for (std::size_t i = 0; i < Order; ++i)
-                    result *= mat(i, permutation[i]);
+                    result *= mat[i, permutation[i]];
                 det += result;
             } while(std::next_permutation(permutation.begin(), permutation.end()));
 
@@ -73,8 +73,8 @@ namespace TG::Math
             std::size_t column0, std::size_t Column1, std::size_t Column2)
         {
             // 代数余子式求行列式公式的一部分。计算过程中考虑了(-1)^(row0 + column0)，可参考Cofactor3X3的分析
-            return mat(row0, column0) *
-                (mat(row1, Column1) * mat(row2, Column2) - mat(row1, Column2) * mat(row2, Column1));
+            return mat[row0, column0] *
+                (mat[row1, Column1] * mat[row2, Column2] - mat[row1, Column2] * mat[row2, Column1]);
         }
         // 第row行第column列的余子式
         static Scalar Minor4X4(const Matrix& mat, std::size_t row, std::size_t column)

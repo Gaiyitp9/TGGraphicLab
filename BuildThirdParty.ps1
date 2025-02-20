@@ -1,4 +1,4 @@
-# 构建TGGraphicLab依赖的三方库
+# 构建TGGraphicLab三方库
 
 # 配置构建目录和安装目录
 $sourceDir = "$PWD\ThirdParty"

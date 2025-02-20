@@ -5,7 +5,7 @@
 *****************************************************************/
 
 #include "Application.h"
-#include "Diagnostic/Log.h"
+#include "Diagnostic/Log.hpp"
 #include "mimalloc.h"
 
 int CALLBACK main()
