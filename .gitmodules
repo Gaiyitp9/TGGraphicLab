@@ -1,6 +1,0 @@
-[submodule "ThirdParty/mimalloc"]
-	path = ThirdParty/mimalloc
-	url = https://github.com/microsoft/mimalloc.git
-[submodule "ThirdParty/spdlog"]
-	path = ThirdParty/spdlog
-	url = https://github.com/gabime/spdlog.git
