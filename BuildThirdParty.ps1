@@ -1,7 +1,7 @@
-# 构建TGGraphicLab
+# 构建TGGraphicLab三方库
 
 # 配置构建目录和安装目录
-$sourceDir = "$PWD"
+$sourceDir = "$PWD\ThirdParty"
 $buildDir = "$PWD\build"
 $installDir = "$PWD\install"
 
@@ -22,10 +22,9 @@ $cmakeOptions = @(
    "-DCMAKE_VERBOSE_MAKEFILE=OFF"
    "-DSPDLOG_USE_STD_FORMAT:BOOL=ON"
    "-DSPDLOG_INSTALL:BOOL=ON"
-   "-DMI_BUILD_TESTS:BOOL=OFF"
 )
 
-function GenerateProjectFiles
+function BuildLibrary
 {
    param
    (
@@ -51,8 +50,8 @@ function GenerateProjectFiles
 }
 
 # 构建Debug版本
-GenerateProjectFiles "Debug"
+BuildLibrary "Debug"
 # 构建Release版本
-GenerateProjectFiles "Release"
+BuildLibrary "Release"
 
 Write-Host "Configuration and build complete!"

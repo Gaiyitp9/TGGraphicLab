@@ -1,7 +1,7 @@
 # 设置测试目录名称
 set(TestsFolderName Tests)
 
-# 下载并集成googletest
+# 下载googletest
 include(FetchContent)
 FetchContent_Declare(
         googletest
