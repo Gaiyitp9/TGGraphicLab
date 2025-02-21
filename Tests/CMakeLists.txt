@@ -1,12 +1,11 @@
 # 设置测试目录名称
 set(TestsFolderName Tests)
 
-# 下载googletest
+# 集成googletest
 include(FetchContent)
 FetchContent_Declare(
         googletest
-        GIT_REPOSITORY https://github.com/google/googletest.git
-        GIT_TAG        6910c9d9165801d8827d628cb72eb7ea9dd538c5 # v1.16.0
+        SOURCE_DIR "${CMAKE_SOURCE_DIR}/ThirdParty/googletest"
         FIND_PACKAGE_ARGS NAMES GTest
 )
 FetchContent_MakeAvailable(googletest)
