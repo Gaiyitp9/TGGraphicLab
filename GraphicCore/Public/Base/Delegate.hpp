@@ -25,7 +25,7 @@ namespace TG
         void Bind(T* object, ReturnType(T::*method)(Args...))
         {
             m_delegate = [object, method](Args... args) {
-                return (object->*method)(args...);
+                return (object->*method)(std::forward<Args>(args)...);
             };
         }
         // 绑定lambda表达式
@@ -34,7 +34,7 @@ namespace TG
             m_delegate = lambda;
         }
 
-        ReturnType Execute(Args&&... args)
+        ReturnType Execute(Args... args)
         {
             if (m_delegate)
                 return m_delegate(std::forward<Args>(args)...);

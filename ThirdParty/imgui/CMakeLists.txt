@@ -3,8 +3,6 @@ cmake_minimum_required(VERSION 3.29)
 project(ImGui VERSION 1.91.4)
 message(STATUS "ImGui version: ${PROJECT_VERSION}")
 
-include(GNUInstallDirs)
-
 # 使用c++23
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -27,6 +25,8 @@ add_library(${PROJECT_NAME} STATIC ${HEADERS} ${SOURCES})
 add_library(TG::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
 
 set_target_properties(${PROJECT_NAME} PROPERTIES DEBUG_POSTFIX d)
+
+include(GNUInstallDirs)
 
 target_include_directories(${PROJECT_NAME} SYSTEM
         PUBLIC

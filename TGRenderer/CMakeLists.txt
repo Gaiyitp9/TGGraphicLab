@@ -1,4 +1,4 @@
-set(EXECUTABLE_NAME TGRenderer)
+set(EXECUTABLE_NAME "TGRenderer")
 
 file(GLOB_RECURSE SOURCES *.cpp *.c)
 file(GLOB_RECURSE HEADERS *.h *.hpp)
@@ -31,11 +31,19 @@ add_custom_command(
         COMMENT "Copying mimalloc dynamic libraries to executable output directory"
 )
 
-set(ICONS ${CMAKE_CURRENT_LIST_DIR}/maple-leaf.ico ${CMAKE_CURRENT_LIST_DIR}/maple-leaf2.ico)
+if (CMAKE_GENERATOR STREQUAL "Visual Studio 17 2022")
+    set(WORKING_DIRECTORY $<TARGET_FILE_DIR:${EXECUTABLE_NAME}>/..)
+elseif (CMAKE_GENERATOR STREQUAL "Ninja")
+    set(WORKING_DIRECTORY $<TARGET_FILE_DIR:${EXECUTABLE_NAME}>)
+else()
+    message(STATUS "Unknown generator: ${CMAKE_GENERATOR}")
+endif()
+
+set(ICONS ${CMAKE_CURRENT_SOURCE_DIR}/maple-leaf.ico ${CMAKE_CURRENT_SOURCE_DIR}/maple-leaf2.ico)
 add_custom_command(
         TARGET ${EXECUTABLE_NAME}
         POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy
-        ${ICONS} $<TARGET_FILE_DIR:${EXECUTABLE_NAME}>
+        ${ICONS} ${WORKING_DIRECTORY}
         COMMENT "Copying icons to executable output directory"
 )
 
@@ -43,6 +51,6 @@ set(SHADER_DIR ${CMAKE_SOURCE_DIR}/Shaders)
 add_custom_command(
         TARGET ${EXECUTABLE_NAME}
         POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_directory
-        ${SHADER_DIR} $<TARGET_FILE_DIR:${EXECUTABLE_NAME}>/Shaders
+        ${SHADER_DIR} ${WORKING_DIRECTORY}/Shaders
         COMMENT "Copying shaders to executable output directory"
 )
