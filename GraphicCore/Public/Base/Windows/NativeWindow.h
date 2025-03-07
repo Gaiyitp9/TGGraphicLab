@@ -8,8 +8,8 @@
 #include "Base/Core.h"
 #include "Input/KeyCode.h"
 #include <string>
-#include <functional>
 #include <optional>
+#include "Base/Delegate.hpp"
 
 namespace TG
 {
@@ -23,15 +23,15 @@ namespace TG
     using NativeDeviceContext = HDC;
     using NativeWindowHandle = HWND;
 
-    using KeyFunction = std::function<void(Input::KeyCode key, int scanCode, Input::Action action)>;
-    using CharFunction = std::function<void(char16_t c)>;
-    using MouseButtonFunction = std::function<void(Input::KeyCode button, Input::Action action)>;
-    using CursorPosFunction = std::function<void(int xPos, int yPos)>;
-    using ScrollFunction = std::function<void(int xOffset, int yOffset)>;
-    using WindowPosFunction = std::function<void(int xPos, int yPos)>;
-    using WindowSizeFunction = std::function<void(unsigned int width, unsigned int height)>;
-    using SuspendFunction = std::function<void()>;
-    using ResumeFunction = std::function<void()>;
+    using KeyDelegate = Delegate<void(Input::KeyCode key, int scanCode, Input::Action action)>;
+    using CharDelegate = Delegate<void(char16_t c)>;
+    using MouseButtonDelegate = Delegate<void(Input::KeyCode button, Input::Action action)>;
+    using CursorPosDelegate = Delegate<void(int xPos, int yPos)>;
+    using ScrollDelegate = Delegate<void(int xOffset, int yOffset)>;
+    using WindowPosDelegate = Delegate<void(int xPos, int yPos)>;
+    using WindowSizeDelegate = Delegate<void(unsigned int width, unsigned int height)>;
+    using SuspendDelegate = Delegate<void()>;
+    using ResumeDelegate = Delegate<void()>;
 
     // 封装Win32原生窗口
     struct NativeWindow
@@ -52,14 +52,14 @@ namespace TG
         HDC     deviceContext{ nullptr };
         bool    destroyed{ false };
 
-        std::function<void(Input::KeyCode key, int scanCode, Input::Action action)> keyFunction;
-        std::function<void(char16_t c)> charFunction{};
-        std::function<void(Input::KeyCode button, Input::Action action)> mouseButtonFunction;
-        std::function<void(int xPos, int yPos)> cursorPosFunction;
-        std::function<void(int xOffset, int yOffset)> scrollFunction;
-        std::function<void(int xPos, int yPos)> windowPosFunction;
-        std::function<void(unsigned int width, unsigned int height)> windowSizeFunction;
-        std::function<void()> suspendFunction;
-        std::function<void()> resumeFunction;
+        KeyDelegate keyDelegate;
+        CharDelegate charDelegate{};
+        MouseButtonDelegate mouseButtonDelegate;
+        CursorPosDelegate cursorPosDelegate;
+        ScrollDelegate scrollDelegate;
+        WindowPosDelegate windowPosDelegate;
+        WindowSizeDelegate windowSizeDelegate;
+        SuspendDelegate suspendDelegate;
+        ResumeDelegate resumeDelegate;
     };
 }

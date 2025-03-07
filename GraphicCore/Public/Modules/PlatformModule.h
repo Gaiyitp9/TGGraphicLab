@@ -9,6 +9,7 @@
 #include "Base/MainWindow.h"
 #include "Base/Chronometer.h"
 #include "Input/Event.h"
+#include "Base/Delegate.hpp"
 
 namespace TG
 {
@@ -29,8 +30,12 @@ namespace TG
         [[nodiscard]] int ExitCode() const;
         [[nodiscard]] const Window& GetWindow() const { return m_mainWindow; }
 
-        std::function<void(const Input::Event<Input::Mouse>&)>& OnMouseEvent() { return m_mouseEventDelegate; }
-        std::function<void(const Input::Event<Input::Keyboard>&)>& OnKeyboardEvent() { return m_keyboardEventDelegate; }
+        // 鼠标事件委托
+        MulticastDelegate<void(const Input::Event<Input::Mouse>&)> onMouseEvent;
+        // 键盘事件委托
+        MulticastDelegate<void(const Input::Event<Input::Keyboard>&)> onKeyboardEvent;
+        // 窗口尺寸变化委托
+        MulticastDelegate<void(unsigned int, unsigned int)> onWindowResize;
 
     private:
         // 主显示器的尺寸
@@ -41,9 +46,5 @@ namespace TG
         std::optional<int> m_exitCode;
         // 高精度计时器
         Chronometer m_timer;
-        // 鼠标事件委托
-        std::function<void(const Input::Event<Input::Mouse>&)> m_mouseEventDelegate;
-        // 键盘事件委托
-        std::function<void(const Input::Event<Input::Keyboard>&)> m_keyboardEventDelegate;
     };
 }

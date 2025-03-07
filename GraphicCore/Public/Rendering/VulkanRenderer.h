@@ -11,12 +11,11 @@
 
 namespace TG
 {
-    enum class VkQueueType : unsigned char
+    enum class VkQueueType
     {
         Graphic = VK_QUEUE_GRAPHICS_BIT,
         Compute = VK_QUEUE_COMPUTE_BIT,
         Transfer = VK_QUEUE_TRANSFER_BIT,
-        SparseBinding = VK_QUEUE_SPARSE_BINDING_BIT,
         Present,
     };
     
@@ -30,15 +29,16 @@ namespace TG
         void Present() override;
 
     private:
-        void CheckExtensionAndLayer();
+        void CheckLayerAndExtension();
         void PopulateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT& createInfo);
         static VKAPI_ATTR VkBool32 VKAPI_CALL DebugCallback(
             VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
             VkDebugUtilsMessageTypeFlagsEXT messageType,
             const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData,
             void* pUserData);
-        void CreateInstance(NativeWindowHandle handle);
+        void CreateInstance();
         void SetupDebugMessenger();
+        void CreateSurface(NativeWindowHandle handle);
         void SelectPhysicalDevice();
         bool IsDeviceSuitable(VkPhysicalDevice device);
         void CreateLogicalDevice();
@@ -57,16 +57,29 @@ namespace TG
         void CreateSyncObjects();
         void DrawFrame();
 
+        // 名称比较器，按字典序排列
+        constexpr static auto NameComparer = [](char const* lhs, char const* rhs) {
+            return std::strcmp(lhs, rhs) < 0;
+        };
+        // 扩展投影
+        constexpr static auto ExtensionProjector = [](const VkExtensionProperties& extensionProperties) {
+            return extensionProperties.extensionName;
+        };
+        // 层投影
+        constexpr static auto LayerProjector = [](const VkLayerProperties& layerProperties) {
+            return layerProperties.layerName;
+        };
+
         bool m_enableValidationLayer { true };
-        std::vector<char const*> m_globalExtensions;    // 需要使用到的vulkan扩展
-        std::vector<char const*> m_globalLayers;        // 需要使用到的vulkan layers
+        std::vector<char const*> m_requiredVulkanExtensions;
+        std::vector<char const*> m_requiredVulkanLayers;
         VkInstance m_instance{ VK_NULL_HANDLE };
         VkDebugUtilsMessengerEXT m_debugMessenger{};
         VkSurfaceKHR m_surface{};
 
-        std::vector<char const*> m_deviceExtensions;
+        std::vector<char const*> m_requiredDeviceExtensions;
+        std::vector<VkQueueType> m_requiredQueueFamilies;
         VkPhysicalDeviceFeatures m_deviceFeatures{};
-        std::vector<VkQueueType> m_queueFamilies;
         VkPhysicalDevice m_physicalDevice{ VK_NULL_HANDLE };
         std::unordered_map<VkQueueType, uint32_t> m_familyIndices;
 

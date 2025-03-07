@@ -18,8 +18,8 @@ namespace TG
 		m_editorModule  = std::make_shared<EditorModule>();
 
 		// 输入模块订阅输入事件委托
-		m_inputModule->Subscribe(m_platformModule->OnMouseEvent());
-		m_inputModule->Subscribe(m_platformModule->OnKeyboardEvent());
+		m_inputModule->Subscribe(m_platformModule->onMouseEvent);
+		m_inputModule->Subscribe(m_platformModule->onKeyboardEvent);
 		// 渲染模块接入视频接口
 		m_renderModule->PlugInVideoPort(m_platformModule->GetWindow());
 		// 编辑器模块设置渲染器，并接入视频接口

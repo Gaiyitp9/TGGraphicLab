@@ -51,15 +51,15 @@ namespace TG
         void Show(bool show) const;
 
         // 窗口消息事件回调
-        void SetWindowPosCallback(const WindowPosFunction& function);
-        void SetWindowSizeCallback(const WindowSizeFunction& function);
-        void SetSuspendCallback(const SuspendFunction& function);
-        void SetResumeCallback(const ResumeFunction& function);
-        void SetKeyCallback(const KeyFunction& function);
-        void SetCharCallback(const CharFunction& function);
-        void SetMouseButtonCallback(const MouseButtonFunction& function);
-        void SetCursorPosCallback(const CursorPosFunction& function);
-        void SetScrollCallback(const ScrollFunction& function);
+        void SetWindowPosCallback(const WindowPosDelegate& function);
+        void SetWindowSizeCallback(const WindowSizeDelegate& function);
+        void SetSuspendCallback(const SuspendDelegate& function);
+        void SetResumeCallback(const ResumeDelegate& function);
+        void SetKeyCallback(const KeyDelegate& function);
+        void SetCharCallback(const CharDelegate& function);
+        void SetMouseButtonCallback(const MouseButtonDelegate& function);
+        void SetCursorPosCallback(const CursorPosDelegate& function);
+        void SetScrollCallback(const ScrollDelegate& function);
 
     private:
         int m_posX, m_posY;

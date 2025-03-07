@@ -40,41 +40,45 @@ namespace TG
         m_mainWindow.Show(true);
         m_mainWindow.SetIcon("maple-leaf.ico");
         m_mainWindow.SetKeyCallback(
-            [&keyboardEventDelegate = m_keyboardEventDelegate](Input::KeyCode key, int scanCode, Input::Action action) {
+            [&keyboardEventDelegate = onKeyboardEvent](Input::KeyCode key, int scanCode, Input::Action action) {
                 Input::Event<Input::Keyboard> event;
                 event.key = key;
                 if (action == Input::Action::Press || action == Input::Action::Repeat)
                     event.isPressed = true;
-                keyboardEventDelegate(event);
+                keyboardEventDelegate.Broadcast(event);
             }
         );
-        m_mainWindow.SetCharCallback([&keyboardEventDelegate = m_keyboardEventDelegate](char16_t c) {
+        m_mainWindow.SetCharCallback([&keyboardEventDelegate = onKeyboardEvent](char16_t c) {
             Input::Event<Input::Keyboard> event;
             event.c = c;
-            keyboardEventDelegate(event);
+            keyboardEventDelegate.Broadcast(event);
         });
         m_mainWindow.SetMouseButtonCallback(
-            [&mouseEventDelegate = m_mouseEventDelegate](Input::KeyCode mouseButton, Input::Action action) {
+            [&mouseEventDelegate = onMouseEvent](Input::KeyCode mouseButton, Input::Action action) {
                 Input::Event<Input::Mouse> event;
                 event.key = mouseButton;
                 if (action == Input::Action::Press)
                     event.isPressed = true;
-                mouseEventDelegate(event);
+                mouseEventDelegate.Broadcast(event);
             }
         );
-        m_mainWindow.SetScrollCallback([&mouseEventDelegate = m_mouseEventDelegate](int xOffset, int yOffset) {
+        m_mainWindow.SetScrollCallback([&mouseEventDelegate = onMouseEvent](int xOffset, int yOffset) {
             Input::Event<Input::Mouse> event;
             event.wheelDelta = static_cast<short>(yOffset);
-            mouseEventDelegate(event);
+            mouseEventDelegate.Broadcast(event);
         });
-        m_mainWindow.SetCursorPosCallback([&mouseEventDelegate = m_mouseEventDelegate](int posX, int posY) {
+        m_mainWindow.SetCursorPosCallback([&mouseEventDelegate = onMouseEvent](int posX, int posY) {
             Input::Event<Input::Mouse> event;
             event.x = static_cast<short>(posX);
             event.y = static_cast<short>(posY);
-            mouseEventDelegate(event);
+            mouseEventDelegate.Broadcast(event);
         });
         m_mainWindow.SetWindowPosCallback([](int xPos, int yPos){});
-        m_mainWindow.SetWindowSizeCallback([](unsigned int w, unsigned int h){});
+        m_mainWindow.SetWindowSizeCallback(
+            [&windowSizeDelegate = onWindowResize](unsigned int width, unsigned int height) {
+                windowSizeDelegate.Broadcast(width, height);
+            }
+        );
         m_mainWindow.SetSuspendCallback([&timer = m_timer]{ timer.Pause(); });
         m_mainWindow.SetResumeCallback([&timer = m_timer]{ timer.Start(); });
     }
@@ -100,5 +104,4 @@ namespace TG
     {
         return *m_exitCode;
     }
-
 }

@@ -162,7 +162,7 @@ namespace TG
 		glEnableVertexAttribArray(0);
 		glBindVertexArray(0);
 
-		std::ifstream vertexFile("../../Shaders/GLSL/simple.vert");
+		std::ifstream vertexFile("Shaders/GLSL/simple.vert");
 		if (!vertexFile)
 			throw BaseException::Create("Failed to load simple vertex shader source file");
 
@@ -182,7 +182,7 @@ namespace TG
 			LogError("ERROR::SHADER::VERTEX::COMPILATION_FAILED\n{}", infoLog);
 		}
 
-    	std::ifstream geometryFile("../../Shaders/GLSL/wireframe.geom");
+    	std::ifstream geometryFile("Shaders/GLSL/wireframe.geom");
     	if (!geometryFile)
     		throw BaseException::Create("Failed to load wireframe shader source file");
     	std::ostringstream geometryBuffer;
@@ -199,7 +199,7 @@ namespace TG
     		LogError("ERROR::SHADER::GEOMETRY::COMPILATION_FAILED\n{}", infoLog);
     	}
 
-		std::ifstream fragmentFile("../../Shaders/GLSL/simple.frag");
+		std::ifstream fragmentFile("Shaders/GLSL/simple.frag");
 		if (!fragmentFile)
 			throw BaseException::Create("Failed to load simple fragment shader source file");
 

@@ -8,7 +8,7 @@
 #include "Module.h"
 #include "Input/Mouse.h"
 #include "Input/Keyboard.h"
-#include <functional>
+#include "Base/Delegate.hpp"
 
 namespace TG
 {
@@ -22,8 +22,8 @@ namespace TG
         InputModule& operator=(InputModule&&) = delete;
         ~InputModule() override;
 
-        void Subscribe(std::function<void(const Input::Event<Input::Mouse>&)>& mouseEventDelegate);
-        void Subscribe(std::function<void(const Input::Event<Input::Keyboard>&)>& keyboardEventDelegate);
+        void Subscribe(MulticastDelegate<void(const Input::Event<Input::Mouse>&)>& mouseEventDelegate);
+        void Subscribe(MulticastDelegate<void(const Input::Event<Input::Keyboard>&)>& keyboardEventDelegate);
 
         void Update() override;
         void PostUpdate() override;

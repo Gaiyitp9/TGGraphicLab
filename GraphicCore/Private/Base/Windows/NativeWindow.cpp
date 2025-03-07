@@ -376,116 +376,95 @@ namespace TG
 				else if ((keyFlags & KF_REPEAT) == KF_REPEAT)
 					action = Input::Action::Repeat;
 
-				if (pWindow->keyFunction)
-   					pWindow->keyFunction(static_cast<Input::KeyCode>(vkCode), scanCode, action);
+				pWindow->keyDelegate.ExecuteIfBound(static_cast<Input::KeyCode>(vkCode), scanCode, action);
 
 				return 0;
 			}
 
 			case WM_CHAR:
 	        {
-	            if (pWindow->charFunction)
-            		pWindow->charFunction(static_cast<char16_t>(wParam));
+	            pWindow->charDelegate.ExecuteIfBound(static_cast<char16_t>(wParam));
 				return 0;
 	        }
 
 			case WM_MOUSEMOVE:
 			{
-				if (pWindow->cursorPosFunction)
-					pWindow->cursorPosFunction(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+				pWindow->cursorPosDelegate.ExecuteIfBound(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
 				return 0;
 			}
 
 			case WM_LBUTTONDOWN:
 			{
-				if (pWindow->mouseButtonFunction)
-					pWindow->mouseButtonFunction(Input::KeyCode::LeftMouseButton, Input::Action::Press);
-				if (pWindow->cursorPosFunction)
-					pWindow->cursorPosFunction(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+				pWindow->mouseButtonDelegate.ExecuteIfBound(Input::KeyCode::LeftMouseButton, Input::Action::Press);
+				pWindow->cursorPosDelegate.ExecuteIfBound(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
 				return 0;
 			}
 
 			case WM_LBUTTONUP:
 			{
-				if (pWindow->mouseButtonFunction)
-					pWindow->mouseButtonFunction(Input::KeyCode::LeftMouseButton, Input::Action::Release);
-				if (pWindow->cursorPosFunction)
-					pWindow->cursorPosFunction(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+				pWindow->mouseButtonDelegate.ExecuteIfBound(Input::KeyCode::LeftMouseButton, Input::Action::Release);
+				pWindow->cursorPosDelegate.ExecuteIfBound(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
 				return 0;
 			}
 
 			case WM_RBUTTONDOWN:
 			{
-				if (pWindow->mouseButtonFunction)
-					pWindow->mouseButtonFunction(Input::KeyCode::RightMouseButton, Input::Action::Press);
-				if (pWindow->cursorPosFunction)
-					pWindow->cursorPosFunction(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+				pWindow->mouseButtonDelegate.ExecuteIfBound(Input::KeyCode::RightMouseButton, Input::Action::Press);
+				pWindow->cursorPosDelegate.ExecuteIfBound(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
 				return 0;
 			}
 
 			case WM_RBUTTONUP:
 			{
-				if (pWindow->mouseButtonFunction)
-					pWindow->mouseButtonFunction(Input::KeyCode::RightMouseButton, Input::Action::Release);
-				if (pWindow->cursorPosFunction)
-					pWindow->cursorPosFunction(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+				pWindow->mouseButtonDelegate.ExecuteIfBound(Input::KeyCode::RightMouseButton, Input::Action::Release);
+				pWindow->cursorPosDelegate.ExecuteIfBound(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
 				return 0;
 			}
 
 			case WM_MBUTTONDOWN:
 			{
-				if (pWindow->mouseButtonFunction)
-					pWindow->mouseButtonFunction(Input::KeyCode::MiddleMouseButton, Input::Action::Press);
-				if (pWindow->cursorPosFunction)
-					pWindow->cursorPosFunction(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+				pWindow->mouseButtonDelegate.ExecuteIfBound(Input::KeyCode::MiddleMouseButton, Input::Action::Press);
+				pWindow->cursorPosDelegate.ExecuteIfBound(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
 				return 0;
 			}
 
 			case WM_MBUTTONUP:
 			{
-				if (pWindow->mouseButtonFunction)
-					pWindow->mouseButtonFunction(Input::KeyCode::MiddleMouseButton, Input::Action::Release);
-				if (pWindow->cursorPosFunction)
-					pWindow->cursorPosFunction(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+				pWindow->mouseButtonDelegate.ExecuteIfBound(Input::KeyCode::MiddleMouseButton, Input::Action::Release);
+				pWindow->cursorPosDelegate.ExecuteIfBound(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
 				return 0;
 			}
 
 			case WM_MOUSEWHEEL:
 	        {
 				// 每帧只会产生一个WM_MOUSEWHEEL
-				if (pWindow->scrollFunction)
-					pWindow->scrollFunction(0, GET_WHEEL_DELTA_WPARAM(wParam) / WHEEL_DELTA);
-				if (pWindow->cursorPosFunction)
-					pWindow->cursorPosFunction(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+				pWindow->scrollDelegate.ExecuteIfBound(0, GET_WHEEL_DELTA_WPARAM(wParam) / WHEEL_DELTA);
+				pWindow->cursorPosDelegate.ExecuteIfBound(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
 				return 0;
 	        }
 
 			case WM_MOVE:
 			{
-				if (pWindow->windowPosFunction)
-					pWindow->windowPosFunction(LOWORD(lParam), HIWORD(lParam));
+				pWindow->windowPosDelegate.ExecuteIfBound(LOWORD(lParam), HIWORD(lParam));
 				return 0;
 			}
 
 			case WM_SIZE:
 			{
-				if (pWindow->windowSizeFunction)
-					pWindow->windowSizeFunction(LOWORD(lParam), HIWORD(lParam));
-				if (pWindow->suspendFunction && wParam == SIZE_MINIMIZED)
-					pWindow->suspendFunction();
-				if (pWindow->resumeFunction && wParam == SIZE_RESTORED)
-					pWindow->resumeFunction();
+				pWindow->windowSizeDelegate.ExecuteIfBound(LOWORD(lParam), HIWORD(lParam));
+				if (wParam == SIZE_MINIMIZED)
+					pWindow->suspendDelegate.ExecuteIfBound();
+				if (wParam == SIZE_RESTORED)
+					pWindow->resumeDelegate.ExecuteIfBound();
 				return 0;
 			}
 
 			case WM_ENTERSIZEMOVE:
-	            if (pWindow->suspendFunction)
-	                pWindow->suspendFunction();
+	            pWindow->suspendDelegate.ExecuteIfBound();
 				return 0;
 
 			case WM_EXITSIZEMOVE:
-	            if (pWindow->resumeFunction)
-	                pWindow->resumeFunction();
+	            pWindow->resumeDelegate.ExecuteIfBound();
 				return 0;
 
 	        default:

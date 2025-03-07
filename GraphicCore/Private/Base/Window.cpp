@@ -52,48 +52,48 @@ namespace TG
         m_nativeWindow.Show(show);
     }
 
-    void Window::SetWindowPosCallback(const WindowPosFunction& function)
+    void Window::SetWindowPosCallback(const WindowPosDelegate& function)
     {
-        m_nativeWindow.windowPosFunction = function;
+        m_nativeWindow.windowPosDelegate = function;
     }
 
-    void Window::SetWindowSizeCallback(const WindowSizeFunction& function)
+    void Window::SetWindowSizeCallback(const WindowSizeDelegate& function)
     {
-        m_nativeWindow.windowSizeFunction = function;
+        m_nativeWindow.windowSizeDelegate = function;
     }
 
-    void Window::SetSuspendCallback(const SuspendFunction& function)
+    void Window::SetSuspendCallback(const SuspendDelegate& function)
     {
-        m_nativeWindow.suspendFunction = function;
+        m_nativeWindow.suspendDelegate = function;
     }
 
-    void Window::SetResumeCallback(const ResumeFunction& function)
+    void Window::SetResumeCallback(const ResumeDelegate& function)
     {
-        m_nativeWindow.resumeFunction = function;
+        m_nativeWindow.resumeDelegate = function;
     }
 
-    void Window::SetKeyCallback(const KeyFunction& function)
+    void Window::SetKeyCallback(const KeyDelegate& function)
     {
-        m_nativeWindow.keyFunction = function;
+        m_nativeWindow.keyDelegate = function;
     }
 
-    void Window::SetCharCallback(const CharFunction& function)
+    void Window::SetCharCallback(const CharDelegate& function)
     {
-        m_nativeWindow.charFunction = function;
+        m_nativeWindow.charDelegate = function;
     }
 
-    void Window::SetMouseButtonCallback(const MouseButtonFunction& function)
+    void Window::SetMouseButtonCallback(const MouseButtonDelegate& function)
     {
-        m_nativeWindow.mouseButtonFunction = function;
+        m_nativeWindow.mouseButtonDelegate = function;
     }
 
-    void Window::SetCursorPosCallback(const CursorPosFunction& function)
+    void Window::SetCursorPosCallback(const CursorPosDelegate& function)
     {
-        m_nativeWindow.cursorPosFunction = function;
+        m_nativeWindow.cursorPosDelegate = function;
     }
 
-    void Window::SetScrollCallback(const ScrollFunction& function)
+    void Window::SetScrollCallback(const ScrollDelegate& function)
     {
-        m_nativeWindow.scrollFunction = function;
+        m_nativeWindow.scrollDelegate = function;
     }
 }

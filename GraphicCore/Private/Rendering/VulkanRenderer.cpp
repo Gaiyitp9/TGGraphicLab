@@ -16,9 +16,10 @@ namespace TG
 {
     VulkanRenderer::VulkanRenderer(NativeWindowHandle handle)
     {
-        CheckExtensionAndLayer();
-        CreateInstance(handle);
+        CheckLayerAndExtension();
+        CreateInstance();
         SetupDebugMessenger();
+        CreateSurface(handle);
         SelectPhysicalDevice();
         CreateLogicalDevice();
         CreateSwapChain();
@@ -33,15 +34,10 @@ namespace TG
 
     VulkanRenderer::~VulkanRenderer()
     {
-        vkDeviceWaitIdle(m_device);
+        if (m_instance == VK_NULL_HANDLE || m_device == VK_NULL_HANDLE)
+            return;
 
-        if (m_enableValidationLayer)
-        {
-            const auto func = reinterpret_cast<PFN_vkDestroyDebugUtilsMessengerEXT>(
-                vkGetInstanceProcAddr(m_instance, "vkDestroyDebugUtilsMessengerEXT"));
-            if (func != nullptr)
-                func(m_instance, m_debugMessenger, nullptr);
-        }
+        vkDeviceWaitIdle(m_device);
 
         for (uint32_t i = 0; i < MAX_FRAMES_IN_FLIGHT; ++i)
         {
@@ -58,6 +54,13 @@ namespace TG
         vkDestroyRenderPass(m_device, m_renderPass, nullptr);
         vkDestroyDevice(m_device, nullptr);
         vkDestroySurfaceKHR(m_instance, m_surface, nullptr);
+        if (m_enableValidationLayer)
+        {
+            const auto vkDestroyDebugUtilsMessengerEXT = reinterpret_cast<PFN_vkDestroyDebugUtilsMessengerEXT>(
+                vkGetInstanceProcAddr(m_instance, "vkDestroyDebugUtilsMessengerEXT"));
+            if (vkDestroyDebugUtilsMessengerEXT != nullptr)
+                vkDestroyDebugUtilsMessengerEXT(m_instance, m_debugMessenger, nullptr);
+        }
         vkDestroyInstance(m_instance, nullptr);
     }
 
@@ -89,9 +92,9 @@ namespace TG
         m_currentFrame = (m_currentFrame + 1) % MAX_FRAMES_IN_FLIGHT;
     }
 
-    void VulkanRenderer::CheckExtensionAndLayer()
+    void VulkanRenderer::CheckLayerAndExtension()
     {
-        // 加入安装了多个版本的vulkan，指定版本需要设置
+        // 假如安装了多个版本的vulkan，指定版本需要设置
         // 1. VK_LAYER_PATH=/path/to/vulkan/Bin来寻找VkLayer_khronos_validation.dll
         // 2. VK_SDK_PATH=/path/to/vulkan/Bin
         // 3. VULKAN_SDK=/path/to/vulkan/Bin
@@ -99,76 +102,58 @@ namespace TG
         // HKEY_LOCAL_MACHINE\SOFTWARE\Khronos\Vulkan\ExplicitLayers
         // HKEY_LOCAL_MACHINE\SOFTWARE\Khronos\Vulkan\ImplicitLayers
 
+        // 需要开启的层
         if (m_enableValidationLayer)
-            m_globalLayers.emplace_back("VK_LAYER_KHRONOS_validation");
-
-        // 查询可用的layer
+            m_requiredVulkanLayers.emplace_back("VK_LAYER_KHRONOS_validation");
+        std::ranges::sort(m_requiredVulkanLayers, NameComparer);
+        // 查询可用的层
         uint32_t layerCount = 0;
         vkEnumerateInstanceLayerProperties(&layerCount, nullptr);
         std::vector<VkLayerProperties> availableLayers(layerCount);
         vkEnumerateInstanceLayerProperties(&layerCount, availableLayers.data());
+        std::ranges::sort(availableLayers, NameComparer, LayerProjector);
+        // 可用层输出到日志
         std::string layersLog;
         for (const auto& layerProperties : availableLayers)
         {
             layersLog += layerProperties.layerName;
             layersLog += "\n";
         }
-        LogInfo("Available layers:\n{}", layersLog);
+        LogInfo("\nAvailable layers:\n{}", layersLog);
+        // 检查是否包含所需层
+        const bool layerFound = std::ranges::includes(availableLayers, m_requiredVulkanLayers,
+            NameComparer, LayerProjector);
+        if (!layerFound)
+            throw BaseException::Create("Layers required, but not available");
 
-        // 检查是否包含所需的layer
-        for (char const* layerName : m_globalLayers)
-        {
-            bool layerFound = false;
-            for (const auto& layerProperties : availableLayers)
-            {
-                if (std::strcmp(layerName, layerProperties.layerName) == 0)
-                {
-                    layerFound = true;
-                    break;
-                }
-            }
-
-            if (!layerFound)
-                throw BaseException::Create("Layers required, but not available");
-        }
-
-        m_globalExtensions.emplace_back(VK_KHR_SURFACE_EXTENSION_NAME);
-        m_globalExtensions.emplace_back("VK_KHR_win32_surface");
+        // 需要支持的扩展
+        m_requiredVulkanExtensions.emplace_back(VK_KHR_SURFACE_EXTENSION_NAME);
+        m_requiredVulkanExtensions.emplace_back("VK_KHR_win32_surface");
         if (m_enableValidationLayer)
-            m_globalExtensions.emplace_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
-
+            m_requiredVulkanExtensions.emplace_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
+        std::ranges::sort(m_requiredVulkanExtensions, NameComparer);
+        // 查询可用的扩展
         uint32_t extensionCount = 0;
         vkEnumerateInstanceExtensionProperties(nullptr, &extensionCount, nullptr);
         std::vector<VkExtensionProperties> availableExtensions(extensionCount);
         vkEnumerateInstanceExtensionProperties(nullptr, &extensionCount, availableExtensions.data());
+        std::ranges::sort(availableExtensions, NameComparer, ExtensionProjector);
+        // 可用扩展输出到日志
         std::string extensionsLog;
         for (const auto& extensionProperties : availableExtensions)
         {
             extensionsLog += extensionProperties.extensionName;
             extensionsLog += "\n";
         }
-        LogInfo("Available extensions:\n{}", extensionsLog);
-
-        // 检查是否包含所需的extension
-        for (char const* extensionName : m_globalExtensions)
-        {
-            bool extensionFound = false;
-            for (const auto& extensionProperties : availableExtensions)
-            {
-                if (std::strcmp(extensionName, extensionProperties.extensionName) == 0)
-                {
-                    extensionFound = true;
-                    break;
-                }
-            }
-
-            if (!extensionFound)
-                throw BaseException::Create("Extensions required, but not available");
-        }
+        LogInfo("\nAvailable extensions:\n{}", extensionsLog);
+        // 检查是否包含所需扩展
+        const bool extensionFound = std::ranges::includes(availableExtensions, m_requiredVulkanExtensions,
+            NameComparer, ExtensionProjector);
+        if (!extensionFound)
+            throw BaseException::Create("Extensions required, but not available");
     }
 
-    void VulkanRenderer::PopulateDebugMessengerCreateInfo(
-        VkDebugUtilsMessengerCreateInfoEXT& createInfo)
+    void VulkanRenderer::PopulateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT& createInfo)
     {
         createInfo = {};
         createInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
@@ -189,7 +174,7 @@ namespace TG
         const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData,
         void* pUserData)
     {
-        LogError("validation layer: {}", pCallbackData->pMessage);
+        LogInfo("validation layer: {}", pCallbackData->pMessage);
         // The callback returns a boolean that indicates if the Vulkan call that
         // triggered the validation layer message should be aborted. If the callback
         // returns true, then the call is aborted with the VK_ERROR_VALIDATION_FAILED_EXT error.
@@ -197,39 +182,32 @@ namespace TG
         return VK_FALSE;
     }
 
-    void VulkanRenderer::CreateInstance(NativeWindowHandle handle)
+    void VulkanRenderer::CreateInstance()
     {
         VkApplicationInfo appInfo{};
         appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
         appInfo.pApplicationName = "TG Renderer";
-        appInfo.applicationVersion = VK_MAKE_VERSION(1, 0, 0);
+        appInfo.applicationVersion = VK_MAKE_API_VERSION(0, 1, 0, 0);
         appInfo.pEngineName = "No Engine";
-        appInfo.engineVersion = VK_MAKE_VERSION(1, 0, 0);
+        appInfo.engineVersion = VK_MAKE_API_VERSION(0, 1, 0, 0);
         appInfo.apiVersion = VK_API_VERSION_1_4;
 
         VkInstanceCreateInfo createInfo{};
         createInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
         createInfo.pApplicationInfo = &appInfo;
-        createInfo.enabledExtensionCount = static_cast<uint32_t>(m_globalExtensions.size());
-        createInfo.ppEnabledExtensionNames = m_globalExtensions.data();
+        createInfo.enabledExtensionCount = static_cast<uint32_t>(m_requiredVulkanExtensions.size());
+        createInfo.ppEnabledExtensionNames = m_requiredVulkanExtensions.data();
+        createInfo.enabledLayerCount = static_cast<uint32_t>(m_requiredVulkanLayers.size());
+        createInfo.ppEnabledLayerNames = m_requiredVulkanLayers.data();
         VkDebugUtilsMessengerCreateInfoEXT debugCreateInfo{};
         if (m_enableValidationLayer)
         {
             PopulateDebugMessengerCreateInfo(debugCreateInfo);
-            createInfo.enabledLayerCount = static_cast<uint32_t>(m_globalLayers.size());
-            createInfo.ppEnabledLayerNames = m_globalLayers.data();
             createInfo.pNext = &debugCreateInfo;
         }
 
         if (vkCreateInstance(&createInfo, nullptr, &m_instance) != VK_SUCCESS)
             throw BaseException::Create("Failed to create instance");
-
-        VkWin32SurfaceCreateInfoKHR surfaceCreateInfo{};
-        surfaceCreateInfo.sType = VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR;
-        surfaceCreateInfo.hwnd = handle;
-        surfaceCreateInfo.hinstance = GetModuleHandle(nullptr);
-        if (vkCreateWin32SurfaceKHR(m_instance, &surfaceCreateInfo, nullptr, &m_surface) != VK_SUCCESS)
-            throw BaseException::Create("Failed to create window surface");
     }
 
     void VulkanRenderer::SetupDebugMessenger()
@@ -239,20 +217,35 @@ namespace TG
 
         VkDebugUtilsMessengerCreateInfoEXT createInfo{};
         PopulateDebugMessengerCreateInfo(createInfo);
-        const auto func = reinterpret_cast<PFN_vkCreateDebugUtilsMessengerEXT>(
+        const auto vkCreateDebugUtilsMessengerEXT = reinterpret_cast<PFN_vkCreateDebugUtilsMessengerEXT>(
             vkGetInstanceProcAddr(m_instance, "vkCreateDebugUtilsMessengerEXT"));
-        if (func == nullptr)
+        if (vkCreateDebugUtilsMessengerEXT == nullptr)
             throw BaseException::Create("Failed to set up debug messenger");
-        func(m_instance, &createInfo, nullptr, &m_debugMessenger);
+        vkCreateDebugUtilsMessengerEXT(m_instance, &createInfo, nullptr, &m_debugMessenger);
+    }
+
+    void VulkanRenderer::CreateSurface(NativeWindowHandle handle)
+    {
+        VkWin32SurfaceCreateInfoKHR surfaceCreateInfo{};
+        surfaceCreateInfo.sType = VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR;
+        surfaceCreateInfo.hwnd = handle;
+        surfaceCreateInfo.hinstance = GetModuleHandle(nullptr);
+        if (vkCreateWin32SurfaceKHR(m_instance, &surfaceCreateInfo, nullptr, &m_surface) != VK_SUCCESS)
+            throw BaseException::Create("Failed to create window surface");
     }
 
     void VulkanRenderer::SelectPhysicalDevice()
     {
-        m_deviceExtensions.emplace_back(VK_KHR_SWAPCHAIN_EXTENSION_NAME);
-        m_queueFamilies.emplace_back(VkQueueType::Graphic);
-        m_queueFamilies.emplace_back(VkQueueType::Compute);
-        m_queueFamilies.emplace_back(VkQueueType::Transfer);
-        m_queueFamilies.emplace_back(VkQueueType::Present);
+        // 设备需要支持的扩展
+        m_requiredDeviceExtensions.emplace_back(VK_KHR_SWAPCHAIN_EXTENSION_NAME);
+        std::ranges::sort(m_requiredVulkanExtensions, NameComparer);
+        // 队列族需要支持的队列类型
+        m_requiredQueueFamilies.emplace_back(VkQueueType::Graphic);
+        m_requiredQueueFamilies.emplace_back(VkQueueType::Compute);
+        m_requiredQueueFamilies.emplace_back(VkQueueType::Transfer);
+        m_requiredQueueFamilies.emplace_back(VkQueueType::Present);
+        // 设备需要支持的特性
+        m_deviceFeatures.samplerAnisotropy = VK_TRUE;
 
         // 获取所有显示设备
         uint32_t deviceCount = 0;
@@ -261,16 +254,6 @@ namespace TG
             throw BaseException::Create("Failed to find GPUs with Vulkan support");
         std::vector<VkPhysicalDevice> availableDevices(deviceCount);
         vkEnumeratePhysicalDevices(m_instance, &deviceCount, availableDevices.data());
-        // 打印所有显示设备信息
-        for (const auto& device : availableDevices)
-        {
-            VkPhysicalDeviceProperties deviceProperties{};
-            vkGetPhysicalDeviceProperties(device, &deviceProperties);
-            LogInfo("Device type: {} Device name: {}",
-                std::to_underlying(deviceProperties.deviceType),
-                deviceProperties.deviceName);
-        }
-
         // 选择合适的显示设备
         for (const auto& device : availableDevices)
         {
@@ -286,45 +269,40 @@ namespace TG
 
     bool VulkanRenderer::IsDeviceSuitable(VkPhysicalDevice device)
     {
+        // 获取设备属性
+        VkPhysicalDeviceProperties deviceProperties{};
+        vkGetPhysicalDeviceProperties(device, &deviceProperties);
+
         // 获取显示设备支持的扩展
         uint32_t extensionCount;
         vkEnumerateDeviceExtensionProperties(device, nullptr, &extensionCount, nullptr);
         std::vector<VkExtensionProperties> availableExtensions(extensionCount);
-        vkEnumerateDeviceExtensionProperties(device, nullptr, &extensionCount,
-            availableExtensions.data());
-        VkPhysicalDeviceProperties deviceProperties{};
-        vkGetPhysicalDeviceProperties(device, &deviceProperties);
+        vkEnumerateDeviceExtensionProperties(device, nullptr, &extensionCount, availableExtensions.data());
+        std::ranges::sort(availableExtensions, NameComparer, ExtensionProjector);
+        // 设备扩展输出到日志
         std::string deviceExtensionsLog;
         for (const auto& extensionProperties : availableExtensions)
         {
             deviceExtensionsLog += extensionProperties.extensionName;
             deviceExtensionsLog += "\n";
         }
-        LogInfo("{} extensions:\n{}", deviceProperties.deviceName, deviceExtensionsLog);
-
+        LogInfo("\nDevice type: {} Device name: {}\nExtensions:\n{}",
+                std::to_underlying(deviceProperties.deviceType),
+                deviceProperties.deviceName,
+                deviceExtensionsLog);
         // 检查是否包含所需扩展
-        for (char const* extension : m_deviceExtensions)
-        {
-            bool extensionFound = false;
-            for (const auto& extensionProperties : availableExtensions)
-            {
-                if (std::strcmp(extensionProperties.extensionName, extension) == 0)
-                {
-                    extensionFound = true;
-                    break;
-                }
-            }
-            if (!extensionFound)
-                return false;
-        }
+        const bool extensionFound = std::ranges::includes(availableExtensions, m_requiredDeviceExtensions,
+            NameComparer, ExtensionProjector);
+        if (!extensionFound)
+            return false;
 
-        // 获取设备支持的queue family
+        // 获取设备支持的队列族
         uint32_t queueFamilyCount = 0;
         vkGetPhysicalDeviceQueueFamilyProperties(device, &queueFamilyCount, nullptr);
         std::vector<VkQueueFamilyProperties> availableQueueFamilies(queueFamilyCount);
-        vkGetPhysicalDeviceQueueFamilyProperties(device, &queueFamilyCount,
-            availableQueueFamilies.data());
-        for (const auto& queueFamily : m_queueFamilies)
+        vkGetPhysicalDeviceQueueFamilyProperties(device, &queueFamilyCount, availableQueueFamilies.data());
+        // 检查是否包含所需的队列族
+        for (const auto& queueFamily : m_requiredQueueFamilies)
         {
             bool familyFound = false;
             for (std::size_t i = 0; i < availableQueueFamilies.size(); ++i)
@@ -362,11 +340,11 @@ namespace TG
         if (formatCount == 0 || presentModeCount == 0)
             return false;
 
+        // 检查设备是否支持所需特性
         VkPhysicalDeviceFeatures supportedFeatures{};
         vkGetPhysicalDeviceFeatures(device, &supportedFeatures);
-        if (!supportedFeatures.samplerAnisotropy)
+        if (m_deviceFeatures.samplerAnisotropy && !supportedFeatures.samplerAnisotropy)
             return false;
-        m_deviceFeatures.samplerAnisotropy = VK_TRUE;
 
         return true;
     }
@@ -394,10 +372,9 @@ namespace TG
         createInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
         createInfo.queueCreateInfoCount = static_cast<uint32_t>(queueCreateInfos.size());
         createInfo.pQueueCreateInfos = queueCreateInfos.data();
-        // 启用各向异性采样
         createInfo.pEnabledFeatures = &m_deviceFeatures;
-        createInfo.enabledExtensionCount = static_cast<uint32_t>(m_deviceExtensions.size());
-        createInfo.ppEnabledExtensionNames = m_deviceExtensions.data();
+        createInfo.enabledExtensionCount = static_cast<uint32_t>(m_requiredDeviceExtensions.size());
+        createInfo.ppEnabledExtensionNames = m_requiredDeviceExtensions.data();
         if (vkCreateDevice(m_physicalDevice, &createInfo, nullptr, &m_device) != VK_SUCCESS)
             throw BaseException::Create("Failed to create logical device!");
 
@@ -428,7 +405,8 @@ namespace TG
 
         VkSurfaceFormatKHR surfaceFormat = ChooseSwapSurfaceFormat();
         VkPresentModeKHR presentMode = ChooseSwapPresentMode();
-        VkExtent2D extent = m_capabilities.currentExtent;
+        m_swapChainImageFormat = surfaceFormat.format;
+        m_swapChainExtent = m_capabilities.currentExtent;
 
         uint32_t imageCount = m_capabilities.minImageCount + 1;
         if (m_capabilities.maxImageCount > 0 && imageCount > m_capabilities.maxImageCount)
@@ -438,9 +416,9 @@ namespace TG
         createInfo.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
         createInfo.surface = m_surface;
         createInfo.minImageCount = imageCount;
-        createInfo.imageFormat = surfaceFormat.format;
+        createInfo.imageFormat = m_swapChainImageFormat;
         createInfo.imageColorSpace = surfaceFormat.colorSpace;
-        createInfo.imageExtent = extent;
+        createInfo.imageExtent = m_swapChainExtent;
         createInfo.imageArrayLayers = 1;
         createInfo.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
         uint32_t presentGraphicFamilyIndices[] = {
@@ -471,8 +449,6 @@ namespace TG
         vkGetSwapchainImagesKHR(m_device, m_swapChain, &imageCount, nullptr);
         m_swapChainImages.resize(imageCount);
         vkGetSwapchainImagesKHR(m_device, m_swapChain, &imageCount, m_swapChainImages.data());
-        m_swapChainImageFormat = surfaceFormat.format;
-        m_swapChainExtent = extent;
     }
 
     VkSurfaceFormatKHR VulkanRenderer::ChooseSwapSurfaceFormat()
