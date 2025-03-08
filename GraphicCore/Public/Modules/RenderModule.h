@@ -6,7 +6,7 @@
 #pragma once
 
 #include "Module.h"
-#include "Base/Window.h"
+#include "Base/WindowBase.hpp"
 #include "Rendering/Renderer.h"
 #include <memory>
 
@@ -22,8 +22,11 @@ namespace TG
         RenderModule& operator=(RenderModule&&) = delete;
         ~RenderModule() override;
 
-        void PlugInVideoPort(const IVideoPort& videoPort);
+        void PlugInVideoPort(const IDefaultVideoPort& videoPort);
+
         [[nodiscard]] const std::shared_ptr<Renderer>& GetRenderer() const noexcept { return m_Renderer; }
+
+        void Subscribe(MulticastDelegate<void(unsigned int, unsigned int)>& windowResizeDelegate);
 
         void Update() override;
         void PostUpdate() override;

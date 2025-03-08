@@ -22,6 +22,7 @@ namespace TG
 		m_inputModule->Subscribe(m_platformModule->onKeyboardEvent);
 		// 渲染模块接入视频接口
 		m_renderModule->PlugInVideoPort(m_platformModule->GetWindow());
+		m_renderModule->Subscribe(m_platformModule->onWindowResize);
 		// 编辑器模块设置渲染器，并接入视频接口
 		// m_editorModule->SetRenderer(m_renderModule->GetRenderer());
 		// m_editorModule->PlugInVideoPort(m_platformModule->GetWindow());
@@ -46,9 +47,6 @@ namespace TG
 
 			for (const auto& module : m_modules)
 				module->Update();
-
-            if (m_inputModule->GetKeyUp(Input::KeyCode::Space))
-	            LogInfo("space up");
 
 			for (const auto& module : m_modules | std::views::reverse)
 				module->PostUpdate();

@@ -14,7 +14,7 @@
 
 namespace TG
 {
-    VulkanRenderer::VulkanRenderer(NativeWindowHandle handle)
+    VulkanRenderer::VulkanRenderer(HWND handle)
     {
         CheckLayerAndExtension();
         CreateInstance();
@@ -82,14 +82,22 @@ namespace TG
         presentInfo.pImageIndices = &m_imageIndex;
         presentInfo.pResults = nullptr;
         VkResult result = vkQueuePresentKHR(m_queues[VkQueueType::Present], &presentInfo);
-        if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR)
+        if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR || m_framebufferResized)
         {
-
+            m_framebufferResized = false;
+            RecreateSwapChain();
         }
         else if (result != VK_SUCCESS)
             throw std::runtime_error("failed to present swap chain image");
 
         m_currentFrame = (m_currentFrame + 1) % MAX_FRAMES_IN_FLIGHT;
+    }
+
+    void VulkanRenderer::FrameBufferResizeCallback(unsigned int width, unsigned int height)
+    {
+        m_framebufferResized = true;
+        m_width = width;
+        m_height = height;
     }
 
     void VulkanRenderer::CheckLayerAndExtension()
@@ -224,7 +232,7 @@ namespace TG
         vkCreateDebugUtilsMessengerEXT(m_instance, &createInfo, nullptr, &m_debugMessenger);
     }
 
-    void VulkanRenderer::CreateSurface(NativeWindowHandle handle)
+    void VulkanRenderer::CreateSurface(HWND handle)
     {
         VkWin32SurfaceCreateInfoKHR surfaceCreateInfo{};
         surfaceCreateInfo.sType = VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR;
@@ -467,12 +475,13 @@ namespace TG
 
     VkPresentModeKHR VulkanRenderer::ChooseSwapPresentMode()
     {
-        for (const auto& availablePresentMode : m_presentModes)
-        {
-            if (availablePresentMode == VK_PRESENT_MODE_MAILBOX_KHR)
-                return availablePresentMode;
-        }
+        // for (const auto& availablePresentMode : m_presentModes)
+        // {
+        //     if (availablePresentMode == VK_PRESENT_MODE_MAILBOX_KHR)
+        //         return availablePresentMode;
+        // }
 
+        // 开启垂直同步
         return VK_PRESENT_MODE_FIFO_KHR;
     }
 
@@ -810,12 +819,19 @@ namespace TG
     void VulkanRenderer::DrawFrame()
     {
         vkWaitForFences(m_device, 1, &m_inFlightFences[m_currentFrame], VK_TRUE, UINT64_MAX);
-        vkResetFences(m_device, 1, &m_inFlightFences[m_currentFrame]);
 
         VkResult result = vkAcquireNextImageKHR(m_device, m_swapChain, UINT64_MAX,
             m_imageAvailableSemaphores[m_currentFrame], VK_NULL_HANDLE, &m_imageIndex);
+        if (result == VK_ERROR_OUT_OF_DATE_KHR)
+        {
+            RecreateSwapChain();
+            return;
+        }
         if (result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR)
             throw BaseException::Create("Failed to acquire image!");
+        // 放在这里防止死锁，因为vkAcquireNextImageKHR返回VK_ERROR_OUT_OF_DATE_KHR后会直接返回，
+        // 导致Fence不会激活，所以确保获取成功后再重置Fence
+        vkResetFences(m_device, 1, &m_inFlightFences[m_currentFrame]);
 
         vkResetCommandBuffer(m_cmdBuffers[m_currentFrame], 0);
         RecordCommandBuffer(m_currentFrame, m_imageIndex);
@@ -837,5 +853,16 @@ namespace TG
         {
             throw BaseException::Create("Failed to submit command buffer!");
         }
+    }
+
+    void VulkanRenderer::RecreateSwapChain()
+    {
+        vkDeviceWaitIdle(m_device);
+
+        CleanupSwapChain();
+
+        CreateSwapChain();
+        CreateImageViews();
+        CreateFrameBuffers();
     }
 }

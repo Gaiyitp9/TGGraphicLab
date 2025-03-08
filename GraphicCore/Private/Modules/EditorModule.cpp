@@ -9,6 +9,7 @@
 #include "imgui_impl_win32.h"
 #include "imgui_impl_opengl3.h"
 #include "Exception/Windows/Win32Exception.h"
+#include "imgui_impl_vulkan.h"
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
@@ -145,7 +146,7 @@ namespace TG
 		EGLSurface surface;
 	};
 
-    void EditorModule::PlugInVideoPort(const IVideoPort& display)
+    void EditorModule::PlugInVideoPort(const IDefaultVideoPort& display)
     {
     	// 初始化IMGUI
     	IMGUI_CHECKVERSION();

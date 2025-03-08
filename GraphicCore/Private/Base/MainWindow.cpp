@@ -9,6 +9,6 @@
 namespace TG
 {
     MainWindow::MainWindow(int x, int y, int width, int height, std::string_view name)
-        : Window(x, y, width, height, name, WindowType::Default)
+        : WindowBase(x, y, width, height, name, WindowType::Default)
     {}
 }

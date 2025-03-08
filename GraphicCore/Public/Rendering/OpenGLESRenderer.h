@@ -7,18 +7,19 @@
 
 #include "Renderer.h"
 #include "DynamicGles.h"
-#include "Base/Window.h"
+#include "Base/WindowBase.hpp"
 
 namespace TG
 {
     class OpenGLESRenderer final : public Renderer
     {
     public:
-        OpenGLESRenderer(NativeWindowHandle handle, NativeDeviceContext context);
+        OpenGLESRenderer(HWND handle, HDC context);
         ~OpenGLESRenderer() override;
 
         void Render() override;
         void Present() override;
+        void FrameBufferResizeCallback(unsigned int width, unsigned int height) override;
 
     private:
         void InitializeTriangle();

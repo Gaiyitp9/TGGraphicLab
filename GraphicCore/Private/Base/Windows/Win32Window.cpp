@@ -4,7 +4,7 @@
 * This code is licensed under the MIT License (MIT).			*
 *****************************************************************/
 
-#include "Base/Windows/NativeWindow.h"
+#include "Base/Windows/Win32Window.h"
 #include "Exception/Windows/Win32Exception.h"
 #include "Base/Utility.h"
 #include <memory_resource>
@@ -12,8 +12,8 @@
 
 namespace TG
 {
-	NativeWindow::NativeWindow(int x, int y, int width, int height, std::string_view name, WindowType type)
-		: name(name)
+	Win32Window::Win32Window(int x, int y, int width, int height, std::string_view name, WindowType type)
+		: m_name(name)
 	{
 		DWORD dwStyle = WS_OVERLAPPEDWINDOW;
 		DWORD dwExStyle = WS_EX_OVERLAPPEDWINDOW;
@@ -35,36 +35,36 @@ namespace TG
 		// 根据客户区域宽和高计算整个窗口的宽和高
 		if (!AdjustWindowRect(&rect, dwStyle, false))
 			throw Win32Exception::Create();
-		handle = CreateWindowExW(dwExStyle, L"Default", MultiBytesToWideChars(name).c_str(), dwStyle,
+		m_handle = CreateWindowExW(dwExStyle, L"Default", MultiBytesToWideChars(name).c_str(), dwStyle,
 							   x, y, rect.right - rect.left, rect.bottom - rect.top,
 							   nullptr, nullptr, nullptr, this);
-		if (handle == nullptr)
+		if (m_handle == nullptr)
 			throw Win32Exception::Create();
 
-		deviceContext = GetDC(handle);
+		m_deviceContext = GetDC(m_handle);
 
 		RAWINPUTDEVICE rid[2];
 		// 鼠标
 		rid[0].usUsagePage = 0x01;
 		rid[0].usUsage = 0x02;
 		rid[0].dwFlags = 0;
-		rid[0].hwndTarget = handle;
+		rid[0].hwndTarget = m_handle;
 		// 键盘
 		rid[1].usUsagePage = 0x01;
 		rid[1].usUsage = 0x06;
 		rid[1].dwFlags = 0;
-		rid[1].hwndTarget = handle;
+		rid[1].hwndTarget = m_handle;
 		// 注册输入设备
 		if (!RegisterRawInputDevices(rid, 2, sizeof(rid[0])))
 			throw Win32Exception::Create("Register mouse and keyboard failed");
 	}
 
-	NativeWindow::~NativeWindow()
+	Win32Window::~Win32Window()
 	{
-		ReleaseDC(handle, deviceContext);
+		ReleaseDC(m_handle, m_deviceContext);
 	}
 
-	std::optional<int> NativeWindow::PollEvents()
+	std::optional<int> Win32Window::PollEvents()
 	{
 		MSG msg = { nullptr };
 
@@ -80,30 +80,30 @@ namespace TG
 		return std::nullopt;
 	}
 
-	void NativeWindow::SetIcon(std::string_view iconPath) const
+	void Win32Window::SetIcon(std::string_view iconPath) const
 	{
 		HANDLE icon = LoadImageW(nullptr, MultiBytesToWideChars(iconPath).c_str(), IMAGE_ICON, 0, 0,
 			LR_DEFAULTSIZE | LR_LOADFROMFILE);
 		if (icon == nullptr)
 			throw Win32Exception::Create("Invalid icon source");
 
-		SendMessageW(handle, WM_SETICON, ICON_BIG, reinterpret_cast<LPARAM>(icon));
-		SendMessageW(handle, WM_SETICON, ICON_SMALL, reinterpret_cast<LPARAM>(icon));
+		SendMessageW(m_handle, WM_SETICON, ICON_BIG, reinterpret_cast<LPARAM>(icon));
+		SendMessageW(m_handle, WM_SETICON, ICON_SMALL, reinterpret_cast<LPARAM>(icon));
 	}
 
-	void NativeWindow::SetPosition(int x, int y) const
+	void Win32Window::SetPosition(int x, int y) const
 	{
-		SetWindowPos(handle, HWND_TOP, x, y, 0, 0, SWP_NOSIZE);
+		SetWindowPos(m_handle, HWND_TOP, x, y, 0, 0, SWP_NOSIZE);
 	}
 
-	void NativeWindow::SetSize(int width, int height) const
+	void Win32Window::SetSize(unsigned int width, unsigned int height) const
 	{
-		SetWindowPos(handle, HWND_TOP, 0, 0, width, height, SWP_NOMOVE);
+		SetWindowPos(m_handle, HWND_TOP, 0, 0, width, height, SWP_NOMOVE);
 	}
 
-	void NativeWindow::Show(bool show) const
+	void Win32Window::Show(bool show) const
 	{
-		ShowWindow(handle, show ? SW_SHOW : SW_HIDE);
+		ShowWindow(m_handle, show ? SW_SHOW : SW_HIDE);
 	}
 
 	// 用于窗口消息字符串的内存池，因为打印窗口消息需要频繁创建string，小字符串优化(SSO)不适用，所以使用内存池避免频繁分配内存
@@ -312,11 +312,11 @@ namespace TG
     static LRESULT WindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	{
         // 注：窗口处理函数不能向上传递异常
-        auto* const pWindow = reinterpret_cast<NativeWindow*>(GetWindowLongPtrW(hwnd, GWLP_USERDATA));
+        auto* const pWindow = reinterpret_cast<Win32Window*>(GetWindowLongPtrW(hwnd, GWLP_USERDATA));
 
 		// 监控窗口消息
 	    std::pmr::string windowMessage{ &g_pool };
-	    std::format_to(std::back_inserter(windowMessage), "{:<16} {}\n", pWindow->name,
+	    std::format_to(std::back_inserter(windowMessage), "{:<16} {}\n", pWindow->m_name,
 	    	WindowMessageToString(msg, wParam, lParam));
 		OutputDebugStringA(windowMessage.data());
 
@@ -325,7 +325,7 @@ namespace TG
 			case WM_DESTROY:
 			{
 	            // 窗口被销毁后，窗口类也需要被销毁
-	            pWindow->destroyed = true;
+	            pWindow->m_destroyed = true;
 				// 基础窗口一般作为主窗口，销毁后要退出线程
 				PostQuitMessage(0);
 				return 0;
@@ -376,96 +376,106 @@ namespace TG
 				else if ((keyFlags & KF_REPEAT) == KF_REPEAT)
 					action = Input::Action::Repeat;
 
-				pWindow->keyDelegate.ExecuteIfBound(static_cast<Input::KeyCode>(vkCode), scanCode, action);
+				pWindow->m_keyDelegate.ExecuteIfBound(static_cast<Input::KeyCode>(vkCode), scanCode, action);
 
 				return 0;
 			}
 
 			case WM_CHAR:
 	        {
-	            pWindow->charDelegate.ExecuteIfBound(static_cast<char16_t>(wParam));
+	            pWindow->m_charDelegate.ExecuteIfBound(static_cast<char16_t>(wParam));
 				return 0;
 	        }
 
 			case WM_MOUSEMOVE:
 			{
-				pWindow->cursorPosDelegate.ExecuteIfBound(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+				pWindow->m_cursorPosDelegate.ExecuteIfBound(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
 				return 0;
 			}
 
 			case WM_LBUTTONDOWN:
 			{
-				pWindow->mouseButtonDelegate.ExecuteIfBound(Input::KeyCode::LeftMouseButton, Input::Action::Press);
-				pWindow->cursorPosDelegate.ExecuteIfBound(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+				pWindow->m_mouseButtonDelegate.ExecuteIfBound(Input::KeyCode::LeftMouseButton, Input::Action::Press);
+				pWindow->m_cursorPosDelegate.ExecuteIfBound(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
 				return 0;
 			}
 
 			case WM_LBUTTONUP:
 			{
-				pWindow->mouseButtonDelegate.ExecuteIfBound(Input::KeyCode::LeftMouseButton, Input::Action::Release);
-				pWindow->cursorPosDelegate.ExecuteIfBound(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+				pWindow->m_mouseButtonDelegate.ExecuteIfBound(Input::KeyCode::LeftMouseButton, Input::Action::Release);
+				pWindow->m_cursorPosDelegate.ExecuteIfBound(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
 				return 0;
 			}
 
 			case WM_RBUTTONDOWN:
 			{
-				pWindow->mouseButtonDelegate.ExecuteIfBound(Input::KeyCode::RightMouseButton, Input::Action::Press);
-				pWindow->cursorPosDelegate.ExecuteIfBound(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+				pWindow->m_mouseButtonDelegate.ExecuteIfBound(Input::KeyCode::RightMouseButton, Input::Action::Press);
+				pWindow->m_cursorPosDelegate.ExecuteIfBound(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
 				return 0;
 			}
 
 			case WM_RBUTTONUP:
 			{
-				pWindow->mouseButtonDelegate.ExecuteIfBound(Input::KeyCode::RightMouseButton, Input::Action::Release);
-				pWindow->cursorPosDelegate.ExecuteIfBound(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+				pWindow->m_mouseButtonDelegate.ExecuteIfBound(Input::KeyCode::RightMouseButton, Input::Action::Release);
+				pWindow->m_cursorPosDelegate.ExecuteIfBound(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
 				return 0;
 			}
 
 			case WM_MBUTTONDOWN:
 			{
-				pWindow->mouseButtonDelegate.ExecuteIfBound(Input::KeyCode::MiddleMouseButton, Input::Action::Press);
-				pWindow->cursorPosDelegate.ExecuteIfBound(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+				pWindow->m_mouseButtonDelegate.ExecuteIfBound(Input::KeyCode::MiddleMouseButton, Input::Action::Press);
+				pWindow->m_cursorPosDelegate.ExecuteIfBound(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
 				return 0;
 			}
 
 			case WM_MBUTTONUP:
 			{
-				pWindow->mouseButtonDelegate.ExecuteIfBound(Input::KeyCode::MiddleMouseButton, Input::Action::Release);
-				pWindow->cursorPosDelegate.ExecuteIfBound(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+				pWindow->m_mouseButtonDelegate.ExecuteIfBound(Input::KeyCode::MiddleMouseButton, Input::Action::Release);
+				pWindow->m_cursorPosDelegate.ExecuteIfBound(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
 				return 0;
 			}
 
 			case WM_MOUSEWHEEL:
 	        {
 				// 每帧只会产生一个WM_MOUSEWHEEL
-				pWindow->scrollDelegate.ExecuteIfBound(0, GET_WHEEL_DELTA_WPARAM(wParam) / WHEEL_DELTA);
-				pWindow->cursorPosDelegate.ExecuteIfBound(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+				pWindow->m_scrollDelegate.ExecuteIfBound(0, GET_WHEEL_DELTA_WPARAM(wParam) / WHEEL_DELTA);
+				pWindow->m_cursorPosDelegate.ExecuteIfBound(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
 				return 0;
 	        }
 
 			case WM_MOVE:
 			{
-				pWindow->windowPosDelegate.ExecuteIfBound(LOWORD(lParam), HIWORD(lParam));
+				pWindow->m_windowPosDelegate.ExecuteIfBound(LOWORD(lParam), HIWORD(lParam));
 				return 0;
 			}
 
 			case WM_SIZE:
 			{
-				pWindow->windowSizeDelegate.ExecuteIfBound(LOWORD(lParam), HIWORD(lParam));
+				pWindow->m_windowSizeDelegate.ExecuteIfBound(LOWORD(lParam), HIWORD(lParam));
 				if (wParam == SIZE_MINIMIZED)
-					pWindow->suspendDelegate.ExecuteIfBound();
+					pWindow->m_suspendDelegate.ExecuteIfBound();
 				if (wParam == SIZE_RESTORED)
-					pWindow->resumeDelegate.ExecuteIfBound();
+					pWindow->m_resumeDelegate.ExecuteIfBound();
 				return 0;
 			}
 
 			case WM_ENTERSIZEMOVE:
-	            pWindow->suspendDelegate.ExecuteIfBound();
+				// 准备移动或改变窗口尺寸时，收到该消息
+				// 但是窗口此时会冻结，添加Timer定时发送WM_TIMER消息，
+				// 在WM_TIMER消息内添加需要更新的函数，比如渲染
+				// SetTimer(hwnd, 1, 16, nullptr);
+	            pWindow->m_suspendDelegate.ExecuteIfBound();
 				return 0;
 
 			case WM_EXITSIZEMOVE:
-	            pWindow->resumeDelegate.ExecuteIfBound();
+				// KillTimer(hwnd, 1);
+	            pWindow->m_resumeDelegate.ExecuteIfBound();
 				return 0;
+
+			// TODO: 添加窗口冻结时需要运行的逻辑
+			// case WM_TIMER:
+				// LogInfo("WM_TIMER");
+				// return 0;
 
 	        default:
 	        	break;
@@ -479,7 +489,7 @@ namespace TG
         if (msg == WM_NCCREATE)
         {
             const CREATESTRUCT* const pCreate = reinterpret_cast<CREATESTRUCT*>(lParam);
-            auto* pWnd = static_cast<NativeWindow*>(pCreate->lpCreateParams);
+            auto* pWnd = static_cast<Win32Window*>(pCreate->lpCreateParams);
 
             SetWindowLongPtrW(hwnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(pWnd));
             SetWindowLongPtrW(hwnd, GWLP_WNDPROC, reinterpret_cast<LONG_PTR>(WindowProc));
@@ -495,14 +505,14 @@ namespace TG
     {
         WNDCLASSEXW wc = {};
         wc.cbSize = sizeof(WNDCLASSEX);
-        wc.style = CS_HREDRAW | CS_VREDRAW | CS_OWNDC;
+        wc.style = CS_OWNDC;
         wc.lpfnWndProc = WindowProcSetup;
         wc.cbClsExtra = 0;
         wc.cbWndExtra = 0;
         wc.hInstance = nullptr;
         wc.hIcon = nullptr;
-        wc.hCursor = nullptr;
-        wc.hbrBackground = nullptr;
+        wc.hCursor = LoadCursor(nullptr, IDC_ARROW);
+        wc.hbrBackground = static_cast<HBRUSH>(GetStockObject(BLACK_BRUSH));
         wc.hIconSm = nullptr;
         wc.lpszMenuName = nullptr;
         wc.lpszClassName = L"Default";

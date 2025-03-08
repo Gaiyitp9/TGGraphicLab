@@ -22,5 +22,6 @@ namespace TG
 
         virtual void Render() = 0;
         virtual void Present() = 0;
+        virtual void FrameBufferResizeCallback(unsigned int width, unsigned int height) = 0;
     };
 }

@@ -6,7 +6,7 @@
 #pragma once
 
 #include "Module.h"
-#include "Base/Window.h"
+#include "Base/WindowBase.hpp"
 #include "Rendering/Renderer.h"
 #include <memory>
 
@@ -23,7 +23,7 @@ namespace TG
         ~EditorModule() override;
 
         void SetRenderer(const std::shared_ptr<Renderer>& renderer);
-        void PlugInVideoPort(const IVideoPort& display);
+        void PlugInVideoPort(const IDefaultVideoPort& display);
 
         void Update() override;
         void PostUpdate() override;

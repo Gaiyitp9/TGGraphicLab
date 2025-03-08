@@ -21,7 +21,6 @@ file(GLOB_RECURSE HEADERS *.hpp *.h)
 file(GLOB_RECURSE SOURCES *.cpp *.c)
 
 if (NOT TG_WINDOWS)
-    # 剔除Windows目录下的代码
     list(FILTER HEADERS EXCLUDE REGEX "Public(/.*)+/Windows")
     list(FILTER SOURCES EXCLUDE REGEX "Private(/.*)+/Windows")
 endif()

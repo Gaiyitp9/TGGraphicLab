@@ -6,7 +6,7 @@
 #pragma once
 
 #include "Renderer.h"
-#include "Base/Window.h"
+#include "Base/WindowBase.hpp"
 #include "vulkan/vulkan.h"
 
 namespace TG
@@ -22,11 +22,12 @@ namespace TG
     class VulkanRenderer final : public Renderer
     {
     public:
-        explicit VulkanRenderer(NativeWindowHandle handle);
+        explicit VulkanRenderer(HWND handle);
         ~VulkanRenderer() override;
 
         void Render() override;
         void Present() override;
+        void FrameBufferResizeCallback(unsigned int width, unsigned int height) override;
 
     private:
         void CheckLayerAndExtension();
@@ -38,7 +39,7 @@ namespace TG
             void* pUserData);
         void CreateInstance();
         void SetupDebugMessenger();
-        void CreateSurface(NativeWindowHandle handle);
+        void CreateSurface(HWND handle);
         void SelectPhysicalDevice();
         bool IsDeviceSuitable(VkPhysicalDevice device);
         void CreateLogicalDevice();
@@ -56,6 +57,7 @@ namespace TG
         void RecordCommandBuffer(uint32_t commandIndex, uint32_t imageIndex);
         void CreateSyncObjects();
         void DrawFrame();
+        void RecreateSwapChain();
 
         // 名称比较器，按字典序排列
         constexpr static auto NameComparer = [](char const* lhs, char const* rhs) {
@@ -110,5 +112,9 @@ namespace TG
         std::vector<VkFence> m_inFlightFences;
         uint32_t m_currentFrame { 0 };
         uint32_t m_imageIndex{ 0 };
+
+        bool m_framebufferResized{ false };
+        unsigned int m_width{ 0 };
+        unsigned int m_height{ 0 };
     };
 }

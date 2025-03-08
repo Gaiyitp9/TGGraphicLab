@@ -16,7 +16,7 @@
 
 namespace TG
 {
-    OpenGLESRenderer::OpenGLESRenderer(NativeWindowHandle handle, NativeDeviceContext context)
+    OpenGLESRenderer::OpenGLESRenderer(HWND handle, HDC context)
     {
 		// 绑定OpenGL ES
     	if (eglBindAPI(EGL_OPENGL_ES_API) == EGL_FALSE)
@@ -142,6 +142,11 @@ namespace TG
 	void OpenGLESRenderer::Present()
 	{
     	eglSwapBuffers(m_eglDisplay, m_eglSurface);
+	}
+
+	void OpenGLESRenderer::FrameBufferResizeCallback(unsigned int width, unsigned int height)
+	{
+
 	}
 
 	void OpenGLESRenderer::InitializeTriangle()

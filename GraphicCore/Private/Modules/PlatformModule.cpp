@@ -92,7 +92,7 @@ namespace TG
 
     void PlatformModule::PostUpdate()
     {
-        m_exitCode = Window::PollEvents();
+        m_exitCode = WindowBase::PollEvents();
     }
 
     bool PlatformModule::ShouldExit() const
