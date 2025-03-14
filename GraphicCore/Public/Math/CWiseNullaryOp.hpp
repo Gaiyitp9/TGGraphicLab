@@ -5,8 +5,6 @@
 *****************************************************************/
 #pragma once
 
-#include "MatrixBase.hpp"
-
 namespace TG::Math
 {
     template<typename NullaryOp, typename Matrix>

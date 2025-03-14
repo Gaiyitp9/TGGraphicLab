@@ -5,8 +5,6 @@
 *****************************************************************/
 #pragma once
 
-#include "Declarations.hpp"
-
 namespace TG::Math
 {
     template<typename Xpr, typename ReductionFunctor>

@@ -7,33 +7,36 @@
 
 namespace TG::Math
 {
-    template<typename NestedXpr>
-    struct Traits<Transpose<NestedXpr>>
+    template<typename Xpr>
+    struct Traits<Transpose<Xpr>>
     {
-        using Scalar = Traits<NestedXpr>::Scalar;
-        static constexpr std::size_t    Rows = Traits<NestedXpr>::Columns;
-        static constexpr std::size_t    Columns = Traits<NestedXpr>::Rows;
+        using Scalar = Traits<Xpr>::Scalar;
+        static constexpr std::size_t    Rows = Traits<Xpr>::Columns;
+        static constexpr std::size_t    Columns = Traits<Xpr>::Rows;
         static constexpr std::size_t    Size = Rows * Columns;
-        // 存储顺序翻转，移除左值标志，其他的标志不变
-        static constexpr XprFlag        Flags = (Traits<NestedXpr>::Flags ^ XprFlag::RowMajor) & ~XprFlag::LeftValue;
+        // 1.存储顺序翻转 2.非左值 3.值嵌入，其他的标志不变
+        static constexpr XprFlag        Flags = (Traits<Xpr>::Flags ^ XprFlag::RowMajor) &
+            ~XprFlag::LeftValue & ~XprFlag::NestByRef;
     };
 
-    template<typename NestedXpr>
-    class Transpose final : public MatrixBase<Transpose<NestedXpr>>
+    template<typename Xpr>
+    class Transpose final : public MatrixBase<Transpose<Xpr>>
     {
-    public:
-        explicit Transpose(const NestedXpr& xpr) : m_xpr(xpr) {}
+        using NestedXpr = RefSelector<Xpr>::Type;
 
-        [[nodiscard]] const NestedXpr& NestedExpression() const noexcept { return m_xpr; }
+    public:
+        explicit Transpose(const Xpr& xpr) : m_xpr(xpr) {}
+
+        [[nodiscard]] const Xpr& NestedExpression() const noexcept { return m_xpr; }
 
     private:
-        const NestedXpr& m_xpr;
+        NestedXpr m_xpr;
     };
 
-    template<typename NestedXpr>
-    class Evaluator<Transpose<NestedXpr>>
+    template<typename ArgXpr>
+    class Evaluator<Transpose<ArgXpr>>
     {
-        using Xpr = Transpose<NestedXpr>;
+        using Xpr = Transpose<ArgXpr>;
         using Scalar = Traits<Xpr>::Scalar;
 
     public:
@@ -50,6 +53,6 @@ namespace TG::Math
         }
 
     private:
-        Evaluator<NestedXpr> m_xprEvaluator;
+        Evaluator<ArgXpr> m_xprEvaluator;
     };
 }

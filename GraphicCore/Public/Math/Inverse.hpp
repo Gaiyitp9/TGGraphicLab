@@ -5,8 +5,6 @@
 *****************************************************************/
 #pragma once
 
-#include "MatrixBase.hpp"
-
 namespace TG::Math
 {
     template<typename NestedXpr>
@@ -16,20 +14,23 @@ namespace TG::Math
         static constexpr std::size_t    Rows = Traits<NestedXpr>::Rows;
         static constexpr std::size_t    Columns = Traits<NestedXpr>::Columns;
         static constexpr std::size_t    Size = Rows * Columns;
-        // 移除左值标志，添加线性访问标志
-        static constexpr XprFlag        Flags = Traits<NestedXpr>::Flags & ~XprFlag::LeftValue | XprFlag::LinearAccess;
+        // 1.非左值标志 2.值嵌入 3.添加线性访问标志
+        static constexpr XprFlag        Flags = Traits<NestedXpr>::Flags & ~XprFlag::LeftValue &
+            ~XprFlag::NestByRef | XprFlag::LinearAccess;
     };
 
-    template<typename NestedXpr>
-    class Inverse final : public MatrixBase<Inverse<NestedXpr>>
+    template<typename Xpr>
+    class Inverse final : public MatrixBase<Inverse<Xpr>>
     {
-    public:
-        explicit Inverse(const NestedXpr& xpr) : m_xpr(xpr) {}
+        using NestedXpr = RefSelector<Xpr>::Type;
 
-        [[nodiscard]] const NestedXpr& NestedExpression() const noexcept { return m_xpr; }
+    public:
+        explicit Inverse(const Xpr& xpr) : m_xpr(xpr) {}
+
+        [[nodiscard]] const Xpr& NestedExpression() const noexcept { return m_xpr; }
 
     private:
-        const NestedXpr& m_xpr;
+        NestedXpr m_xpr;
     };
 
     template<typename NestedXpr>

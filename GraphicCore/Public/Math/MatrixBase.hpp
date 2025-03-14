@@ -5,12 +5,6 @@
 *****************************************************************/
 #pragma once
 
-#include "Declarations.hpp"
-#include "Reduction.hpp"
-#include "Determinant.hpp"
-#include "OrthoMethod.hpp"
-#include <cmath>
-
 namespace TG::Math
 {
     template<typename Derived> requires IsMatrixExpression<Derived>

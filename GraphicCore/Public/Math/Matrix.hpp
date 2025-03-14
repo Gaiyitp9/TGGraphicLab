@@ -5,10 +5,6 @@
 *****************************************************************/
 #pragma once
 
-#include "MatrixBase.hpp"
-#include "Assignment.hpp"
-#include <initializer_list>
-
 namespace TG::Math
 {
 	template<typename ScalarT, std::size_t RowsT, std::size_t ColumnsT, StorageOrder Order>
@@ -19,7 +15,7 @@ namespace TG::Math
         static constexpr std::size_t	Columns = ColumnsT;
         static constexpr std::size_t	Size = Rows * Columns;
         static constexpr XprFlag        Flags = (Order == StorageOrder::RowMajor ? XprFlag::RowMajor : XprFlag::None) |
-			XprFlag::LeftValue | XprFlag::LinearAccess;
+			XprFlag::LeftValue | XprFlag::LinearAccess | XprFlag::NestByRef;
 	};
 
 	template<typename Scalar, std::size_t Rows, std::size_t Columns, StorageOrder Order>
@@ -30,6 +26,10 @@ namespace TG::Math
 
 	public:
 		Matrix() = default;
+		Matrix(const Matrix& other) = default;
+		Matrix(Matrix&& other) = default;
+		Matrix& operator=(const Matrix& other) = default;
+		Matrix& operator=(Matrix&& other) = default;
 
 		// 构造时才会调用，不存在aliasing问题
         template<typename Derived>

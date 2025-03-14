@@ -5,9 +5,6 @@
 *****************************************************************/
 #pragma once
 
-#include "MatrixBase.hpp"
-#include "Assignment.hpp"
-
 namespace TG::Math
 {
     template<typename LhsXpr, typename RhsXpr, ProductType Type>
@@ -29,6 +26,9 @@ namespace TG::Math
 	template<typename LhsXpr, typename RhsXpr, ProductType Type>
 	class Product final : public MatrixBase<Product<LhsXpr, RhsXpr, Type>>
 	{
+	    using NestedLhsXpr = RefSelector<LhsXpr>::Type;
+	    using NestedRhsXpr = RefSelector<RhsXpr>::Type;
+
     public:
         Product(const LhsXpr& lhs, const RhsXpr& rhs) : m_lhs(lhs), m_rhs(rhs) {}
 
@@ -36,14 +36,15 @@ namespace TG::Math
         const RhsXpr& RhsExpression() const { return m_rhs; }
 
     private:
-        const LhsXpr& m_lhs;
-        const RhsXpr& m_rhs;
+        NestedLhsXpr m_lhs;
+        NestedRhsXpr m_rhs;
 	};
 
     // 两个表达式是否可以执行矩阵乘法，左边表达式的列数要等于右边表达式的行数
     template<typename LhsXpr, typename RhsXpr>
-    concept MatrixMultipliable = std::is_same_v<typename Traits<LhsXpr>::Scalar, typename Traits<RhsXpr>::Scalar> &&
-            Traits<LhsXpr>::Columns == Traits<RhsXpr>::Rows;
+    concept MatrixMultipliable =
+        std::is_convertible_v<typename Traits<LhsXpr>::Scalar, typename Traits<RhsXpr>::Scalar> &&
+        Traits<LhsXpr>::Columns == Traits<RhsXpr>::Rows;
     // 矩阵乘法默认类型需要考虑Aliasing
     template<typename LhsXpr, typename RhsXpr>
     constexpr bool EvaluatorAssumeAliasing<Product<LhsXpr, RhsXpr, ProductType::Default>> = true;

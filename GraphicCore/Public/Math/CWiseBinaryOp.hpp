@@ -5,8 +5,6 @@
 *****************************************************************/
 #pragma once
 
-#include "MatrixBase.hpp"
-
 namespace TG::Math
 {
     template<typename BinaryOp, typename LhsXpr, typename RhsXpr>
@@ -16,9 +14,9 @@ namespace TG::Math
         static constexpr std::size_t	Rows = Traits<LhsXpr>::Rows;
         static constexpr std::size_t	Columns = Traits<LhsXpr>::Columns;
         static constexpr std::size_t	Size = Rows * Columns;
-        // 非左值；如果两个表达式存储顺序不同，则不能线性访问
+        // 1.非左值 2.值嵌入 3.如果两个表达式存储顺序不同，则不能线性访问
         static constexpr XprFlag        Flags = Traits<LhsXpr>::Flags & Traits<RhsXpr>::Flags &
-            ~XprFlag::LeftValue &
+            ~XprFlag::LeftValue & ~XprFlag::NestByRef &
             (HasFlag<LhsXpr, XprFlag::RowMajor> == HasFlag<RhsXpr, XprFlag::RowMajor> ?
                 ~XprFlag::None : ~XprFlag::LinearAccess);
     };
@@ -27,6 +25,9 @@ namespace TG::Math
 	template<typename BinaryOp, typename LhsXpr, typename RhsXpr>
 	class CWiseBinaryOp final : public MatrixBase<CWiseBinaryOp<BinaryOp, LhsXpr, RhsXpr>>
 	{
+	    using NestedLhsXpr = RefSelector<LhsXpr>::Type;
+	    using NestedRhsXpr = RefSelector<RhsXpr>::Type;
+
     public:
         CWiseBinaryOp(const LhsXpr& lhs, const RhsXpr& rhs, BinaryOp op = {})
             : m_functor(op), m_lhs(lhs), m_rhs(rhs) {}
@@ -37,14 +38,15 @@ namespace TG::Math
 
     private:
         const BinaryOp m_functor;
-        const LhsXpr& m_lhs;
-        const RhsXpr& m_rhs;
+        NestedLhsXpr m_lhs;
+        NestedRhsXpr m_rhs;
 	};
 
     // 矩阵逐元素二元运算，要求矩阵元素类型相同以及行列相等
     template<typename LhsXpr, typename RhsXpr>
-    concept CWiseOperable = std::is_same_v<typename Traits<LhsXpr>::Scalar, typename Traits<RhsXpr>::Scalar> &&
-            Traits<LhsXpr>::Rows == Traits<RhsXpr>::Rows && Traits<LhsXpr>::Columns == Traits<RhsXpr>::Columns;
+    concept CWiseOperable =
+        std::is_convertible_v<typename Traits<LhsXpr>::Scalar, typename Traits<RhsXpr>::Scalar> &&
+        Traits<LhsXpr>::Rows == Traits<RhsXpr>::Rows && Traits<LhsXpr>::Columns == Traits<RhsXpr>::Columns;
 
     template<typename BinaryOp, typename LhsXpr, typename RhsXpr> requires CWiseOperable<LhsXpr, RhsXpr>
     class Evaluator<CWiseBinaryOp<BinaryOp, LhsXpr, RhsXpr>>

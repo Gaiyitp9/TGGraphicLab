@@ -5,10 +5,6 @@
 *****************************************************************/
 #pragma once
 
-#include "Declarations.hpp"
-#include <array>
-#include <algorithm>
-
 namespace TG::Math
 {
     template<typename Derived, std::size_t Order> requires (Traits<Derived>::Rows == Traits<Derived>::Columns)

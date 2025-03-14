@@ -5,8 +5,6 @@
 *****************************************************************/
 #pragma once
 
-#include "Declarations.hpp"
-
 namespace TG::Math
 {
     template<typename Derived, typename OtherDerived, std::size_t Size = Traits<Derived>::Size> requires (

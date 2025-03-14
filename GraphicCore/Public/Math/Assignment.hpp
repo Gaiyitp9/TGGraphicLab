@@ -5,8 +5,6 @@
 *****************************************************************/
 #pragma once
 
-#include "Declarations.hpp"
-
 namespace TG::Math
 {
     // 赋值运算符
@@ -49,8 +47,10 @@ namespace TG::Math
 
     // 矩阵表达式赋值概念，目标表达式和源表达式的行列数需要相等，且表达式需要是左值
     template<typename Dst, typename Src>
-    concept Assignable = Traits<Dst>::Rows == Traits<Src>::Rows && Traits<Dst>::Columns == Traits<Src>::Columns &&
-            HasFlag<Dst, XprFlag::LeftValue>;
+    concept Assignable = std::is_convertible_v<typename Traits<Src>::Scalar, typename Traits<Dst>::Scalar> &&
+        Traits<Dst>::Rows == Traits<Src>::Rows &&
+        Traits<Dst>::Columns == Traits<Src>::Columns &&
+        HasFlag<Dst, XprFlag::LeftValue>;
     // 求值器是否需要考虑Aliasing
     template<typename T> constexpr bool EvaluatorAssumeAliasing = false;
 
