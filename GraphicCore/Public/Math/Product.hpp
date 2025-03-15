@@ -43,7 +43,7 @@ namespace TG::Math
     // 两个表达式是否可以执行矩阵乘法，左边表达式的列数要等于右边表达式的行数
     template<typename LhsXpr, typename RhsXpr>
     concept MatrixMultipliable =
-        std::is_convertible_v<typename Traits<LhsXpr>::Scalar, typename Traits<RhsXpr>::Scalar> &&
+        std::convertible_to<typename Traits<LhsXpr>::Scalar, typename Traits<RhsXpr>::Scalar> &&
         Traits<LhsXpr>::Columns == Traits<RhsXpr>::Rows;
     // 矩阵乘法默认类型需要考虑Aliasing
     template<typename LhsXpr, typename RhsXpr>
@@ -106,7 +106,7 @@ namespace TG::Math
 
         Scalar Entry(std::size_t row, std::size_t column) const
         {
-            return m_lhs.Row(row).CWiseProduct(m_rhs.Column(column).Transposed()).Sum();
+            return m_lhs.Row(row).CWiseProduct(m_rhs.Column(column).Transpose()).Sum();
         }
 
     private:

@@ -42,53 +42,53 @@ namespace TG::Math
         CWiseBinaryOp<ScalarAddOp<Scalar>, Derived, OtherDerived>
             operator+(const MatrixBase<OtherDerived>& other) const
         {
-            return {Expression(), other.Expression()};
+            return { Expression(), other.Expression() };
         }
 
         template<typename OtherDerived>
         CWiseBinaryOp<ScalarSubtractOp<Scalar>, Derived, OtherDerived>
             operator-(const MatrixBase<OtherDerived>& other) const
         {
-            return {Expression(), other.Expression()};
+            return { Expression(), other.Expression() };
         }
 
         template<typename OtherDerived>
         CWiseBinaryOp<ScalarDivideOp<Scalar>, Derived, OtherDerived>
             operator/(const MatrixBase<OtherDerived>& other) const
         {
-            return {Expression(), other.Expression()};
+            return { Expression(), other.Expression() };
         }
 
         CWiseBinaryOp<ScalarDivideOp<Scalar>, Derived, CWiseNullaryOp<ScalarConstantOp<Scalar>, Derived>>
             operator/(Scalar scalar) const
         {
-            return {Expression(), Constant(scalar)};
+            return { Expression(), Constant(scalar) };
         }
 
         CWiseBinaryOp<ScalarProductOp<Scalar>, Derived, CWiseNullaryOp<ScalarConstantOp<Scalar>, Derived>>
             operator*(Scalar scalar) const
         {
-            return {Expression(), Constant(scalar)};
+            return { Expression(), Constant(scalar) };
         }
 
         template<typename OtherDerived>
         CWiseBinaryOp<ScalarProductOp<Scalar>, Derived, OtherDerived>
             CWiseProduct(const MatrixBase<OtherDerived>& other) const
         {
-            return {Expression(), other.Expression()};
+            return { Expression(), other.Expression() };
         }
 
         template<typename OtherDerived>
         Product<Derived, OtherDerived, ProductType::Default>
             operator*(const MatrixBase<OtherDerived>& other) const
         {
-            return {Expression(), other.Expression()};
+            return { Expression(), other.Expression() };
         }
 
         template<typename OtherDerived>
         Product<Derived, OtherDerived, ProductType::Lazy> LazyProduct(const MatrixBase<OtherDerived>& other) const
         {
-            return {Expression(), other.Expression()};
+            return { Expression(), other.Expression() };
         }
 
         template<typename BinaryOp>
@@ -131,40 +131,40 @@ namespace TG::Math
         }
 
         template<std::size_t BlockRows, std::size_t BlockCols>
-        Block<Derived, BlockRows, BlockCols> SubMatrix(std::size_t startRow, std::size_t startColumn)
+        Math::Block<Derived, BlockRows, BlockCols> Block(std::size_t startRow, std::size_t startColumn)
         {
-            return {Expression(), startRow, startColumn};
+            return { Expression(), startRow, startColumn };
         }
 
         template<std::size_t BlockRows, std::size_t BlockCols>
-        Block<const Derived, BlockRows, BlockCols> SubMatrix(std::size_t startRow, std::size_t startColumn) const
+        Math::Block<const Derived, BlockRows, BlockCols> Block(std::size_t startRow, std::size_t startColumn) const
         {
-            return {Expression(), startRow, startColumn};
+            return { Expression(), startRow, startColumn };
         }
 
-        Transpose<Derived> Transposed() const
+        Math::Transpose<Derived> Transpose() const
         {
             return Math::Transpose<Derived>(Expression());
         }
 
-        Block<Derived, 1, Traits<Derived>::Columns> Row(std::size_t row)
+        Math::Block<Derived, 1, Traits<Derived>::Columns> Row(std::size_t row)
         {
-            return {Expression(), row, 0};
+            return { Expression(), row, 0 };
         }
 
-        Block<const Derived, 1, Traits<Derived>::Columns> Row(std::size_t row) const
+        Math::Block<const Derived, 1, Traits<Derived>::Columns> Row(std::size_t row) const
         {
-            return {Expression(), row, 0};
+            return { Expression(), row, 0 };
         }
 
-        Block<Derived, Traits<Derived>::Rows, 1> Column(std::size_t column)
+        Math::Block<Derived, Traits<Derived>::Rows, 1> Column(std::size_t column)
         {
-            return {Expression(), 0, column};
+            return { Expression(), 0, column };
         }
 
-        Block<const Derived, Traits<Derived>::Rows, 1> Column(std::size_t column) const
+        Math::Block<const Derived, Traits<Derived>::Rows, 1> Column(std::size_t column) const
         {
-            return {Expression(), 0, column};
+            return { Expression(), 0, column };
         }
 
         Scalar Determinant() const requires IsSquare
@@ -172,9 +172,9 @@ namespace TG::Math
             return DeterminantImpl<Derived, Traits<Derived>::Rows>{}(Expression());
         }
 
-        Inverse<Derived> Inversed() const requires IsSquare
+        Math::Inverse<Derived> Inverse() const requires IsSquare
         {
-            return Inverse<Derived>(Expression());
+            return Math::Inverse<Derived>(Expression());
         }
     };
 }

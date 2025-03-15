@@ -45,8 +45,9 @@ namespace TG::Math
     // 矩阵逐元素二元运算，要求矩阵元素类型相同以及行列相等
     template<typename LhsXpr, typename RhsXpr>
     concept CWiseOperable =
-        std::is_convertible_v<typename Traits<LhsXpr>::Scalar, typename Traits<RhsXpr>::Scalar> &&
-        Traits<LhsXpr>::Rows == Traits<RhsXpr>::Rows && Traits<LhsXpr>::Columns == Traits<RhsXpr>::Columns;
+        std::convertible_to<typename Traits<LhsXpr>::Scalar, typename Traits<RhsXpr>::Scalar> &&
+        Traits<LhsXpr>::Rows == Traits<RhsXpr>::Rows &&
+        Traits<LhsXpr>::Columns == Traits<RhsXpr>::Columns;
 
     template<typename BinaryOp, typename LhsXpr, typename RhsXpr> requires CWiseOperable<LhsXpr, RhsXpr>
     class Evaluator<CWiseBinaryOp<BinaryOp, LhsXpr, RhsXpr>>

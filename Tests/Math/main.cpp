@@ -51,7 +51,7 @@ namespace TG::Math
             mat4[i] = gUrd(gGen);
 
         std::size_t startRow = 1, startCol = 1;
-        Matrix3F mat3 = mat4.SubMatrix<3, 3>(startRow, startCol);
+        Matrix3F mat3 = mat4.Block<3, 3>(startRow, startCol);
         for (std::size_t i = 0; i < 3; ++i)
             for (std::size_t j = 0; j < 3; ++j)
             {
@@ -61,7 +61,7 @@ namespace TG::Math
         Matrix2F mat2;
         for (std::size_t i = 0; i < 4; ++i)
             mat2[i] = gUrd(gGen);
-        mat4.SubMatrix<2, 2>(0, 0) = mat2;
+        mat4.Block<2, 2>(0, 0) = mat2;
         for (std::size_t i = 0; i < 2; ++i)
             for (std::size_t j = 0; j < 2; ++j)
                 EXPECT_NEAR((mat4[i, j]), (mat2[i, j]), gEpsilon);
@@ -73,12 +73,12 @@ namespace TG::Math
         for (std::size_t i = 0; i < 16; ++i)
             mat4[i] = gUrd(gGen);
 
-        Matrix4F transpose = mat4.Transposed();
+        Matrix4F transpose = mat4.Transpose();
         for (std::size_t i = 0; i < 4; ++i)
             for (std::size_t j = 0; j < 4; ++j)
                 EXPECT_NEAR((transpose[i, j]), (mat4[j, i]), gEpsilon);
 
-        Matrix4F transpose1 = mat4.Transposed().Transposed();
+        Matrix4F transpose1 = mat4.Transpose().Transpose();
         for (std::size_t i = 0; i < 4; ++i)
             for (std::size_t j = 0; j < 4; ++j)
                 EXPECT_NEAR((transpose1[i, j]), (mat4[i, j]), gEpsilon);
@@ -231,7 +231,7 @@ namespace TG::Math
             0, 1,
             2, 3
         };
-        Matrix2F invMat2 = mat2.Inversed();
+        Matrix2F invMat2 = mat2.Inverse();
         EXPECT_NEAR(invMat2[0], -1.5f, gEpsilon);
         EXPECT_NEAR(invMat2[1],  0.5f, gEpsilon);
         EXPECT_NEAR(invMat2[2],  1.0f, gEpsilon);
@@ -242,7 +242,7 @@ namespace TG::Math
             1.0f, 3.0f, 5.0f,
             2.0f, 6.0f, 8.0f,
         };
-        Matrix3F invMat3 = mat3.Inversed();
+        Matrix3F invMat3 = mat3.Inverse();
         EXPECT_NEAR(invMat3[0],  3.0f, gEpsilon);
         EXPECT_NEAR(invMat3[1], -4.0f, gEpsilon);
         EXPECT_NEAR(invMat3[2],  1.0f, gEpsilon);
@@ -259,7 +259,7 @@ namespace TG::Math
             2.0f, 6.0f, 8.0f, 10.0f,
             3.0f, 5.0f, 6.0f, 6.0f,
         };
-        Matrix4F invMat4 = mat4.Inversed();
+        Matrix4F invMat4 = mat4.Inverse();
         EXPECT_NEAR(invMat4[0],  3.0f, gEpsilon);
         EXPECT_NEAR(invMat4[1], -4.0f, gEpsilon);
         EXPECT_NEAR(invMat4[2],  1.0f, gEpsilon);

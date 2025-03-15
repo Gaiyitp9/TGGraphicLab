@@ -25,3 +25,4 @@
 #include "Product.hpp"
 #include "CWiseNullaryOp.hpp"
 #include "Inverse.hpp"
+#include "RotationBase.hpp"

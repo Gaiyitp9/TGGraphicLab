@@ -36,17 +36,22 @@ namespace TG::Math
         using NestedXpr = std::conditional_t<IsConst,
             typename RefSelector<RawXpr>::Type,
             typename RefSelector<RawXpr>::NonConstType>;
+        using Base = MatrixBase<Block>;
 
     public:
         Block(Xpr& xpr, std::size_t startRow, std::size_t startColumn)
             : m_xpr(xpr), m_startRow(startRow), m_startColumn(startColumn) {}
-
+        
         template<typename Derived> requires (!std::is_const_v<Xpr> && HasFlag<Block, XprFlag::LeftValue>)
         Block& operator=(const MatrixBase<Derived>& other)
         {
             CallAssignment(this->Expression(), other.Expression());
             return *this;
         }
+
+        // 解决MatrixBase的Block方法和Block类重名问题
+        // 不添加using声明时，Block对象无法调用基类的Block方法，会识别为类名
+        using Base::Block;
 
         RawXpr& NestedExpression() noexcept requires !IsConst { return m_xpr; }
         [[nodiscard]] const RawXpr& NestedExpression() const noexcept { return m_xpr; }
