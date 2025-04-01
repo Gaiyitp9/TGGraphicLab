@@ -1,0 +1,1 @@
+Windows平台下，运行前需要设置环境变量PATH=D:\Software\Qt\6.8.3\msvc2022_64\bin;%PATH%

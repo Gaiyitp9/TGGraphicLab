@@ -65,4 +65,13 @@ $buildDir = "$PWD\build\PowerVR"
 BuildLibrary "Debug" $sourceDir $buildDir
 BuildLibrary "Release" $sourceDir $buildDir
 
+$sourceDir = "$PWD\ThirdParty\glm"
+$buildDir = "$PWD\build\glm"
+$cmakeOptions = @(
+   "-DGLM_BUILD_TESTS:BOOL=OFF"
+   "-DBUILD_SHARED_LIBS:BOOL=OFF"
+)
+BuildLibrary "Debug" $sourceDir $buildDir
+BuildLibrary "Release" $sourceDir $buildDir
+
 Write-Host "Configuration and generation completed"
