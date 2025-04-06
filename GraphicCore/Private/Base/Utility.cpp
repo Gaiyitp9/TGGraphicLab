@@ -64,7 +64,9 @@ namespace TG
         return str;
     }
 
-    // Win32 API 窄字符转宽字符。这里仅留作记录。
+    /**
+     * Win32 API 窄字符转宽字符。保留在这里仅作为记录
+     */
     // std::wstring Utf8ToUtf16(std::string_view str)
     // {
     //     int length = MultiByteToWideChar(CP_UTF8, 0, str.data(), -1, nullptr, 0);

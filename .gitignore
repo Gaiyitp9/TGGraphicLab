@@ -1,5 +1,6 @@
 .idea/
 .vs/
+.venv/
 cmake-build-debug*/
 cmake-build-release*/
 build/

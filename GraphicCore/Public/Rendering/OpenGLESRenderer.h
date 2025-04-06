@@ -7,7 +7,6 @@
 
 #include "Renderer.h"
 #include "DynamicGles.h"
-#include "Base/WindowBase.hpp"
 
 namespace TG
 {

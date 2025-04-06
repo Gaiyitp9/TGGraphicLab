@@ -6,7 +6,7 @@
   - [PlanetChili](https://github.com/planetchili/hw3d)
 
 ## 构建
-- `git submodule update`获取最新的三方库
-- 对于Windows平台，在powershell中运行BuildThirdParty.ps1构建三方库，完成后再构建TGGraphicLab
+- `git submodule update --init`获取最新的三方库
+- 运行BuildDependencies.py构建三方库，完成后再构建TGGraphicLab
 - 运行时需要设置的环境变量： `MIMALLOC_DISABLE_REDIRECT=1` `MIMALLOC_SHOW_ERRORS=1` `MIMALLOC_SHOW_STATS=1` 
 `MIMALLOC_VERBOSE=1`

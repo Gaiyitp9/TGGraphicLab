@@ -7,7 +7,6 @@
 #include "Base/Windows/Win32Window.h"
 #include "Exception/Windows/Win32Exception.h"
 #include "Base/Utility.h"
-#include <memory_resource>
 #include <format>
 
 namespace TG
@@ -98,7 +97,7 @@ namespace TG
 
 	void Win32Window::SetSize(unsigned int width, unsigned int height) const
 	{
-		SetWindowPos(m_handle, HWND_TOP, 0, 0, width, height, SWP_NOMOVE);
+		SetWindowPos(m_handle, HWND_TOP, 0, 0, static_cast<int>(width), static_cast<int>(height), SWP_NOMOVE);
 	}
 
 	void Win32Window::Show(bool show) const
@@ -106,10 +105,8 @@ namespace TG
 		ShowWindow(m_handle, show ? SW_SHOW : SW_HIDE);
 	}
 
-	// 用于窗口消息字符串的内存池，因为打印窗口消息需要频繁创建string，小字符串优化(SSO)不适用，所以使用内存池避免频繁分配内存
-	static std::pmr::unsynchronized_pool_resource g_pool;
     // 窗口消息转成字符串
-    static std::pmr::string WindowMessageToString(UINT msg, WPARAM wp, LPARAM lp)
+    static std::string WindowMessageToString(UINT msg, WPARAM wp, LPARAM lp)
     {
         static std::unordered_map<DWORD, char const*> windowMessage
         {
@@ -297,28 +294,31 @@ namespace TG
         };
 
         const auto it = windowMessage.find(msg);
-        std::pmr::string msgName{ &g_pool };
+        std::string msgName;
         if (it == windowMessage.end())
             std::format_to(std::back_inserter(msgName), "Unknown message: {:#x}", msg);
         else
             msgName.append(it->second);
 
-        std::pmr::string message{ &g_pool };
+        std::string message;
         std::format_to(std::back_inserter(message), "{:<25} LP: {:#018x}   WP: {:#018x}", msgName, lp, wp);
 
-        return std::pmr::string{ message, &g_pool };
+        return message;
     }
 
-    static LRESULT WindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
+    LRESULT WindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	{
         // 注：窗口处理函数不能向上传递异常
         auto* const pWindow = reinterpret_cast<Win32Window*>(GetWindowLongPtrW(hwnd, GWLP_USERDATA));
 
+#ifdef _DEBUG
 		// 监控窗口消息
-	    std::pmr::string windowMessage{ &g_pool };
+		// 因为打印窗口消息需要频繁创建string，小字符串优化(SSO)不适用，所以最好使用内存池避免频繁分配内存
+	    std::string windowMessage;
 	    std::format_to(std::back_inserter(windowMessage), "{:<16} {}\n", pWindow->m_name,
 	    	WindowMessageToString(msg, wParam, lParam));
 		OutputDebugStringA(windowMessage.data());
+#endif
 
 		switch (msg)
 		{
@@ -333,16 +333,47 @@ namespace TG
 
 			case WM_INPUT:
 			{
-				RAWINPUT rawInput;
 				UINT dwSize = sizeof(RAWINPUT);
-				if (GetRawInputData(reinterpret_cast<HRAWINPUT>(lParam), RID_INPUT, &rawInput,
-					&dwSize, sizeof(RAWINPUTHEADER)) != -1)
+				BYTE lpb[sizeof(RAWINPUT)];
+				if (GetRawInputData(reinterpret_cast<HRAWINPUT>(lParam), RID_INPUT, lpb,
+					&dwSize, sizeof(RAWINPUTHEADER)) == -1)
 				{
-					if (rawInput.header.dwType == RIM_TYPEMOUSE)
-						OutputDebugStringA("Mouse\n");
-					else if (rawInput.header.dwType == RIM_TYPEKEYBOARD)
-						OutputDebugStringA("Keyboard\n");
+					break;
 				}
+
+				if (const auto* rawInput = reinterpret_cast<RAWINPUT*>(lpb); rawInput->header.dwType == RIM_TYPEMOUSE)
+				{
+					// 鼠标移动
+					int dx = rawInput->data.mouse.lLastX;
+					int dy = rawInput->data.mouse.lLastY;
+
+					// 鼠标按钮状态
+					USHORT buttonFlags = rawInput->data.mouse.usButtonFlags;
+					if (buttonFlags & RI_MOUSE_LEFT_BUTTON_DOWN) {
+						// 左键按下
+						OutputDebugStringA("left Mouse down\n");
+					}
+					if (buttonFlags & RI_MOUSE_LEFT_BUTTON_UP) {
+						// 左键释放
+						OutputDebugStringA("left Mouse up\n");
+					}
+					// 类似处理中键、右键等
+				}
+				else if (rawInput->header.dwType == RIM_TYPEKEYBOARD)
+				{
+					RAWKEYBOARD kb = rawInput->data.keyboard;
+					// 虚拟键码
+					USHORT vKey = kb.VKey;
+					// 按下或释放
+					bool isKeyDown = !(kb.Flags & RI_KEY_BREAK); // RI_KEY_MAKE表示按下
+
+					// 示例：处理空格键
+					if (vKey == VK_SPACE && isKeyDown) {
+						// 空格键按下
+						OutputDebugStringA("Keyboard space down\n");
+					}
+				}
+
 				return 0;
 			}
 

@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.30)
 
 project(QtDemo)
 
-set(QtLibraryPath "F:/Qt/6.8.3/msvc2022_64" CACHE STRING "Qt directory" FORCE)
+set(QtLibraryPath "D:/Software/Qt/6.8.3/msvc2022_64" CACHE STRING "Qt directory" FORCE)
 set(CMAKE_PREFIX_PATH ${CMAKE_PREFIX_PATH};${QtLibraryPath})
 
 set(CMAKE_AUTOMOC ON)
