@@ -51,6 +51,6 @@ add_custom_command(
 add_custom_command(
     TARGET ${EXECUTABLE_NAME}
     POST_BUILD
-    COMMAND ${PYTHON3_EXECUTABLE} ${CMAKE_SOURCE_DIR}/BuildTools/Version.py ${EXECUTABLE_OUTPUT_DIRECTORY}
+    COMMAND ${Python3_EXECUTABLE} ${CMAKE_SOURCE_DIR}/BuildTools/Version.py ${EXECUTABLE_OUTPUT_DIRECTORY}
     COMMENT "Generating GitLog.txt"
 )

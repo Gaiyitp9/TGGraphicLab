@@ -8,6 +8,7 @@
 #include "Exception/Windows/Win32Exception.h"
 #include "Base/Utility.h"
 #include <format>
+#include <hidusage.h>
 
 namespace TG
 {
@@ -44,13 +45,13 @@ namespace TG
 
 		RAWINPUTDEVICE rid[2];
 		// 鼠标
-		rid[0].usUsagePage = 0x01;
-		rid[0].usUsage = 0x02;
+		rid[0].usUsagePage = HID_USAGE_PAGE_GENERIC;
+		rid[0].usUsage = HID_USAGE_GENERIC_MOUSE;
 		rid[0].dwFlags = 0;
 		rid[0].hwndTarget = m_handle;
 		// 键盘
-		rid[1].usUsagePage = 0x01;
-		rid[1].usUsage = 0x06;
+		rid[1].usUsagePage = HID_USAGE_PAGE_GENERIC;
+		rid[1].usUsage = HID_USAGE_GENERIC_KEYBOARD;
 		rid[1].dwFlags = 0;
 		rid[1].hwndTarget = m_handle;
 		// 注册输入设备
@@ -311,14 +312,12 @@ namespace TG
         // 注：窗口处理函数不能向上传递异常
         auto* const pWindow = reinterpret_cast<Win32Window*>(GetWindowLongPtrW(hwnd, GWLP_USERDATA));
 
-#ifdef _DEBUG
 		// 监控窗口消息
 		// 因为打印窗口消息需要频繁创建string，小字符串优化(SSO)不适用，所以最好使用内存池避免频繁分配内存
 	    std::string windowMessage;
 	    std::format_to(std::back_inserter(windowMessage), "{:<16} {}\n", pWindow->m_name,
 	    	WindowMessageToString(msg, wParam, lParam));
 		OutputDebugStringA(windowMessage.data());
-#endif
 
 		switch (msg)
 		{
@@ -341,11 +340,43 @@ namespace TG
 					break;
 				}
 
-				if (const auto* rawInput = reinterpret_cast<RAWINPUT*>(lpb); rawInput->header.dwType == RIM_TYPEMOUSE)
+				if (auto* rawInput = reinterpret_cast<RAWINPUT*>(lpb); rawInput->header.dwType == RIM_TYPEMOUSE)
 				{
+					// 更新鼠标位置
+					POINT mousePos;
+					GetCursorPos(&mousePos);
+					pWindow->m_cursorPosDelegate.ExecuteIfBound(mousePos.x, mousePos.y);
+
 					// 鼠标移动
-					int dx = rawInput->data.mouse.lLastX;
-					int dy = rawInput->data.mouse.lLastY;
+					if (const RAWMOUSE& mouse = rawInput->data.mouse; mouse.usFlags & MOUSE_MOVE_ABSOLUTE)
+					{
+						RECT rect;
+						if (mouse.usFlags & MOUSE_VIRTUAL_DESKTOP)
+						{
+							rect.left = GetSystemMetrics(SM_XVIRTUALSCREEN);
+							rect.top = GetSystemMetrics(SM_YVIRTUALSCREEN);
+							rect.right = GetSystemMetrics(SM_CXVIRTUALSCREEN);
+							rect.bottom = GetSystemMetrics(SM_CYVIRTUALSCREEN);
+						}
+						else
+						{
+							rect.left = 0;
+							rect.top = 0;
+							rect.right = GetSystemMetrics(SM_CXSCREEN);
+							rect.bottom = GetSystemMetrics(SM_CYSCREEN);
+						}
+
+						int absoluteX = MulDiv(mouse.lLastX, rect.right, USHRT_MAX) + rect.left;
+						int absoluteY = MulDiv(mouse.lLastY, rect.bottom, USHRT_MAX) + rect.top;
+						pWindow->m_cursorPosDelegate.ExecuteIfBound(absoluteX, absoluteY);
+					}
+					else if (mouse.lLastX != 0 || mouse.lLastY != 0)
+					{
+						int relativeX = mouse.lLastX;
+						int relativeY = mouse.lLastY;
+						OutputDebugStringA(std::to_string(relativeX).c_str());
+						OutputDebugStringA(std::to_string(relativeY).c_str());
+					}
 
 					// 鼠标按钮状态
 					USHORT buttonFlags = rawInput->data.mouse.usButtonFlags;
