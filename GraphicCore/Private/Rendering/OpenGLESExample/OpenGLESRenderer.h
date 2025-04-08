@@ -5,8 +5,10 @@
 *****************************************************************/
 #pragma once
 
-#include "Renderer.h"
+#include "Rendering/Renderer.h"
 #include "DynamicGles.h"
+#include "Example.h"
+#include <memory>
 
 namespace TG
 {
@@ -21,8 +23,6 @@ namespace TG
         void FrameBufferResizeCallback(unsigned int width, unsigned int height) override;
 
     private:
-        void InitializeTriangle();
-
         EGLDisplay m_eglDisplay{ EGL_NO_DISPLAY };
         EGLContext m_eglContext{ EGL_NO_CONTEXT };
         EGLSurface m_eglSurface{ EGL_NO_SURFACE };
@@ -30,10 +30,6 @@ namespace TG
         bool m_createContext{ false };
         bool m_createSurface{ false };
 
-        GLuint m_shaderProgram{};
-        GLuint m_VAO{};
-        GLuint m_VBO{};
-        GLuint m_EBO{};
-        bool m_wireframe{ false };
+        std::unique_ptr<Example> m_sample;
     };
 }

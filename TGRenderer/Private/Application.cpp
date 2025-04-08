@@ -5,7 +5,6 @@
 *****************************************************************/
 
 #include "Application.h"
-#include "Diagnostic/Log.hpp"
 #include <ranges>
 
 namespace TG
@@ -24,13 +23,13 @@ namespace TG
 		m_renderModule->PlugInVideoPort(m_platformModule->GetWindow());
 		m_renderModule->Subscribe(m_platformModule->onWindowResize);
 		// 编辑器模块设置渲染器，并接入视频接口
-		// m_editorModule->SetRenderer(m_renderModule->GetRenderer());
-		// m_editorModule->PlugInVideoPort(m_platformModule->GetWindow());
+		m_editorModule->SetRenderer(m_renderModule->GetRenderer());
+		m_editorModule->PlugInVideoPort(m_platformModule->GetWindow());
 
 		m_modules.emplace_back(m_platformModule);
 		m_modules.emplace_back(m_inputModule);
 		m_modules.emplace_back(m_renderModule);
-		// m_modules.emplace_back(m_editorModule);
+		m_modules.emplace_back(m_editorModule);
 
 		// std::string_view mbstr = "z\u00df\u6c34\U0001f34c";
 		// std::wstring_view wcstr = L"z\u00df\u6c34\U0001f34c";

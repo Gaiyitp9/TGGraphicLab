@@ -4,7 +4,7 @@
 * This code is licensed under the MIT License (MIT).			*
 *****************************************************************/
 
-#include "Rendering/VulkanRenderer.h"
+#include "Rendering/VulkanExample/VulkanRenderer.h"
 #include "Base/Utility.h"
 #include "Diagnostic/Log.hpp"
 #include "Exception/BaseException.h"

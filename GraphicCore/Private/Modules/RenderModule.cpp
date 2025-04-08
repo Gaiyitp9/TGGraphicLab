@@ -5,8 +5,8 @@
 *****************************************************************/
 
 #include "Modules/RenderModule.h"
-// #include "Rendering/OpenGLESRenderer.h"
-#include "Rendering/VulkanRenderer.h"
+#include "Rendering/OpenGLESExample/OpenGLESRenderer.h"
+// #include "Rendering/VulkanSample/VulkanRenderer.h"
 
 namespace TG
 {
@@ -29,8 +29,8 @@ namespace TG
     void RenderModule::PlugInVideoPort(const IDefaultVideoPort& videoPort)
     {
     	// 不能同时初始化Vulkan和OpenGLES，否则会报错，原因暂时未知(可能是不能使用相同窗口来初始化)
-    	m_Renderer = std::make_shared<VulkanRenderer>(videoPort.GetHandle());
-    	// m_Renderer = std::make_shared<OpenGLESRenderer>(videoPort.GetHandle(), videoPort.GetContext());
+    	// m_Renderer = std::make_shared<VulkanRenderer>(videoPort.GetHandle());
+    	m_Renderer = std::make_shared<OpenGLESRenderer>(videoPort.GetHandle(), videoPort.GetContext());
     }
 
 	void RenderModule::Subscribe(MulticastDelegate<void(unsigned int, unsigned int)>& windowResizeDelegate)
