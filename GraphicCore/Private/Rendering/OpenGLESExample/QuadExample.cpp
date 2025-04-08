@@ -7,7 +7,6 @@
 #include "QuadExample.h"
 #include "Exception/OpenGLException.h"
 #include "Diagnostic/Log.hpp"
-#include "Geometry/Primitives.h"
 #include "Color/StandardColors.h"
 #include "imgui_impl_opengl3.h"
 #include "imgui_impl_win32.h"
@@ -17,7 +16,16 @@ namespace TG
 {
     QuadExample::QuadExample()
     {
-        Geometry::Mesh quad = CreatePrimitive(Geometry::PrimitiveType::Quad);
+    	float vertices[] = {
+    		 0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f,
+    		 0.5f,  0.5f, 0.0f, 0.0f, 1.0f, 0.0f,
+			-0.5f,  0.5f, 0.0f, 0.0f, 0.0f, 1.0f,
+			-0.5f, -0.5f, 0.0f, 1.0f, 0.5f, 0.2f,
+		};
+    	std::uint32_t indices[] = {
+    		0, 1, 2,
+			2, 3, 0,
+    	};
 
 		glGenBuffers(1, &m_VBO);
     	glGenBuffers(1, &m_EBO);
@@ -25,12 +33,13 @@ namespace TG
 		glBindVertexArray(m_VAO);
 		// 把顶点数据传入显存
 		glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
-		glBufferData(GL_ARRAY_BUFFER, 3 * sizeof(float) * quad.vertices.size(), quad.vertices.data(), GL_STATIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
     	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_EBO);
-    	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(std::uint32_t) * quad.indices.size(), quad.indices.data(),
-    		GL_STATIC_DRAW);
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), nullptr);
+    	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), nullptr);
 		glEnableVertexAttribArray(0);
+		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), reinterpret_cast<void*>(3 * sizeof(float)));
+    	glEnableVertexAttribArray(1);
 		glBindVertexArray(0);
 
 		std::ifstream vertexFile("Shaders/GLSL/simple.vert");

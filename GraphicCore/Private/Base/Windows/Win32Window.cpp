@@ -7,8 +7,8 @@
 #include "Base/Windows/Win32Window.h"
 #include "Exception/Windows/Win32Exception.h"
 #include "Base/Utility.h"
+// #include <hidusage.h>
 #include <format>
-#include <hidusage.h>
 
 namespace TG
 {
@@ -43,20 +43,20 @@ namespace TG
 
 		m_deviceContext = GetDC(m_handle);
 
-		RAWINPUTDEVICE rid[2];
-		// 鼠标
-		rid[0].usUsagePage = HID_USAGE_PAGE_GENERIC;
-		rid[0].usUsage = HID_USAGE_GENERIC_MOUSE;
-		rid[0].dwFlags = 0;
-		rid[0].hwndTarget = m_handle;
-		// 键盘
-		rid[1].usUsagePage = HID_USAGE_PAGE_GENERIC;
-		rid[1].usUsage = HID_USAGE_GENERIC_KEYBOARD;
-		rid[1].dwFlags = 0;
-		rid[1].hwndTarget = m_handle;
-		// 注册输入设备
-		if (!RegisterRawInputDevices(rid, 2, sizeof(rid[0])))
-			throw Win32Exception::Create("Register mouse and keyboard failed");
+		// RAWINPUTDEVICE rid[2];
+		// // 鼠标
+		// rid[0].usUsagePage = HID_USAGE_PAGE_GENERIC;
+		// rid[0].usUsage = HID_USAGE_GENERIC_MOUSE;
+		// rid[0].dwFlags = 0;
+		// rid[0].hwndTarget = m_handle;
+		// // 键盘
+		// rid[1].usUsagePage = HID_USAGE_PAGE_GENERIC;
+		// rid[1].usUsage = HID_USAGE_GENERIC_KEYBOARD;
+		// rid[1].dwFlags = 0;
+		// rid[1].hwndTarget = m_handle;
+		// // 注册输入设备
+		// if (!RegisterRawInputDevices(rid, 2, sizeof(rid[0])))
+		// 	throw Win32Exception::Create("Register mouse and keyboard failed");
 	}
 
 	Win32Window::~Win32Window()
@@ -330,83 +330,84 @@ namespace TG
 				return 0;
 			}
 
-			case WM_INPUT:
-			{
-				UINT dwSize = sizeof(RAWINPUT);
-				BYTE lpb[sizeof(RAWINPUT)];
-				if (GetRawInputData(reinterpret_cast<HRAWINPUT>(lParam), RID_INPUT, lpb,
-					&dwSize, sizeof(RAWINPUTHEADER)) == -1)
-				{
-					break;
-				}
-
-				if (auto* rawInput = reinterpret_cast<RAWINPUT*>(lpb); rawInput->header.dwType == RIM_TYPEMOUSE)
-				{
-					// 更新鼠标位置
-					POINT mousePos;
-					GetCursorPos(&mousePos);
-					pWindow->m_cursorPosDelegate.ExecuteIfBound(mousePos.x, mousePos.y);
-
-					// 鼠标移动
-					if (const RAWMOUSE& mouse = rawInput->data.mouse; mouse.usFlags & MOUSE_MOVE_ABSOLUTE)
-					{
-						RECT rect;
-						if (mouse.usFlags & MOUSE_VIRTUAL_DESKTOP)
-						{
-							rect.left = GetSystemMetrics(SM_XVIRTUALSCREEN);
-							rect.top = GetSystemMetrics(SM_YVIRTUALSCREEN);
-							rect.right = GetSystemMetrics(SM_CXVIRTUALSCREEN);
-							rect.bottom = GetSystemMetrics(SM_CYVIRTUALSCREEN);
-						}
-						else
-						{
-							rect.left = 0;
-							rect.top = 0;
-							rect.right = GetSystemMetrics(SM_CXSCREEN);
-							rect.bottom = GetSystemMetrics(SM_CYSCREEN);
-						}
-
-						int absoluteX = MulDiv(mouse.lLastX, rect.right, USHRT_MAX) + rect.left;
-						int absoluteY = MulDiv(mouse.lLastY, rect.bottom, USHRT_MAX) + rect.top;
-						pWindow->m_cursorPosDelegate.ExecuteIfBound(absoluteX, absoluteY);
-					}
-					else if (mouse.lLastX != 0 || mouse.lLastY != 0)
-					{
-						int relativeX = mouse.lLastX;
-						int relativeY = mouse.lLastY;
-						OutputDebugStringA(std::to_string(relativeX).c_str());
-						OutputDebugStringA(std::to_string(relativeY).c_str());
-					}
-
-					// 鼠标按钮状态
-					USHORT buttonFlags = rawInput->data.mouse.usButtonFlags;
-					if (buttonFlags & RI_MOUSE_LEFT_BUTTON_DOWN) {
-						// 左键按下
-						OutputDebugStringA("left Mouse down\n");
-					}
-					if (buttonFlags & RI_MOUSE_LEFT_BUTTON_UP) {
-						// 左键释放
-						OutputDebugStringA("left Mouse up\n");
-					}
-					// 类似处理中键、右键等
-				}
-				else if (rawInput->header.dwType == RIM_TYPEKEYBOARD)
-				{
-					RAWKEYBOARD kb = rawInput->data.keyboard;
-					// 虚拟键码
-					USHORT vKey = kb.VKey;
-					// 按下或释放
-					bool isKeyDown = !(kb.Flags & RI_KEY_BREAK); // RI_KEY_MAKE表示按下
-
-					// 示例：处理空格键
-					if (vKey == VK_SPACE && isKeyDown) {
-						// 空格键按下
-						OutputDebugStringA("Keyboard space down\n");
-					}
-				}
-
-				return 0;
-			}
+			// case WM_INPUT:
+			// {
+			// 	UINT dwSize = sizeof(RAWINPUT);
+			// 	BYTE lpb[sizeof(RAWINPUT)];
+			// 	if (GetRawInputData(reinterpret_cast<HRAWINPUT>(lParam), RID_INPUT, lpb,
+			// 		&dwSize, sizeof(RAWINPUTHEADER)) == -1)
+			// 	{
+			// 		break;
+			// 	}
+			//
+			// 	if (auto* rawInput = reinterpret_cast<RAWINPUT*>(lpb); rawInput->header.dwType == RIM_TYPEMOUSE)
+			// 	{
+			// 		if (const RAWMOUSE& mouse = rawInput->data.mouse; mouse.usFlags & MOUSE_MOVE_ABSOLUTE)
+			// 		{
+			// 			RECT rect;
+			// 			if (mouse.usFlags & MOUSE_VIRTUAL_DESKTOP)
+			// 			{
+			// 				rect.left = GetSystemMetrics(SM_XVIRTUALSCREEN);
+			// 				rect.top = GetSystemMetrics(SM_YVIRTUALSCREEN);
+			// 				rect.right = GetSystemMetrics(SM_CXVIRTUALSCREEN);
+			// 				rect.bottom = GetSystemMetrics(SM_CYVIRTUALSCREEN);
+			// 			}
+			// 			else
+			// 			{
+			// 				rect.left = 0;
+			// 				rect.top = 0;
+			// 				rect.right = GetSystemMetrics(SM_CXSCREEN);
+			// 				rect.bottom = GetSystemMetrics(SM_CYSCREEN);
+			// 			}
+			//
+			// 			POINT screenPos;
+			// 			screenPos.x = MulDiv(mouse.lLastX, rect.right, USHRT_MAX) + rect.left;
+			// 			screenPos.y = MulDiv(mouse.lLastY, rect.bottom, USHRT_MAX) + rect.top;
+			// 			ScreenToClient(pWindow->m_handle, &screenPos);
+			// 			pWindow->m_cursorPosDelegate.ExecuteIfBound(screenPos.x, screenPos.y);
+			// 		}
+			// 		else if (mouse.lLastX != 0 || mouse.lLastY != 0)
+			// 		{
+			// 			int relativeX = mouse.lLastX;
+			// 			int relativeY = mouse.lLastY;
+			// 			// 更新鼠标位置
+			// 			POINT screenPos;
+			// 			GetCursorPos(&screenPos);
+			// 			ScreenToClient(pWindow->m_handle, &screenPos);
+			// 			pWindow->m_cursorPosDelegate.ExecuteIfBound(screenPos.x, screenPos.y);
+			// 			OutputDebugStringA(std::to_string(screenPos.x).c_str());
+			// 			OutputDebugStringA(std::to_string(screenPos.y).c_str());
+			// 		}
+			//
+			// 		// 鼠标按钮状态
+			// 		USHORT buttonFlags = rawInput->data.mouse.usButtonFlags;
+			// 		if (buttonFlags & RI_MOUSE_LEFT_BUTTON_DOWN) {
+			// 			// 左键按下
+			// 			OutputDebugStringA("left Mouse down\n");
+			// 		}
+			// 		if (buttonFlags & RI_MOUSE_LEFT_BUTTON_UP) {
+			// 			// 左键释放
+			// 			OutputDebugStringA("left Mouse up\n");
+			// 		}
+			// 		// 类似处理中键、右键等
+			// 	}
+			// 	else if (rawInput->header.dwType == RIM_TYPEKEYBOARD)
+			// 	{
+			// 		RAWKEYBOARD kb = rawInput->data.keyboard;
+			// 		// 虚拟键码
+			// 		USHORT vKey = kb.VKey;
+			// 		// 按下或释放
+			// 		bool isKeyDown = !(kb.Flags & RI_KEY_BREAK); // RI_KEY_MAKE表示按下
+			//
+			// 		// 示例：处理空格键
+			// 		if (vKey == VK_SPACE && isKeyDown) {
+			// 			// 空格键按下
+			// 			OutputDebugStringA("Keyboard space down\n");
+			// 		}
+			// 	}
+			//
+			// 	return 0;
+			// }
 
 			case WM_KEYDOWN:
 			case WM_SYSKEYDOWN:

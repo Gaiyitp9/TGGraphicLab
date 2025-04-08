@@ -95,6 +95,9 @@ namespace TG
     	if (glShadingLanguageVersion == nullptr)
     		throw OpenGLException::Create("Failed to get OpenGL ES shading language version");
     	LogInfo("Shading language version: {}", glShadingLanguageVersion);
+    	GLint maxAttribs = 0;
+    	glGetIntegerv(GL_MAX_VERTEX_ATTRIBS, &maxAttribs);
+    	LogInfo("Max vertex attributes: {}", maxAttribs);
 
     	// 正面朝向设置为顺时针
     	// glFrontFace(GL_CW);
