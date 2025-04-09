@@ -5,12 +5,13 @@
 *****************************************************************/
 #pragma once
 
+#include "Timer.h"
 #include <chrono>
 
 namespace TG
 {
 	// 高精度计时器
-	class Chronometer
+	class Chronometer final : public ITimer
 	{
 	public:
 		Chronometer();
@@ -18,12 +19,14 @@ namespace TG
 		Chronometer(Chronometer&&) = delete;
 		Chronometer& operator=(const Chronometer&) = delete;
 		Chronometer& operator=(Chronometer&&) = delete;
-		~Chronometer();
+		~Chronometer() override;
 
 		static std::string Date();	// 当前时区的日期和时间
 
 		[[nodiscard]] float DeltaTime() const;
 		[[nodiscard]] float TotalTime() const;
+
+		[[nodiscard]] float GetTime() const override { return TotalTime(); }
 
 		void Reset();
 		void Pause();

@@ -8,6 +8,7 @@
 #include "Module.h"
 #include "Base/WindowBase.hpp"
 #include "Rendering/Renderer.h"
+#include "Base/Timer.h"
 #include <memory>
 
 namespace TG
@@ -22,7 +23,7 @@ namespace TG
         RenderModule& operator=(RenderModule&&) = delete;
         ~RenderModule() override;
 
-        void PlugInVideoPort(const IDefaultVideoPort& videoPort);
+        void PlugInVideoPort(const IDefaultVideoPort& videoPort, const ITimer& timer);
 
         [[nodiscard]] const std::shared_ptr<Renderer>& GetRenderer() const noexcept { return m_Renderer; }
 

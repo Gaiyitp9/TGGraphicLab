@@ -6,6 +6,7 @@
 #pragma once
 
 #include "Rendering/Renderer.h"
+#include "Base/Timer.h"
 #include "DynamicGles.h"
 #include "Example.h"
 #include <memory>
@@ -15,7 +16,7 @@ namespace TG
     class OpenGLESRenderer final : public Renderer
     {
     public:
-        OpenGLESRenderer(HWND handle, HDC context);
+        OpenGLESRenderer(HWND handle, HDC context, const ITimer& timer);
         ~OpenGLESRenderer() override;
 
         void Render() override;
@@ -30,6 +31,6 @@ namespace TG
         bool m_createContext{ false };
         bool m_createSurface{ false };
 
-        std::unique_ptr<Example> m_sample;
+        std::unique_ptr<Example> m_example;
     };
 }

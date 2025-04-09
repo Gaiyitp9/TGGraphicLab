@@ -5,19 +5,12 @@
 *****************************************************************/
 #pragma once
 
-#include "DynamicGles.h"
-
 namespace TG
 {
-    class Shader
+    struct ITimer
     {
-    public:
-        void Use();
-        void SetBool(std::string_view name, bool value) const;
-        void SetInt(std::string_view name, int value) const;
-        void SetFloat(std::string_view name, float value) const;
+        virtual ~ITimer() = default;
 
-    private:
-        GLuint m_shaderProgram{};
+        [[nodiscard]] virtual float GetTime() const = 0;
     };
 }

@@ -7,18 +7,20 @@
 
 #include "Example.h"
 #include "DynamicGles.h"
+#include "Base/Timer.h"
 
 namespace TG
 {
-    class QuadExample : public Example
+    class QuadExample final : public Example
     {
     public:
-        QuadExample();
+        explicit QuadExample(const ITimer& timer);
         ~QuadExample() override;
 
         void Render() override;
 
     private:
+        const ITimer& m_timer;
         GLuint m_shaderProgram{};
         GLuint m_shaderProgramWireframe{};
         GLuint m_VAO{};

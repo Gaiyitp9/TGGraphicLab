@@ -13,7 +13,7 @@
 
 namespace TG
 {
-    OpenGLESRenderer::OpenGLESRenderer(HWND handle, HDC context)
+    OpenGLESRenderer::OpenGLESRenderer(HWND handle, HDC context, const ITimer& timer)
     {
 		// 绑定OpenGL ES
     	if (eglBindAPI(EGL_OPENGL_ES_API) == EGL_FALSE)
@@ -102,12 +102,12 @@ namespace TG
     	// 正面朝向设置为顺时针
     	// glFrontFace(GL_CW);
 
-    	m_sample = std::make_unique<QuadExample>();
+    	m_example = std::make_unique<QuadExample>(timer);
     }
 
     OpenGLESRenderer::~OpenGLESRenderer()
     {
-    	m_sample.reset();
+    	m_example.reset();
 
     	if (m_getDisplay && eglMakeCurrent(m_eglDisplay, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT) == EGL_FALSE)
     		LogError(EGLException::Create("Failed to make EGL context current").what());
@@ -124,7 +124,7 @@ namespace TG
     	if (eglMakeCurrent(m_eglDisplay, m_eglSurface, m_eglSurface, m_eglContext) == EGL_FALSE)
     		throw EGLException::Create("Failed to make EGL current");
 
-    	m_sample->Render();
+    	m_example->Render();
 	}
 
 	void OpenGLESRenderer::Present()

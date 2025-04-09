@@ -87,7 +87,7 @@ namespace TG
 
     void PlatformModule::Update()
     {
-
+        m_timer.Tick();
     }
 
     void PlatformModule::PostUpdate()

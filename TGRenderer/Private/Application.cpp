@@ -20,7 +20,7 @@ namespace TG
 		m_inputModule->Subscribe(m_platformModule->onMouseEvent);
 		m_inputModule->Subscribe(m_platformModule->onKeyboardEvent);
 		// 渲染模块接入视频接口
-		m_renderModule->PlugInVideoPort(m_platformModule->GetWindow());
+		m_renderModule->PlugInVideoPort(m_platformModule->GetWindow(), m_platformModule->GetTimer());
 		m_renderModule->Subscribe(m_platformModule->onWindowResize);
 		// 编辑器模块设置渲染器，并接入视频接口
 		m_editorModule->SetRenderer(m_renderModule->GetRenderer());

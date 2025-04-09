@@ -29,6 +29,7 @@ namespace TG
         [[nodiscard]] bool ShouldExit() const;
         [[nodiscard]] int ExitCode() const;
         [[nodiscard]] const WindowBase& GetWindow() const { return m_mainWindow; }
+        [[nodiscard]] const ITimer& GetTimer() const { return m_timer; };
 
         // 鼠标事件委托
         MulticastDelegate<void(const Input::Event<Input::Mouse>&)> onMouseEvent;

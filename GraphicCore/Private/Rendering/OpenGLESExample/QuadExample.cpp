@@ -14,7 +14,7 @@
 
 namespace TG
 {
-    QuadExample::QuadExample()
+    QuadExample::QuadExample(const ITimer& timer) : m_timer(timer)
     {
     	float vertices[] = {
     		 0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f,
@@ -38,7 +38,8 @@ namespace TG
     	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), nullptr);
 		glEnableVertexAttribArray(0);
-		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), reinterpret_cast<void*>(3 * sizeof(float)));
+		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float),
+			reinterpret_cast<void*>(3 * sizeof(float)));
     	glEnableVertexAttribArray(1);
 		glBindVertexArray(0);
 
@@ -142,6 +143,12 @@ namespace TG
     		glUseProgram(m_shaderProgramWireframe);
     	else
 	    	glUseProgram(m_shaderProgram);
+
+    	float timeValue = m_timer.GetTime() * 0.001f;
+    	float greenValue = std::sin(timeValue) * 0.5f + 0.5f;
+    	int ourColorLocation = glGetUniformLocation(m_shaderProgram, "ourColor");
+    	glUniform4f(ourColorLocation, greenValue, greenValue, greenValue, 1.0f);
+
     	glBindVertexArray(m_VAO);
     	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
     	glBindVertexArray(0);
