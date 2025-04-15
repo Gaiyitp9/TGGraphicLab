@@ -135,8 +135,9 @@ namespace TG
 	{
 		assert(g_prevWndProc != nullptr);
 
-		return ImGui_ImplWin32_WndProcHandler(hwnd, msg, wParam, lParam) ||
-			g_prevWndProc(hwnd, msg, wParam, lParam);
+		if (ImGui_ImplWin32_WndProcHandler(hwnd, msg, wParam, lParam))
+			return 1;
+		return g_prevWndProc(hwnd, msg, wParam, lParam);
 	}
 
 	struct EGLData

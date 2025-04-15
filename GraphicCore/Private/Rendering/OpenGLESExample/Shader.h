@@ -9,15 +9,28 @@
 
 namespace TG
 {
+    enum class ShaderStage : unsigned char
+    {
+        Vertex,
+        Geometry,
+        Fragment,
+    };
+
     class Shader
     {
     public:
-        void Use();
+        Shader(std::string_view shaderPath, ShaderStage shaderStage);
+        ~Shader();
+
+        void Activate() const;
+        void Deactivate() const;
+        [[nodiscard]] GLuint GetId() const { return m_shaderId; }
         void SetBool(std::string_view name, bool value) const;
         void SetInt(std::string_view name, int value) const;
         void SetFloat(std::string_view name, float value) const;
+        void SetFloat4(std::string_view name, float v0, float v1, float v2, float v3) const;
 
     private:
-        GLuint m_shaderProgram{};
+        GLuint m_shaderId{};
     };
 }

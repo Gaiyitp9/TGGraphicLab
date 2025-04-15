@@ -30,8 +30,8 @@ namespace TG
 
     private:
         std::weak_ptr<Renderer> m_renderer;
-        bool m_showDemoWindow{ true };
-        bool m_showAnotherWindow{ false };
         bool m_isInitialized{ false };
+        // bool m_showDemoWindow{ true };
+        // bool m_showAnotherWindow{ false };
     };
 }

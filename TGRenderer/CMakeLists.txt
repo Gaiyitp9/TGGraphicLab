@@ -41,10 +41,12 @@ add_custom_command(
 )
 
 set(SHADER_DIR ${CMAKE_SOURCE_DIR}/Shaders)
+set(RESOURCES_DIR ${CMAKE_SOURCE_DIR}/Resources)
 add_custom_command(
     TARGET ${EXECUTABLE_NAME}
     POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_directory ${SHADER_DIR} ${EXECUTABLE_OUTPUT_DIRECTORY}/Shaders
+    COMMAND ${CMAKE_COMMAND} -E copy_directory ${RESOURCES_DIR} ${EXECUTABLE_OUTPUT_DIRECTORY}/Resources
     COMMENT "Copying shaders to executable output directory"
 )
 

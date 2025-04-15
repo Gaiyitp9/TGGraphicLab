@@ -5,123 +5,95 @@
 *****************************************************************/
 
 #include "QuadExample.h"
-#include "Exception/OpenGLException.h"
-#include "Diagnostic/Log.hpp"
 #include "Color/StandardColors.h"
+#include "Exception/BaseException.h"
 #include "imgui_impl_opengl3.h"
 #include "imgui_impl_win32.h"
-#include <fstream>
+#include "stb_image.h"
 
 namespace TG
 {
-    QuadExample::QuadExample(const ITimer& timer) : m_timer(timer)
+    QuadExample::QuadExample(const ITimer& timer) : m_timer(timer),
+		m_vertexShader("Shaders/GLSL/simple.vert", ShaderStage::Vertex),
+		m_fragmentShader("Shaders/GLSL/simple.frag", ShaderStage::Fragment),
+		m_geometryShader("Shaders/GLSL/wireframe.geom", ShaderStage::Geometry)
     {
-    	float vertices[] = {
-    		 0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f,
-    		 0.5f,  0.5f, 0.0f, 0.0f, 1.0f, 0.0f,
-			-0.5f,  0.5f, 0.0f, 0.0f, 0.0f, 1.0f,
-			-0.5f, -0.5f, 0.0f, 1.0f, 0.5f, 0.2f,
+	    float vertices[] = {
+	    	// positions			colors			  uvs
+	    	-0.5f, -0.5f, 0.0f, 1.0f, 0.5f, 0.2f, 0.0f, 0.0f,
+			 0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f,
+			 0.5f,  0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f,
+			-0.5f,  0.5f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f
 		};
     	std::uint32_t indices[] = {
     		0, 1, 2,
 			2, 3, 0,
-    	};
+		};
 
-		glGenBuffers(1, &m_VBO);
+    	glGenBuffers(1, &m_VBO);
     	glGenBuffers(1, &m_EBO);
-		glGenVertexArrays(1, &m_VAO);
-		glBindVertexArray(m_VAO);
-		// 把顶点数据传入显存
-		glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+    	glGenVertexArrays(1, &m_VAO);
+    	glBindVertexArray(m_VAO);
+    	// 把顶点数据传入显存
+    	glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
+    	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
     	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_EBO);
     	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), nullptr);
-		glEnableVertexAttribArray(0);
-		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float),
+    	// 设置顶点属性
+    	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), nullptr);
+    	glEnableVertexAttribArray(0);
+    	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float),
 			reinterpret_cast<void*>(3 * sizeof(float)));
     	glEnableVertexAttribArray(1);
-		glBindVertexArray(0);
-
-		std::ifstream vertexFile("Shaders/GLSL/simple.vert");
-		if (!vertexFile)
-			throw BaseException::Create("Failed to load simple vertex shader source file");
-
-		std::ostringstream vertexBuffer;
-		vertexBuffer << vertexFile.rdbuf();
-		std::string vertexStr = vertexBuffer.str();
-		char const* vertexShaderSource = vertexStr.c_str();
-		unsigned int vertexShader = glCreateShader(GL_VERTEX_SHADER);
-		glShaderSource(vertexShader, 1, &vertexShaderSource, nullptr);
-		glCompileShader(vertexShader);
-		int success;
-		char infoLog[512];
-		glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
-		if (!success)
-		{
-			glGetShaderInfoLog(vertexShader, 512, nullptr, infoLog);
-			LogError("ERROR::SHADER::VERTEX::COMPILATION_FAILED\n{}", infoLog);
-		}
-
-    	std::ifstream geometryFile("Shaders/GLSL/wireframe.geom");
-    	if (!geometryFile)
-    		throw BaseException::Create("Failed to load wireframe shader source file");
-    	std::ostringstream geometryBuffer;
-    	geometryBuffer << geometryFile.rdbuf();
-    	std::string geometryStr = geometryBuffer.str();
-    	char const* geometryShaderSource = geometryStr.c_str();
-    	unsigned int geometryShader = glCreateShader(GL_GEOMETRY_SHADER);
-    	glShaderSource(geometryShader, 1, &geometryShaderSource, nullptr);
-    	glCompileShader(geometryShader);
-    	glGetShaderiv(geometryShader, GL_COMPILE_STATUS, &success);
-    	if (!success)
+    	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float),
+			reinterpret_cast<void*>(6 * sizeof(float)));
+    	glEnableVertexAttribArray(2);
+    	glBindVertexArray(0);
+    	// 加载贴图
+    	glGenTextures(2, m_albedo);
+    	glBindTexture(GL_TEXTURE_2D, m_albedo[0]);
+    	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    	int width, height, nrChannels;
+    	unsigned char* data = stbi_load("Resources/Textures/wall.jpg", &width, &height, &nrChannels, 0);
+    	if (data)
     	{
-    		glGetShaderInfoLog(geometryShader, 512, nullptr, infoLog);
-    		LogError("ERROR::SHADER::GEOMETRY::COMPILATION_FAILED\n{}", infoLog);
+    		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+    		glGenerateMipmap(GL_TEXTURE_2D);
     	}
-
-		std::ifstream fragmentFile("Shaders/GLSL/simple.frag");
-		if (!fragmentFile)
-			throw BaseException::Create("Failed to load simple fragment shader source file");
-
-		std::ostringstream fragmentBuffer;
-		fragmentBuffer << fragmentFile.rdbuf();
-		std::string fragStr = fragmentBuffer.str();
-		char const* fragmentShaderSource = fragStr.c_str();
-		unsigned int fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-		glShaderSource(fragmentShader, 1, &fragmentShaderSource, nullptr);
-		glCompileShader(fragmentShader);
-		glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
-		if (!success)
-		{
-			glGetShaderInfoLog(fragmentShader, 512, nullptr, infoLog);
-			LogError("ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n {}", infoLog);
-		}
-
-		m_shaderProgram = glCreateProgram();
-		glAttachShader(m_shaderProgram, vertexShader);
-		glAttachShader(m_shaderProgram, fragmentShader);
-		glLinkProgram(m_shaderProgram);
-		glGetProgramiv(m_shaderProgram, GL_LINK_STATUS, &success);
-		if (!success) {
-			glGetProgramInfoLog(m_shaderProgram, 512, nullptr, infoLog);
-			LogError("ERROR::SHADER::PROGRAM::LINKING_FAILED\n {}", infoLog);
-		}
-
-    	m_shaderProgramWireframe = glCreateProgram();
-    	glAttachShader(m_shaderProgramWireframe, vertexShader);
-   		glAttachShader(m_shaderProgramWireframe, geometryShader);
-    	glAttachShader(m_shaderProgramWireframe, fragmentShader);
-    	glLinkProgram(m_shaderProgramWireframe);
-    	glGetProgramiv(m_shaderProgramWireframe, GL_LINK_STATUS, &success);
-    	if (!success) {
-    		glGetProgramInfoLog(m_shaderProgramWireframe, 512, nullptr, infoLog);
-    		LogError("ERROR::SHADER::PROGRAM::LINKING_FAILED\n {}", infoLog);
+    	else
+    	{
+    		throw BaseException::Create("Failed to load texture");
     	}
+    	stbi_image_free(data);
 
-		glDeleteShader(vertexShader);
-    	glDeleteShader(geometryShader);
-		glDeleteShader(fragmentShader);
+    	glBindTexture(GL_TEXTURE_2D, m_albedo[1]);
+    	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		data = stbi_load("Resources/Textures/container.jpg", &width, &height, &nrChannels, 0);
+    	if (data)
+    	{
+    		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+    		glGenerateMipmap(GL_TEXTURE_2D);
+    	}
+    	else
+    	{
+    		throw BaseException::Create("Failed to load texture");
+    	}
+    	stbi_image_free(data);
+
+    	m_fragmentShader.Activate();
+    	m_fragmentShader.SetInt("albedo0", 0);
+    	m_fragmentShader.SetInt("albedo1", 1);
+    	m_fragmentShader.Deactivate();
+
+    	glGenProgramPipelines(1, &m_pipeline);
+    	glUseProgramStages(m_pipeline, GL_VERTEX_SHADER_BIT, m_vertexShader.GetId());
+    	glUseProgramStages(m_pipeline, GL_FRAGMENT_SHADER_BIT, m_fragmentShader.GetId());
     }
 
     QuadExample::~QuadExample()
@@ -129,7 +101,7 @@ namespace TG
     	glDeleteVertexArrays(1, &m_VAO);
     	glDeleteBuffers(1, &m_VBO);
     	glDeleteBuffers(1, &m_EBO);
-    	glDeleteProgram(m_shaderProgram);
+    	glDeleteProgramPipelines(1, &m_pipeline);
     }
 
     void QuadExample::Render()
@@ -140,16 +112,23 @@ namespace TG
     	glClear(GL_COLOR_BUFFER_BIT);
 
     	if (m_wireframe)
-    		glUseProgram(m_shaderProgramWireframe);
+    		glUseProgramStages(m_pipeline, GL_GEOMETRY_SHADER_BIT, m_geometryShader.GetId());
     	else
-	    	glUseProgram(m_shaderProgram);
+    		glUseProgramStages(m_pipeline, GL_GEOMETRY_SHADER_BIT, 0);
 
     	float timeValue = m_timer.GetTime() * 0.001f;
-    	float greenValue = std::sin(timeValue) * 0.5f + 0.5f;
-    	int ourColorLocation = glGetUniformLocation(m_shaderProgram, "ourColor");
-    	glUniform4f(ourColorLocation, greenValue, greenValue, greenValue, 1.0f);
+    	float greyValue = std::sin(timeValue) * 0.5f + 0.5f;
+    	m_fragmentShader.Activate();
+    	m_fragmentShader.SetFloat4("ourColor", greyValue, greyValue, greyValue, 1.0f);
+    	m_fragmentShader.Deactivate();
+
+    	glActiveTexture(GL_TEXTURE0);
+    	glBindTexture(GL_TEXTURE_2D, m_albedo[0]);
+    	glActiveTexture(GL_TEXTURE1);
+    	glBindTexture(GL_TEXTURE_2D, m_albedo[1]);
 
     	glBindVertexArray(m_VAO);
+    	glBindProgramPipeline(m_pipeline);
     	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
     	glBindVertexArray(0);
 
@@ -157,8 +136,10 @@ namespace TG
     	ImGui_ImplWin32_NewFrame();
     	ImGui::NewFrame();
 
+    	const ImGuiIO& io = ImGui::GetIO();
 		ImGui::Begin("Settings");
 		ImGui::Checkbox("Draw wireframe", &m_wireframe);
+    	ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
     	ImGui::End();
 
     	ImGui::Render();

@@ -263,7 +263,6 @@ namespace TG
             { WM_PRINTCLIENT,           "WM_PRINTCLIENT" },
             { WM_POWERBROADCAST,        "WM_POWERBROADCAST" },
             { WM_HOTKEY,                "WM_HOTKEY" },
-            { WM_GETICON,               "WM_GETICON" },
             { WM_EXITMENULOOP,          "WM_EXITMENULOOP" },
             { WM_ENTERMENULOOP,         "WM_ENTERMENULOOP" },
             { WM_DISPLAYCHANGE,         "WM_DISPLAYCHANGE" },
@@ -523,17 +522,21 @@ namespace TG
 			}
 
 			case WM_ENTERSIZEMOVE:
+			{
 				// 准备移动或改变窗口尺寸时，收到该消息
 				// 但是窗口此时会冻结，添加Timer定时发送WM_TIMER消息，
 				// 在WM_TIMER消息内添加需要更新的函数，比如渲染
 				// SetTimer(hwnd, 1, 16, nullptr);
 	            pWindow->m_suspendDelegate.ExecuteIfBound();
 				return 0;
+			}
 
 			case WM_EXITSIZEMOVE:
+			{
 				// KillTimer(hwnd, 1);
 	            pWindow->m_resumeDelegate.ExecuteIfBound();
 				return 0;
+			}
 
 			// TODO: 添加窗口冻结时需要运行的逻辑
 			// case WM_TIMER:

@@ -10,7 +10,7 @@
 namespace TG::Math
 {
 	template<typename Scalar>
-	class Quaternion
+	class Quaternion : public RotationBase<Scalar, 4>
 	{
 	public:
 		Quaternion() : m_elements{ 0, 0, 0, 1 } {}

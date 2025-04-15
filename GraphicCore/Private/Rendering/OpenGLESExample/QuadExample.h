@@ -8,6 +8,7 @@
 #include "Example.h"
 #include "DynamicGles.h"
 #include "Base/Timer.h"
+#include "Shader.h"
 
 namespace TG
 {
@@ -21,11 +22,14 @@ namespace TG
 
     private:
         const ITimer& m_timer;
-        GLuint m_shaderProgram{};
-        GLuint m_shaderProgramWireframe{};
         GLuint m_VAO{};
         GLuint m_VBO{};
         GLuint m_EBO{};
         bool m_wireframe{ false };
+        GLuint m_pipeline{};
+        Shader m_vertexShader;
+        Shader m_fragmentShader;
+        Shader m_geometryShader;
+        GLuint m_albedo[2]{};
     };
 }

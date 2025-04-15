@@ -26,3 +26,4 @@
 #include "CWiseNullaryOp.hpp"
 #include "Inverse.hpp"
 #include "RotationBase.hpp"
+#include "Quaternion.hpp"

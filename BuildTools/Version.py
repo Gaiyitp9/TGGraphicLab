@@ -37,3 +37,4 @@ def write_git_log():
 
 if __name__ == "__main__":
     write_git_log()
+
