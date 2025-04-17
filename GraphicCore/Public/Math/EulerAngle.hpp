@@ -5,10 +5,12 @@
 *****************************************************************/
 #pragma once
 
+#include "Math/Core.hpp"
+
 namespace TG::Math
 {
     template<typename Scalar>
-    class Transform
+    class EulerAngle : public RotationBase<EulerAngle<Scalar>, 3>
     {
 
     };

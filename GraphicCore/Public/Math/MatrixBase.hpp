@@ -114,20 +114,25 @@ namespace TG::Math
             return CrossImpl<Derived, OtherDerived>{}(Expression(), other.Expression());
         }
 
-        Scalar Length()
+        Scalar Norm() const
         {
             // Frobenius范数（矩阵的欧几里得范数），对应向量在欧几里得空间中的直线距离
             return std::sqrt(Dot(Expression()));
         }
 
-        void Normalize() requires IsLeftValue
+        Scalar SquaredNorm() const
         {
-            Expression() = Expression() / Length();
+            return Dot(Expression());
         }
 
-        PlainMatrix<Derived> Normalized()
+        void Normalize() requires IsLeftValue
         {
-            return Expression() / Length();
+            Expression() = Expression() / Norm();
+        }
+
+        PlainMatrix<Derived> Normalized() const
+        {
+            return Expression() / Norm();
         }
 
         template<std::size_t BlockRows, std::size_t BlockCols>

@@ -11,12 +11,21 @@ namespace TG::Math
     class RotationBase
     {
         using Scalar = Traits<Derived>::Scalar;
-        using RotationMatrix =  Matrix<Scalar, Dimension, Dimension>;
 
     public:
+        using RotationMatrix =  Matrix<Scalar, Dimension, Dimension>;
+
+        const Derived& Expression() const { return *static_cast<Derived const*>(this); }
+        Derived& Expression() { return *static_cast<Derived*>(this); }
+
         RotationMatrix ToRotationMatrix() const
         {
+            return Expression().ToRotationMatrix();
+        }
 
+        Derived Inverse() const
+        {
+            return Expression().Inverse();
         }
     };
 }

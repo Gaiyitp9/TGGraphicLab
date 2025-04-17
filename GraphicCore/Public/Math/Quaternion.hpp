@@ -10,8 +10,11 @@
 namespace TG::Math
 {
 	template<typename Scalar>
-	class Quaternion : public RotationBase<Scalar, 4>
+	class Quaternion : public RotationBase<Quaternion<Scalar>, 3>
 	{
+		using Base = RotationBase<Scalar, 3>;
+		using RotationMatrix = Base::RotationMatrix;
+
 	public:
 		Quaternion() : m_elements{ 0, 0, 0, 1 } {}
 		Quaternion(Scalar x, Scalar y, Scalar z, Scalar w) : m_elements{ x, y, z, w } {}
@@ -19,8 +22,8 @@ namespace TG::Math
 		Quaternion(Scalar angle, const Vector<Scalar, 3>& axis)
 		{
 			axis.Normalize();
-			Scalar halfAngle = angle * static_cast<Scalar>(0.5);
-			Scalar sinHalfAngle = std::sin(halfAngle);
+			const Scalar halfAngle = angle * static_cast<Scalar>(0.5);
+			const Scalar sinHalfAngle = std::sin(halfAngle);
             m_elements.X() = sinHalfAngle * axis.X();
             m_elements.Y() = sinHalfAngle * axis.Y();
             m_elements.Z() = sinHalfAngle * axis.Z();
@@ -32,12 +35,12 @@ namespace TG::Math
 		// Y-X-Z(Object Space)或Z-X-Y(World Space 或 Parent Space)
 		explicit Quaternion(const Vector<Scalar, 3>& euler)
 		{
-			Scalar halfX = euler.X() * static_cast<Scalar>(0.5);
-			Scalar halfY = euler.Y() * static_cast<Scalar>(0.5);
-			Scalar halfZ = euler.Z() * static_cast<Scalar>(0.5);
-			float sx = std::sin(halfX), cx = std::cos(halfX);
-			float sy = std::sin(halfY), cy = std::cos(halfY);
-			float sz = std::sin(halfZ), cz = std::cos(halfZ);
+			const Scalar halfX = euler.X() * static_cast<Scalar>(0.5);
+			const Scalar halfY = euler.Y() * static_cast<Scalar>(0.5);
+			const Scalar halfZ = euler.Z() * static_cast<Scalar>(0.5);
+			const float sx = std::sin(halfX), cx = std::cos(halfX);
+			const float sy = std::sin(halfY), cy = std::cos(halfY);
+			const float sz = std::sin(halfZ), cz = std::cos(halfZ);
             m_elements.X() = sx * cy * cz + cx * sy * sz;
             m_elements.Y() = cx * sy * cz - sx * cy * sz;
             m_elements.Z() = cx * cy * sz - sx * sy * cz;
@@ -52,25 +55,54 @@ namespace TG::Math
 		Scalar& Y() { return m_elements.Y(); }
 		Scalar& Z() { return m_elements.Z(); }
 		Scalar& W() { return m_elements.W(); }
+
+		RotationMatrix ToRotationMatrix() const
+		{
+			RotationMatrix result;
+			const Scalar tx = 2 * X();
+			const Scalar ty = 2 * Y();
+			const Scalar tz = 2 * Z();
+			const Scalar twx = tx * W();
+			const Scalar twy = ty * W();
+			const Scalar twz = tz * W();
+			const Scalar txx = tx * X();
+			const Scalar txy = ty * X();
+			const Scalar txz = tz * X();
+			const Scalar tyy = ty * Y();
+			const Scalar tyz = tz * Y();
+			const Scalar tzz = tz * Z();
+
+			result[0, 0] = 1 - (tyy + tzz);
+			result[0, 1] = txy - twz;
+			result[0, 2] = txz + twy;
+			result[1, 0] = txy + twz;
+			result[1, 1] = 1 - (txx + tzz);
+			result[1, 2] = tyz - twx;
+			result[2, 0] = txz - twy;
+			result[2, 1] = tyz + twx;
+			result[2, 2] = 1 - (txx + tyy);
+			return result;
+		}
 		
-		Quaternion Conjugate() const { return { -m_elements[0], -m_elements[1], -m_elements[2], m_elements[3] }; }
+		Quaternion Conjugate() const { return { -X(), -Y(), -Z(), W() }; }
+		Quaternion Inverse() const { return Vector<Scalar, 4>({ -X(), -Y(), -Z(), W() }) / m_elements.SquaredNorm(); }
 		Quaternion Normalized() const { return Quaternion(m_elements.Normalized()); }
 		void Normalize() { m_elements.Normalize(); }
 
 		Quaternion operator*(const Quaternion& q) const
 		{
-			float x = m_elements[0] * q.m_elements[3] + m_elements[3] * q.m_elements[0] - m_elements[2] * q.m_elements[1] + m_elements[1] * q.m_elements[2];
-			float y = m_elements[1] * q.m_elements[3] + m_elements[2] * q.m_elements[0] + m_elements[3] * q.m_elements[1] - m_elements[0] * q.m_elements[2];
-			float z = m_elements[2] * q.m_elements[3] - m_elements[1] * q.m_elements[0] + m_elements[0] * q.m_elements[1] + m_elements[3] * q.m_elements[2];
-			float w = m_elements[3] * q.m_elements[3] - m_elements[0] * q.m_elements[0] - m_elements[1] * q.m_elements[1] - m_elements[2] * q.m_elements[2];
+			const float x = X() * q.W() + W() * q.X() - Z() * q.Y() + Y() * q.Z();
+			const float y = Y() * q.W() + Z() * q.X() + W() * q.Y() - X() * q.Z();
+			const float z = Z() * q.W() - Y() * q.X() + X() * q.Y() + W() * q.Z();
+			const float w = W() * q.W() - X() * q.X() - Y() * q.Y() - Z() * q.Z();
 			return { x, y, z, w };
 		}
 
 		Vector<Scalar, 3> operator*(const Vector<Scalar, 3>& vec) const
 		{
-			Quaternion q = Normalized();
-			Quaternion v{ vec.X(), vec.Y(), vec.Z(), 0 };
-			Quaternion v1 = q * v * q.Conjugate();
+			const Quaternion q = Normalized();
+			const Quaternion v{ vec.X(), vec.Y(), vec.Z(), 0 };
+			const Quaternion v1 = q * v * q.Conjugate();
 			return { v1.X(), v1.Y(), v1.Z() };
 		}
 		Scalar Dot(const Quaternion& q) const { return m_elements.Dot(q.m_elements); }
