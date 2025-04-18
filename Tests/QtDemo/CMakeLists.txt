@@ -24,7 +24,7 @@ endif()
 
 set(SHADERS ${CMAKE_CURRENT_SOURCE_DIR}/triangle.vert ${CMAKE_CURRENT_SOURCE_DIR}/triangle.frag)
 add_custom_command(
-        TARGET QtDemo
-        POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy
-        ${SHADERS} ${WORKING_DIRECTORY}
+    TARGET QtDemo
+    POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy
+    ${SHADERS} ${WORKING_DIRECTORY}
 )

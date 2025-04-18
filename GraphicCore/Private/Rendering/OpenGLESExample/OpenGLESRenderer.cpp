@@ -98,6 +98,24 @@ namespace TG
     	GLint maxAttribs = 0;
     	glGetIntegerv(GL_MAX_VERTEX_ATTRIBS, &maxAttribs);
     	LogInfo("Max vertex attributes: {}", maxAttribs);
+    	GLint maxVertexTextureImageUnits = 0;
+    	glGetIntegerv(GL_MAX_VERTEX_TEXTURE_IMAGE_UNITS, &maxVertexTextureImageUnits);
+    	LogInfo("Max vertex texture image units: {}", maxVertexTextureImageUnits);
+    	GLint maxFragmentTextureImageUnits = 0;
+    	glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &maxFragmentTextureImageUnits);
+    	LogInfo("Max fragment texture image units: {}", maxFragmentTextureImageUnits);
+    	GLint maxGeometryTextureImageUnits = 0;
+    	glGetIntegerv(GL_MAX_GEOMETRY_TEXTURE_IMAGE_UNITS, &maxGeometryTextureImageUnits);
+    	LogInfo("Max geometry texture image units: {}", maxGeometryTextureImageUnits);
+    	GLint maxTessellationControlTextureImageUnits = 0;
+    	glGetIntegerv(GL_MAX_TESS_CONTROL_TEXTURE_IMAGE_UNITS, &maxTessellationControlTextureImageUnits);
+    	LogInfo("Max tessellation control texture image units: {}", maxTessellationControlTextureImageUnits);
+    	GLint maxTessellationEvaluationTextureImageUnits = 0;
+    	glGetIntegerv(GL_MAX_TESS_EVALUATION_TEXTURE_IMAGE_UNITS, &maxTessellationEvaluationTextureImageUnits);
+    	LogInfo("Max tessellation evaluation texture image units: {}", maxTessellationEvaluationTextureImageUnits);
+    	GLint maxComputeTextureImageUnits = 0;
+    	glGetIntegerv(GL_MAX_COMPUTE_TEXTURE_IMAGE_UNITS, &maxComputeTextureImageUnits);
+    	LogInfo("Max compute texture image units: {}", maxComputeTextureImageUnits);
 
     	// 正面朝向设置为顺时针
     	// glFrontFace(GL_CW);
