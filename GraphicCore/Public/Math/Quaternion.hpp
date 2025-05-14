@@ -71,7 +71,6 @@ namespace TG::Math
 			const Scalar tyy = ty * Y();
 			const Scalar tyz = tz * Y();
 			const Scalar tzz = tz * Z();
-
 			result[0, 0] = 1 - (tyy + tzz);
 			result[0, 1] = txy - twz;
 			result[0, 2] = txz + twy;

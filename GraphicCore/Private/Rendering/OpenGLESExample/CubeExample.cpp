@@ -6,6 +6,7 @@
 
 #include "CubeExample.h"
 #include "Color/StandardColors.h"
+#include "Geometry/Primitives.h"
 #include "imgui_impl_opengl3.h"
 #include "imgui_impl_win32.h"
 #include "glm/ext/matrix_clip_space.hpp"
@@ -19,50 +20,7 @@ namespace TG
         m_fragmentShader("Shaders/GLSL/Cube.frag", ShaderStage::Fragment),
         m_geometryShader("Shaders/GLSL/wireframe.geom", ShaderStage::Geometry)
     {
-        constexpr float vertices[] = {
-            // positions          uvs
-            -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
-             0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
-             0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-             0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-            -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
-            -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
-
-            -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-             0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-             0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
-             0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
-            -0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
-            -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-
-            -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-            -0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-            -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-            -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-            -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-            -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-
-             0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-             0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-             0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-             0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-             0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-             0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-
-            -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-             0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
-             0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-             0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-            -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-            -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-
-            -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
-             0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-             0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-             0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-            -0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
-            -0.5f,  0.5f, -0.5f,  0.0f, 1.0f
-        };
+        m_cubeMesh = Geometry::CreatePrimitive(Geometry::PrimitiveType::Cube);
 
         m_cubePositions[0] = glm::vec3(0.0f, 0.0f, 0.0f);
         m_cubePositions[1] = glm::vec3(2.0f, 5.0f, -15.0f);
@@ -76,16 +34,27 @@ namespace TG
         m_cubePositions[9] = glm::vec3(-1.3f, 1.0f, -1.5f);
 
         glGenBuffers(1, &m_VBO);
+        glGenBuffers(1, &m_EBO);
         glGenVertexArrays(1, &m_VAO);
 
         glBindVertexArray(m_VAO);
-        glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
-        glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), nullptr);
+        glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
+        const GLsizeiptr positionByteSize = 3 * sizeof(float) * m_cubeMesh.vertices.size();
+        const GLsizeiptr uvByteSize = 2 * sizeof(float) * m_cubeMesh.uv.size();
+        glBufferData(GL_ARRAY_BUFFER, positionByteSize + uvByteSize, nullptr, GL_STATIC_DRAW);
+        glBufferSubData(GL_ARRAY_BUFFER, 0, positionByteSize, m_cubeMesh.vertices.data());
+        glBufferSubData(GL_ARRAY_BUFFER, positionByteSize, uvByteSize, m_cubeMesh.uv.data());
+
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), nullptr);
         glEnableVertexAttribArray(0);
-        glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), reinterpret_cast<void*>(3 * sizeof(float)));
+        glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), reinterpret_cast<void*>(positionByteSize));
         glEnableVertexAttribArray(1);
+
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_EBO);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(std::uint32_t) * m_cubeMesh.indices.size(),
+            m_cubeMesh.indices.data(), GL_STATIC_DRAW);
+
         glBindVertexArray(0);
 
         m_textures[0].Upload("Resources/Textures/wall.jpg");
@@ -97,6 +66,8 @@ namespace TG
         glGenProgramPipelines(1, &m_pipeline);
         glUseProgramStages(m_pipeline, GL_VERTEX_SHADER_BIT, m_vertexShader.GetID());
         glUseProgramStages(m_pipeline, GL_FRAGMENT_SHADER_BIT, m_fragmentShader.GetID());
+
+        glEnable(GL_DEPTH_TEST);
     }
 
     CubeExample::~CubeExample()
@@ -124,9 +95,8 @@ namespace TG
         glBindTexture(GL_TEXTURE_2D, m_textures[1].GetID());
 
         glm::mat4 view = glm::mat4(1.0f);
-        glm::mat4 projection = glm::mat4(1.0f);
         view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
-        projection = glm::perspective(glm::radians(45.0f),
+        glm::mat4 projection = glm::perspective(glm::radians(45.0f),
             static_cast<float>(m_videoPort.Width()) / static_cast<float>(m_videoPort.Height()), 0.1f, 100.0f);
         m_vertexShader.SetMat4("view", view);
         m_vertexShader.SetMat4("projection", projection);
@@ -141,7 +111,7 @@ namespace TG
             model = glm::rotate(model, angle, glm::vec3(1.0f, 0.3f, 0.5f));
             m_vertexShader.SetMat4("model", model);
 
-            glDrawArrays(GL_TRIANGLES, 0, 36);
+    	    glDrawElements(GL_TRIANGLES, m_cubeMesh.indices.size(), GL_UNSIGNED_INT, nullptr);
         }
         glBindVertexArray(0);
 

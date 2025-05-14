@@ -17,10 +17,6 @@ namespace TG
 {
     OpenGLESRenderer::OpenGLESRenderer(const IDefaultVideoPort& videoPort, const ITimer& timer)
     {
-		// 绑定OpenGL ES
-    	if (eglBindAPI(EGL_OPENGL_ES_API) == EGL_FALSE)
-    		throw EGLException::Create("Failed to bind OpenGL ES API");
-
         // 创建EGLDisplay并初始化
         m_eglDisplay = eglGetDisplay(videoPort.GetContext());
         if (m_eglDisplay == EGL_NO_DISPLAY)
@@ -33,6 +29,10 @@ namespace TG
         if (eglInitialize(m_eglDisplay, &eglMajorVersion, &eglMinorVersion) == EGL_FALSE)
         	throw EGLException::Create("Failed to initialize EGLDisplay");
     	m_getDisplay = true;
+
+		// 绑定OpenGL ES
+    	if (eglBindAPI(EGL_OPENGL_ES_API) == EGL_FALSE)
+    		throw EGLException::Create("Failed to bind OpenGL ES API");
 
     	const char* version = eglQueryString(m_eglDisplay, EGL_VERSION);
     	if (version == nullptr)

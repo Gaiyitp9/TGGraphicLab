@@ -36,11 +36,10 @@ namespace TG
     	glGenVertexArrays(1, &m_VAO);
 
     	glBindVertexArray(m_VAO);
-    	// 把顶点数据传入显存
+
+    	// 顶点数据传入显存
     	glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
     	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-    	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_EBO);
-    	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
     	// 设置顶点属性
     	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), nullptr);
     	glEnableVertexAttribArray(0);
@@ -50,7 +49,12 @@ namespace TG
     	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float),
 			reinterpret_cast<void*>(6 * sizeof(float)));
     	glEnableVertexAttribArray(2);
+    	// 顶点索引传入显存
+    	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_EBO);
+    	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+
     	glBindVertexArray(0);
+
     	// 加载贴图
     	glGenTextures(2, m_albedo);
     	glBindTexture(GL_TEXTURE_2D, m_albedo[0]);

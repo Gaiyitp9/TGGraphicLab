@@ -36,28 +36,28 @@ namespace TG::Reflection
         [[nodiscard]] Type GetRawType() const noexcept;
         [[nodiscard]] Type GetWrappedType() const noexcept;
 
-        std::size_t GetSizeof() const noexcept;
+        [[nodiscard]] std::size_t GetSizeof() const noexcept;
 
-        bool IsClass() const;
-        bool IsTemplateInstantiation() const;
-        std::ranges::subrange<std::vector<Type>::iterator> GetTemplateArguments() const;
-        bool IsEnumeration() const;
-        Enumeration GetEnumeration() const;
-        bool IsWrapper() const;
-        bool IsArray() const;
-        bool IsPointer() const;
-        bool IsArithmetic() const;
-        bool IsFunctionPointer() const;
-        bool IsMemberObjectPointer() const;
-        bool IsMemberFunctionPointer() const;
-        bool IsDerivedFrom(const Type& other) const;
+        [[nodiscard]] bool IsClass() const;
+        [[nodiscard]] bool IsTemplateInstantiation() const;
+        [[nodiscard]] std::ranges::subrange<std::vector<Type>::iterator> GetTemplateArguments() const;
+        [[nodiscard]] bool IsEnumeration() const;
+        [[nodiscard]] Enumeration GetEnumeration() const;
+        [[nodiscard]] bool IsWrapper() const;
+        [[nodiscard]] bool IsArray() const;
+        [[nodiscard]] bool IsPointer() const;
+        [[nodiscard]] bool IsArithmetic() const;
+        [[nodiscard]] bool IsFunctionPointer() const;
+        [[nodiscard]] bool IsMemberObjectPointer() const;
+        [[nodiscard]] bool IsMemberFunctionPointer() const;
+        [[nodiscard]] bool IsDerivedFrom(const Type& other) const;
         template<typename T>
-        bool IsDerivedFrom() const;
-        bool IsBaseOf(const Type& other) const;
+        [[nodiscard]] bool IsDerivedFrom() const;
+        [[nodiscard]] bool IsBaseOf(const Type& other) const;
         template<typename T>
-        bool IsBaseOf() const;
-        std::ranges::subrange<std::vector<Type>::iterator> GetBaseClasses() const;
-        std::ranges::subrange<std::vector<Type>::iterator> GetDerivedClasses() const;
+        [[nodiscard]] bool IsBaseOf() const;
+        [[nodiscard]] std::ranges::subrange<std::vector<Type>::iterator> GetBaseClasses() const;
+        [[nodiscard]] std::ranges::subrange<std::vector<Type>::iterator> GetDerivedClasses() const;
 
 
     private:

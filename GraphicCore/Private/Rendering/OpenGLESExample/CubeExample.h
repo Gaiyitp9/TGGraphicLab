@@ -9,6 +9,7 @@
 #include "DynamicGles.h"
 #include "Base/Timer.h"
 #include "Base/WindowBase.hpp"
+#include "Geometry/Mesh.h"
 #include "Shader.h"
 #include "Texture2D.h"
 
@@ -26,10 +27,12 @@ namespace TG
         const ITimer& m_timer;
         const IDefaultVideoPort& m_videoPort;
 
+        Geometry::Mesh m_cubeMesh;
         glm::vec3 m_cubePositions[10]{};
 
         GLuint m_VAO{};
         GLuint m_VBO{};
+        GLuint m_EBO{};
         bool m_wireframe{ false };
         GLuint m_pipeline{};
         Shader m_vertexShader;
