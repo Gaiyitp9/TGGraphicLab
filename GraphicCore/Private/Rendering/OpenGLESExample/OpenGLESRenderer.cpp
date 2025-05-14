@@ -9,18 +9,20 @@
 #include "Exception/OpenGLException.h"
 #include "Diagnostic/Log.hpp"
 #include "QuadExample.h"
+#include "CubeExample.h"
 #include <regex>
+
 
 namespace TG
 {
-    OpenGLESRenderer::OpenGLESRenderer(HWND handle, HDC context, const ITimer& timer)
+    OpenGLESRenderer::OpenGLESRenderer(const IDefaultVideoPort& videoPort, const ITimer& timer)
     {
 		// 绑定OpenGL ES
     	if (eglBindAPI(EGL_OPENGL_ES_API) == EGL_FALSE)
     		throw EGLException::Create("Failed to bind OpenGL ES API");
 
         // 创建EGLDisplay并初始化
-        m_eglDisplay = eglGetDisplay(context);
+        m_eglDisplay = eglGetDisplay(videoPort.GetContext());
         if (m_eglDisplay == EGL_NO_DISPLAY)
             m_eglDisplay = eglGetDisplay(EGL_DEFAULT_DISPLAY);
         if (m_eglDisplay == EGL_NO_DISPLAY)
@@ -55,7 +57,7 @@ namespace TG
         if (eglChooseConfig(m_eglDisplay, configurationAttributes, &eglConfig, 1, &numConfigs) == EGL_FALSE)
         	throw EGLException::Create("Failed to choose EGLConfig");
 
-        m_eglSurface = eglCreateWindowSurface(m_eglDisplay, eglConfig, handle, nullptr);
+        m_eglSurface = eglCreateWindowSurface(m_eglDisplay, eglConfig, videoPort.GetHandle(), nullptr);
         if (m_eglSurface == EGL_NO_SURFACE)
         	throw EGLException::Create("Failed to create EGLSurface");
     	m_createSurface = true;
@@ -120,7 +122,8 @@ namespace TG
     	// 正面朝向设置为顺时针
     	// glFrontFace(GL_CW);
 
-    	m_example = std::make_unique<QuadExample>(timer);
+    	// m_example = std::make_unique<QuadExample>(timer);
+    	m_example = std::make_unique<CubeExample>(videoPort, timer);
     }
 
     OpenGLESRenderer::~OpenGLESRenderer()

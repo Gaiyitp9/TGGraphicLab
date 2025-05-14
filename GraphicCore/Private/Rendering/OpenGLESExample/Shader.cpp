@@ -7,6 +7,7 @@
 #include "Shader.h"
 #include "Exception/BaseException.h"
 #include "Diagnostic/Log.hpp"
+#include "glm/gtc/type_ptr.hpp"
 #include <fstream>
 #include <sstream>
 #include <format>
@@ -51,15 +52,15 @@ namespace TG
             throw BaseException::Create(std::format("Shader compilation failed\n{}", infoLog));
         }
 
-        m_shaderId = glCreateProgram();
-        glProgramParameteri(m_shaderId, GL_PROGRAM_SEPARABLE, GL_TRUE);
-        glAttachShader(m_shaderId, shader);
-        glLinkProgram(m_shaderId);
-        glGetProgramiv(m_shaderId, GL_LINK_STATUS, &success);
+        m_shaderID = glCreateProgram();
+        glProgramParameteri(m_shaderID, GL_PROGRAM_SEPARABLE, GL_TRUE);
+        glAttachShader(m_shaderID, shader);
+        glLinkProgram(m_shaderID);
+        glGetProgramiv(m_shaderID, GL_LINK_STATUS, &success);
         if (!success)
         {
             char infoLog[512];
-            glGetProgramInfoLog(m_shaderId, 512, nullptr, infoLog);
+            glGetProgramInfoLog(m_shaderID, 512, nullptr, infoLog);
             throw BaseException::Create(std::format("Shader program link failed\n {}", infoLog));
         }
 
@@ -68,36 +69,32 @@ namespace TG
 
     Shader::~Shader()
     {
-        glDeleteProgram(m_shaderId);
-    }
-
-    void Shader::Activate() const
-    {
-        glUseProgram(m_shaderId);
-    }
-
-    void Shader::Deactivate() const
-    {
-        glUseProgram(0);
+        glDeleteProgram(m_shaderID);
     }
 
     void Shader::SetBool(std::string_view name, bool value) const
     {
-        glUniform1i(glGetUniformLocation(m_shaderId, name.data()), value);
+        glProgramUniform1i(m_shaderID, glGetUniformLocation(m_shaderID, name.data()), value);
     }
 
     void Shader::SetInt(std::string_view name, int value) const
     {
-        glUniform1i(glGetUniformLocation(m_shaderId, name.data()), value);
+        glProgramUniform1i(m_shaderID, glGetUniformLocation(m_shaderID, name.data()), value);
     }
 
     void Shader::SetFloat(std::string_view name, float value) const
     {
-        glUniform1f(glGetUniformLocation(m_shaderId, name.data()), value);
+        glProgramUniform1f(m_shaderID, glGetUniformLocation(m_shaderID, name.data()), value);
     }
 
     void Shader::SetFloat4(std::string_view name, float v0, float v1, float v2, float v3) const
     {
-        glUniform4f(glGetUniformLocation(m_shaderId, name.data()), v0, v1, v2, v3);
+        glProgramUniform4f(m_shaderID, glGetUniformLocation(m_shaderID, name.data()), v0, v1, v2, v3);
+    }
+
+    void Shader::SetMat4(std::string_view name, const glm::mat4 &value) const
+    {
+        glProgramUniformMatrix4fv(m_shaderID, glGetUniformLocation(m_shaderID, name.data()), 1,
+            GL_FALSE, glm::value_ptr(value));
     }
 }

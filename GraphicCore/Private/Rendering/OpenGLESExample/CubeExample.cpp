@@ -1,0 +1,165 @@
+/****************************************************************
+* TianGong GraphicLab											*
+* Copyright (c) Gaiyitp9. All rights reserved.					*
+* This code is licensed under the MIT License (MIT).			*
+*****************************************************************/
+
+#include "CubeExample.h"
+#include "Color/StandardColors.h"
+#include "imgui_impl_opengl3.h"
+#include "imgui_impl_win32.h"
+#include "glm/ext/matrix_clip_space.hpp"
+#include "glm/ext/matrix_transform.hpp"
+
+namespace TG
+{
+    CubeExample::CubeExample(const IDefaultVideoPort& videoPort, const ITimer &timer)
+        : m_timer(timer), m_videoPort(videoPort),
+        m_vertexShader("Shaders/GLSL/Cube.vert", ShaderStage::Vertex),
+        m_fragmentShader("Shaders/GLSL/Cube.frag", ShaderStage::Fragment),
+        m_geometryShader("Shaders/GLSL/wireframe.geom", ShaderStage::Geometry)
+    {
+        constexpr float vertices[] = {
+            // positions          uvs
+            -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+             0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
+             0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+             0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+            -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+            -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+
+            -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+             0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+             0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
+             0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
+            -0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
+            -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+
+            -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+            -0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+            -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+            -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+            -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+            -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+
+             0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+             0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+             0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+             0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+             0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+             0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+
+            -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+             0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
+             0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+             0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+            -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+            -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+
+            -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+             0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+             0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+             0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+            -0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
+            -0.5f,  0.5f, -0.5f,  0.0f, 1.0f
+        };
+
+        m_cubePositions[0] = glm::vec3(0.0f, 0.0f, 0.0f);
+        m_cubePositions[1] = glm::vec3(2.0f, 5.0f, -15.0f);
+        m_cubePositions[2] = glm::vec3(-1.5f, -2.2f, -2.5f);
+        m_cubePositions[3] = glm::vec3(-3.8f, -2.0f, -12.3f);
+        m_cubePositions[4] = glm::vec3(2.4f, -0.4f, -3.5f);
+        m_cubePositions[5] = glm::vec3(-1.7f, 3.0f, -7.5f);
+        m_cubePositions[6] = glm::vec3(1.3f, -2.0f, -2.5f);
+        m_cubePositions[7] = glm::vec3(1.5f, 2.0f, -2.5f);
+        m_cubePositions[8] = glm::vec3(1.5f, 0.2f, -1.5f);
+        m_cubePositions[9] = glm::vec3(-1.3f, 1.0f, -1.5f);
+
+        glGenBuffers(1, &m_VBO);
+        glGenVertexArrays(1, &m_VAO);
+
+        glBindVertexArray(m_VAO);
+        glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), nullptr);
+        glEnableVertexAttribArray(0);
+        glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), reinterpret_cast<void*>(3 * sizeof(float)));
+        glEnableVertexAttribArray(1);
+        glBindVertexArray(0);
+
+        m_textures[0].Upload("Resources/Textures/wall.jpg");
+        m_textures[1].Upload("Resources/Textures/container.jpg");
+
+        m_fragmentShader.SetInt("albedo0", 0);
+        m_fragmentShader.SetInt("albedo1", 1);
+
+        glGenProgramPipelines(1, &m_pipeline);
+        glUseProgramStages(m_pipeline, GL_VERTEX_SHADER_BIT, m_vertexShader.GetID());
+        glUseProgramStages(m_pipeline, GL_FRAGMENT_SHADER_BIT, m_fragmentShader.GetID());
+    }
+
+    CubeExample::~CubeExample()
+    {
+        glDeleteVertexArrays(1, &m_VAO);
+        glDeleteBuffers(1, &m_VBO);
+        glDeleteProgramPipelines(1, &m_pipeline);
+    }
+
+    void CubeExample::Render()
+    {
+        Color::Color clearColor = Color::AliceBlue;
+
+        glClearColor(clearColor.R(), clearColor.G(), clearColor.B(), clearColor.A());
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+        if (m_wireframe)
+            glUseProgramStages(m_pipeline, GL_GEOMETRY_SHADER_BIT, m_geometryShader.GetID());
+        else
+            glUseProgramStages(m_pipeline, GL_GEOMETRY_SHADER_BIT, 0);
+
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, m_textures[0].GetID());
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_2D, m_textures[1].GetID());
+
+        glm::mat4 view = glm::mat4(1.0f);
+        glm::mat4 projection = glm::mat4(1.0f);
+        view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
+        projection = glm::perspective(glm::radians(45.0f),
+            static_cast<float>(m_videoPort.Width()) / static_cast<float>(m_videoPort.Height()), 0.1f, 100.0f);
+        m_vertexShader.SetMat4("view", view);
+        m_vertexShader.SetMat4("projection", projection);
+
+        glBindVertexArray(m_VAO);
+        glBindProgramPipeline(m_pipeline);
+        for (unsigned int i = 0; i < 10; ++i)
+        {
+            glm::mat4 model = glm::mat4(1.0f);
+            model = glm::translate(model, m_cubePositions[i]);
+            float angle = 20.0f * i;
+            model = glm::rotate(model, angle, glm::vec3(1.0f, 0.3f, 0.5f));
+            m_vertexShader.SetMat4("model", model);
+
+            glDrawArrays(GL_TRIANGLES, 0, 36);
+        }
+        glBindVertexArray(0);
+
+        ImGui_ImplOpenGL3_NewFrame();
+        ImGui_ImplWin32_NewFrame();
+        ImGui::NewFrame();
+
+        const ImGuiIO& io = ImGui::GetIO();
+        ImGui::Begin("Settings");
+        ImGui::Checkbox("Draw wireframe", &m_wireframe);
+        ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
+        ImGui::End();
+
+        ImGui::Render();
+
+        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
+        ImGui::UpdatePlatformWindows();
+        ImGui::RenderPlatformWindowsDefault();
+    }
+}

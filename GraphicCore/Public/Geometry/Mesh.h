@@ -24,14 +24,7 @@ namespace TG::Geometry
     public:
         Mesh() = default;
 
-        // [[nodiscard]] float const* Buffer() const { return m_buffer.data(); }
-
-        // void SetVertices();
-        // void SetIndices();
-        // void SetUVs();
-        // void SetColors();
-        // void SetNormals();
-        // void SetTangents();
+        [[nodiscard]] float const* Buffer() const { return m_buffer.data(); }
 
         std::vector<Math::Vector3F> vertices;
         std::vector<std::uint32_t>  indices;
@@ -39,8 +32,9 @@ namespace TG::Geometry
         std::vector<Math::Vector3F> colors;
         std::vector<Math::Vector3F> normals;
         std::vector<Math::Vector3F> tangents;
+
     private:
-        std::vector<Vertex> m_buffer;
+        std::vector<float> m_buffer;
         std::vector<std::uint32_t> m_indices;
     };
 }

@@ -17,6 +17,8 @@ namespace TG
 
         [[nodiscard]] virtual NativePolicy::WindowHandle GetHandle() const noexcept = 0;
         [[nodiscard]] virtual NativePolicy::DeviceContext GetContext() const noexcept = 0;
+        [[nodiscard]] virtual int Width() const noexcept = 0;
+        [[nodiscard]] virtual int Height() const noexcept = 0;
     };
 
     // 窗口基类
@@ -56,8 +58,8 @@ namespace TG
         }
         [[nodiscard]] int PositionX() const noexcept { return m_posX; }
         [[nodiscard]] int PositionY() const noexcept { return m_posY; }
-        [[nodiscard]] int Width() const noexcept { return m_width; }
-        [[nodiscard]] int Height() const noexcept { return m_height; }
+        [[nodiscard]] int Width() const noexcept override { return m_width; }
+        [[nodiscard]] int Height() const noexcept override { return m_height; }
 
         void SetIcon(std::string_view iconPath) const
         {

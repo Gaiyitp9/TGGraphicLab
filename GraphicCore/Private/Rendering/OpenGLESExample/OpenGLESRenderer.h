@@ -7,6 +7,7 @@
 
 #include "Rendering/Renderer.h"
 #include "Base/Timer.h"
+#include "Base/WindowBase.hpp"
 #include "DynamicGles.h"
 #include "Example.h"
 #include <memory>
@@ -16,7 +17,7 @@ namespace TG
     class OpenGLESRenderer final : public Renderer
     {
     public:
-        OpenGLESRenderer(HWND handle, HDC context, const ITimer& timer);
+        OpenGLESRenderer(const IDefaultVideoPort& videoPort, const ITimer& timer);
         ~OpenGLESRenderer() override;
 
         void Render() override;

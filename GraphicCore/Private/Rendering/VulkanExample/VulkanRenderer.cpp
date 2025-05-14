@@ -14,12 +14,12 @@
 
 namespace TG
 {
-    VulkanRenderer::VulkanRenderer(HWND handle)
+    VulkanRenderer::VulkanRenderer(const IDefaultVideoPort& videoPort)
     {
         CheckLayerAndExtension();
         CreateInstance();
         SetupDebugMessenger();
-        CreateSurface(handle);
+        CreateSurface(videoPort.GetHandle());
         SelectPhysicalDevice();
         CreateLogicalDevice();
         CreateSwapChain();

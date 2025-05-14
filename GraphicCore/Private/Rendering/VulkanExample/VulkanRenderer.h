@@ -22,7 +22,7 @@ namespace TG
     class VulkanRenderer final : public Renderer
     {
     public:
-        explicit VulkanRenderer(HWND handle);
+        explicit VulkanRenderer(const IDefaultVideoPort& videoPort);
         ~VulkanRenderer() override;
 
         void Render() override;

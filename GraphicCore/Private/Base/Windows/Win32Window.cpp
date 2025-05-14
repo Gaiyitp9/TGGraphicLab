@@ -47,12 +47,12 @@ namespace TG
 		// // 鼠标
 		// rid[0].usUsagePage = HID_USAGE_PAGE_GENERIC;
 		// rid[0].usUsage = HID_USAGE_GENERIC_MOUSE;
-		// rid[0].dwFlags = 0;
+		// rid[0].dwFlags = RIDEV_NOLEGACY;
 		// rid[0].hwndTarget = m_handle;
 		// // 键盘
 		// rid[1].usUsagePage = HID_USAGE_PAGE_GENERIC;
 		// rid[1].usUsage = HID_USAGE_GENERIC_KEYBOARD;
-		// rid[1].dwFlags = 0;
+		// rid[1].dwFlags = RIDEV_NOLEGACY;
 		// rid[1].hwndTarget = m_handle;
 		// // 注册输入设备
 		// if (!RegisterRawInputDevices(rid, 2, sizeof(rid[0])))
@@ -324,7 +324,7 @@ namespace TG
 			{
 	            // 窗口被销毁后，窗口类也需要被销毁
 	            pWindow->m_destroyed = true;
-				// 基础窗口一般作为主窗口，销毁后要退出线程
+				// 基础窗口作为主窗口，销毁后要退出线程
 				PostQuitMessage(0);
 				return 0;
 			}

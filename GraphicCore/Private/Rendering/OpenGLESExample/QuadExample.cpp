@@ -10,22 +10,23 @@
 #include "imgui_impl_opengl3.h"
 #include "imgui_impl_win32.h"
 #include "stb_image.h"
+#include "glm/ext/matrix_transform.hpp"
 
 namespace TG
 {
     QuadExample::QuadExample(const ITimer& timer) : m_timer(timer),
-		m_vertexShader("Shaders/GLSL/simple.vert", ShaderStage::Vertex),
-		m_fragmentShader("Shaders/GLSL/simple.frag", ShaderStage::Fragment),
+		m_vertexShader("Shaders/GLSL/Quad.vert", ShaderStage::Vertex),
+		m_fragmentShader("Shaders/GLSL/Quad.frag", ShaderStage::Fragment),
 		m_geometryShader("Shaders/GLSL/wireframe.geom", ShaderStage::Geometry)
     {
-	    float vertices[] = {
-	    	// positions			colors			  uvs
+	    constexpr float vertices[] = {
+	    	// positions		colors			  uvs
 	    	-0.5f, -0.5f, 0.0f, 1.0f, 0.5f, 0.2f, 0.0f, 0.0f,
 			 0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f,
 			 0.5f,  0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f,
 			-0.5f,  0.5f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f
 		};
-    	std::uint32_t indices[] = {
+    	const std::uint32_t indices[] = {
     		0, 1, 2,
 			2, 3, 0,
 		};
@@ -33,6 +34,7 @@ namespace TG
     	glGenBuffers(1, &m_VBO);
     	glGenBuffers(1, &m_EBO);
     	glGenVertexArrays(1, &m_VAO);
+
     	glBindVertexArray(m_VAO);
     	// 把顶点数据传入显存
     	glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
@@ -86,18 +88,17 @@ namespace TG
     	}
     	stbi_image_free(data);
 
-    	m_fragmentShader.Activate();
     	m_fragmentShader.SetInt("albedo0", 0);
     	m_fragmentShader.SetInt("albedo1", 1);
-    	m_fragmentShader.Deactivate();
 
     	glGenProgramPipelines(1, &m_pipeline);
-    	glUseProgramStages(m_pipeline, GL_VERTEX_SHADER_BIT, m_vertexShader.GetId());
-    	glUseProgramStages(m_pipeline, GL_FRAGMENT_SHADER_BIT, m_fragmentShader.GetId());
+    	glUseProgramStages(m_pipeline, GL_VERTEX_SHADER_BIT, m_vertexShader.GetID());
+    	glUseProgramStages(m_pipeline, GL_FRAGMENT_SHADER_BIT, m_fragmentShader.GetID());
     }
 
     QuadExample::~QuadExample()
     {
+    	glDeleteTextures(2, m_albedo);
     	glDeleteVertexArrays(1, &m_VAO);
     	glDeleteBuffers(1, &m_VBO);
     	glDeleteBuffers(1, &m_EBO);
@@ -112,15 +113,18 @@ namespace TG
     	glClear(GL_COLOR_BUFFER_BIT);
 
     	if (m_wireframe)
-    		glUseProgramStages(m_pipeline, GL_GEOMETRY_SHADER_BIT, m_geometryShader.GetId());
+    		glUseProgramStages(m_pipeline, GL_GEOMETRY_SHADER_BIT, m_geometryShader.GetID());
     	else
     		glUseProgramStages(m_pipeline, GL_GEOMETRY_SHADER_BIT, 0);
 
     	float timeValue = m_timer.GetTime() * 0.001f;
     	float greyValue = std::sin(timeValue) * 0.5f + 0.5f;
-    	m_fragmentShader.Activate();
     	m_fragmentShader.SetFloat4("ourColor", greyValue, greyValue, greyValue, 1.0f);
-    	m_fragmentShader.Deactivate();
+
+    	glm::mat4 transform{1.0f};
+		transform = glm::translate(transform, glm::vec3(0.5f, -0.5f, 0.0f));
+    	transform = glm::rotate(transform, timeValue, glm::vec3(0.0f, 0.0f, 1.0f));
+    	m_vertexShader.SetMat4("transform", transform);
 
     	glActiveTexture(GL_TEXTURE0);
     	glBindTexture(GL_TEXTURE_2D, m_albedo[0]);

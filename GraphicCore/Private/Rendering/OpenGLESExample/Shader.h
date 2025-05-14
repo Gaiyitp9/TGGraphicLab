@@ -6,6 +6,7 @@
 #pragma once
 
 #include "DynamicGles.h"
+#include "glm/matrix.hpp"
 
 namespace TG
 {
@@ -22,15 +23,14 @@ namespace TG
         Shader(std::string_view shaderPath, ShaderStage shaderStage);
         ~Shader();
 
-        void Activate() const;
-        void Deactivate() const;
-        [[nodiscard]] GLuint GetId() const { return m_shaderId; }
+        [[nodiscard]] GLuint GetID() const { return m_shaderID; }
         void SetBool(std::string_view name, bool value) const;
         void SetInt(std::string_view name, int value) const;
         void SetFloat(std::string_view name, float value) const;
         void SetFloat4(std::string_view name, float v0, float v1, float v2, float v3) const;
+        void SetMat4(std::string_view name, const glm::mat4& value) const;
 
     private:
-        GLuint m_shaderId{};
+        GLuint m_shaderID{};
     };
 }
