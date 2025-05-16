@@ -70,7 +70,7 @@ namespace TG::Math
 
         Scalar Entry(std::size_t row, std::size_t col) const
         {
-            return m_product(row, col);
+            return m_product[row, col];
         }
 
     private:

@@ -7,6 +7,7 @@
 #include "CubeExample.h"
 #include "Color/StandardColors.h"
 #include "Geometry/Primitives.h"
+#include "Rendering/ProjectionMatrix.hpp"
 #include "imgui_impl_opengl3.h"
 #include "imgui_impl_win32.h"
 #include "glm/ext/matrix_clip_space.hpp"
@@ -18,20 +19,20 @@ namespace TG
         : m_timer(timer), m_videoPort(videoPort),
         m_vertexShader("Shaders/GLSL/Cube.vert", ShaderStage::Vertex),
         m_fragmentShader("Shaders/GLSL/Cube.frag", ShaderStage::Fragment),
-        m_geometryShader("Shaders/GLSL/wireframe.geom", ShaderStage::Geometry)
+        m_geometryShader("Shaders/GLSL/Wireframe.geom", ShaderStage::Geometry)
     {
         m_cubeMesh = Geometry::CreatePrimitive(Geometry::PrimitiveType::Cube);
 
-        m_cubePositions[0] = glm::vec3(0.0f, 0.0f, 0.0f);
-        m_cubePositions[1] = glm::vec3(2.0f, 5.0f, -15.0f);
-        m_cubePositions[2] = glm::vec3(-1.5f, -2.2f, -2.5f);
-        m_cubePositions[3] = glm::vec3(-3.8f, -2.0f, -12.3f);
-        m_cubePositions[4] = glm::vec3(2.4f, -0.4f, -3.5f);
-        m_cubePositions[5] = glm::vec3(-1.7f, 3.0f, -7.5f);
-        m_cubePositions[6] = glm::vec3(1.3f, -2.0f, -2.5f);
-        m_cubePositions[7] = glm::vec3(1.5f, 2.0f, -2.5f);
-        m_cubePositions[8] = glm::vec3(1.5f, 0.2f, -1.5f);
-        m_cubePositions[9] = glm::vec3(-1.3f, 1.0f, -1.5f);
+        m_cubePositions[0] = Math::Vector3F{ 0.0f, 0.0f, 0.0f };
+        m_cubePositions[1] = Math::Vector3F{ 2.0f, 5.0f, -15.0f };
+        m_cubePositions[2] = Math::Vector3F{ -1.5f, -2.2f, -2.5f };
+        m_cubePositions[3] = Math::Vector3F{ -3.8f, -2.0f, -12.3f };
+        m_cubePositions[4] = Math::Vector3F{ 2.4f, -0.4f, -3.5f };
+        m_cubePositions[5] = Math::Vector3F{ -1.7f, 3.0f, -7.5f };
+        m_cubePositions[6] = Math::Vector3F{ 1.3f, -2.0f, -2.5f };
+        m_cubePositions[7] = Math::Vector3F{ 1.5f, 2.0f, -2.5f };
+        m_cubePositions[8] = Math::Vector3F{ 1.5f, 0.2f, -1.5f };
+        m_cubePositions[9] = Math::Vector3F{ -1.3f, 1.0f, -1.5f };
 
         glGenBuffers(1, &m_VBO);
         glGenBuffers(1, &m_EBO);
@@ -40,11 +41,11 @@ namespace TG
         glBindVertexArray(m_VAO);
 
         glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
-        const GLsizeiptr positionByteSize = 3 * sizeof(float) * m_cubeMesh.vertices.size();
-        const GLsizeiptr uvByteSize = 2 * sizeof(float) * m_cubeMesh.uv.size();
+        const auto positionByteSize = static_cast<GLsizeiptr>(3 * sizeof(float) * m_cubeMesh.vertices.size());
+        const auto uvByteSize = static_cast<GLsizeiptr>(2 * sizeof(float) * m_cubeMesh.uvs.size());
         glBufferData(GL_ARRAY_BUFFER, positionByteSize + uvByteSize, nullptr, GL_STATIC_DRAW);
         glBufferSubData(GL_ARRAY_BUFFER, 0, positionByteSize, m_cubeMesh.vertices.data());
-        glBufferSubData(GL_ARRAY_BUFFER, positionByteSize, uvByteSize, m_cubeMesh.uv.data());
+        glBufferSubData(GL_ARRAY_BUFFER, positionByteSize, uvByteSize, m_cubeMesh.uvs.data());
 
         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), nullptr);
         glEnableVertexAttribArray(0);
@@ -52,7 +53,8 @@ namespace TG
         glEnableVertexAttribArray(1);
 
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_EBO);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(std::uint32_t) * m_cubeMesh.indices.size(),
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER,
+            static_cast<GLsizeiptr>(sizeof(std::uint32_t) * m_cubeMesh.indices.size()),
             m_cubeMesh.indices.data(), GL_STATIC_DRAW);
 
         glBindVertexArray(0);
@@ -74,6 +76,7 @@ namespace TG
     {
         glDeleteVertexArrays(1, &m_VAO);
         glDeleteBuffers(1, &m_VBO);
+        glDeleteBuffers(1, &m_EBO);
         glDeleteProgramPipelines(1, &m_pipeline);
     }
 
@@ -94,24 +97,24 @@ namespace TG
         glActiveTexture(GL_TEXTURE1);
         glBindTexture(GL_TEXTURE_2D, m_textures[1].GetID());
 
-        glm::mat4 view = glm::mat4(1.0f);
-        view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
-        glm::mat4 projection = glm::perspective(glm::radians(45.0f),
+        Math::Transform<float, 3> viewTransform;
+        viewTransform.Translate(Math::Vector3F{ 0.0f, 0.0f, -3.0f });
+        Math::Matrix4 projection = Rendering::Perspective(static_cast<float>(45.0_deg_to_rad),
             static_cast<float>(m_videoPort.Width()) / static_cast<float>(m_videoPort.Height()), 0.1f, 100.0f);
-        m_vertexShader.SetMat4("view", view);
+        m_vertexShader.SetMat4("view", viewTransform.ToTransformMatrix());
         m_vertexShader.SetMat4("projection", projection);
 
         glBindVertexArray(m_VAO);
         glBindProgramPipeline(m_pipeline);
         for (unsigned int i = 0; i < 10; ++i)
         {
-            glm::mat4 model = glm::mat4(1.0f);
-            model = glm::translate(model, m_cubePositions[i]);
-            float angle = 20.0f * i;
-            model = glm::rotate(model, angle, glm::vec3(1.0f, 0.3f, 0.5f));
-            m_vertexShader.SetMat4("model", model);
+            Math::Transform<float, 3> modelTransform;
+            modelTransform.Translate(m_cubePositions[i]);
+            const float angle = 20.0f * static_cast<float>(i);
+            modelTransform.Rotate(Math::AngleAxis{ angle, Math::Vector3F{ 1.0f, 0.3f, 0.5f }});
+            m_vertexShader.SetMat4("model", modelTransform.ToTransformMatrix());
 
-    	    glDrawElements(GL_TRIANGLES, m_cubeMesh.indices.size(), GL_UNSIGNED_INT, nullptr);
+    	    glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(m_cubeMesh.indices.size()), GL_UNSIGNED_INT, nullptr);
         }
         glBindVertexArray(0);
 

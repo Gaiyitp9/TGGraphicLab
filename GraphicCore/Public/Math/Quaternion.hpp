@@ -5,8 +5,6 @@
 *****************************************************************/
 #pragma once
 
-#include "Math/Core.hpp"
-
 namespace TG::Math
 {
 	template<typename Scalar>
@@ -19,7 +17,7 @@ namespace TG::Math
 		Quaternion() : m_elements{ 0, 0, 0, 1 } {}
 		Quaternion(Scalar x, Scalar y, Scalar z, Scalar w) : m_elements{ x, y, z, w } {}
 		explicit Quaternion(const Vector<Scalar, 4>& v) : m_elements{ v } {}
-		Quaternion(Scalar angle, const Vector<Scalar, 3>& axis)
+		Quaternion(Scalar angle, const Vector3<Scalar>& axis)
 		{
 			axis.Normalize();
 			const Scalar halfAngle = angle * static_cast<Scalar>(0.5);
@@ -33,7 +31,7 @@ namespace TG::Math
 		// 当按局部坐标系旋转和按世界坐标系旋转的轴旋转矩阵相乘顺序相反时，这两种旋转等价
 		// 欧拉角环绕顺序为heading-pitch-bank(yaw-pitch-roll，局部坐标系)
 		// Y-X-Z(Object Space)或Z-X-Y(World Space 或 Parent Space)
-		explicit Quaternion(const Vector<Scalar, 3>& euler)
+		explicit Quaternion(const Vector3<Scalar>& euler)
 		{
 			const Scalar halfX = euler.X() * static_cast<Scalar>(0.5);
 			const Scalar halfY = euler.Y() * static_cast<Scalar>(0.5);
@@ -97,7 +95,7 @@ namespace TG::Math
 			return { x, y, z, w };
 		}
 
-		Vector<Scalar, 3> operator*(const Vector<Scalar, 3>& vec) const
+		Vector3<Scalar> operator*(const Vector<Scalar, 3>& vec) const
 		{
 			const Quaternion q = Normalized();
 			const Quaternion v{ vec.X(), vec.Y(), vec.Z(), 0 };
@@ -107,7 +105,7 @@ namespace TG::Math
 		Scalar Dot(const Quaternion& q) const { return m_elements.Dot(q.m_elements); }
 
 	private:
-		Vector<Scalar, 4> m_elements;
+		Vector4<Scalar> m_elements;
 	};
 
 	using QuaternionF = Quaternion<float>;

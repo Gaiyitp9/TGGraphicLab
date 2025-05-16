@@ -27,7 +27,7 @@ namespace TG::Geometry
             { 1.0f, 1.0f, 1.0f },
             { 1.0f, 1.0f, 1.0f },
         });
-        mesh.uv.assign({
+        mesh.uvs.assign({
             { 0.0f, 0.0f },
             { 1.0f, 0.0f },
             { 1.0f, 1.0f },
@@ -129,7 +129,7 @@ namespace TG::Geometry
             { 1.0f, 1.0f, 1.0f },
             { 1.0f, 1.0f, 1.0f },
         });
-        mesh.uv.assign({
+        mesh.uvs.assign({
             { 0.0f, 0.0f }, { 0.0f, 1.0f }, { 1.0f, 1.0f }, { 1.0f, 0.0f },
             { 0.0f, 0.0f }, { 0.0f, 1.0f }, { 1.0f, 1.0f }, { 1.0f, 0.0f },
             { 0.0f, 0.0f }, { 0.0f, 1.0f }, { 1.0f, 1.0f }, { 1.0f, 0.0f },

@@ -2,10 +2,10 @@
 layout(triangles) in;
 layout(line_strip, max_vertices = 6) out;
 
-layout(location = 0) in vec3 vColor[];
-layout(location = 1) in vec2 vTexCoord[];
-layout(location = 0) out vec3 fColor;
-layout(location = 1) out vec2 fTexCoord;
+layout(location = 0) in vec2 vTexCoord[];
+layout(location = 1) in vec3 vColor[];
+layout(location = 0) out vec2 fTexCoord;
+layout(location = 1) out vec3 fColor;
 
 void main()
 {

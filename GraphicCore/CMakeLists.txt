@@ -28,7 +28,7 @@ endif()
 
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${HEADERS} ${SOURCES})
 
-set(TG_MATRIX_STORAGE_ORDER "RowMajor" CACHE STRING "Default matrix storage order" FORCE)
+set(TG_MATRIX_STORAGE_ORDER "ColumnMajor" CACHE STRING "Default matrix storage order" FORCE)
 set_property(CACHE TG_MATRIX_STORAGE_ORDER PROPERTY STRINGS "RowMajor" "ColumnMajor")
 
 add_library(${LIBRARY_NAME} ${HEADERS} ${SOURCES})

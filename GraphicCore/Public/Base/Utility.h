@@ -19,7 +19,7 @@ namespace TG
     // 窄字符转宽字符
     std::wstring MultiBytesToWideChars(std::string_view str);
     // 宽字符转窄字符
-    std::string WideCharsToMultiBytes(std::wstring_view wstr);
+    std::string WideCharsToMultiBytes(std::wstring_view wStr);
 
     // 读取二进制文件
     std::vector<char> ReadBinaryFile(std::string_view fileName);

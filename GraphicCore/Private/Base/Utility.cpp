@@ -39,20 +39,20 @@ namespace TG
         auto* data = static_cast<wchar_t*>(malloc(length * sizeof(wchar_t)));
         std::mbstowcs(data, str.data(), length);
 #endif
-        std::wstring wstr(data);
+        std::wstring wStr(data);
         std::free(data);
-        return wstr;
+        return wStr;
     }
 
-    std::string WideCharsToMultiBytes(std::wstring_view wstr)
+    std::string WideCharsToMultiBytes(std::wstring_view wStr)
     {
         std::setlocale(LC_ALL, "zh_CN.utf-8");
         // Windows上用安全的版本，Linux没有这个版本，所以用旧版本
 #ifdef TG_WINDOWS
         std::size_t length = 0;
-        wcstombs_s(&length, nullptr, 0, wstr.data(), 0);
+        wcstombs_s(&length, nullptr, 0, wStr.data(), 0);
         auto* data = static_cast<char*>(std::malloc(length * sizeof(char)));
-        wcstombs_s(&length, data, length, wstr.data(), length);
+        wcstombs_s(&length, data, length, wStr.data(), length);
 #else
         // 计算出的长度不包含'/0'，所以要加1
         std::size_t length = std::wcstombs(nullptr, wstr.data(), 0) + 1;

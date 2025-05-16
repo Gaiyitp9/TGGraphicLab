@@ -7,6 +7,7 @@
 #include "QuadExample.h"
 #include "Color/StandardColors.h"
 #include "Exception/BaseException.h"
+#include "Geometry/Primitives.h"
 #include "imgui_impl_opengl3.h"
 #include "imgui_impl_win32.h"
 #include "stb_image.h"
@@ -17,19 +18,13 @@ namespace TG
     QuadExample::QuadExample(const ITimer& timer) : m_timer(timer),
 		m_vertexShader("Shaders/GLSL/Quad.vert", ShaderStage::Vertex),
 		m_fragmentShader("Shaders/GLSL/Quad.frag", ShaderStage::Fragment),
-		m_geometryShader("Shaders/GLSL/wireframe.geom", ShaderStage::Geometry)
+		m_geometryShader("Shaders/GLSL/Wireframe.geom", ShaderStage::Geometry)
     {
-	    constexpr float vertices[] = {
-	    	// positions		colors			  uvs
-	    	-0.5f, -0.5f, 0.0f, 1.0f, 0.5f, 0.2f, 0.0f, 0.0f,
-			 0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f,
-			 0.5f,  0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f,
-			-0.5f,  0.5f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f
-		};
-    	const std::uint32_t indices[] = {
-    		0, 1, 2,
-			2, 3, 0,
-		};
+    	m_quadMesh = Geometry::CreatePrimitive(Geometry::PrimitiveType::Quad);
+		m_quadMesh.colors[0] = { 1.0f, 0.5f, 0.2f };
+		m_quadMesh.colors[1] = { 1.0f, 0.0f, 0.0f };
+		m_quadMesh.colors[2] = { 0.0f, 1.0f, 0.0f };
+		m_quadMesh.colors[3] = { 0.0f, 0.0f, 1.0f };
 
     	glGenBuffers(1, &m_VBO);
     	glGenBuffers(1, &m_EBO);
@@ -39,19 +34,27 @@ namespace TG
 
     	// 顶点数据传入显存
     	glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
-    	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+    	const auto positionByteSize = static_cast<GLsizeiptr>(3 * sizeof(float) * m_quadMesh.vertices.size());
+    	const auto uvByteSize = static_cast<GLsizeiptr>(2 * sizeof(float) * m_quadMesh.uvs.size());
+    	const auto colorByteSize = static_cast<GLsizeiptr>(3 * sizeof(float) * m_quadMesh.colors.size());
+    	glBufferData(GL_ARRAY_BUFFER, positionByteSize + uvByteSize + colorByteSize, nullptr, GL_STATIC_DRAW);
+    	glBufferSubData(GL_ARRAY_BUFFER, 0, positionByteSize, m_quadMesh.vertices.data());
+    	glBufferSubData(GL_ARRAY_BUFFER, positionByteSize, uvByteSize, m_quadMesh.uvs.data());
+    	glBufferSubData(GL_ARRAY_BUFFER, positionByteSize + uvByteSize, colorByteSize, m_quadMesh.colors.data());
     	// 设置顶点属性
-    	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), nullptr);
+    	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), nullptr);
     	glEnableVertexAttribArray(0);
-    	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float),
-			reinterpret_cast<void*>(3 * sizeof(float)));
+    	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float),
+			reinterpret_cast<void*>(positionByteSize));
     	glEnableVertexAttribArray(1);
-    	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float),
-			reinterpret_cast<void*>(6 * sizeof(float)));
+    	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float),
+			reinterpret_cast<void*>(positionByteSize + uvByteSize));
     	glEnableVertexAttribArray(2);
     	// 顶点索引传入显存
     	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_EBO);
-    	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+    	glBufferData(GL_ELEMENT_ARRAY_BUFFER,
+    		static_cast<GLsizeiptr>(sizeof(std::uint32_t) * m_quadMesh.indices.size()),
+    		m_quadMesh.indices.data(), GL_STATIC_DRAW);
 
     	glBindVertexArray(0);
 
@@ -121,14 +124,14 @@ namespace TG
     	else
     		glUseProgramStages(m_pipeline, GL_GEOMETRY_SHADER_BIT, 0);
 
-    	float timeValue = m_timer.GetTime() * 0.001f;
-    	float greyValue = std::sin(timeValue) * 0.5f + 0.5f;
+    	const float timeValue = m_timer.GetTime() * 0.001f;
+    	const float greyValue = std::sin(timeValue) * 0.5f + 0.5f;
     	m_fragmentShader.SetFloat4("ourColor", greyValue, greyValue, greyValue, 1.0f);
 
-    	glm::mat4 transform{1.0f};
-		transform = glm::translate(transform, glm::vec3(0.5f, -0.5f, 0.0f));
-    	transform = glm::rotate(transform, timeValue, glm::vec3(0.0f, 0.0f, 1.0f));
-    	m_vertexShader.SetMat4("transform", transform);
+    	Math::Transform<float, 3> transform;
+    	transform.Translate(Math::Vector3F{ 0.5f, -0.5f, 0.0f });
+    	transform.Rotate(Math::AngleAxis{ timeValue, Math::Vector3F{ 0.0f, 0.0f, 1.0f }});
+    	m_vertexShader.SetMat4("transform", transform.ToTransformMatrix());
 
     	glActiveTexture(GL_TEXTURE0);
     	glBindTexture(GL_TEXTURE_2D, m_albedo[0]);
@@ -137,7 +140,7 @@ namespace TG
 
     	glBindVertexArray(m_VAO);
     	glBindProgramPipeline(m_pipeline);
-    	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
+    	glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(m_quadMesh.indices.size()), GL_UNSIGNED_INT, nullptr);
     	glBindVertexArray(0);
 
     	ImGui_ImplOpenGL3_NewFrame();

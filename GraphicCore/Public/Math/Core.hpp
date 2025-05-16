@@ -12,6 +12,8 @@
 #include <cmath>
 #include <array>
 #include <algorithm>
+#include <numbers>
+#include "Constants.hpp"
 #include "Declarations.hpp"
 #include "Reduction.hpp"
 #include "Determinant.hpp"
@@ -27,3 +29,5 @@
 #include "Inverse.hpp"
 #include "RotationBase.hpp"
 #include "Quaternion.hpp"
+#include "AngleAxis.hpp"
+#include "Transform.hpp"

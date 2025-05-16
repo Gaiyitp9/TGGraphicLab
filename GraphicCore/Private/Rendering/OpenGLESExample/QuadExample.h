@@ -8,6 +8,7 @@
 #include "Example.h"
 #include "DynamicGles.h"
 #include "Base/Timer.h"
+#include "Geometry/Mesh.h"
 #include "Shader.h"
 
 namespace TG
@@ -22,6 +23,9 @@ namespace TG
 
     private:
         const ITimer& m_timer;
+
+        Geometry::Mesh m_quadMesh;
+
         GLuint m_VAO{};
         GLuint m_VBO{};
         GLuint m_EBO{};

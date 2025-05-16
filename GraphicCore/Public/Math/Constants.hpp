@@ -5,9 +5,6 @@
 *****************************************************************/
 #pragma once
 
-#include <concepts>
-#include <numbers>
-
 namespace TG::Math
 {
     template<std::floating_point T> inline constexpr T Rad2Deg = static_cast<T>(57.2957795130823);
@@ -18,15 +15,19 @@ namespace TG::Math
     inline constexpr float Rad2DegF = Rad2Deg<float>;
     inline constexpr float Deg2RadF = Deg2Rad<float>;
 
+}
+
+namespace TG
+{
     constexpr long double operator""_deg_to_rad(long double degree)
     {
-        long double radian = degree * std::numbers::pi_v<long double> / 180;
+        const long double radian = degree * std::numbers::pi_v<long double> / 180;
         return radian;
     }
 
     constexpr long double operator""_rad_to_deg(long double radian)
     {
-        long double degree = radian * 180 / std::numbers::pi_v<long double>;
+        const long double degree = radian * 180 / std::numbers::pi_v<long double>;
         return degree;
     }
 }

@@ -40,10 +40,7 @@ namespace TG::Math
 
 		Matrix(std::initializer_list<Scalar> values)
         {
-	        std::size_t count = std::min(values.size(), Rows * Columns);
-        	auto it = values.begin();
-        	for (int i = 0; i < count; ++i)
-        		m_storage[i] = *it++;
+	        Set(values);
         }
 
 		template<typename Derived>
@@ -57,10 +54,19 @@ namespace TG::Math
 
 		void Set(std::initializer_list<Scalar> values)
         {
-        	std::size_t count = std::min(values.size(), Rows * Columns);
+        	const std::size_t count = std::min(values.size(), Rows * Columns);
         	auto it = values.begin();
         	for (int i = 0; i < count; ++i)
-        		m_storage[i] = *it++;
+        	{
+        		std::size_t index = i;
+				if constexpr (!HasFlag<Matrix, XprFlag::RowMajor>)
+				{
+        			const std::size_t row = i / Columns;
+        			const std::size_t column = i % Columns;
+					index = row + column * Rows;
+        		}
+        		m_storage[index] = *it++;
+        	}
         }
 
 		Scalar X() const requires (IsVector && Size > 0) { return m_storage[0]; }
@@ -101,6 +107,16 @@ namespace TG::Math
 
 	template<typename Scalar, std::size_t Size> using Vector = Matrix<Scalar, Size, 1>;
 	template<typename Scalar, std::size_t Size> using RowVector = Matrix<Scalar, 1, Size>;
+
+	template<typename Scalar> using Vector2 = Vector<Scalar, 2>;
+	template<typename Scalar> using Vector3 = Vector<Scalar, 3>;
+	template<typename Scalar> using Vector4 = Vector<Scalar, 4>;
+	template<typename Scalar> using RowVector2 = Vector<Scalar, 2>;
+	template<typename Scalar> using RowVector3 = Vector<Scalar, 3>;
+	template<typename Scalar> using RowVector4 = Vector<Scalar, 4>;
+	template<typename Scalar> using Matrix2 = Matrix<Scalar, 2, 2>;
+	template<typename Scalar> using Matrix3 = Matrix<Scalar, 3, 3>;
+	template<typename Scalar> using Matrix4 = Matrix<Scalar, 4, 4>;
 
 	using Vector2F = Vector<float, 2>;
 	using Vector3F = Vector<float, 3>;

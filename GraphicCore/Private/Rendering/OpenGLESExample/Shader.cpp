@@ -97,4 +97,10 @@ namespace TG
         glProgramUniformMatrix4fv(m_shaderID, glGetUniformLocation(m_shaderID, name.data()), 1,
             GL_FALSE, glm::value_ptr(value));
     }
+
+    void Shader::SetMat4(std::string_view name, const Math::Matrix4F& value) const
+    {
+        glProgramUniformMatrix4fv(m_shaderID, glGetUniformLocation(m_shaderID, name.data()), 1,
+            GL_FALSE, value.Data());
+    }
 }

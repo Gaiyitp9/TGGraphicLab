@@ -7,6 +7,7 @@
 
 #include "DynamicGles.h"
 #include "glm/matrix.hpp"
+#include "Math/Core.hpp"
 
 namespace TG
 {
@@ -28,6 +29,7 @@ namespace TG
         void SetInt(std::string_view name, int value) const;
         void SetFloat(std::string_view name, float value) const;
         void SetFloat4(std::string_view name, float v0, float v1, float v2, float v3) const;
+        void SetMat4(std::string_view name, const Math::Matrix4F& value) const;
         void SetMat4(std::string_view name, const glm::mat4& value) const;
 
     private:

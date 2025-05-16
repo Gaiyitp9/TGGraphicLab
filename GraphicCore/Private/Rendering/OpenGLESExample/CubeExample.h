@@ -28,7 +28,7 @@ namespace TG
         const IDefaultVideoPort& m_videoPort;
 
         Geometry::Mesh m_cubeMesh;
-        glm::vec3 m_cubePositions[10]{};
+        Math::Vector3F m_cubePositions[10];
 
         GLuint m_VAO{};
         GLuint m_VBO{};

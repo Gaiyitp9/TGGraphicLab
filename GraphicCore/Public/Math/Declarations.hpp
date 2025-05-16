@@ -169,4 +169,17 @@ namespace TG::Math
         using Type = std::conditional_t<HasFlag<Xpr, XprFlag::NestByRef>, const Xpr&, const Xpr>;
         using NonConstType = std::conditional_t<HasFlag<Xpr, XprFlag::NestByRef>, Xpr&, Xpr>;
     };
+
+    // 旋转基类
+    template<typename Derived, int Dimension>
+    class RotationBase;
+    // 旋转轴和旋转角表示的旋转
+    template<typename Scalar>
+    class AngleAxis;
+    // 四元数表示的旋转
+    template<typename Scalar>
+    class Quaternion;
+    // 物体变换
+    template<typename Scalar, std::size_t Dimension, StorageOrder Order = DefaultOrder>
+    class Transform;
 }
