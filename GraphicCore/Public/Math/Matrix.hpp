@@ -52,6 +52,10 @@ namespace TG::Math
 
 		Scalar const* Data() const noexcept { return m_storage; }
 
+		/**
+		 * 按照row major的形式填充矩阵，与矩阵保存数据的形式无关
+		 * @values 填充矩阵的数据
+		 */
 		void Set(std::initializer_list<Scalar> values)
         {
         	const std::size_t count = std::min(values.size(), Rows * Columns);

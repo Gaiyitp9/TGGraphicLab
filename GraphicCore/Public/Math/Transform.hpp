@@ -55,6 +55,18 @@ namespace TG::Math
             return *this;
         }
 
+        template<typename Derived> requires Dimension == 3
+        Transform& LookAt(const MatrixBase<Derived>& center, const MatrixBase<Derived>& worldUp = { 0, 1, 0 })
+        {
+            Matrix3<Scalar> front = center - m_matrix.Block<3, 1>(0, 3);
+            Matrix3<Scalar> right = front.Cross(worldUp);
+            Matrix3<Scalar> up = right.Cross(front);
+            m_matrix.Column(0) = right;
+            m_matrix.Column(1) = up;
+            m_matrix.Column(2) = front;
+            return *this;
+        }
+
     private:
         MatrixType m_matrix;
     };

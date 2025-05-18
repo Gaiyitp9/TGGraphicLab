@@ -10,13 +10,14 @@
 namespace TG::Rendering
 {
     // 投影矩阵。从相机空间变换到裁剪空间，xyz坐标范围在[-1, 1]
+    // 裁剪空间使用左手坐标系，世界空间和相机空间使用右手坐标系
 
     /**
      * 透视投影矩阵
      * @fov     相机视角(field of view)，这里使用的是垂直fov
      * @aspect  长宽比
-     * @zNear   近平面位置
-     * @zFar    远平面位置
+     * @zNear   近平面位置，数值大于0
+     * @zFar    远平面位置，同上
      */
     template<typename Scalar>
     Math::Matrix4<Scalar> Perspective(Scalar fov, Scalar aspect, Scalar zNear, Scalar zFar)
@@ -38,7 +39,7 @@ namespace TG::Rendering
      * @right   右边界
      * @bottom  下边界
      * @top     上边界
-     * @zNear   近平面
+     * @zNear   近平面，数值大于0
      * @zFar    远平面
      */
     template<typename Scalar>
