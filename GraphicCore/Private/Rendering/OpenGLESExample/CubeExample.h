@@ -10,6 +10,7 @@
 #include "Base/Timer.h"
 #include "Base/WindowBase.hpp"
 #include "Geometry/Mesh.h"
+#include "Rendering/Camera.h"
 #include "Shader.h"
 #include "Texture2D.h"
 
@@ -25,7 +26,8 @@ namespace TG
 
     private:
         const ITimer& m_timer;
-        const IDefaultVideoPort& m_videoPort;
+
+        Camera m_camera;
 
         Geometry::Mesh m_cubeMesh;
         Math::Vector3F m_cubePositions[10];

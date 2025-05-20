@@ -6,28 +6,44 @@
 #pragma once
 
 #include "Math/Core.hpp"
+#include "Base/WindowBase.hpp"
 
 namespace TG
 {
+    enum class CameraType
+    {
+        Perspective,
+        Orthographic,
+    };
+
     class Camera
     {
     public:
-        Camera();
+        Camera(const IDefaultVideoPort& videoPort);
         ~Camera();
 
         [[nodiscard]] Math::Matrix4F ViewMatrix() const;
         [[nodiscard]] Math::Matrix4F ProjectionMatrix() const;
 
     private:
-        // glm::vec3 m_position;
-        // glm::vec3 m_front;
-        // glm::vec3 m_up;
-        Math::Vector3F m_worldUp{ 0.0f, 1.0f, 0.0f };
-        float m_yaw;
-        float m_pitch;
+        const IDefaultVideoPort& m_videoPort;
 
-        float m_moveSpeed;
-        float m_mouseSensitivity;
-        float m_fov;
+        CameraType m_cameraType{ CameraType::Perspective };
+
+        float m_fov{ 45.0_deg_to_rad };
+        float m_aspectRatio{ 1.0f };
+        float m_nearPlane{ 0.1f };
+        float m_farPlane{ 100.0f };
+
+        Math::Vector3F m_position{ 0.0f, 0.0f, 3.0f };
+        Math::Vector3F m_front{ 0.0f, 0.2f, -1.0f };
+        Math::Vector3F m_up{ 0.0f, 1.0f, 0.0f };
+        Math::Vector3F m_worldUp{ 0.0f, 1.0f, 0.0f };
+
+        float m_yaw{};
+        float m_pitch{};
+
+        float m_moveSpeed{};
+        float m_mouseSensitivity{};
     };
 }

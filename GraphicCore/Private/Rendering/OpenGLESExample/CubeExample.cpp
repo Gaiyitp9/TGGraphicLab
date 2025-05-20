@@ -7,16 +7,15 @@
 #include "CubeExample.h"
 #include "Color/StandardColors.h"
 #include "Geometry/Primitives.h"
-#include "Rendering/ProjectionMatrix.hpp"
+#include "Rendering/ViewProjectionMatrix.hpp"
 #include "imgui_impl_opengl3.h"
 #include "imgui_impl_win32.h"
-#include "glm/ext/matrix_clip_space.hpp"
 #include "glm/ext/matrix_transform.hpp"
 
 namespace TG
 {
     CubeExample::CubeExample(const IDefaultVideoPort& videoPort, const ITimer &timer)
-        : m_timer(timer), m_videoPort(videoPort),
+        : m_timer(timer), m_camera(videoPort),
         m_vertexShader("Shaders/GLSL/Cube.vert", ShaderStage::Vertex),
         m_fragmentShader("Shaders/GLSL/Cube.frag", ShaderStage::Fragment),
         m_geometryShader("Shaders/GLSL/Wireframe.geom", ShaderStage::Geometry)
@@ -97,12 +96,8 @@ namespace TG
         glActiveTexture(GL_TEXTURE1);
         glBindTexture(GL_TEXTURE_2D, m_textures[1].GetID());
 
-        Math::Transform<float, 3> viewTransform;
-        viewTransform.Translate(Math::Vector3F{ 0.0f, 0.0f, -3.0f });
-        Math::Matrix4 projection = Rendering::Perspective(static_cast<float>(45.0_deg_to_rad),
-            static_cast<float>(m_videoPort.Width()) / static_cast<float>(m_videoPort.Height()), 0.1f, 100.0f);
-        m_vertexShader.SetMat4("view", viewTransform.ToTransformMatrix());
-        m_vertexShader.SetMat4("projection", projection);
+        m_vertexShader.SetMat4("view", m_camera.ViewMatrix());
+        m_vertexShader.SetMat4("projection", m_camera.ProjectionMatrix());
 
         glBindVertexArray(m_VAO);
         glBindProgramPipeline(m_pipeline);
