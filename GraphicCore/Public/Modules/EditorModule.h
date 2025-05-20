@@ -22,8 +22,8 @@ namespace TG
         EditorModule& operator=(EditorModule&&) = delete;
         ~EditorModule() override;
 
-        void SetRenderer(const std::shared_ptr<Renderer>& renderer);
-        void PlugInVideoPort(const IDefaultVideoPort& display);
+        void SetRenderer(const std::weak_ptr<Renderer>& renderer);
+        void PlugInVideoPort(const std::weak_ptr<IDefaultVideoPort>& display);
 
         void Update() override;
         void PostUpdate() override;

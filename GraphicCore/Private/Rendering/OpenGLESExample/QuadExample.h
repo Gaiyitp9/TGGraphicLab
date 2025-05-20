@@ -7,7 +7,7 @@
 
 #include "Example.h"
 #include "DynamicGles.h"
-#include "Base/Timer.h"
+#include "Base/CommonInterfaces.h"
 #include "Geometry/Mesh.h"
 #include "Shader.h"
 
@@ -16,13 +16,13 @@ namespace TG
     class QuadExample final : public Example
     {
     public:
-        explicit QuadExample(const ITimer& timer);
+        explicit QuadExample(const std::weak_ptr<ITimer>& timer);
         ~QuadExample() override;
 
         void Render() override;
 
     private:
-        const ITimer& m_timer;
+        std::weak_ptr<ITimer> m_timer;
 
         Geometry::Mesh m_quadMesh;
 

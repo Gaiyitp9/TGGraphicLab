@@ -27,7 +27,7 @@ namespace TG
     	}
     }
 
-	void EditorModule::SetRenderer(const std::shared_ptr<Renderer>& renderer)
+	void EditorModule::SetRenderer(const std::weak_ptr<Renderer>& renderer)
 	{
 		m_renderer = renderer;
 	}
@@ -147,21 +147,26 @@ namespace TG
 		EGLSurface surface;
 	};
 
-    void EditorModule::PlugInVideoPort(const IDefaultVideoPort& display)
+    void EditorModule::PlugInVideoPort(const std::weak_ptr<IDefaultVideoPort>& display)
     {
+    	if (display.expired())
+    		throw BaseException::Create("Interfaces are not valid");
+
+    	auto displayPtr = display.lock();
+
     	// 初始化IMGUI
     	IMGUI_CHECKVERSION();
     	ImGui::CreateContext();
-    	ImGui_ImplWin32_InitForOpenGL(display.GetHandle());
+    	ImGui_ImplWin32_InitForOpenGL(displayPtr->GetHandle());
     	ImGui_ImplOpenGL3_Init();
     	m_isInitialized = true;
 
         // 窗口程序插入ImGui处理输入事件的代码
-    	g_prevWndProc = reinterpret_cast<Win32Proc>(GetWindowLongPtrW(display.GetHandle(), GWLP_WNDPROC));
+    	g_prevWndProc = reinterpret_cast<Win32Proc>(GetWindowLongPtrW(displayPtr->GetHandle(), GWLP_WNDPROC));
     	if (!g_prevWndProc)
     		throw Win32Exception::Create("Failed to get window procedure");
     	SetLastError(0);
-	    if (SetWindowLongPtrW(display.GetHandle(), GWLP_WNDPROC, reinterpret_cast<LONG_PTR>(ImGuiWindowProc)) == 0
+	    if (SetWindowLongPtrW(displayPtr->GetHandle(), GWLP_WNDPROC, reinterpret_cast<LONG_PTR>(ImGuiWindowProc)) == 0
 	    	&& GetLastError() != 0)
 	    {
     		throw Win32Exception::Create("Failed to set window procedure");

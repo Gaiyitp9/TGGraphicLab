@@ -5,7 +5,7 @@
 *****************************************************************/
 #pragma once
 
-#include "Timer.h"
+#include "CommonInterfaces.h"
 #include <chrono>
 
 namespace TG

@@ -6,7 +6,7 @@
 #pragma once
 
 #include "Rendering/Renderer.h"
-#include "Base/Timer.h"
+#include "Base/CommonInterfaces.h"
 #include "Base/WindowBase.hpp"
 #include "DynamicGles.h"
 #include "Example.h"
@@ -17,7 +17,7 @@ namespace TG
     class OpenGLESRenderer final : public Renderer
     {
     public:
-        OpenGLESRenderer(const IDefaultVideoPort& videoPort, const ITimer& timer);
+        OpenGLESRenderer(const std::weak_ptr<IDefaultVideoPort>& videoPort, const std::weak_ptr<ITimer>& timer);
         ~OpenGLESRenderer() override;
 
         void Render() override;

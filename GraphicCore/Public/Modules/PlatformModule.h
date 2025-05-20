@@ -28,8 +28,8 @@ namespace TG
 
         [[nodiscard]] bool ShouldExit() const;
         [[nodiscard]] int ExitCode() const;
-        [[nodiscard]] const WindowBase& GetWindow() const { return m_mainWindow; }
-        [[nodiscard]] const ITimer& GetTimer() const { return m_timer; };
+        [[nodiscard]] std::weak_ptr<WindowBase> GetWindow() const { return m_mainWindow; }
+        [[nodiscard]] std::weak_ptr<ITimer> GetTimer() const { return m_timer; };
 
         // 鼠标事件委托
         MulticastDelegate<void(const Input::Event<Input::Mouse>&)> onMouseEvent;
@@ -42,10 +42,10 @@ namespace TG
         // 主显示器的尺寸
         int m_screenWidth{ 0 };
         int m_screenHeight{ 0 };
-        // 主窗口
-        MainWindow m_mainWindow;
-        std::optional<int> m_exitCode;
         // 高精度计时器
-        Chronometer m_timer;
+        std::shared_ptr<Chronometer> m_timer;
+        // 主窗口
+        std::shared_ptr<MainWindow> m_mainWindow;
+        std::optional<int> m_exitCode;
     };
 }

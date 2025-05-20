@@ -9,7 +9,7 @@
 
 namespace TG
 {
-    PlatformModule::PlatformModule() : m_mainWindow(0, 0, 1, 1, "天工渲染器")
+    PlatformModule::PlatformModule()
     {
         // 注：使用CRT library检测内存泄漏时，文件的行分隔符要设置为CRLF(\r\n)，否则_CrtSetDbgFlag函数不起作用
         // 开启内存泄漏检测
@@ -28,6 +28,7 @@ namespace TG
         // FILE* nullFile = nullptr;
         // freopen_s(&nullFile, "NUL", "w", stderr);
 
+        m_timer = std::make_shared<Chronometer>();
         // 打印日期
         LogInfo(Chronometer::Date());
 
@@ -35,11 +36,10 @@ namespace TG
         int windowHeight = m_screenHeight * 4 / 5;
         int windowPosX = windowWidth / 8;
         int windowPosY = windowHeight / 10;
-        m_mainWindow.SetPosition(windowPosX, windowPosY);
-        m_mainWindow.SetSize(windowWidth, windowHeight);
-        m_mainWindow.Show(true);
-        m_mainWindow.SetIcon("maple-leaf.ico");
-        m_mainWindow.SetKeyCallback(
+        m_mainWindow = std::make_shared<MainWindow>(windowPosX, windowPosY, windowWidth, windowHeight, "天工渲染器");
+        m_mainWindow->Show(true);
+        m_mainWindow->SetIcon("maple-leaf.ico");
+        m_mainWindow->SetKeyCallback(
             [&keyboardEventDelegate = onKeyboardEvent](Input::KeyCode key, int scanCode, Input::Action action) {
                 Input::Event<Input::Keyboard> event;
                 event.key = key;
@@ -48,12 +48,12 @@ namespace TG
                 keyboardEventDelegate.Broadcast(event);
             }
         );
-        m_mainWindow.SetCharCallback([&keyboardEventDelegate = onKeyboardEvent](char16_t c) {
+        m_mainWindow->SetCharCallback([&keyboardEventDelegate = onKeyboardEvent](char16_t c) {
             Input::Event<Input::Keyboard> event;
             event.c = c;
             keyboardEventDelegate.Broadcast(event);
         });
-        m_mainWindow.SetMouseButtonCallback(
+        m_mainWindow->SetMouseButtonCallback(
             [&mouseEventDelegate = onMouseEvent](Input::KeyCode mouseButton, Input::Action action) {
                 Input::Event<Input::Mouse> event;
                 event.key = mouseButton;
@@ -62,32 +62,32 @@ namespace TG
                 mouseEventDelegate.Broadcast(event);
             }
         );
-        m_mainWindow.SetScrollCallback([&mouseEventDelegate = onMouseEvent](int xOffset, int yOffset) {
+        m_mainWindow->SetScrollCallback([&mouseEventDelegate = onMouseEvent](int xOffset, int yOffset) {
             Input::Event<Input::Mouse> event;
             event.wheelDelta = static_cast<short>(yOffset);
             mouseEventDelegate.Broadcast(event);
         });
-        m_mainWindow.SetCursorPosCallback([&mouseEventDelegate = onMouseEvent](int posX, int posY) {
+        m_mainWindow->SetCursorPosCallback([&mouseEventDelegate = onMouseEvent](int posX, int posY) {
             Input::Event<Input::Mouse> event;
             event.x = static_cast<short>(posX);
             event.y = static_cast<short>(posY);
             mouseEventDelegate.Broadcast(event);
         });
-        m_mainWindow.SetWindowPosCallback([](int xPos, int yPos){});
-        m_mainWindow.SetWindowSizeCallback(
+        m_mainWindow->SetWindowPosCallback([](int xPos, int yPos){});
+        m_mainWindow->SetWindowSizeCallback(
             [&windowSizeDelegate = onWindowResize](unsigned int width, unsigned int height) {
                 windowSizeDelegate.Broadcast(width, height);
             }
         );
-        m_mainWindow.SetSuspendCallback([&timer = m_timer]{ timer.Pause(); });
-        m_mainWindow.SetResumeCallback([&timer = m_timer]{ timer.Start(); });
+        m_mainWindow->SetSuspendCallback([timer = m_timer]{ timer->Pause(); });
+        m_mainWindow->SetResumeCallback([timer = m_timer]{ timer->Start(); });
     }
 
     PlatformModule::~PlatformModule() = default;
 
     void PlatformModule::Update()
     {
-        m_timer.Tick();
+        m_timer->Tick();
     }
 
     void PlatformModule::PostUpdate()
@@ -97,7 +97,7 @@ namespace TG
 
     bool PlatformModule::ShouldExit() const
     {
-        return m_mainWindow.IsDestroyed();
+        return m_mainWindow->IsDestroyed();
     }
 
     int PlatformModule::ExitCode() const

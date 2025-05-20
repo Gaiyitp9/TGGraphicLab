@@ -15,7 +15,7 @@ namespace TG::Rendering
      * @param   eye     相机位置
      * @param   center  注视点
      * @param   worldUp 上方向
-     * @return 相机矩阵
+     * @returns 相机矩阵
      */
     template<typename Scalar>
     Math::Matrix4<Scalar> LookAt(const Math::Vector3<Scalar>& eye, const Math::Vector3<Scalar>& center,
@@ -51,7 +51,7 @@ namespace TG::Rendering
      * @param   aspect  长宽比
      * @param   zNear   近平面位置，数值大于0
      * @param   zFar    远平面位置，同上
-     * @return  透视投影矩阵
+     * @returns  透视投影矩阵
      */
     template<typename Scalar>
     Math::Matrix4<Scalar> Perspective(Scalar fov, Scalar aspect, Scalar zNear, Scalar zFar)
@@ -74,7 +74,7 @@ namespace TG::Rendering
      * @param   top     上边界
      * @param   zNear   近平面，数值大于0
      * @param   zFar    远平面
-     * @return  正交投影矩阵
+     * @returns  正交投影矩阵
      */
     template<typename Scalar>
     Math::Matrix4<Scalar> Orthographic(Scalar left, Scalar right, Scalar bottom, Scalar top, Scalar zNear, Scalar zFar)

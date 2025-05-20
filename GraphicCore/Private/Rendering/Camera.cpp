@@ -9,9 +9,15 @@
 
 namespace TG
 {
-    Camera::Camera(const IDefaultVideoPort& videoPort) : m_videoPort(videoPort)
+    Camera::Camera(const std::weak_ptr<IDefaultVideoPort>& videoPort, const std::weak_ptr<ITimer>& timer)
+        : m_videoPort(videoPort), m_timer(timer)
     {
-        m_aspectRatio = static_cast<float>(m_videoPort.Width()) / static_cast<float>(m_videoPort.Height());
+        if (m_videoPort.expired() || m_timer.expired())
+            throw BaseException::Create("Interfaces are not valid");
+
+        auto videoPortPtr = m_videoPort.lock();
+
+        m_aspectRatio = static_cast<float>(videoPortPtr->Width()) / static_cast<float>(videoPortPtr->Height());
     }
 
     Camera::~Camera() = default;

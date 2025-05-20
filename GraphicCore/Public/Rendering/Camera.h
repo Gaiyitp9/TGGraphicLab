@@ -6,7 +6,7 @@
 #pragma once
 
 #include "Math/Core.hpp"
-#include "Base/WindowBase.hpp"
+#include "Base/CommonInterfaces.h"
 
 namespace TG
 {
@@ -19,14 +19,17 @@ namespace TG
     class Camera
     {
     public:
-        Camera(const IDefaultVideoPort& videoPort);
+        Camera(const std::weak_ptr<IDefaultVideoPort>& videoPort, const std::weak_ptr<ITimer>& timer);
         ~Camera();
 
         [[nodiscard]] Math::Matrix4F ViewMatrix() const;
         [[nodiscard]] Math::Matrix4F ProjectionMatrix() const;
 
+
+
     private:
-        const IDefaultVideoPort& m_videoPort;
+        std::weak_ptr<IDefaultVideoPort> m_videoPort;
+        std::weak_ptr<ITimer> m_timer;
 
         CameraType m_cameraType{ CameraType::Perspective };
 

@@ -7,8 +7,7 @@
 
 #include "Example.h"
 #include "DynamicGles.h"
-#include "Base/Timer.h"
-#include "Base/WindowBase.hpp"
+#include "Base/CommonInterfaces.h"
 #include "Geometry/Mesh.h"
 #include "Rendering/Camera.h"
 #include "Shader.h"
@@ -19,13 +18,13 @@ namespace TG
     class CubeExample final : public Example
     {
     public:
-        explicit CubeExample(const IDefaultVideoPort& videoPort, const ITimer& timer);
+        CubeExample(const std::weak_ptr<IDefaultVideoPort>& videoPort, const std::weak_ptr<ITimer> &timer);
         ~CubeExample() override;
 
         void Render() override;
 
     private:
-        const ITimer& m_timer;
+        std::weak_ptr<ITimer> m_timer;
 
         Camera m_camera;
 

@@ -5,24 +5,12 @@
 *****************************************************************/
 #pragma once
 
-#include "Policy.h"
+#include "CommonInterfaces.h"
 
 namespace TG
 {
-    // 显示接口
-    template <typename NativePolicy>
-    struct IVideoPort
-    {
-        virtual ~IVideoPort() = default;
-
-        [[nodiscard]] virtual NativePolicy::WindowHandle GetHandle() const noexcept = 0;
-        [[nodiscard]] virtual NativePolicy::DeviceContext GetContext() const noexcept = 0;
-        [[nodiscard]] virtual int Width() const noexcept = 0;
-        [[nodiscard]] virtual int Height() const noexcept = 0;
-    };
-
     // 窗口基类
-    template <typename NativePolicy> requires IsValidNativePolicy<NativePolicy>
+    template <typename NativePolicy>
     class Window : NativePolicy::Window, public IVideoPort<NativePolicy>
     {
         using Super = NativePolicy::Window;
@@ -128,5 +116,4 @@ namespace TG
     };
 
     using WindowBase = Window<DefaultNativePolicy>;
-    using IDefaultVideoPort = IVideoPort<DefaultNativePolicy>;
 }

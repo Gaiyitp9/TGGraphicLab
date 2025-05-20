@@ -15,7 +15,7 @@
 
 namespace TG
 {
-    QuadExample::QuadExample(const ITimer& timer) : m_timer(timer),
+    QuadExample::QuadExample(const std::weak_ptr<ITimer>& timer) : m_timer(timer),
 		m_vertexShader("Shaders/GLSL/Quad.vert", ShaderStage::Vertex),
 		m_fragmentShader("Shaders/GLSL/Quad.frag", ShaderStage::Fragment),
 		m_geometryShader("Shaders/GLSL/Wireframe.geom", ShaderStage::Geometry)
@@ -124,14 +124,17 @@ namespace TG
     	else
     		glUseProgramStages(m_pipeline, GL_GEOMETRY_SHADER_BIT, 0);
 
-    	const float timeValue = m_timer.GetTime() * 0.001f;
-    	const float greyValue = std::sin(timeValue) * 0.5f + 0.5f;
-    	m_fragmentShader.SetFloat4("ourColor", greyValue, greyValue, greyValue, 1.0f);
+    	if (auto timerPtr = m_timer.lock())
+    	{
+    		const float timeValue = timerPtr->GetTime() * 0.001f;
+    		const float greyValue = std::sin(timeValue) * 0.5f + 0.5f;
+    		m_fragmentShader.SetFloat4("ourColor", greyValue, greyValue, greyValue, 1.0f);
 
-    	Math::Transform<float, 3> transform;
-    	transform.Translate(Math::Vector3F{ 0.5f, -0.5f, 0.0f });
-    	transform.Rotate(Math::AngleAxis{ timeValue, Math::Vector3F{ 0.0f, 0.0f, 1.0f }});
-    	m_vertexShader.SetMat4("transform", transform.ToTransformMatrix());
+    		Math::Transform<float, 3> transform;
+    		transform.Translate(Math::Vector3F{ 0.5f, -0.5f, 0.0f });
+    		transform.Rotate(Math::AngleAxis{ timeValue, Math::Vector3F{ 0.0f, 0.0f, 1.0f }});
+    		m_vertexShader.SetMat4("transform", transform.ToTransformMatrix());
+    	}
 
     	glActiveTexture(GL_TEXTURE0);
     	glBindTexture(GL_TEXTURE_2D, m_albedo[0]);

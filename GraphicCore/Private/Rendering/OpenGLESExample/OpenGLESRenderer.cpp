@@ -12,13 +12,18 @@
 #include "CubeExample.h"
 #include <regex>
 
-
 namespace TG
 {
-    OpenGLESRenderer::OpenGLESRenderer(const IDefaultVideoPort& videoPort, const ITimer& timer)
+    OpenGLESRenderer::OpenGLESRenderer(const std::weak_ptr<IDefaultVideoPort>& videoPort,
+    	const std::weak_ptr<ITimer>& timer)
     {
+    	if (videoPort.expired() || timer.expired())
+    		throw BaseException::Create("Interfaces are not valid");
+
+    	auto videoPortPtr = videoPort.lock();
+
         // 创建EGLDisplay并初始化
-        m_eglDisplay = eglGetDisplay(videoPort.GetContext());
+        m_eglDisplay = eglGetDisplay(videoPortPtr->GetContext());
         if (m_eglDisplay == EGL_NO_DISPLAY)
             m_eglDisplay = eglGetDisplay(EGL_DEFAULT_DISPLAY);
         if (m_eglDisplay == EGL_NO_DISPLAY)
@@ -57,7 +62,7 @@ namespace TG
         if (eglChooseConfig(m_eglDisplay, configurationAttributes, &eglConfig, 1, &numConfigs) == EGL_FALSE)
         	throw EGLException::Create("Failed to choose EGLConfig");
 
-        m_eglSurface = eglCreateWindowSurface(m_eglDisplay, eglConfig, videoPort.GetHandle(), nullptr);
+        m_eglSurface = eglCreateWindowSurface(m_eglDisplay, eglConfig, videoPortPtr->GetHandle(), nullptr);
         if (m_eglSurface == EGL_NO_SURFACE)
         	throw EGLException::Create("Failed to create EGLSurface");
     	m_createSurface = true;
