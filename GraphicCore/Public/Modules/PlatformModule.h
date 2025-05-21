@@ -9,7 +9,6 @@
 #include "Base/MainWindow.h"
 #include "Base/Chronometer.h"
 #include "Input/Event.h"
-#include "Base/Delegate.hpp"
 
 namespace TG
 {

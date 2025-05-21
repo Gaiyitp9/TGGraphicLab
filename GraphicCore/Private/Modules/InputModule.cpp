@@ -5,24 +5,35 @@
 *****************************************************************/
 
 #include "Modules/InputModule.h"
+#include "Input/Devices.h"
 
 namespace TG
 {
-    InputModule::InputModule() = default;
+    InputModule::InputModule()
+    {
+        m_mouse = std::make_shared<Input::Mouse>();
+        m_keyboard = std::make_shared<Input::Keyboard>();
+        Input::Devices::Self().m_mouse = m_mouse;
+        Input::Devices::Self().m_keyboard = m_keyboard;
+    }
 
     InputModule::~InputModule() = default;
 
     void InputModule::Subscribe(MulticastDelegate<void(const Input::Event<Input::Mouse>&)>& mouseEventDelegate)
     {
-        mouseEventDelegate.Add([&mouse = m_mouse](const Input::Event<Input::Mouse>& event) {
-            mouse.Handle(event);
+        std::weak_ptr mouse(m_mouse);
+        mouseEventDelegate.Add([mouse](const Input::Event<Input::Mouse>& event) {
+            if (auto mousePtr = mouse.lock())
+                mousePtr->Handle(event);
         });
     }
 
     void InputModule::Subscribe(MulticastDelegate<void(const Input::Event<Input::Keyboard>&)>& keyboardEventDelegate)
     {
-        keyboardEventDelegate.Add([&keyboard = m_keyboard](const Input::Event<Input::Keyboard>& event) {
-            keyboard.Handle(event);
+        std::weak_ptr keyboard(m_keyboard);
+        keyboardEventDelegate.Add([keyboard](const Input::Event<Input::Keyboard>& event) {
+            if (auto keyboardPtr = keyboard.lock())
+                keyboardPtr->Handle(event);
         });
     }
 
@@ -33,22 +44,7 @@ namespace TG
 
     void InputModule::PostUpdate()
     {
-        m_mouse.Update();
-        m_keyboard.Update();
-    }
-
-    bool InputModule::GetKey(Input::KeyCode key) const
-    {
-        return m_mouse.GetKey(key) || m_keyboard.GetKey(key);
-    }
-
-    bool InputModule::GetKeyDown(Input::KeyCode key) const
-    {
-        return m_mouse.GetKeyDown(key) || m_keyboard.GetKeyDown(key);
-    }
-
-    bool InputModule::GetKeyUp(Input::KeyCode key) const
-    {
-        return m_mouse.GetKeyUp(key) || m_keyboard.GetKeyUp(key);
+        m_mouse->Update();
+        m_keyboard->Update();
     }
 }

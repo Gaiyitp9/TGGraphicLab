@@ -9,13 +9,11 @@
 
 namespace TG::Rendering
 {
-    // 相机矩阵。从世界空间变换到相机空间，世界空间和相机空间使用右手坐标系
     /**
-     * @tparam  Scalar  矩阵元素类型
-     * @param   eye     相机位置
-     * @param   center  注视点
-     * @param   worldUp 上方向
-     * @returns 相机矩阵
+     * \brief 计算相机矩阵。从世界空间变换到相机空间，世界空间和相机空间使用右手坐标系
+     * \param eye     相机位置
+     * \param center  注视点
+     * \param worldUp 上方向
      */
     template<typename Scalar>
     Math::Matrix4<Scalar> LookAt(const Math::Vector3<Scalar>& eye, const Math::Vector3<Scalar>& center,
@@ -43,15 +41,12 @@ namespace TG::Rendering
         return view;
     }
 
-    // 投影矩阵。从相机空间变换到裁剪空间，xyz坐标范围在[-1, 1]
-    // 裁剪空间使用左手坐标系
     /**
-     * @tparam  Scalar  矩阵元素类型
-     * @param   fov     相机视角(field of view)，这里使用的是垂直fov
-     * @param   aspect  长宽比
-     * @param   zNear   近平面位置，数值大于0
-     * @param   zFar    远平面位置，同上
-     * @returns  透视投影矩阵
+     * \brief 透视投影矩阵。从相机空间变换到裁剪空间，xyz坐标范围在[-1, 1]，裁剪空间使用左手坐标系
+     * \param fov     相机视角(field of view)，这里使用的是垂直fov
+     * \param aspect  长宽比
+     * \param zNear   近平面位置，数值大于0
+     * \param zFar    远平面位置，同上
      */
     template<typename Scalar>
     Math::Matrix4<Scalar> Perspective(Scalar fov, Scalar aspect, Scalar zNear, Scalar zFar)
@@ -67,14 +62,13 @@ namespace TG::Rendering
     }
 
     /**
-     * @tparam  Scalar  矩阵元素类型
-     * @param   left    左边界
-     * @param   right   右边界
-     * @param   bottom  下边界
-     * @param   top     上边界
-     * @param   zNear   近平面，数值大于0
-     * @param   zFar    远平面
-     * @returns  正交投影矩阵
+     * \brief 正交投影矩阵，与透视投影矩阵类似
+     * \param left    左边界
+     * \param right   右边界
+     * \param bottom  下边界
+     * \param top     上边界
+     * \param zNear   近平面，数值大于0
+     * \param zFar    远平面
      */
     template<typename Scalar>
     Math::Matrix4<Scalar> Orthographic(Scalar left, Scalar right, Scalar bottom, Scalar top, Scalar zNear, Scalar zFar)

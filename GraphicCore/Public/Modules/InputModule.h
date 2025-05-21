@@ -28,12 +28,8 @@ namespace TG
         void Update() override;
         void PostUpdate() override;
 
-        [[nodiscard]] bool GetKey(Input::KeyCode key) const;
-        [[nodiscard]] bool GetKeyDown(Input::KeyCode key) const;
-        [[nodiscard]] bool GetKeyUp(Input::KeyCode key) const;
-
     private:
-        Input::Mouse m_mouse;
-        Input::Keyboard m_keyboard;
+        std::shared_ptr<Input::Mouse> m_mouse;
+        std::shared_ptr<Input::Keyboard> m_keyboard;
     };
 }

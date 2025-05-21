@@ -15,7 +15,7 @@
 namespace TG
 {
     CubeExample::CubeExample(const std::weak_ptr<IDefaultVideoPort>& videoPort, const std::weak_ptr<ITimer>& timer)
-        : m_timer(timer), m_camera(videoPort, timer),
+        : m_camera(videoPort, timer),
         m_vertexShader("Shaders/GLSL/Cube.vert", ShaderStage::Vertex),
         m_fragmentShader("Shaders/GLSL/Cube.frag", ShaderStage::Fragment),
         m_geometryShader("Shaders/GLSL/Wireframe.geom", ShaderStage::Geometry)
@@ -81,6 +81,8 @@ namespace TG
 
     void CubeExample::Render()
     {
+        m_camera.Update();
+
         Color::Color clearColor = Color::AliceBlue;
 
         glClearColor(clearColor.R(), clearColor.G(), clearColor.B(), clearColor.A());

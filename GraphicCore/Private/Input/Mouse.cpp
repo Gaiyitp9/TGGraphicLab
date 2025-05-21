@@ -12,6 +12,7 @@ namespace TG::Input
 	{
 		m_mouseDown.reset();
 		m_mouseUp.reset();
+		m_wheelDelta = 0;
 	}
 
     void Mouse::Handle(const Event<Mouse>& event)
@@ -34,7 +35,7 @@ namespace TG::Input
 
 		m_positionX = event.x;
 		m_positionY = event.y;
-		m_wheelDelta = event.wheelDelta;
+		m_wheelDelta += event.wheelDelta;
     }
 
     bool Mouse::GetKey(KeyCode key) const

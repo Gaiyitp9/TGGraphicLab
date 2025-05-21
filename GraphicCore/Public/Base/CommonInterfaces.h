@@ -28,6 +28,20 @@ namespace TG
     {
         virtual ~ITimer() = default;
 
-        [[nodiscard]] virtual float GetTime() const = 0;
+        [[nodiscard]] virtual float TotalTime() const = 0;
+        [[nodiscard]] virtual float DeltaTime() const = 0;
+    };
+
+    // 输入接口
+    struct IInput
+    {
+        virtual ~IInput() = default;
+
+        [[nodiscard]] virtual bool GetKey(Input::KeyCode key) const = 0;
+        [[nodiscard]] virtual bool GetKeyDown(Input::KeyCode key) const = 0;
+        [[nodiscard]] virtual bool GetKeyUp(Input::KeyCode key) const = 0;
+        [[nodiscard]] virtual short MousePositionX() const = 0;
+        [[nodiscard]] virtual short MousePositionY() const = 0;
+        [[nodiscard]] virtual short MouseWheelDelta() const = 0;
     };
 }

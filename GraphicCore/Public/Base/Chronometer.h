@@ -23,10 +23,8 @@ namespace TG
 
 		static std::string Date();	// 当前时区的日期和时间
 
-		[[nodiscard]] float DeltaTime() const;
-		[[nodiscard]] float TotalTime() const;
-
-		[[nodiscard]] float GetTime() const override { return TotalTime(); }
+		[[nodiscard]] float DeltaTime() const override;
+		[[nodiscard]] float TotalTime() const override;
 
 		void Reset();
 		void Pause();

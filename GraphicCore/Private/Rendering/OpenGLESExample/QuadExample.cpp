@@ -126,7 +126,7 @@ namespace TG
 
     	if (auto timerPtr = m_timer.lock())
     	{
-    		const float timeValue = timerPtr->GetTime() * 0.001f;
+    		const float timeValue = timerPtr->TotalTime() * 0.001f;
     		const float greyValue = std::sin(timeValue) * 0.5f + 0.5f;
     		m_fragmentShader.SetFloat4("ourColor", greyValue, greyValue, greyValue, 1.0f);
 

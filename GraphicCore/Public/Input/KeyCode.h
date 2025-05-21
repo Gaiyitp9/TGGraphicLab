@@ -7,7 +7,6 @@
 
 namespace TG::Input
 {
-	// 按键枚举
     enum class KeyCode : unsigned char
     {
         None,

@@ -17,7 +17,7 @@ namespace TG
     {
     public:
         Win32Window(int x, int y, int width, int height, std::string_view name, WindowType type);
-        ~Win32Window();
+        virtual ~Win32Window();
 
         // 轮询输入事件，需要每帧调用
         static std::optional<int> PollEvents();

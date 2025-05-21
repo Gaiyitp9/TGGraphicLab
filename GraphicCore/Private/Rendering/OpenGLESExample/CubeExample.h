@@ -24,8 +24,6 @@ namespace TG
         void Render() override;
 
     private:
-        std::weak_ptr<ITimer> m_timer;
-
         Camera m_camera;
 
         Geometry::Mesh m_cubeMesh;
