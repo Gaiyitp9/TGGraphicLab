@@ -22,19 +22,20 @@ namespace TG
 
     Math::Matrix4F Camera::ProjectionMatrix() const
     {
+        auto videoPortPtr = m_videoPort.lock();
+        float aspectRatio = static_cast<float>(videoPortPtr->Width()) /
+            static_cast<float>(videoPortPtr->Height());
         switch (m_cameraType)
         {
             case CameraType::Perspective:
-            {
-                auto videoPortPtr = m_videoPort.lock();
-                float aspectRatio = static_cast<float>(videoPortPtr->Width()) /
-                    static_cast<float>(videoPortPtr->Height());
                 return Rendering::Perspective(m_fov * Math::Deg2RadF, aspectRatio, m_nearPlane, m_farPlane);
-            }
 
             case CameraType::Orthographic:
-                return Math::Matrix4F::Identity();
-                // return Rendering::Orthographic();
+            {
+                float orthoHeight = m_orthoWidth / aspectRatio;
+                return Rendering::Orthographic(-m_orthoWidth, m_orthoWidth, -orthoHeight, orthoHeight,
+                    m_nearPlane, m_farPlane);
+            }
 
             default:
                 return Math::Matrix4F::Identity();
@@ -49,17 +50,17 @@ namespace TG
         auto timer = m_timer.lock();
         float velocity = m_moveSpeed * timer->DeltaTime() * 0.001f;
         if (Input::GetKey(Input::KeyCode::W))
-            m_position = m_position + velocity * m_front;
+            m_position += velocity * m_front;
         if (Input::GetKey(Input::KeyCode::S))
-            m_position = m_position - velocity * m_front;
+            m_position -= velocity * m_front;
         if (Input::GetKey(Input::KeyCode::A))
-            m_position = m_position - velocity * m_right;
+            m_position -= velocity * m_right;
         if (Input::GetKey(Input::KeyCode::D))
-            m_position = m_position + velocity * m_right;
+            m_position += velocity * m_right;
         if (Input::GetKey(Input::KeyCode::Q))
-            m_position = m_position - velocity * m_worldUp;
+            m_position -= velocity * m_worldUp;
         if (Input::GetKey(Input::KeyCode::E))
-            m_position = m_position + velocity * m_worldUp;
+            m_position += velocity * m_worldUp;
 
         if (Input::GetKeyDown(Input::KeyCode::RightMouseButton))
         {
@@ -81,6 +82,7 @@ namespace TG
         }
 
         m_fov = std::clamp(m_fov - static_cast<float>(Input::MouseWheelDelta()), 1.0f, 45.0f);
+        m_orthoWidth = std::clamp(m_orthoWidth - static_cast<float>(Input::MouseWheelDelta()) * 0.1f, 0.2f, 20.0f);
     }
 
     void Camera::UpdateCameraVectors()

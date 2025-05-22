@@ -53,6 +53,20 @@ namespace TG::Math
         }
 
         template<typename OtherDerived>
+        Derived& operator+=(const MatrixBase<OtherDerived>& other)
+        {
+            CallAssignment(this->Expression(), other.Expression(), AddAssignOp<Scalar>());
+            return Expression();
+        }
+
+        template<typename OtherDerived>
+        Derived& operator-=(const MatrixBase<OtherDerived>& other)
+        {
+            CallAssignment(this->Expression(), other.Expression(), SubtractAssignOp<Scalar>());
+            return Expression();
+        }
+
+        template<typename OtherDerived>
         CWiseBinaryOp<ScalarDivideOp<Scalar>, Derived, OtherDerived>
             operator/(const MatrixBase<OtherDerived>& other) const
         {
@@ -83,6 +97,19 @@ namespace TG::Math
             operator*(const MatrixBase<OtherDerived>& other) const
         {
             return { Expression(), other.Expression() };
+        }
+
+        template<typename OtherDerived>
+        Derived& operator*=(const MatrixBase<OtherDerived>& other)
+        {
+            Expression() = Expression() * other.Expression();
+            return Expression();
+        }
+
+        Derived& operator*=(Scalar scalar)
+        {
+            Expression() = Expression() * scalar;
+            return Expression();
         }
 
         template<typename OtherDerived>

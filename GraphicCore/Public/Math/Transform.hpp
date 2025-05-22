@@ -44,14 +44,14 @@ namespace TG::Math
         template<typename Derived>
         Transform& Translate(const MatrixBase<Derived>& translation)
         {
-            TranslationExt() = TranslationExt() + LinearExt() * translation;
+            TranslationExt() += LinearExt() * translation;
             return *this;
         }
 
         template<typename Derived>
         Transform& Rotate(const RotationBase<Derived, 3>& rotation)
         {
-            LinearExt() = LinearExt() * rotation.ToRotationMatrix();
+            LinearExt() *= rotation.ToRotationMatrix();
             return *this;
         }
 

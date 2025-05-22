@@ -140,6 +140,10 @@ namespace TG::Math
     template<typename Scalar> struct ScalarSubtractOp;
     template<typename Scalar> struct ScalarProductOp;
     template<typename Scalar> struct ScalarDivideOp;
+    // 复制运算
+    template<typename Scalar, typename Functor> struct CompoundAssignOp;
+    template<typename Scalar> struct AddAssignOp;
+    template<typename Scalar> struct SubtractAssignOp;
     // 矩阵乘法表达式
     template<typename LhsXpr, typename RhsXpr, ProductType Type>
     class Product;

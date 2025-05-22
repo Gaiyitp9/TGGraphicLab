@@ -95,6 +95,19 @@ namespace TG::Math
         [[nodiscard]] Scalar operator()(Scalar a, Scalar b) const { return a / b; }
     };
 
+    template<typename Scalar, typename Functor>
+    struct CompoundAssignOp
+    {
+        void operator()(Scalar& a, Scalar b)
+        {
+            AssignOp<Scalar>()(a, Functor()(a, b));
+        }
+    };
+    template<typename Scalar>
+    struct AddAssignOp : CompoundAssignOp<Scalar, ScalarAddOp<Scalar>> {};
+    template<typename Scalar>
+    struct SubtractAssignOp : CompoundAssignOp<Scalar, ScalarSubtractOp<Scalar>> {};
+
     // 常量左乘矩阵
     template<typename Derived> requires std::derived_from<Derived, MatrixBase<Derived>>
     CWiseBinaryOp<ScalarProductOp<typename Traits<Derived>::Scalar>, Derived,

@@ -13,6 +13,7 @@ namespace TG::Math
     {
         void operator()(Scalar& a, Scalar b) const { a = b; }
     };
+
     // 赋值运算算法，全部封装在一个类中，方便管理
     template<typename Dst, typename Src, typename AssignFunctor>
     class Assignment

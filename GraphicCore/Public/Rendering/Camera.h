@@ -39,6 +39,8 @@ namespace TG
         float m_nearPlane{ 0.1f };
         float m_farPlane{ 100.0f };
 
+        float m_orthoWidth{ 3.0f };
+
         Math::Vector3F m_position{ 0.0f, 0.0f, 3.0f };
         Math::Vector3F m_front{ 0.0f, 0.0f, -1.0f };
         Math::Vector3F m_right{ 1.0f, 0.0f, 0.0f };

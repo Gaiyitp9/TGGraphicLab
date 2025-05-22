@@ -501,7 +501,11 @@ namespace TG
 	        {
 				// 每帧只会产生一个WM_MOUSEWHEEL
 				pWindow->m_scrollDelegate.ExecuteIfBound(0, GET_WHEEL_DELTA_WPARAM(wParam) / WHEEL_DELTA);
-				pWindow->m_cursorPosDelegate.ExecuteIfBound(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+				POINT pt;
+				pt.x = GET_X_LPARAM(lParam);
+				pt.y = GET_Y_LPARAM(lParam);
+				ScreenToClient(hwnd, &pt);
+				pWindow->m_cursorPosDelegate.ExecuteIfBound(pt.x, pt.y);
 				return 0;
 	        }
 
