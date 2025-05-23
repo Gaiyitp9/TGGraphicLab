@@ -5,6 +5,8 @@
 *****************************************************************/
 #pragma once
 
+#include "Mesh.h"
+
 namespace TG::Geometry
 {
     class Plane
@@ -13,9 +15,11 @@ namespace TG::Geometry
         Plane();
 
     private:
+        Mesh m_mesh;
+
         float m_width;
         float m_height;
-        int m_rows;
-        int m_columns;
+        unsigned int m_rows;
+        unsigned int m_columns;
     };
 }

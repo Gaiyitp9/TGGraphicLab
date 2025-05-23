@@ -10,7 +10,6 @@
 #include "Rendering/ViewProjectionMatrix.hpp"
 #include "imgui_impl_opengl3.h"
 #include "imgui_impl_win32.h"
-#include "glm/ext/matrix_transform.hpp"
 
 namespace TG
 {
@@ -83,7 +82,7 @@ namespace TG
     {
         m_camera.Update();
 
-        Color::Color clearColor = Color::AliceBlue;
+        Color::Color clearColor = Color::DimGray;
 
         glClearColor(clearColor.R(), clearColor.G(), clearColor.B(), clearColor.A());
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);

@@ -22,8 +22,8 @@ namespace TG
 
     Math::Matrix4F Camera::ProjectionMatrix() const
     {
-        auto videoPortPtr = m_videoPort.lock();
-        float aspectRatio = static_cast<float>(videoPortPtr->Width()) /
+        const auto videoPortPtr = m_videoPort.lock();
+        const float aspectRatio = static_cast<float>(videoPortPtr->Width()) /
             static_cast<float>(videoPortPtr->Height());
         switch (m_cameraType)
         {
@@ -81,8 +81,10 @@ namespace TG
             UpdateCameraVectors();
         }
 
-        m_fov = std::clamp(m_fov - static_cast<float>(Input::MouseWheelDelta()), 1.0f, 45.0f);
+        m_fov = std::clamp(m_fov - static_cast<float>(Input::MouseWheelDelta()), 1.0f, 80.0f);
         m_orthoWidth = std::clamp(m_orthoWidth - static_cast<float>(Input::MouseWheelDelta()) * 0.1f, 0.2f, 20.0f);
+
+
     }
 
     void Camera::UpdateCameraVectors()

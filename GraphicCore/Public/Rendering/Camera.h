@@ -7,6 +7,7 @@
 
 #include "Math/Core.hpp"
 #include "Base/CommonInterfaces.h"
+#include "DynamicGles.h"
 
 namespace TG
 {
@@ -53,5 +54,12 @@ namespace TG
 
         float m_moveSpeed{ 2.5f };
         float m_mouseSensitivity{ 0.1f };
+
+        GLuint m_VAO{ 0 };
+        GLuint m_VBO{ 0 };
+        GLuint m_pipeline{};
+        // Shader m_vertexShader;
+        // Shader m_fragmentShader;
+        // Shader m_geometryShader;
     };
 }
