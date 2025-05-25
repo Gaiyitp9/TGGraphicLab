@@ -6,7 +6,7 @@
 
 #include "Modules/RenderModule.h"
 #include "Rendering/OpenGLESExample/OpenGLESRenderer.h"
-// #include "Rendering/VulkanSample/VulkanRenderer.h"
+// #include "Rendering/VulkanExample/VulkanRenderer.h"
 
 namespace TG
 {

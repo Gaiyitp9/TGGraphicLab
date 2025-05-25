@@ -14,12 +14,16 @@
 
 namespace TG
 {
-    VulkanRenderer::VulkanRenderer(const IDefaultVideoPort& videoPort)
+    VulkanRenderer::VulkanRenderer(const std::weak_ptr<IDefaultVideoPort>& videoPort)
     {
+        if (videoPort.expired())
+            throw BaseException::Create("Interfaces are not valid");
+        auto videoPortPtr = videoPort.lock();
+
         CheckLayerAndExtension();
         CreateInstance();
         SetupDebugMessenger();
-        CreateSurface(videoPort.GetHandle());
+        CreateSurface(videoPortPtr->GetHandle());
         SelectPhysicalDevice();
         CreateLogicalDevice();
         CreateSwapChain();

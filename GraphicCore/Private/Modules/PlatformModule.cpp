@@ -38,7 +38,6 @@ namespace TG
         int windowPosY = windowHeight / 10;
         m_mainWindow = std::make_shared<MainWindow>(windowPosX, windowPosY, windowWidth, windowHeight, "天工渲染器");
         m_mainWindow->Show(true);
-        m_mainWindow->SetIcon("maple-leaf.ico");
         m_mainWindow->SetKeyCallback(
             [&keyboardEventDelegate = onKeyboardEvent](Input::KeyCode key, int scanCode, Input::Action action) {
                 Input::Event<Input::Keyboard> event;

@@ -7,7 +7,6 @@
 
 #include "Rendering/Renderer.h"
 #include "Base/CommonInterfaces.h"
-#include "Base/WindowBase.hpp"
 #include "DynamicGles.h"
 #include "Example.h"
 #include <memory>

@@ -573,6 +573,9 @@ namespace TG
     // 注册窗口类
     static char RegisterWindow()
     {
+		HANDLE icon = LoadImageW(nullptr, L"maple-leaf.ico", IMAGE_ICON, 0, 0,
+			LR_DEFAULTSIZE | LR_LOADFROMFILE);
+
         WNDCLASSEXW wc = {};
         wc.cbSize = sizeof(WNDCLASSEX);
         wc.style = CS_OWNDC;
@@ -580,10 +583,10 @@ namespace TG
         wc.cbClsExtra = 0;
         wc.cbWndExtra = 0;
         wc.hInstance = nullptr;
-        wc.hIcon = nullptr;
+        wc.hIcon = static_cast<HICON>(icon);
         wc.hCursor = LoadCursor(nullptr, IDC_ARROW);
         wc.hbrBackground = static_cast<HBRUSH>(GetStockObject(BLACK_BRUSH));
-        wc.hIconSm = nullptr;
+        wc.hIconSm = static_cast<HICON>(icon);
         wc.lpszMenuName = nullptr;
         wc.lpszClassName = L"Default";
         if (RegisterClassExW(&wc) == 0)

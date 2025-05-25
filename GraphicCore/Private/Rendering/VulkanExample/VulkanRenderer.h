@@ -6,7 +6,7 @@
 #pragma once
 
 #include "Rendering/Renderer.h"
-#include "Base/WindowBase.hpp"
+#include "Base/CommonInterfaces.h"
 #include "vulkan/vulkan.h"
 
 namespace TG
@@ -22,7 +22,7 @@ namespace TG
     class VulkanRenderer final : public Renderer
     {
     public:
-        explicit VulkanRenderer(const IDefaultVideoPort& videoPort);
+        explicit VulkanRenderer(const std::weak_ptr<IDefaultVideoPort>& videoPort);
         ~VulkanRenderer() override;
 
         void Render() override;
