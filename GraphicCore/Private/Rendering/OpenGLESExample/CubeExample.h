@@ -5,13 +5,13 @@
 *****************************************************************/
 #pragma once
 
-#include "Example.h"
-#include "DynamicGles.h"
+#include "../Example.h"
 #include "Base/CommonInterfaces.h"
 #include "Geometry/Mesh.h"
 #include "Rendering/Camera.h"
 #include "Shader.h"
 #include "Texture2D.h"
+#include "ViewportGrid.h"
 
 namespace TG
 {
@@ -38,5 +38,7 @@ namespace TG
         Shader m_fragmentShader;
         Shader m_geometryShader;
         Texture2D m_textures[2]{};
+
+        // ViewportGrid m_viewportGrid;
     };
 }

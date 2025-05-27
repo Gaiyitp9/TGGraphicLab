@@ -4,9 +4,9 @@
 * This code is licensed under the MIT License (MIT).			*
 *****************************************************************/
 
-#include "Rendering/OpenGLESExample/OpenGLESRenderer.h"
+#include "OpenGLESRenderer.h"
 #include "Exception/EGLException.h"
-#include "Exception/OpenGLException.h"
+#include "Exception/OpenGLESException.h"
 #include "Diagnostic/Log.hpp"
 #include "QuadExample.h"
 #include "CubeExample.h"
@@ -88,19 +88,19 @@ namespace TG
     	// 查询OpenGL ES相关信息
     	auto glVersion = reinterpret_cast<char const*>(glGetString(GL_VERSION));
     	if (glVersion == nullptr)
-    		throw OpenGLException::Create("Failed to get OpenGL ES version");
+    		throw OpenGLESException::Create("Failed to get OpenGL ES version");
     	LogInfo("OpenGL version: {}", glVersion);
     	auto glVendor = reinterpret_cast<char const*>(glGetString(GL_VENDOR));
     	if (glVendor == nullptr)
-    		throw OpenGLException::Create("Failed to get OpenGL ES vendor");
+    		throw OpenGLESException::Create("Failed to get OpenGL ES vendor");
     	LogInfo("Company for the OpenGL implementation: {} ", glVendor);
     	auto glRenderer = reinterpret_cast<char const*>(glGetString(GL_RENDERER));
     	if (glRenderer == nullptr)
-    		throw OpenGLException::Create("Failed to get OpenGL ES renderer");
+    		throw OpenGLESException::Create("Failed to get OpenGL ES renderer");
     	LogInfo("Name of the OpenGL renderer: {}", glRenderer);
     	auto glShadingLanguageVersion = reinterpret_cast<char const*>(glGetString(GL_SHADING_LANGUAGE_VERSION));
     	if (glShadingLanguageVersion == nullptr)
-    		throw OpenGLException::Create("Failed to get OpenGL ES shading language version");
+    		throw OpenGLESException::Create("Failed to get OpenGL ES shading language version");
     	LogInfo("Shading language version: {}", glShadingLanguageVersion);
     	GLint maxAttribs = 0;
     	glGetIntegerv(GL_MAX_VERTEX_ATTRIBS, &maxAttribs);
@@ -123,11 +123,17 @@ namespace TG
     	GLint maxComputeTextureImageUnits = 0;
     	glGetIntegerv(GL_MAX_COMPUTE_TEXTURE_IMAGE_UNITS, &maxComputeTextureImageUnits);
     	LogInfo("Max compute texture image units: {}", maxComputeTextureImageUnits);
+    	GLint maxUniformLocations = 0;
+    	glGetIntegerv(GL_MAX_UNIFORM_LOCATIONS, &maxUniformLocations);
+    	LogInfo("Max uniform locations: {}", maxUniformLocations);
+    	GLint maxVerticesOut;
+    	glGetIntegerv(GL_MAX_GEOMETRY_OUTPUT_VERTICES, &maxVerticesOut);
+    	LogInfo("Max geometry output vertices: {}", maxVerticesOut);
 
     	// 正面朝向设置为顺时针
     	// glFrontFace(GL_CW);
 
-    	// m_example = std::make_unique<QuadExample>(timer);
+    	// m_example = std::make_unique<QuadExample>(videoPort, timer);
     	m_example = std::make_unique<CubeExample>(videoPort, timer);
     }
 

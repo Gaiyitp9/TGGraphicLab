@@ -22,6 +22,9 @@ namespace TG
 
     Math::Matrix4F Camera::ProjectionMatrix() const
     {
+        if (m_videoPort.expired())
+            return Math::Matrix4F::Identity();
+
         const auto videoPortPtr = m_videoPort.lock();
         const float aspectRatio = static_cast<float>(videoPortPtr->Width()) /
             static_cast<float>(videoPortPtr->Height());
@@ -40,6 +43,33 @@ namespace TG
             default:
                 return Math::Matrix4F::Identity();
         }
+    }
+
+    Frustum Camera::ViewFrustum() const
+    {
+        if (m_videoPort.expired())
+            return {};
+        const auto videoPortPtr = m_videoPort.lock();
+        const float aspectRatio = static_cast<float>(videoPortPtr->Width()) /
+            static_cast<float>(videoPortPtr->Height());
+        Math::Vector3F nearFront = m_front.Normalized() * m_nearPlane;
+        Math::Vector3F nearUp = m_nearPlane * std::tan(m_fov * Math::Deg2RadF * 0.5f) * m_up;
+        Math::Vector3F nearRight = nearUp.Norm() * aspectRatio * m_right;
+        Math::Vector3F farFront = m_front.Normalized() * m_farPlane;
+        Math::Vector3F farUp = m_farPlane * std::tan(m_fov * Math::Deg2RadF * 0.5f) * m_up;
+        Math::Vector3F farRight = farUp.Norm() * aspectRatio * m_right;
+
+        Frustum frustum;
+        frustum.corners[0] = m_position + nearFront - nearRight - nearUp;
+        frustum.corners[1] = m_position + nearFront + nearRight - nearUp;
+        frustum.corners[2] = m_position + nearFront + nearRight + nearUp;
+        frustum.corners[3] = m_position + nearFront - nearRight + nearUp;
+        frustum.corners[4] = m_position + farFront - farRight - farUp;
+        frustum.corners[5] = m_position + farFront - farRight + farUp;
+        frustum.corners[6] = m_position + farFront + farRight + farUp;
+        frustum.corners[7] = m_position + farFront - farRight + farUp;
+
+        return frustum;
     }
 
     void Camera::Update()
@@ -83,8 +113,6 @@ namespace TG
 
         m_fov = std::clamp(m_fov - static_cast<float>(Input::MouseWheelDelta()), 1.0f, 80.0f);
         m_orthoWidth = std::clamp(m_orthoWidth - static_cast<float>(Input::MouseWheelDelta()) * 0.1f, 0.2f, 20.0f);
-
-
     }
 
     void Camera::UpdateCameraVectors()
@@ -93,5 +121,6 @@ namespace TG
         m_front.Y() = std::sin(m_pitch * Math::Deg2RadF);
         m_front.Z() = -std::cos(m_pitch * Math::Deg2RadF) * std::cos(m_yaw * Math::Deg2RadF);
         m_right = m_front.Cross(m_worldUp);
+        m_up = m_right.Cross(m_front);
     }
 }

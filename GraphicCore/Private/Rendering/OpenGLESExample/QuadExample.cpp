@@ -11,11 +11,11 @@
 #include "imgui_impl_opengl3.h"
 #include "imgui_impl_win32.h"
 #include "stb_image.h"
-#include "glm/ext/matrix_transform.hpp"
 
 namespace TG
 {
-    QuadExample::QuadExample(const std::weak_ptr<ITimer>& timer) : m_timer(timer),
+    QuadExample::QuadExample(const std::weak_ptr<IDefaultVideoPort>& videoPort, const std::weak_ptr<ITimer> &timer)
+		: m_videoPort(videoPort), m_timer(timer),
 		m_vertexShader("Shaders/GLSL/Quad.vert", ShaderStage::Vertex),
 		m_fragmentShader("Shaders/GLSL/Quad.frag", ShaderStage::Fragment),
 		m_geometryShader("Shaders/GLSL/Wireframe.geom", ShaderStage::Geometry)
@@ -31,7 +31,6 @@ namespace TG
     	glGenVertexArrays(1, &m_VAO);
 
     	glBindVertexArray(m_VAO);
-
     	// 顶点数据传入显存
     	glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
     	const auto positionByteSize = static_cast<GLsizeiptr>(3 * sizeof(float) * m_quadMesh.vertices.size());
@@ -55,7 +54,6 @@ namespace TG
     	glBufferData(GL_ELEMENT_ARRAY_BUFFER,
     		static_cast<GLsizeiptr>(sizeof(std::uint32_t) * m_quadMesh.indices.size()),
     		m_quadMesh.indices.data(), GL_STATIC_DRAW);
-
     	glBindVertexArray(0);
 
     	// 加载贴图
@@ -99,6 +97,7 @@ namespace TG
     	m_fragmentShader.SetInt("albedo1", 1);
 
     	glGenProgramPipelines(1, &m_pipeline);
+    	glBindProgramPipeline(m_pipeline);
     	glUseProgramStages(m_pipeline, GL_VERTEX_SHADER_BIT, m_vertexShader.GetID());
     	glUseProgramStages(m_pipeline, GL_FRAGMENT_SHADER_BIT, m_fragmentShader.GetID());
     }
@@ -144,7 +143,6 @@ namespace TG
     	glBindVertexArray(m_VAO);
     	glBindProgramPipeline(m_pipeline);
     	glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(m_quadMesh.indices.size()), GL_UNSIGNED_INT, nullptr);
-    	glBindVertexArray(0);
 
     	ImGui_ImplOpenGL3_NewFrame();
     	ImGui_ImplWin32_NewFrame();

@@ -53,8 +53,8 @@ namespace TG
         }
 
         m_shaderID = glCreateProgram();
-        glProgramParameteri(m_shaderID, GL_PROGRAM_SEPARABLE, GL_TRUE);
         glAttachShader(m_shaderID, shader);
+        glProgramParameteri(m_shaderID, GL_PROGRAM_SEPARABLE, GL_TRUE);
         glLinkProgram(m_shaderID);
         glGetProgramiv(m_shaderID, GL_LINK_STATUS, &success);
         if (!success)
@@ -85,6 +85,11 @@ namespace TG
     void Shader::SetFloat(std::string_view name, float value) const
     {
         glProgramUniform1f(m_shaderID, glGetUniformLocation(m_shaderID, name.data()), value);
+    }
+
+    void Shader::SetFloat2(std::string_view name, float v0, float v1) const
+    {
+        glProgramUniform2f(m_shaderID, glGetUniformLocation(m_shaderID, name.data()), v0, v1);
     }
 
     void Shader::SetFloat4(std::string_view name, float v0, float v1, float v2, float v3) const

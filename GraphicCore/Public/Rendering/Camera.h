@@ -17,6 +17,11 @@ namespace TG
         Orthographic,
     };
 
+    struct Frustum
+    {
+        Math::Vector3F corners[8];
+    };
+
     class Camera
     {
     public:
@@ -25,6 +30,7 @@ namespace TG
 
         [[nodiscard]] Math::Matrix4F ViewMatrix() const;
         [[nodiscard]] Math::Matrix4F ProjectionMatrix() const;
+        [[nodiscard]] Frustum ViewFrustum() const;
 
         void Update();
 
@@ -45,6 +51,7 @@ namespace TG
         Math::Vector3F m_position{ 0.0f, 0.0f, 3.0f };
         Math::Vector3F m_front{ 0.0f, 0.0f, -1.0f };
         Math::Vector3F m_right{ 1.0f, 0.0f, 0.0f };
+        Math::Vector3F m_up{ 0.0f, 1.0f, 0.0f };
         Math::Vector3F m_worldUp{ 0.0f, 1.0f, 0.0f };
 
         float m_yaw{ 0.0f };
@@ -58,8 +65,5 @@ namespace TG
         GLuint m_VAO{ 0 };
         GLuint m_VBO{ 0 };
         GLuint m_pipeline{};
-        // Shader m_vertexShader;
-        // Shader m_fragmentShader;
-        // Shader m_geometryShader;
     };
 }

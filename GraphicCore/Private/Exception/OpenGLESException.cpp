@@ -4,16 +4,16 @@
 * This code is licensed under the MIT License (MIT).			*
 *****************************************************************/
 
-#include "Exception/OpenGLException.h"
-#include "glad/gl.h"
+#include "Exception/OpenGLESException.h"
+#include "DynamicGles.h"
 #include <format>
 #include <stacktrace>
 
 namespace TG
 {
-    OpenGLException::OpenGLException(std::string_view message) : BaseException(message) {}
+    OpenGLESException::OpenGLESException(std::string_view message) : BaseException(message) {}
 
-    OpenGLException OpenGLException::Create(std::string_view message)
+    OpenGLESException OpenGLESException::Create(std::string_view message)
     {
         GLenum error;
         std::string whatBuffer;
@@ -37,14 +37,6 @@ namespace TG
                 case GL_OUT_OF_MEMORY:
                     errorMsg = "There is not enough memory left to execute the command.";
                     break;
-                case GL_STACK_UNDERFLOW:
-                    errorMsg = "An attempt has been made to perform an operation that "
-                               "would cause an internal stack to underflow.";
-                    break;
-                case GL_STACK_OVERFLOW:
-                    errorMsg = "An attempt has been made to perform an operation that "
-                               "would cause an internal stack to overflow.";
-                    break;
                 default:
                     errorMsg = "Unknown error.";
                     break;
@@ -55,6 +47,6 @@ namespace TG
                                      "[OpenGL] {}\n"
                                      "{}\n", error, errorMsg, message, std::stacktrace::current());
         }
-        return OpenGLException(whatBuffer);
+        return OpenGLESException(whatBuffer);
     }
 }

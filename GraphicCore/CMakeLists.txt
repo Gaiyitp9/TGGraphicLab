@@ -18,6 +18,12 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(stb)
 
+FetchContent_Declare(
+    glad
+    SOURCE_DIR "${CMAKE_SOURCE_DIR}/ThirdParty/glad"
+)
+FetchContent_MakeAvailable(glad)
+
 file(GLOB_RECURSE HEADERS *.hpp *.h)
 file(GLOB_RECURSE SOURCES *.cpp *.c)
 
@@ -35,7 +41,7 @@ add_library(${LIBRARY_NAME} ${HEADERS} ${SOURCES})
 target_include_directories(${LIBRARY_NAME}
     PUBLIC ${CMAKE_CURRENT_LIST_DIR}/Public
     PRIVATE ${CMAKE_CURRENT_LIST_DIR}/Private)
-target_link_libraries(${LIBRARY_NAME} PUBLIC mimalloc spdlog::spdlog TG::ImGui TG::stb glm::glm)
+target_link_libraries(${LIBRARY_NAME} PUBLIC mimalloc spdlog::spdlog TG::ImGui TG::stb glm::glm TG::glad)
 target_compile_definitions(${LIBRARY_NAME}
     PUBLIC $<$<STREQUAL:${TG_MATRIX_STORAGE_ORDER},RowMajor>:TG_ROW_MAJOR_MATRIX>
     # CRT库查找内存泄漏所需定义的宏

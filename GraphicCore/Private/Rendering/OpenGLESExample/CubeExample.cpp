@@ -64,6 +64,7 @@ namespace TG
         m_fragmentShader.SetInt("albedo1", 1);
 
         glGenProgramPipelines(1, &m_pipeline);
+        glBindProgramPipeline(m_pipeline);
         glUseProgramStages(m_pipeline, GL_VERTEX_SHADER_BIT, m_vertexShader.GetID());
         glUseProgramStages(m_pipeline, GL_FRAGMENT_SHADER_BIT, m_fragmentShader.GetID());
 
@@ -113,6 +114,8 @@ namespace TG
     	    glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(m_cubeMesh.indices.size()), GL_UNSIGNED_INT, nullptr);
         }
         glBindVertexArray(0);
+
+        // m_viewportGrid.Render(m_camera);
 
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplWin32_NewFrame();
