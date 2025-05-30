@@ -11,7 +11,10 @@
 namespace TG
 {
     Camera::Camera(const std::weak_ptr<IDefaultVideoPort>& videoPort, const std::weak_ptr<ITimer>& timer)
-        : m_videoPort(videoPort), m_timer(timer) {}
+        : m_videoPort(videoPort), m_timer(timer)
+    {
+        UpdateCameraVectors();
+    }
 
     Camera::~Camera() = default;
 

@@ -35,7 +35,7 @@ target_include_directories(${PROJECT_NAME} SYSTEM
         PRIVATE
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/Private>
 )
-target_link_libraries(${PROJECT_NAME} PUBLIC TG::PowerVR Vulkan::Vulkan)
+target_link_libraries(${PROJECT_NAME} PUBLIC TG::PowerVR Vulkan::Vulkan opengl32)
 
 set(PROJECT_CONFIG_IN "${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}Config.cmake.in")
 set(PROJECT_CONFIG_OUT "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake")

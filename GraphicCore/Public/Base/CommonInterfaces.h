@@ -15,7 +15,7 @@ namespace TG
     {
         virtual ~IVideoPort() = default;
 
-        [[nodiscard]] virtual NativePolicy::WindowHandle GetHandle() const noexcept = 0;
+        [[nodiscard]] virtual NativePolicy::WindowHandle Handle() const noexcept = 0;
         [[nodiscard]] virtual NativePolicy::DeviceContext GetContext() const noexcept = 0;
         [[nodiscard]] virtual int Width() const noexcept = 0;
         [[nodiscard]] virtual int Height() const noexcept = 0;

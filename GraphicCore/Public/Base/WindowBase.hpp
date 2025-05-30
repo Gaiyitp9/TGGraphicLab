@@ -32,7 +32,7 @@ namespace TG
             return Super::PollEvents();
         }
 
-        [[nodiscard]] NativePolicy::WindowHandle GetHandle() const noexcept override
+        [[nodiscard]] NativePolicy::WindowHandle Handle() const noexcept override
         {
             return Super::GetHandle();
         }

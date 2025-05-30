@@ -7,7 +7,6 @@
 
 #include "Math/Core.hpp"
 #include "Base/CommonInterfaces.h"
-#include "DynamicGles.h"
 
 namespace TG
 {
@@ -48,22 +47,18 @@ namespace TG
 
         float m_orthoWidth{ 3.0f };
 
-        Math::Vector3F m_position{ 0.0f, 0.0f, 3.0f };
-        Math::Vector3F m_front{ 0.0f, 0.0f, -1.0f };
-        Math::Vector3F m_right{ 1.0f, 0.0f, 0.0f };
-        Math::Vector3F m_up{ 0.0f, 1.0f, 0.0f };
+        Math::Vector3F m_position{ 0.0f, 1.0f, 4.0f };
+        Math::Vector3F m_front;
+        Math::Vector3F m_right;
+        Math::Vector3F m_up;
         Math::Vector3F m_worldUp{ 0.0f, 1.0f, 0.0f };
 
         float m_yaw{ 0.0f };
-        float m_pitch{ 0.0f };
+        float m_pitch{ -5.0f };
         short m_lastMouseX{ 0 };
         short m_lastMouseY{ 0 };
 
         float m_moveSpeed{ 2.5f };
         float m_mouseSensitivity{ 0.1f };
-
-        GLuint m_VAO{ 0 };
-        GLuint m_VBO{ 0 };
-        GLuint m_pipeline{};
     };
 }

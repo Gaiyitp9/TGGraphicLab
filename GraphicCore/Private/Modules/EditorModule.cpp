@@ -157,16 +157,16 @@ namespace TG
     	// 初始化IMGUI
     	IMGUI_CHECKVERSION();
     	ImGui::CreateContext();
-    	ImGui_ImplWin32_InitForOpenGL(displayPtr->GetHandle());
+    	ImGui_ImplWin32_InitForOpenGL(displayPtr->Handle());
     	ImGui_ImplOpenGL3_Init();
     	m_isInitialized = true;
 
         // 窗口程序插入ImGui处理输入事件的代码
-    	g_prevWndProc = reinterpret_cast<Win32Proc>(GetWindowLongPtrW(displayPtr->GetHandle(), GWLP_WNDPROC));
+    	g_prevWndProc = reinterpret_cast<Win32Proc>(GetWindowLongPtrW(displayPtr->Handle(), GWLP_WNDPROC));
     	if (!g_prevWndProc)
     		throw Win32Exception::Create("Failed to get window procedure");
     	SetLastError(0);
-	    if (SetWindowLongPtrW(displayPtr->GetHandle(), GWLP_WNDPROC, reinterpret_cast<LONG_PTR>(ImGuiWindowProc)) == 0
+	    if (SetWindowLongPtrW(displayPtr->Handle(), GWLP_WNDPROC, reinterpret_cast<LONG_PTR>(ImGuiWindowProc)) == 0
 	    	&& GetLastError() != 0)
 	    {
     		throw Win32Exception::Create("Failed to set window procedure");

@@ -23,6 +23,8 @@ namespace TG
         void FrameBufferResizeCallback(unsigned int width, unsigned int height) override;
 
     private:
+        HDC m_hdc{};
+        HGLRC m_wglContext{};
 
         std::unique_ptr<Example> m_example;
     };

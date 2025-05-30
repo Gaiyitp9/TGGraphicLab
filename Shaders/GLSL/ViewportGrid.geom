@@ -1,40 +1,31 @@
 #version 320 es
 layout(points) in;
-layout(line_strip, max_vertices = 64) out;
-
-layout(location = 0) out vec3 fColor;
+layout(line_strip, max_vertices = 256) out;
 
 uniform mat4 view;
 uniform mat4 projection;
-uniform vec2 origin;
-uniform float size;
-uniform float gridSpacing = 1;
+uniform ivec2 origin;
 
 void main()
 {
-    uint gridCount = uint(size / gridSpacing);
-    float end = gridCount * gridSpacing;
+    int gridSpacing = 1;
+    int size = 63;
+    int gridCount = size / gridSpacing;
 
     mat4 pv = projection * view;
 
-    vec3 color = vec3(0.2);
-
-    for (uint i = 0; i <= gridCount; ++i)
+    for (int i = 0; i <= gridCount; ++i)
     {
-        float x = i * gridSpacing;
+        int x = i * gridSpacing;
         gl_Position = pv * vec4(origin.x, 0, origin.y + x, 1.0);
-        fColor = color;
         EmitVertex();
-        gl_Position = pv * vec4(origin.x + end, 0, origin.y + x, 1.0);
-        fColor = color;
+        gl_Position = pv * vec4(origin.x + size, 0, origin.y + x, 1.0);
         EmitVertex();
         EndPrimitive();
 
         gl_Position = pv * vec4(origin.x + x, 0, origin.y, 1.0);
-        fColor = color;
         EmitVertex();
-        gl_Position = pv * vec4(origin.x + x, 0, origin.y + end, 1.0);
-        fColor = color;
+        gl_Position = pv * vec4(origin.x + x, 0, origin.y + size, 1.0);
         EmitVertex();
         EndPrimitive();
     }

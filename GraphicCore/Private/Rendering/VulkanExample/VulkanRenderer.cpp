@@ -23,7 +23,7 @@ namespace TG
         CheckLayerAndExtension();
         CreateInstance();
         SetupDebugMessenger();
-        CreateSurface(videoPortPtr->GetHandle());
+        CreateSurface(videoPortPtr->Handle());
         SelectPhysicalDevice();
         CreateLogicalDevice();
         CreateSwapChain();

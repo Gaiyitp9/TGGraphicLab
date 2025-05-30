@@ -62,7 +62,7 @@ namespace TG
         if (eglChooseConfig(m_eglDisplay, configurationAttributes, &eglConfig, 1, &numConfigs) == EGL_FALSE)
         	throw EGLException::Create("Failed to choose EGLConfig");
 
-        m_eglSurface = eglCreateWindowSurface(m_eglDisplay, eglConfig, videoPortPtr->GetHandle(), nullptr);
+        m_eglSurface = eglCreateWindowSurface(m_eglDisplay, eglConfig, videoPortPtr->Handle(), nullptr);
         if (m_eglSurface == EGL_NO_SURFACE)
         	throw EGLException::Create("Failed to create EGLSurface");
     	m_createSurface = true;
