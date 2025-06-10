@@ -5,23 +5,23 @@
 *****************************************************************/
 #pragma once
 
-#include "Policy.h"
+#include "PlatformTraits.h"
 
 namespace TG
 {
     // 显示接口
-    template <typename NativePolicy> requires IsValidNativePolicy<NativePolicy>
+    template <typename PlatformTraits> requires IsValidPlatformTraits<PlatformTraits>
     struct IVideoPort
     {
         virtual ~IVideoPort() = default;
 
-        [[nodiscard]] virtual NativePolicy::WindowHandle Handle() const noexcept = 0;
-        [[nodiscard]] virtual NativePolicy::DeviceContext GetContext() const noexcept = 0;
+        [[nodiscard]] virtual PlatformTraits::WindowHandle Handle() const noexcept = 0;
+        [[nodiscard]] virtual PlatformTraits::DeviceContext Context() const noexcept = 0;
         [[nodiscard]] virtual int Width() const noexcept = 0;
         [[nodiscard]] virtual int Height() const noexcept = 0;
     };
 
-    using IDefaultVideoPort = IVideoPort<DefaultNativePolicy>;
+    using IDefaultVideoPort = IVideoPort<DefaultPlatformTraits>;
 
     // 计时器接口
     struct ITimer

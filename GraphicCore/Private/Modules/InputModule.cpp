@@ -13,13 +13,14 @@ namespace TG
     {
         m_mouse = std::make_shared<Input::Mouse>();
         m_keyboard = std::make_shared<Input::Keyboard>();
-        Input::Devices::Self().m_mouse = m_mouse;
-        Input::Devices::Self().m_keyboard = m_keyboard;
+        Input::SetMouse(m_mouse);
+        Input::SetKeyboard(m_keyboard);
     }
 
     InputModule::~InputModule() = default;
 
-    void InputModule::Subscribe(MulticastDelegate<void(const Input::Event<Input::Mouse>&)>& mouseEventDelegate)
+    void InputModule::Subscribe(MulticastDelegate<void(const Input::Event<Input::Mouse>&)>&
+        mouseEventDelegate) const
     {
         std::weak_ptr mouse(m_mouse);
         mouseEventDelegate.Add([mouse](const Input::Event<Input::Mouse>& event) {
@@ -28,7 +29,8 @@ namespace TG
         });
     }
 
-    void InputModule::Subscribe(MulticastDelegate<void(const Input::Event<Input::Keyboard>&)>& keyboardEventDelegate)
+    void InputModule::Subscribe(MulticastDelegate<void(const Input::Event<Input::Keyboard>&)>&
+        keyboardEventDelegate) const
     {
         std::weak_ptr keyboard(m_keyboard);
         keyboardEventDelegate.Add([keyboard](const Input::Event<Input::Keyboard>& event) {

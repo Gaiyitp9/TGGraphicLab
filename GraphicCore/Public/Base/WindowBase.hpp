@@ -10,10 +10,10 @@
 namespace TG
 {
     // 窗口基类
-    template <typename NativePolicy>
-    class Window : NativePolicy::Window, public IVideoPort<NativePolicy>
+    template <typename PlatformTraits>
+    class Window : PlatformTraits::Window, public IVideoPort<PlatformTraits>
     {
-        using Super = NativePolicy::Window;
+        using Super = PlatformTraits::Window;
 
     public:
         Window(int x, int y, int width, int height, std::string_view name, WindowType type)
@@ -32,22 +32,23 @@ namespace TG
             return Super::PollEvents();
         }
 
-        [[nodiscard]] NativePolicy::WindowHandle Handle() const noexcept override
-        {
-            return Super::GetHandle();
-        }
-        [[nodiscard]] NativePolicy::DeviceContext GetContext() const noexcept override
-        {
-            return Super::GetContext();
-        }
-        [[nodiscard]] bool IsDestroyed() const noexcept
-        {
-            return Super::IsDestroyed();
-        }
         [[nodiscard]] int PositionX() const noexcept { return m_posX; }
         [[nodiscard]] int PositionY() const noexcept { return m_posY; }
         [[nodiscard]] int Width() const noexcept override { return m_width; }
         [[nodiscard]] int Height() const noexcept override { return m_height; }
+
+        [[nodiscard]] PlatformTraits::WindowHandle Handle() const noexcept override
+        {
+            return Super::handle;
+        }
+        [[nodiscard]] PlatformTraits::DeviceContext Context() const noexcept override
+        {
+            return Super::deviceContext;
+        }
+        [[nodiscard]] bool IsDestroyed() const noexcept
+        {
+            return Super::destroyed;
+        }
 
         void SetIcon(std::string_view iconPath) const
         {
@@ -73,39 +74,39 @@ namespace TG
         // 窗口消息事件回调
         void SetWindowPosCallback(const WindowPosDelegate& delegate)
         {
-            Super::SetWindowPosCallback(delegate);
+            Super::windowPosDelegate = delegate;
         }
         void SetWindowSizeCallback(const WindowSizeDelegate& delegate)
         {
-            Super::SetWindowSizeCallback(delegate);
+            Super::windowSizeDelegate = delegate;
         }
         void SetSuspendCallback(const SuspendDelegate& delegate)
         {
-            Super::SetSuspendCallback(delegate);
+            Super::suspendDelegate = delegate;
         }
         void SetResumeCallback(const ResumeDelegate& delegate)
         {
-            Super::SetResumeCallback(delegate);
+            Super::resumeDelegate = delegate;
         }
         void SetKeyCallback(const KeyDelegate& delegate)
         {
-            Super::SetKeyCallback(delegate);
+            Super::keyDelegate = delegate;
         }
         void SetCharCallback(const CharDelegate& delegate)
         {
-            Super::SetCharCallback(delegate);
+            Super::charDelegate = delegate;
         }
         void SetMouseButtonCallback(const MouseButtonDelegate& delegate)
         {
-            Super::SetMouseButtonCallback(delegate);
+            Super::mouseButtonDelegate = delegate;
         }
         void SetCursorPosCallback(const CursorPosDelegate& delegate)
         {
-            Super::SetCursorPosCallback(delegate);
+            Super::cursorPosDelegate = delegate;
         }
         void SetScrollCallback(const ScrollDelegate& delegate)
         {
-            Super::SetScrollCallback(delegate);
+            Super::scrollDelegate = delegate;
         }
 
     private:
@@ -115,5 +116,5 @@ namespace TG
         unsigned int m_height;
     };
 
-    using WindowBase = Window<DefaultNativePolicy>;
+    using WindowBase = Window<DefaultPlatformTraits>;
 }

@@ -7,13 +7,13 @@
 #include "Base/Windows/Win32Window.h"
 #include "Exception/Windows/Win32Exception.h"
 #include "Base/Utility.h"
-// #include <hidusage.h>
 #include <format>
+// #include <hidusage.h>
 
 namespace TG
 {
 	Win32Window::Win32Window(int x, int y, int width, int height, std::string_view name, WindowType type)
-		: m_name(name)
+		: name(name)
 	{
 		DWORD dwStyle = WS_OVERLAPPEDWINDOW;
 		DWORD dwExStyle = WS_EX_OVERLAPPEDWINDOW;
@@ -35,25 +35,25 @@ namespace TG
 		// 根据客户区域宽和高计算整个窗口的宽和高
 		if (!AdjustWindowRect(&rect, dwStyle, false))
 			throw Win32Exception::Create();
-		m_handle = CreateWindowExW(dwExStyle, L"Default", MultiBytesToWideChars(name).c_str(), dwStyle,
+		handle = CreateWindowExW(dwExStyle, L"Default", MultiBytesToWideChars(name).c_str(), dwStyle,
 							   x, y, rect.right - rect.left, rect.bottom - rect.top,
 							   nullptr, nullptr, nullptr, this);
-		if (m_handle == nullptr)
+		if (handle == nullptr)
 			throw Win32Exception::Create();
 
-		m_deviceContext = GetDC(m_handle);
+		deviceContext = GetDC(handle);
 
 		// RAWINPUTDEVICE rid[2];
 		// // 鼠标
 		// rid[0].usUsagePage = HID_USAGE_PAGE_GENERIC;
 		// rid[0].usUsage = HID_USAGE_GENERIC_MOUSE;
 		// rid[0].dwFlags = RIDEV_NOLEGACY;
-		// rid[0].hwndTarget = m_handle;
+		// rid[0].hwndTarget = handle;
 		// // 键盘
 		// rid[1].usUsagePage = HID_USAGE_PAGE_GENERIC;
 		// rid[1].usUsage = HID_USAGE_GENERIC_KEYBOARD;
 		// rid[1].dwFlags = RIDEV_NOLEGACY;
-		// rid[1].hwndTarget = m_handle;
+		// rid[1].hwndTarget = handle;
 		// // 注册输入设备
 		// if (!RegisterRawInputDevices(rid, 2, sizeof(rid[0])))
 		// 	throw Win32Exception::Create("Register mouse and keyboard failed");
@@ -61,7 +61,7 @@ namespace TG
 
 	Win32Window::~Win32Window()
 	{
-		ReleaseDC(m_handle, m_deviceContext);
+		ReleaseDC(handle, deviceContext);
 	}
 
 	std::optional<int> Win32Window::PollEvents()
@@ -87,23 +87,23 @@ namespace TG
 		if (icon == nullptr)
 			throw Win32Exception::Create("Invalid icon source");
 
-		SendMessageW(m_handle, WM_SETICON, ICON_BIG, reinterpret_cast<LPARAM>(icon));
-		SendMessageW(m_handle, WM_SETICON, ICON_SMALL, reinterpret_cast<LPARAM>(icon));
+		SendMessageW(handle, WM_SETICON, ICON_BIG, reinterpret_cast<LPARAM>(icon));
+		SendMessageW(handle, WM_SETICON, ICON_SMALL, reinterpret_cast<LPARAM>(icon));
 	}
 
 	void Win32Window::SetPosition(int x, int y) const
 	{
-		SetWindowPos(m_handle, HWND_TOP, x, y, 0, 0, SWP_NOSIZE);
+		SetWindowPos(handle, HWND_TOP, x, y, 0, 0, SWP_NOSIZE);
 	}
 
 	void Win32Window::SetSize(unsigned int width, unsigned int height) const
 	{
-		SetWindowPos(m_handle, HWND_TOP, 0, 0, static_cast<int>(width), static_cast<int>(height), SWP_NOMOVE);
+		SetWindowPos(handle, HWND_TOP, 0, 0, static_cast<int>(width), static_cast<int>(height), SWP_NOMOVE);
 	}
 
 	void Win32Window::Show(bool show) const
 	{
-		ShowWindow(m_handle, show ? SW_SHOW : SW_HIDE);
+		ShowWindow(handle, show ? SW_SHOW : SW_HIDE);
 	}
 
     // 窗口消息转成字符串
@@ -314,7 +314,7 @@ namespace TG
 		// 监控窗口消息
 		// 因为打印窗口消息需要频繁创建string，小字符串优化(SSO)不适用，所以最好使用内存池避免频繁分配内存
 	    std::string windowMessage;
-	    std::format_to(std::back_inserter(windowMessage), "{:<16} {}\n", pWindow->m_name,
+	    std::format_to(std::back_inserter(windowMessage), "{:<16} {}\n", pWindow->name,
 	    	WindowMessageToString(msg, wParam, lParam));
 		OutputDebugStringA(windowMessage.data());
 
@@ -323,7 +323,7 @@ namespace TG
 			case WM_DESTROY:
 			{
 	            // 窗口被销毁后，窗口类也需要被销毁
-	            pWindow->m_destroyed = true;
+	            pWindow->destroyed = true;
 				// 基础窗口作为主窗口，销毁后要退出线程
 				PostQuitMessage(0);
 				return 0;
@@ -362,7 +362,7 @@ namespace TG
 			// 			POINT screenPos;
 			// 			screenPos.x = MulDiv(mouse.lLastX, rect.right, USHRT_MAX) + rect.left;
 			// 			screenPos.y = MulDiv(mouse.lLastY, rect.bottom, USHRT_MAX) + rect.top;
-			// 			ScreenToClient(pWindow->m_handle, &screenPos);
+			// 			ScreenToClient(pWindow->handle, &screenPos);
 			// 			pWindow->m_cursorPosDelegate.ExecuteIfBound(screenPos.x, screenPos.y);
 			// 		}
 			// 		else if (mouse.lLastX != 0 || mouse.lLastY != 0)
@@ -372,7 +372,7 @@ namespace TG
 			// 			// 更新鼠标位置
 			// 			POINT screenPos;
 			// 			GetCursorPos(&screenPos);
-			// 			ScreenToClient(pWindow->m_handle, &screenPos);
+			// 			ScreenToClient(pWindow->handle, &screenPos);
 			// 			pWindow->m_cursorPosDelegate.ExecuteIfBound(screenPos.x, screenPos.y);
 			// 			OutputDebugStringA(std::to_string(screenPos.x).c_str());
 			// 			OutputDebugStringA(std::to_string(screenPos.y).c_str());
@@ -438,90 +438,90 @@ namespace TG
 				else if ((keyFlags & KF_REPEAT) == KF_REPEAT)
 					action = Input::Action::Repeat;
 
-				pWindow->m_keyDelegate.ExecuteIfBound(static_cast<Input::KeyCode>(vkCode), scanCode, action);
+				pWindow->keyDelegate.ExecuteIfBound(static_cast<Input::KeyCode>(vkCode), scanCode, action);
 
 				return 0;
 			}
 
 			case WM_CHAR:
 	        {
-	            pWindow->m_charDelegate.ExecuteIfBound(static_cast<char16_t>(wParam));
+	            pWindow->charDelegate.ExecuteIfBound(static_cast<char16_t>(wParam));
 				return 0;
 	        }
 
 			case WM_MOUSEMOVE:
 			{
-				pWindow->m_cursorPosDelegate.ExecuteIfBound(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+				pWindow->cursorPosDelegate.ExecuteIfBound(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
 				return 0;
 			}
 
 			case WM_LBUTTONDOWN:
 			{
-				pWindow->m_mouseButtonDelegate.ExecuteIfBound(Input::KeyCode::LeftMouseButton, Input::Action::Press);
-				pWindow->m_cursorPosDelegate.ExecuteIfBound(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+				pWindow->mouseButtonDelegate.ExecuteIfBound(Input::KeyCode::LeftMouseButton, Input::Action::Press);
+				pWindow->cursorPosDelegate.ExecuteIfBound(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
 				return 0;
 			}
 
 			case WM_LBUTTONUP:
 			{
-				pWindow->m_mouseButtonDelegate.ExecuteIfBound(Input::KeyCode::LeftMouseButton, Input::Action::Release);
-				pWindow->m_cursorPosDelegate.ExecuteIfBound(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+				pWindow->mouseButtonDelegate.ExecuteIfBound(Input::KeyCode::LeftMouseButton, Input::Action::Release);
+				pWindow->cursorPosDelegate.ExecuteIfBound(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
 				return 0;
 			}
 
 			case WM_RBUTTONDOWN:
 			{
-				pWindow->m_mouseButtonDelegate.ExecuteIfBound(Input::KeyCode::RightMouseButton, Input::Action::Press);
-				pWindow->m_cursorPosDelegate.ExecuteIfBound(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+				pWindow->mouseButtonDelegate.ExecuteIfBound(Input::KeyCode::RightMouseButton, Input::Action::Press);
+				pWindow->cursorPosDelegate.ExecuteIfBound(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
 				return 0;
 			}
 
 			case WM_RBUTTONUP:
 			{
-				pWindow->m_mouseButtonDelegate.ExecuteIfBound(Input::KeyCode::RightMouseButton, Input::Action::Release);
-				pWindow->m_cursorPosDelegate.ExecuteIfBound(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+				pWindow->mouseButtonDelegate.ExecuteIfBound(Input::KeyCode::RightMouseButton, Input::Action::Release);
+				pWindow->cursorPosDelegate.ExecuteIfBound(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
 				return 0;
 			}
 
 			case WM_MBUTTONDOWN:
 			{
-				pWindow->m_mouseButtonDelegate.ExecuteIfBound(Input::KeyCode::MiddleMouseButton, Input::Action::Press);
-				pWindow->m_cursorPosDelegate.ExecuteIfBound(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+				pWindow->mouseButtonDelegate.ExecuteIfBound(Input::KeyCode::MiddleMouseButton, Input::Action::Press);
+				pWindow->cursorPosDelegate.ExecuteIfBound(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
 				return 0;
 			}
 
 			case WM_MBUTTONUP:
 			{
-				pWindow->m_mouseButtonDelegate.ExecuteIfBound(Input::KeyCode::MiddleMouseButton, Input::Action::Release);
-				pWindow->m_cursorPosDelegate.ExecuteIfBound(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+				pWindow->mouseButtonDelegate.ExecuteIfBound(Input::KeyCode::MiddleMouseButton, Input::Action::Release);
+				pWindow->cursorPosDelegate.ExecuteIfBound(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
 				return 0;
 			}
 
 			case WM_MOUSEWHEEL:
 	        {
 				// 每帧只会产生一个WM_MOUSEWHEEL
-				pWindow->m_scrollDelegate.ExecuteIfBound(0, GET_WHEEL_DELTA_WPARAM(wParam) / WHEEL_DELTA);
+				pWindow->scrollDelegate.ExecuteIfBound(0, GET_WHEEL_DELTA_WPARAM(wParam) / WHEEL_DELTA);
 				POINT pt;
 				pt.x = GET_X_LPARAM(lParam);
 				pt.y = GET_Y_LPARAM(lParam);
 				ScreenToClient(hwnd, &pt);
-				pWindow->m_cursorPosDelegate.ExecuteIfBound(pt.x, pt.y);
+				pWindow->cursorPosDelegate.ExecuteIfBound(pt.x, pt.y);
 				return 0;
 	        }
 
 			case WM_MOVE:
 			{
-				pWindow->m_windowPosDelegate.ExecuteIfBound(LOWORD(lParam), HIWORD(lParam));
+				pWindow->windowPosDelegate.ExecuteIfBound(LOWORD(lParam), HIWORD(lParam));
 				return 0;
 			}
 
 			case WM_SIZE:
 			{
-				pWindow->m_windowSizeDelegate.ExecuteIfBound(LOWORD(lParam), HIWORD(lParam));
+				pWindow->windowSizeDelegate.ExecuteIfBound(LOWORD(lParam), HIWORD(lParam));
 				if (wParam == SIZE_MINIMIZED)
-					pWindow->m_suspendDelegate.ExecuteIfBound();
+					pWindow->suspendDelegate.ExecuteIfBound();
 				if (wParam == SIZE_RESTORED)
-					pWindow->m_resumeDelegate.ExecuteIfBound();
+					pWindow->resumeDelegate.ExecuteIfBound();
 				return 0;
 			}
 
@@ -531,14 +531,14 @@ namespace TG
 				// 但是窗口此时会冻结，添加Timer定时发送WM_TIMER消息，
 				// 在WM_TIMER消息内添加需要更新的函数，比如渲染
 				// SetTimer(hwnd, 1, 16, nullptr);
-	            pWindow->m_suspendDelegate.ExecuteIfBound();
+	            pWindow->suspendDelegate.ExecuteIfBound();
 				return 0;
 			}
 
 			case WM_EXITSIZEMOVE:
 			{
 				// KillTimer(hwnd, 1);
-	            pWindow->m_resumeDelegate.ExecuteIfBound();
+	            pWindow->resumeDelegate.ExecuteIfBound();
 				return 0;
 			}
 

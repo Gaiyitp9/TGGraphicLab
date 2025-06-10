@@ -34,7 +34,7 @@ namespace TG
     		0,
     		0, 0, 0, 0
     	};
-    	m_hdc = videoPort.lock()->GetContext();
+    	m_hdc = videoPort.lock()->Context();
     	int pixelFormat = ChoosePixelFormat(m_hdc, &pfd);
     	if (pixelFormat == 0)
     		throw BaseException::Create("Failed to get a valid ChoosePixelFormat");
@@ -68,6 +68,7 @@ namespace TG
 
     	// 加载OpenGL函数
     	gladLoaderLoadGL();
+
     	// 查询OpenGL相关信息
     	auto glVersion = reinterpret_cast<char const*>(glGetString(GL_VERSION));
     	if (glVersion == nullptr)
@@ -115,7 +116,6 @@ namespace TG
     	GLfloat lineWidthRange[2];
     	glGetFloatv(GL_ALIASED_LINE_WIDTH_RANGE, lineWidthRange);
     	LogInfo("Line width range: {} - {}", lineWidthRange[0], lineWidthRange[1]);
-
 
     	// 正面朝向设置为顺时针
     	// glFrontFace(GL_CW);

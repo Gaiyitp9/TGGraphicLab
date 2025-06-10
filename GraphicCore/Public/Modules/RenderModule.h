@@ -22,7 +22,7 @@ namespace TG
         RenderModule& operator=(RenderModule&&) = delete;
         ~RenderModule() override;
 
-        void PlugInVideoPort(const std::weak_ptr<IDefaultVideoPort>& videoPort, const std::weak_ptr<ITimer>& timer);
+        void Initialize(const std::weak_ptr<IDefaultVideoPort>& videoPort, const std::weak_ptr<ITimer>& timer);
 
         [[nodiscard]] std::weak_ptr<Renderer> GetRenderer() const noexcept { return m_Renderer; }
 

@@ -23,7 +23,7 @@ namespace TG
     	auto videoPortPtr = videoPort.lock();
 
         // 创建EGLDisplay并初始化
-        m_eglDisplay = eglGetDisplay(videoPortPtr->GetContext());
+        m_eglDisplay = eglGetDisplay(videoPortPtr->Context());
         if (m_eglDisplay == EGL_NO_DISPLAY)
             m_eglDisplay = eglGetDisplay(EGL_DEFAULT_DISPLAY);
         if (m_eglDisplay == EGL_NO_DISPLAY)

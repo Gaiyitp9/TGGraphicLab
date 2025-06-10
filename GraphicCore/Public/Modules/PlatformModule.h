@@ -27,7 +27,7 @@ namespace TG
 
         [[nodiscard]] bool ShouldExit() const;
         [[nodiscard]] int ExitCode() const;
-        [[nodiscard]] std::weak_ptr<WindowBase> GetWindow() const { return m_mainWindow; }
+        [[nodiscard]] std::weak_ptr<IDefaultVideoPort> GetVideoPort() const { return m_mainWindow; }
         [[nodiscard]] std::weak_ptr<ITimer> GetTimer() const { return m_timer; };
 
         // 鼠标事件委托

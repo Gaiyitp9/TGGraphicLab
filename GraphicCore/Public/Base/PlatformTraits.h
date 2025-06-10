@@ -11,16 +11,16 @@
 
 namespace TG
 {
-    template <typename NativePolicy>
-    concept IsValidNativePolicy = requires
+    template <typename PlatformTraits>
+    concept IsValidPlatformTraits = requires
     {
-        typename NativePolicy::Window;
-        typename NativePolicy::WindowHandle;
-        typename NativePolicy::DeviceContext;
+        typename PlatformTraits::Window;
+        typename PlatformTraits::WindowHandle;
+        typename PlatformTraits::DeviceContext;
     };
 
 #ifdef TG_WINDOWS
-    struct DefaultNativePolicy
+    struct DefaultPlatformTraits
     {
         using Window = Win32Window;
         using WindowHandle = HWND;

@@ -22,8 +22,10 @@ namespace TG
         InputModule& operator=(InputModule&&) = delete;
         ~InputModule() override;
 
-        void Subscribe(MulticastDelegate<void(const Input::Event<Input::Mouse>&)>& mouseEventDelegate);
-        void Subscribe(MulticastDelegate<void(const Input::Event<Input::Keyboard>&)>& keyboardEventDelegate);
+        void Subscribe(MulticastDelegate<void(const Input::Event<Input::Mouse>&)>&
+            mouseEventDelegate) const;
+        void Subscribe(MulticastDelegate<void(const Input::Event<Input::Keyboard>&)>&
+            keyboardEventDelegate) const;
 
         void Update() override;
         void PostUpdate() override;

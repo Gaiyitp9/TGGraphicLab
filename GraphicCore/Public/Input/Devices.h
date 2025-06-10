@@ -8,7 +8,6 @@
 #include "Base/CommonInterfaces.h"
 #include "Input/Mouse.h"
 #include "Input/Keyboard.h"
-#include "Modules/InputModule.h"
 
 namespace TG::Input
 {
@@ -45,8 +44,19 @@ namespace TG::Input
         std::weak_ptr<Mouse> m_mouse;
         std::weak_ptr<Keyboard> m_keyboard;
 
-        friend InputModule::InputModule();
+        friend void SetMouse(const std::shared_ptr<Mouse> &mouse);
+        friend void SetKeyboard(const std::shared_ptr<Keyboard> &keyboard);
     };
+
+    inline void SetMouse(const std::shared_ptr<Mouse>& mouse)
+    {
+        Devices::Self().m_mouse = mouse;
+    }
+
+    inline void SetKeyboard(const std::shared_ptr<Keyboard>& keyboard)
+    {
+        Devices::Self().m_keyboard = keyboard;
+    }
 
     inline bool GetKey(KeyCode key)
     {
