@@ -6,20 +6,18 @@
 #pragma once
 
 #include "Rendering/Shader.h"
-#include "glad/gl.h"
-#include <string_view>
 
 namespace TG::Rendering
 {
     class OpenGLShader : public Shader
     {
     public:
-        OpenGLShader();
+        OpenGLShader(std::string_view shaderPath, ShaderStage shaderStage);
         ~OpenGLShader() override;
 
-        [[nodiscard]] ShaderID GetID() const override { return m_shaderID; }
+        [[nodiscard]] ShaderID GetID() const override { return m_shader; }
 
-        void SetBool(std::string_view name, bool value) const override override;
+        void SetBool(std::string_view name, bool value) const override;
         void SetInt(std::string_view name, int value) const override;
         void SetInt2(std::string_view name, int v0, int v1) const override;
         void SetFloat(std::string_view name, float value) const override;
@@ -30,6 +28,6 @@ namespace TG::Rendering
         void SetMat4(std::string_view name, const glm::mat4& value) const override;
 
     private:
-        GLuint m_shaderID{};
+        GLuint m_shader{};
     };
 }

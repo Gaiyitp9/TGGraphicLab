@@ -3,21 +3,18 @@
 * Copyright (c) Gaiyitp9. All rights reserved.					*
 * This code is licensed under the MIT License (MIT).			*
 *****************************************************************/
-#pragma once
 
-#include "glad/gl.h"
-#include <variant>
+#include "Rendering/OpenGL/OpenGLTexture.h"
 
 namespace TG::Rendering
 {
-    using OpenGLID = GLuint;
-
-    using ShaderID = std::variant<OpenGLID>;
-    using TextureID = std::variant<OpenGLID>;
-
-    template<typename T>
-    T CastID(ShaderID id)
+    OpenGLTexture::OpenGLTexture()
     {
-        return std::get<T>(id);
+        glGenTextures(1, &m_texture);
+    }
+
+    OpenGLTexture::~OpenGLTexture()
+    {
+        glDeleteTextures(1, &m_texture);
     }
 }

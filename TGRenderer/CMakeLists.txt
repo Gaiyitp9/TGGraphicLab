@@ -24,16 +24,12 @@ else()
     message(STATUS "Unknown generator: ${CMAKE_GENERATOR}")
 endif()
 
-set(EGLLib ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_BINDIR}/LibEGL.dll)
-set(GLESLib ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_BINDIR}/LibGLESv2.dll)
 set(mimallocLib ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_BINDIR}/mimalloc$<$<CONFIG:DEBUG>:-debug>.dll)
 set(mimallocRedirectLib ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_BINDIR}/mimalloc-redirect.dll)
 set(ICONS ${CMAKE_CURRENT_SOURCE_DIR}/maple-leaf.ico ${CMAKE_CURRENT_SOURCE_DIR}/maple-leaf2.ico)
 add_custom_command(
     TARGET ${EXECUTABLE_NAME}
     POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy_if_different ${EGLLib} ${EXECUTABLE_OUTPUT_DIRECTORY}
-    COMMAND ${CMAKE_COMMAND} -E copy_if_different ${GLESLib} ${EXECUTABLE_OUTPUT_DIRECTORY}
     COMMAND ${CMAKE_COMMAND} -E copy_if_different ${mimallocLib} ${EXECUTABLE_OUTPUT_DIRECTORY}
     COMMAND ${CMAKE_COMMAND} -E copy_if_different ${mimallocRedirectLib} ${EXECUTABLE_OUTPUT_DIRECTORY}
     COMMAND ${CMAKE_COMMAND} -E copy_if_different ${ICONS} ${EXECUTABLE_OUTPUT_DIRECTORY}

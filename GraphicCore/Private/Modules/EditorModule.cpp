@@ -5,7 +5,7 @@
 *****************************************************************/
 
 #include "Modules/EditorModule.h"
-#include "Exception/EGLException.h"
+#include "glad/wgl.h"
 #include "imgui_impl_win32.h"
 #include "imgui_impl_opengl3.h"
 #include "Exception/Windows/Win32Exception.h"
@@ -140,11 +140,10 @@ namespace TG
 		return g_prevWndProc(hwnd, msg, wParam, lParam);
 	}
 
-	struct EGLData
+	struct WGLWindowData
 	{
-		EGLDisplay display;
-		EGLContext context;
-		EGLSurface surface;
+		HDC hdc;
+		HGLRC hglrc;
 	};
 
     void EditorModule::PlugInVideoPort(const std::weak_ptr<IDefaultVideoPort>& display)
@@ -190,55 +189,47 @@ namespace TG
     	platformIO.Renderer_CreateWindow = [](ImGuiViewport* viewport) {
     		assert(viewport->RendererUserData == nullptr);
 
-    		auto* data = TG_NEW EGLData;
-    		viewport->RendererUserData = data;
-
-    		data->display = eglGetCurrentDisplay();
-    		data->context = eglGetCurrentContext();
-
-    		// ChooseEGLConfig
-    		const EGLint configurationAttributes[] = {
-    			EGL_SURFACE_TYPE, EGL_WINDOW_BIT,
-				EGL_RENDERABLE_TYPE, EGL_OPENGL_ES3_BIT,
-				EGL_NONE
+    		auto wglData = TG_NEW WGLWindowData;
+    		wglData->hdc = GetDC(static_cast<HWND>(viewport->PlatformHandle));
+    		PIXELFORMATDESCRIPTOR pfd{
+    			sizeof(PIXELFORMATDESCRIPTOR),
+				1,
+				PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL | PFD_DOUBLEBUFFER,
+				PFD_TYPE_RGBA,
+				24,
+				0, 0, 0, 0, 0, 0, 0, 0,
+				0, 0, 0, 0, 0,
+				24,
+				8,
+				0,
+				0,
+				0, 0, 0, 0
 			};
-    		EGLint numConfigs;
-			EGLConfig eglConfig;
-    		if (eglChooseConfig(data->display, configurationAttributes, &eglConfig, 1, &numConfigs) != GL_TRUE)
-    			throw EGLException::Create("Failed to choose EGLConfig");
-    		if (numConfigs != 1)
-    			throw EGLException::Create("eglChooseConfig return no config");
+    		int pixelFormat = ChoosePixelFormat(wglData->hdc, &pfd);
+    		if (pixelFormat == 0)
+    			throw BaseException::Create("Failed to get a valid ChoosePixelFormat");
+    		if (!SetPixelFormat(wglData->hdc, pixelFormat, &pfd))
+    			throw BaseException::Create("Failed to set the pixel format");
+    		wglData->hglrc = wglGetCurrentContext();
 
-    		// 创建EGLSurface
-    		data->surface = eglCreateWindowSurface(data->display, eglConfig,
-				static_cast<EGLNativeWindowType>(viewport->PlatformHandle), nullptr);
-    		if (data->surface == EGL_NO_SURFACE)
-    			throw EGLException::Create("Failed to create EGLSurface");
+    		viewport->RendererUserData = wglData;
     	};
     	platformIO.Renderer_DestroyWindow = [](ImGuiViewport* viewport) {
-    		if (auto* data = static_cast<EGLData*>(viewport->RendererUserData))
+    		if (auto* data = static_cast<WGLWindowData*>(viewport->RendererUserData))
     		{
-    			viewport->RendererUserData = nullptr;
-    			EGLDisplay display = data->display;
-    			EGLSurface surface = data->surface;
+    			wglMakeCurrent(nullptr, nullptr);
+    			ReleaseDC(static_cast<HWND>(viewport->PlatformHandle), data->hdc);
     			delete data;
-    			if (eglDestroySurface(display, surface) != EGL_TRUE)
-    				throw EGLException::Create("Failed to destroy EGLSurface");
+    			viewport->RendererUserData = nullptr;
     		}
     	};
     	platformIO.Renderer_SwapBuffers = [](ImGuiViewport* viewport, void*) {
-    		if (auto* data = static_cast<EGLData*>(viewport->RendererUserData))
-    		{
-    			if (eglSwapBuffers(data->display, data->surface) != EGL_TRUE)
-    				throw EGLException::Create("Failed to swap buffers");
-    		}
+    		if (auto* data = static_cast<WGLWindowData*>(viewport->RendererUserData))
+    			SwapBuffers(data->hdc);
     	};
     	platformIO.Platform_RenderWindow = [](ImGuiViewport* viewport, void*) {
-    		if (auto* data = static_cast<EGLData*>(viewport->RendererUserData))
-    		{
-    			if (eglMakeCurrent(data->display, data->surface, data->surface, data->context) != EGL_TRUE)
-    				throw EGLException::Create("Failed to make current surface");
-    		}
+    		if (auto* data = static_cast<WGLWindowData*>(viewport->RendererUserData))
+    			wglMakeCurrent(data->hdc, data->hglrc);
     	};
     }
 }

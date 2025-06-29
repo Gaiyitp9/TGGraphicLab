@@ -5,19 +5,17 @@
 *****************************************************************/
 #pragma once
 
-#include "glad/gl.h"
-#include <variant>
+#include "GraphicsAPITraits.h"
+#include <string_view>
 
 namespace TG::Rendering
 {
-    using OpenGLID = GLuint;
-
-    using ShaderID = std::variant<OpenGLID>;
-    using TextureID = std::variant<OpenGLID>;
-
-    template<typename T>
-    T CastID(ShaderID id)
+    class Texture
     {
-        return std::get<T>(id);
-    }
+    public:
+        virtual ~Texture() = default;
+
+        [[nodiscard]] virtual TextureID GetID() const = 0;
+        virtual void Upload(std::string_view filePath) const = 0;
+    };
 }

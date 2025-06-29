@@ -53,34 +53,34 @@ def build_library(local_source_dir, local_build_dir, local_generator, build_type
 
 
 if __name__ == "__main__":
-    os.chdir("..")
+    root_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-    install_dir = Path(os.getcwd()) / "install"
+    install_dir = Path(root_dir) / "install"
     print(f"Install directory: {install_dir}")
 
     generator = "Visual Studio 17 2022"
     print(f"Generator: {generator}")
 
-    source_dir = str(Path(os.getcwd()) / "ThirdParty" / "mimalloc")
-    build_dir = str(Path(os.getcwd()) / "build" / "mimalloc")
+    source_dir = str(Path(root_dir) / "ThirdParty" / "mimalloc")
+    build_dir = str(Path(root_dir) / "build" / "mimalloc")
     cmake_options = ["-DMI_BUILD_TESTS=OFF"]
     build_library(source_dir, build_dir, generator, "Debug", cmake_options, install_dir)
     build_library(source_dir, build_dir, generator, "Release", cmake_options, install_dir)
 
-    source_dir = str(Path(os.getcwd()) / "ThirdParty" / "spdlog")
-    build_dir = str(Path(os.getcwd()) / "build" / "spdlog")
+    source_dir = str(Path(root_dir) / "ThirdParty" / "spdlog")
+    build_dir = str(Path(root_dir) / "build" / "spdlog")
     cmake_options = ["-DSPDLOG_USE_STD_FORMAT=ON", "-DSPDLOG_INSTALL=ON"]
     build_library(source_dir, build_dir, generator, "Debug", cmake_options, install_dir)
     build_library(source_dir, build_dir, generator, "Release", cmake_options, install_dir)
 
-    source_dir = str(Path(os.getcwd()) / "ThirdParty" / "PowerVR")
-    build_dir = str(Path(os.getcwd()) / "build" / "PowerVR")
+    source_dir = str(Path(root_dir) / "ThirdParty" / "glad")
+    build_dir = str(Path(root_dir) / "build" / "glad")
     cmake_options = []
     build_library(source_dir, build_dir, generator, "Debug", cmake_options, install_dir)
     build_library(source_dir, build_dir, generator, "Release", cmake_options, install_dir)
 
-    source_dir = str(Path(os.getcwd()) / "ThirdParty" / "glm")
-    build_dir = str(Path(os.getcwd()) / "build" / "glm")
+    source_dir = str(Path(root_dir) / "ThirdParty" / "glm")
+    build_dir = str(Path(root_dir) / "build" / "glm")
     cmake_options = ["-DGLM_BUILD_TESTS=OFF", "-DBUILD_SHARED_LIBS=OFF"]
     build_library(source_dir, build_dir, generator, "Debug", cmake_options, install_dir)
     build_library(source_dir, build_dir, generator, "Release", cmake_options, install_dir)

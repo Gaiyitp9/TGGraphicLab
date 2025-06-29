@@ -5,19 +5,19 @@
 *****************************************************************/
 #pragma once
 
-#include "glad/gl.h"
-#include <variant>
+#include "Rendering/Texture.h"
 
 namespace TG::Rendering
 {
-    using OpenGLID = GLuint;
-
-    using ShaderID = std::variant<OpenGLID>;
-    using TextureID = std::variant<OpenGLID>;
-
-    template<typename T>
-    T CastID(ShaderID id)
+    class OpenGLTexture : public Texture
     {
-        return std::get<T>(id);
-    }
+    public:
+        OpenGLTexture();
+        ~OpenGLTexture() override;
+
+        [[nodiscard]] TextureID GetID() const override { return m_texture; }
+
+    protected:
+        GLuint m_texture{};
+    };
 }

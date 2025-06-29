@@ -6,7 +6,7 @@
 #pragma once
 
 #include "Module.h"
-#include "Base/WindowBase.hpp"
+#include "Base/CommonInterfaces.h"
 #include "Rendering/Renderer.h"
 #include <memory>
 

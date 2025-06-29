@@ -5,9 +5,9 @@
 *****************************************************************/
 #pragma once
 
+#include "Rendering/GraphicsAPITraits.h"
 #include "Math/Core.hpp"
 #include "glm/matrix.hpp"
-#include "Rendering/GraphicsAPITraits.h"
 #include <string_view>
 
 namespace TG::Rendering
