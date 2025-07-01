@@ -7,7 +7,8 @@
 
 #include "Rendering/Renderer.h"
 #include "Base/CommonInterfaces.h"
-#include "../Example.h"
+#include "Rendering/OpenGL/OpenGLContext.h"
+#include "Rendering/Example.h"
 #include <memory>
 
 namespace TG::Rendering
@@ -23,9 +24,10 @@ namespace TG::Rendering
         void FrameBufferResizeCallback(unsigned int width, unsigned int height) override;
 
     private:
-        HDC m_hdc{};
-        HGLRC m_wglContext{};
+        OpenGLContext m_context;
 
+        std::unique_ptr<ExampleFactory> m_exampleFactory;
         std::unique_ptr<Example> m_example;
+        ExampleEnum m_exampleEnum = ExampleEnum::Cube;
     };
 }

@@ -97,6 +97,7 @@ namespace TG
 
         if (Input::GetKeyDown(Input::KeyCode::RightMouseButton))
         {
+            ShowCursor(false);
             m_lastMouseX = Input::MousePositionX();
             m_lastMouseY = Input::MousePositionY();
         }
@@ -105,14 +106,18 @@ namespace TG
         {
             const float xOffset = static_cast<float>(Input::MousePositionX() - m_lastMouseX) * m_mouseSensitivity;
             const float yOffset = static_cast<float>(Input::MousePositionY() - m_lastMouseY) * m_mouseSensitivity;
-            m_lastMouseX = Input::MousePositionX();
-            m_lastMouseY = Input::MousePositionY();
+            POINT screenPos{ m_lastMouseX, m_lastMouseY };
+            ClientToScreen(m_videoPort.lock()->Handle(), &screenPos);
+            SetCursorPos(screenPos.x, screenPos.y);
 
             m_yaw -= xOffset;
             m_pitch = std::clamp(m_pitch - yOffset, -89.0f, 89.0f);
 
             UpdateCameraVectors();
         }
+
+        if (Input::GetKeyUp(Input::KeyCode::RightMouseButton))
+            ShowCursor(true);
 
         m_fov = std::clamp(m_fov - static_cast<float>(Input::MouseWheelDelta()), 1.0f, 80.0f);
         m_orthoWidth = std::clamp(m_orthoWidth - static_cast<float>(Input::MouseWheelDelta()) * 0.1f, 0.2f, 20.0f);

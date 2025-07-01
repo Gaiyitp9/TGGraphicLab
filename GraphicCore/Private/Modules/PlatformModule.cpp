@@ -80,7 +80,7 @@ namespace TG
         );
         m_mainWindow->SetSuspendCallback([timer = m_timer]{ timer->Pause(); });
         m_mainWindow->SetResumeCallback([timer = m_timer]{ timer->Start(); });
-        // 禁止输入法
+        // 禁用输入法
         ImmAssociateContextEx(m_mainWindow->Handle(), nullptr, 0);
     }
 

@@ -5,7 +5,6 @@
 *****************************************************************/
 
 #include "Modules/RenderModule.h"
-// #include "Rendering/OpenGL/OpenGLESRenderer.h"
 #include "Rendering/OpenGL/OpenGLRenderer.h"
 // #include "Rendering/VulkanExample/VulkanRenderer.h"
 

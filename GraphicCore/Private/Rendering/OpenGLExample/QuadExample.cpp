@@ -18,7 +18,8 @@ namespace TG::Rendering
 		: m_videoPort(videoPort), m_timer(timer),
 		m_vertexShader("Shaders/GLSL/Quad.vert", ShaderStage::Vertex),
 		m_fragmentShader("Shaders/GLSL/Quad.frag", ShaderStage::Fragment),
-		m_geometryShader("Shaders/GLSL/Wireframe.geom", ShaderStage::Geometry)
+		m_wireframeGeometryShader("Shaders/GLSL/Wireframe.geom", ShaderStage::Geometry),
+		m_wireframeFragmentShader("Shaders/GLSL/Wireframe.frag", ShaderStage::Fragment)
     {
     	m_quadMesh = Geometry::CreatePrimitive(Geometry::PrimitiveType::Quad);
 		m_quadMesh.colors[0] = { 1.0f, 0.5f, 0.2f };
@@ -99,7 +100,6 @@ namespace TG::Rendering
     	glGenProgramPipelines(1, &m_pipeline);
     	glBindProgramPipeline(m_pipeline);
     	glUseProgramStages(m_pipeline, GL_VERTEX_SHADER_BIT, CastID<GLuint>(m_vertexShader.GetID()));
-    	glUseProgramStages(m_pipeline, GL_FRAGMENT_SHADER_BIT, CastID<GLuint>(m_fragmentShader.GetID()));
     }
 
     QuadExample::~QuadExample()
@@ -119,9 +119,15 @@ namespace TG::Rendering
     	glClear(GL_COLOR_BUFFER_BIT);
 
     	if (m_wireframe)
-    		glUseProgramStages(m_pipeline, GL_GEOMETRY_SHADER_BIT, CastID<GLuint>(m_geometryShader.GetID()));
+    	{
+    		glUseProgramStages(m_pipeline, GL_GEOMETRY_SHADER_BIT, CastID<GLuint>(m_wireframeGeometryShader.GetID()));
+    		glUseProgramStages(m_pipeline, GL_FRAGMENT_SHADER_BIT, CastID<GLuint>(m_wireframeFragmentShader.GetID()));
+    	}
     	else
+    	{
     		glUseProgramStages(m_pipeline, GL_GEOMETRY_SHADER_BIT, 0);
+    		glUseProgramStages(m_pipeline, GL_FRAGMENT_SHADER_BIT, CastID<GLuint>(m_fragmentShader.GetID()));
+    	}
 
     	if (auto timerPtr = m_timer.lock())
     	{

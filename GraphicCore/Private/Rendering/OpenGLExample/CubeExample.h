@@ -37,7 +37,8 @@ namespace TG::Rendering
         GLuint m_pipeline{};
         OpenGLShader m_vertexShader;
         OpenGLShader m_fragmentShader;
-        OpenGLShader m_geometryShader;
+        OpenGLShader m_wireframeGeometryShader;
+        OpenGLShader m_wireframeFragmentShader;
         OpenGLTexture2D m_textures[2]{};
 
         ViewportGrid m_viewportGrid;

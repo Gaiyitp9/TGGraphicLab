@@ -17,7 +17,8 @@ namespace TG::Rendering
         : m_camera(videoPort, timer),
         m_vertexShader("Shaders/GLSL/Cube.vert", ShaderStage::Vertex),
         m_fragmentShader("Shaders/GLSL/Cube.frag", ShaderStage::Fragment),
-        m_geometryShader("Shaders/GLSL/Wireframe.geom", ShaderStage::Geometry)
+        m_wireframeGeometryShader("Shaders/GLSL/Wireframe.geom", ShaderStage::Geometry),
+        m_wireframeFragmentShader("Shaders/GLSL/Wireframe.frag", ShaderStage::Fragment)
     {
         m_cubeMesh = Geometry::CreatePrimitive(Geometry::PrimitiveType::Cube);
 
@@ -66,7 +67,6 @@ namespace TG::Rendering
         glGenProgramPipelines(1, &m_pipeline);
         glBindProgramPipeline(m_pipeline);
         glUseProgramStages(m_pipeline, GL_VERTEX_SHADER_BIT, CastID<GLuint>(m_vertexShader.GetID()));
-        glUseProgramStages(m_pipeline, GL_FRAGMENT_SHADER_BIT, CastID<GLuint>(m_fragmentShader.GetID()));
 
         glEnable(GL_DEPTH_TEST);
     }
@@ -89,9 +89,15 @@ namespace TG::Rendering
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         if (m_wireframe)
-            glUseProgramStages(m_pipeline, GL_GEOMETRY_SHADER_BIT, CastID<GLuint>(m_geometryShader.GetID()));
+        {
+            glUseProgramStages(m_pipeline, GL_GEOMETRY_SHADER_BIT, CastID<GLuint>(m_wireframeGeometryShader.GetID()));
+            glUseProgramStages(m_pipeline, GL_FRAGMENT_SHADER_BIT, CastID<GLuint>(m_wireframeFragmentShader.GetID()));
+        }
         else
+        {
             glUseProgramStages(m_pipeline, GL_GEOMETRY_SHADER_BIT, 0);
+            glUseProgramStages(m_pipeline, GL_FRAGMENT_SHADER_BIT, CastID<GLuint>(m_fragmentShader.GetID()));
+        }
 
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, CastID<GLuint>(m_textures[0].GetID()));

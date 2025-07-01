@@ -40,8 +40,6 @@ namespace TG::Rendering
         glBindProgramPipeline(m_pipeline);
         glUseProgramStages(m_pipeline, GL_VERTEX_SHADER_BIT, CastID<GLuint>(m_vertexShader.GetID()));
         glUseProgramStages(m_pipeline, GL_FRAGMENT_SHADER_BIT, CastID<GLuint>(m_fragmentShader.GetID()));
-
-        glEnable(GL_DEPTH_TEST);
     }
 
     SkyBox::~SkyBox()
@@ -54,9 +52,15 @@ namespace TG::Rendering
 
     void SkyBox::Render(const Camera& camera) const
     {
+        const bool prevDepthTest = glIsEnabled(GL_DEPTH_TEST);
         GLint prevDepthFunc;
-        glGetIntegerv(GL_DEPTH_FUNC, &prevDepthFunc);
-        glDepthFunc(GL_LEQUAL);
+        if (!prevDepthTest)
+            glEnable(GL_DEPTH_TEST);
+        else
+        {
+            glGetIntegerv(GL_DEPTH_FUNC, &prevDepthFunc);
+            glDepthFunc(GL_LEQUAL);
+        }
 
         glActiveTexture(GL_TEXTURE_CUBE_MAP);
         glBindTexture(GL_TEXTURE_CUBE_MAP, CastID<GLuint>(m_cubeMap.GetID()));
@@ -72,6 +76,9 @@ namespace TG::Rendering
         glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(m_cubeMesh.indices.size()), GL_UNSIGNED_INT, nullptr);
         glBindVertexArray(0);
 
-        glDepthFunc(prevDepthFunc);
+        if (!prevDepthTest)
+            glDisable(GL_DEPTH_TEST);
+        else
+            glDepthFunc(prevDepthFunc);
     }
 }

@@ -5,6 +5,8 @@
 *****************************************************************/
 #pragma once
 
+#include <memory>
+
 namespace TG
 {
     struct Example
@@ -12,5 +14,20 @@ namespace TG
         virtual ~Example() = default;
 
         virtual void Render() = 0;
+    };
+
+    enum class ExampleEnum
+    {
+        Quad,
+        Cube,
+        BasicLight,
+    };
+
+    class ExampleFactory
+    {
+    public:
+        virtual ~ExampleFactory() = default;
+
+        virtual std::unique_ptr<Example> CreateExample(ExampleEnum example) = 0;
     };
 }

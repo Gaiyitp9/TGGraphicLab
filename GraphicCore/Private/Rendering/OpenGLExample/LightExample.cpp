@@ -17,5 +17,13 @@ namespace TG::Rendering
 
     }
 
+    LightExample::~LightExample()
+    {
 
+    }
+
+    void LightExample::Render()
+    {
+
+    }
 }
