@@ -10,6 +10,7 @@
 #include "Diagnostic/Log.hpp"
 #include "Rendering/OpenGLExample/QuadExample.h"
 #include "Rendering/OpenGLExample/CubeExample.h"
+#include "Rendering/OpenGLExample/LightExample.h"
 
 namespace TG::Rendering
 {

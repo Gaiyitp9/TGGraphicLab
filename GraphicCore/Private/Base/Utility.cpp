@@ -5,6 +5,9 @@
 *****************************************************************/
 
 #include "Base/Utility.h"
+
+#include <algorithm>
+
 #include "Exception/BaseException.h"
 #include <locale>
 #include <fstream>
@@ -101,5 +104,28 @@ namespace TG
         file.close();
 
         return buffer;
+    }
+
+    std::string ToLower(std::string_view input)
+    {
+        std::string lower;
+        for (char c : input | std::views::transform([](unsigned char c) {
+            return static_cast<char>(std::tolower(c));
+        }))
+        {
+            lower += c;
+        }
+        return lower;
+    }
+
+    bool IsImageByExtension(std::string_view extension)
+    {
+        static const std::vector<std::string> exts = {
+            ".jpg", ".jpeg", ".png", ".bmp", ".tiff", ".tga",
+        };
+
+        std::string ext(extension);
+        std::ranges::transform(ext, ext.begin(), ::tolower);
+        return std::ranges::find(exts, ext) != exts.end();
     }
 }

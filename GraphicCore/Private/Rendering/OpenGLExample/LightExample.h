@@ -12,15 +12,14 @@
 #include "Rendering/OpenGL/OpenGLShader.h"
 #include "Rendering/OpenGL/OpenGLTexture2D.h"
 #include "ViewportGrid.h"
-#include "SkyBox.h"
 
 namespace TG::Rendering
 {
-    class CubeExample final : public Example
+    class LightExample final : public Example
     {
     public:
-        CubeExample(const std::weak_ptr<IDefaultVideoPort>& videoPort, const std::weak_ptr<ITimer> &timer);
-        ~CubeExample() override;
+        LightExample(const std::weak_ptr<IDefaultVideoPort>& videoPort, const std::weak_ptr<ITimer> &timer);
+        ~LightExample() override;
 
         void Render() override;
 
@@ -41,6 +40,5 @@ namespace TG::Rendering
         OpenGLTexture2D m_textures[2]{};
 
         ViewportGrid m_viewportGrid;
-        SkyBox m_skyBox;
     };
 }

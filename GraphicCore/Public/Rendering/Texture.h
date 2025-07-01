@@ -5,7 +5,7 @@
 *****************************************************************/
 #pragma once
 
-#include "GraphicsAPITraits.h"
+#include "Rendering/GraphicsAPIDefines.h"
 #include <string_view>
 
 namespace TG::Rendering

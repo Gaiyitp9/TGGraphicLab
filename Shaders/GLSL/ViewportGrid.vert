@@ -1,4 +1,9 @@
-#version 320 es
+#version 410 core
+
+out gl_PerVertex
+{
+    vec4 gl_Position;
+};
 
 void main()
 {

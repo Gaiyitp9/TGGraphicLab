@@ -1,10 +1,15 @@
-#version 320 es
+#version 410 core
 layout(points) in;
 layout(line_strip, max_vertices = 256) out;
 
 uniform mat4 view;
 uniform mat4 projection;
 uniform ivec2 origin;
+
+out gl_PerVertex
+{
+    vec4 gl_Position;
+};
 
 void main()
 {

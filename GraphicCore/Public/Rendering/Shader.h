@@ -5,7 +5,7 @@
 *****************************************************************/
 #pragma once
 
-#include "Rendering/GraphicsAPITraits.h"
+#include "Rendering/GraphicsAPIDefines.h"
 #include "Math/Core.hpp"
 #include "glm/matrix.hpp"
 #include <string_view>

@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.29)
 
-project(ImGui VERSION 1.91.4)
+project(ImGui VERSION 1.92.0)
 message(STATUS "ImGui version: ${PROJECT_VERSION}")
 
 # 使用c++23

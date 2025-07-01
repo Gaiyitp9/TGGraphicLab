@@ -75,8 +75,8 @@ namespace TG::Math
     public:
         explicit Evaluator(InternalXpr& block) : m_xprEvaluator(block.NestedExpression()),
             m_startRow(block.StartRow()), m_startColumn(block.StartColumn()),
-            m_offset(HasFlag<Xpr, XprFlag::RowMajor> ? m_startRow * BlockColumns + m_startColumn :
-                m_startColumn * BlockRows + m_startRow)
+            m_offset(HasFlag<Xpr, XprFlag::RowMajor> ? m_startRow * Traits<ArgXpr>::Columns + m_startColumn :
+                m_startColumn * Traits<ArgXpr>::Rows + m_startRow)
         {}
 
         [[nodiscard]] Scalar Entry(std::size_t index) const requires HasFlag<Xpr, XprFlag::LinearAccess>

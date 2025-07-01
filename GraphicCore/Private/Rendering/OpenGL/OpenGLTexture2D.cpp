@@ -12,9 +12,6 @@ namespace TG::Rendering
 {
     void OpenGLTexture2D::Upload(std::string_view filePath) const
     {
-        if (filePath.empty())
-            return;
-
         int width, height, channels;
         if (unsigned char* data = stbi_load(filePath.data(), &width, &height, &channels, 0))
         {

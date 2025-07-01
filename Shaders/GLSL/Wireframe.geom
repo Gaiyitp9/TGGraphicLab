@@ -1,4 +1,4 @@
-#version 320 es
+#version 410 core
 layout(triangles) in;
 layout(line_strip, max_vertices = 4) out;
 
@@ -6,6 +6,16 @@ layout(location = 0) in vec2 vTexCoord[];
 layout(location = 1) in vec3 vColor[];
 layout(location = 0) out vec2 fTexCoord;
 layout(location = 1) out vec3 fColor;
+
+in gl_PerVertex
+{
+   vec4 gl_Position;
+} gl_in[];
+
+out gl_PerVertex
+{
+   vec4 gl_Position;
+};
 
 void main()
 {

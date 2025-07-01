@@ -7,6 +7,7 @@
 
 #include <vector>
 #include <string>
+#include <ranges>
 
 namespace TG
 {
@@ -23,4 +24,10 @@ namespace TG
 
     // 读取二进制文件
     std::vector<char> ReadBinaryFile(std::string_view fileName);
+
+    // 字符串转换为小写
+    std::string ToLower(std::string_view input);
+
+    // 通过后缀名判断是否为支持的图片格式
+    bool IsImageByExtension(std::string_view extension);
 }

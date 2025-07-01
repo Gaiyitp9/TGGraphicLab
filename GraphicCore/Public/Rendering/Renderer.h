@@ -7,15 +7,6 @@
 
 namespace TG
 {
-    enum class GraphicsAPI : unsigned char
-    {
-        OpenGLES,
-        OpenGL,
-        Vulkan,
-        DirectX11,
-        DirectX12,
-    };
-
     class Renderer
     {
     public:

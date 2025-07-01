@@ -116,6 +116,7 @@ namespace TG::Rendering
         glBindVertexArray(0);
 
         m_viewportGrid.Render(m_camera);
+        m_skyBox.Render(m_camera);
 
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplWin32_NewFrame();
