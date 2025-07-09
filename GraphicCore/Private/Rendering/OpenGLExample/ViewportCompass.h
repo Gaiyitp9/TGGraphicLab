@@ -7,6 +7,7 @@
 
 #include "Rendering/Camera.h"
 #include "Rendering/OpenGL/OpenGLShader.h"
+#include <array>
 
 namespace TG::Rendering
 {
@@ -20,11 +21,12 @@ namespace TG::Rendering
 
     private:
         GLuint m_VBO{};
-        GLuint m_EBO{};
         GLuint m_VAO{};
         GLuint m_pipeline{};
 
         OpenGLShader m_vertexShader;
         OpenGLShader m_fragmentShader;
+
+        std::array<float, 36> m_axisVertices;
     };
 }
