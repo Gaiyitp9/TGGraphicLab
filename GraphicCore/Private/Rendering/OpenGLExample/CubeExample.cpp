@@ -86,6 +86,7 @@ namespace TG::Rendering
         Color::Color clearColor = Color::DimGray;
 
         glClearColor(clearColor.R(), clearColor.G(), clearColor.B(), clearColor.A());
+        glClearDepth(1.0);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         if (m_wireframe)
@@ -123,6 +124,7 @@ namespace TG::Rendering
 
         m_viewportGrid.Render(m_camera);
         m_skyBox.Render(m_camera);
+        m_viewportCompass.Render(m_camera);
 
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplWin32_NewFrame();

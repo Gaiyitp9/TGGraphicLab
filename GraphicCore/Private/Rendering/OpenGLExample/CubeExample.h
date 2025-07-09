@@ -13,6 +13,7 @@
 #include "Rendering/OpenGL/OpenGLTexture2D.h"
 #include "ViewportGrid.h"
 #include "SkyBox.h"
+#include "ViewportCompass.h"
 
 namespace TG::Rendering
 {
@@ -43,5 +44,6 @@ namespace TG::Rendering
 
         ViewportGrid m_viewportGrid;
         SkyBox m_skyBox;
+        ViewportCompass m_viewportCompass;
     };
 }

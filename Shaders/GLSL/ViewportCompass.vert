@@ -4,7 +4,7 @@ layout(location = 1) in vec3 aColor;
 
 layout(location = 0) out vec3 vColor;
 
-uniform mat4 model;
+uniform mat4 view;
 uniform mat4 projection;
 
 out gl_PerVertex
@@ -14,6 +14,6 @@ out gl_PerVertex
 
 void main()
 {
-    gl_Position = projection * model * vec4(aPos, 1.0);
+    gl_Position = projection * view * vec4(aPos, 1.0);
     vColor = aColor;
 }
