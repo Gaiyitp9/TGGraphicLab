@@ -90,7 +90,7 @@ namespace TG
     //     return str;
     // }
 
-    std::vector<char> ReadBinaryFile(std::string_view fileName)
+    std::vector<char> LoadBinaryFile(std::string_view fileName)
     {
         std::ifstream file(fileName.data(), std::ios::ate | std::ios::binary);
 

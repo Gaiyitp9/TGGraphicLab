@@ -104,4 +104,9 @@ namespace TG::Rendering
             }
         }
     }
+
+    void OpenGLCubeMap::Upload(unsigned char *data, int width, int height, TextureFormat textureFormat) const
+    {
+
+    }
 }

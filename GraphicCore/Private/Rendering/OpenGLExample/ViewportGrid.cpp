@@ -18,7 +18,6 @@ namespace TG::Rendering
         glUseProgramStages(m_pipeline, GL_FRAGMENT_SHADER_BIT, CastID<GLuint>(m_fragmentShader.GetID()));
         glUseProgramStages(m_pipeline, GL_GEOMETRY_SHADER_BIT, CastID<GLuint>(m_geometryShader.GetID()));
 
-        glLineWidth(1.0f);
     }
 
     ViewportGrid::~ViewportGrid()
@@ -29,6 +28,7 @@ namespace TG::Rendering
 
     void ViewportGrid::Render(const Camera& camera) const
     {
+        glLineWidth(1.0f);
         Frustum frustum = camera.ViewFrustum();
 
         // 计算xz平面的aabb

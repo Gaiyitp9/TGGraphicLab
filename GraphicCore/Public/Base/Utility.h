@@ -23,7 +23,7 @@ namespace TG
     std::string WideCharsToMultiBytes(std::wstring_view wStr);
 
     // 读取二进制文件
-    std::vector<char> ReadBinaryFile(std::string_view fileName);
+    std::vector<char> LoadBinaryFile(std::string_view fileName);
 
     // 字符串转换为小写
     std::string ToLower(std::string_view input);

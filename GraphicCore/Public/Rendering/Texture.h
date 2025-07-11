@@ -10,6 +10,14 @@
 
 namespace TG::Rendering
 {
+    enum class TextureFormat
+    {
+        R,
+        RG,
+        RGB,
+        RGBA,
+    };
+
     class Texture
     {
     public:
@@ -17,5 +25,6 @@ namespace TG::Rendering
 
         [[nodiscard]] virtual TextureID GetID() const = 0;
         virtual void Upload(std::string_view filePath) const = 0;
+        virtual void Upload(unsigned char* data, int width, int height, TextureFormat textureFormat) const = 0;
     };
 }

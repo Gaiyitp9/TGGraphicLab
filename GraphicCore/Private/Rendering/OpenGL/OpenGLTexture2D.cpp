@@ -39,12 +39,56 @@ namespace TG::Rendering
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
             glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, width, height, 0, format, GL_UNSIGNED_BYTE, data);
-            glGenerateMipmap(GL_TEXTURE_2D);
             stbi_image_free(data);
         }
         else
         {
             throw BaseException::Create("Failed to load texture");
         }
+    }
+
+    void OpenGLTexture2D::Upload(unsigned char* data, int width, int height, TextureFormat textureFormat) const
+    {
+        GLint internalFormat;
+        GLenum format;
+        switch (textureFormat)
+        {
+            case TextureFormat::R:
+            {
+                internalFormat = GL_RED;
+                format = GL_RED;
+                break;
+            }
+            case TextureFormat::RG:
+            {
+                internalFormat = GL_RG;
+                format = GL_RG;
+                break;
+            }
+            case TextureFormat::RGB:
+            {
+                internalFormat = GL_RGB;
+                format = GL_RGB;
+                break;
+            }
+            case TextureFormat::RGBA:
+            {
+                internalFormat = GL_RGBA;
+                format = GL_RGBA;
+                break;
+            }
+            default:
+            {
+                internalFormat = GL_RGBA;
+                format = GL_RGBA;
+            }
+        }
+
+        glBindTexture(GL_TEXTURE_2D, m_texture);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, width, height, 0, format, GL_UNSIGNED_BYTE, data);
     }
 }
