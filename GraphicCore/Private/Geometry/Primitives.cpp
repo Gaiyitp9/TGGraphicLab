@@ -12,10 +12,10 @@ namespace TG::Geometry
     {
         Mesh mesh;
         mesh.vertices.assign({
+            { -0.5f, -0.5f, 0.0f },
             {  0.5f, -0.5f, 0.0f },
             {  0.5f,  0.5f, 0.0f },
             { -0.5f,  0.5f, 0.0f },
-            { -0.5f, -0.5f, 0.0f },
         });
         mesh.indices.assign({
             0, 1, 2,

@@ -28,9 +28,7 @@ namespace TG::Rendering
 
     void ViewportGrid::Render(const Camera& camera) const
     {
-        glLineWidth(1.0f);
         Frustum frustum = camera.ViewFrustum();
-
         // 计算xz平面的aabb
         float minX = frustum.corners[0].X();
         float maxX = frustum.corners[0].X();

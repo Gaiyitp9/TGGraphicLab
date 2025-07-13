@@ -158,6 +158,8 @@ namespace TG::Math
     template<typename Scalar> struct ScalarIdentityOp;
     // 生成常量矩阵运算符
     template<typename Scalar> struct ScalarConstantOp;
+    // 取反运算符
+    template<typename Scalar> struct ScalarOppositeOp;
     // 逆矩阵表达式
     template<typename Xpr> class Inverse;
 

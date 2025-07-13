@@ -34,9 +34,11 @@ namespace TG::Rendering
 
         OpenGLShader m_axisNameVertexShader;
         OpenGLShader m_axisNameFragmentShader;
+
         Geometry::Mesh m_axisNameMesh;
 
         GLuint m_axisNameVBO{};
+        GLuint m_axisNameEBO{};
         GLuint m_axisNameVAO{};
         GLuint m_axisNamePipeline{};
 

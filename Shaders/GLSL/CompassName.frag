@@ -8,5 +8,5 @@ uniform vec3 fontColor;
 
 void main()
 {
-    FragColor = texture(fontTexture, fTexcoord) * vec4(fontColor, 1.0);
+    FragColor = texture(fontTexture, fTexcoord).rrrr * vec4(fontColor, 1.0);
 }
