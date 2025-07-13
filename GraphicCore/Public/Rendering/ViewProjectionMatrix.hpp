@@ -20,23 +20,15 @@ namespace TG::Rendering
         const Math::Vector3<Scalar>& worldUp = { 0, 1, 0 })
     {
         Math::Matrix4<Scalar> view;
-        // 这里计算出的front, right和up是左手坐标系，然后通过
-        //          [1  0  0  0
-        //           0  1  0  0
-        //           0  0 -1  0
-        //           0  0  0  1]
-        // 转换为右手坐标系，这样相机的负方向就会指向center
-        Math::Vector3<Scalar> front = (center - eye).Normalized();
-        Math::Vector3<Scalar> right = front.Cross(worldUp).Normalized();
-        Math::Vector3<Scalar> up = right.Cross(front);
+        Math::Vector3<Scalar> front = (eye - center).Normalized();
+        Math::Vector3<Scalar> right = worldUp.Cross(front).Normalized();
+        Math::Vector3<Scalar> up = front.Cross(right);
         view.Block<1, 3>(0, 0) = right.Transpose();
         view.Block<1, 3>(1, 0) = up.Transpose();
-        view[2, 0] = -front[0];
-        view[2, 1] = -front[1];
-        view[2, 2] = -front[2];
+        view.Block<1, 3>(2, 0) = front.Transpose();
         view[0, 3] = -eye.Dot(right);
         view[1, 3] = -eye.Dot(up);
-        view[2, 3] = eye.Dot(front);
+        view[2, 3] = -eye.Dot(front);
         view[3, 3] = static_cast<Scalar>(1);
         return view;
     }
@@ -51,6 +43,12 @@ namespace TG::Rendering
     template<typename Scalar>
     Math::Matrix4<Scalar> Perspective(Scalar fov, Scalar aspect, Scalar zNear, Scalar zFar)
     {
+        // 相机空间是右手坐标系，所以需要右乘
+        //          [1  0  0  0
+        //           0  1  0  0
+        //           0  0 -1  0
+        //           0  0  0  1]
+        // 转换为左手坐标系，这样深度为正，远平面的深度大于近平面的深度
         Math::Matrix4<Scalar> perspective;
         Scalar tanHalfFov = std::tan(fov / static_cast<Scalar>(2));
         perspective[0, 0] = static_cast<Scalar>(1) / (aspect * tanHalfFov);
@@ -73,6 +71,12 @@ namespace TG::Rendering
     template<typename Scalar>
     Math::Matrix4<Scalar> Orthographic(Scalar left, Scalar right, Scalar bottom, Scalar top, Scalar zNear, Scalar zFar)
     {
+        // 同透视变换，需要右乘
+        //          [1  0  0  0
+        //           0  1  0  0
+        //           0  0 -1  0
+        //           0  0  0  1]
+        // 转换为左手坐标系
         Math::Matrix4<Scalar> ortho;
         ortho[0, 0] = static_cast<Scalar>(2) / (right - left);
         ortho[1, 1] = static_cast<Scalar>(2) / (top - bottom);

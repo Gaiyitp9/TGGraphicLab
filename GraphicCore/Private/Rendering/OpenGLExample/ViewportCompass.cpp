@@ -142,9 +142,9 @@ namespace TG::Rendering
         Math::Matrix4F model = Math::Matrix4F::Identity();
         Math::Vector3F front = view.Block<1, 3>(2, 0).Transpose();
         Math::Vector3F up{ 0.0f, 1.0f, 0.0f };
-        Math::Vector3F left = up.Cross(front).Normalized();
-        up = front.Cross(left);
-        model.Block<3, 1>(0, 0) = left * 0.3f;
+        Math::Vector3F right = up.Cross(front).Normalized();
+        up = front.Cross(right);
+        model.Block<3, 1>(0, 0) = right * 0.3f;
         model.Block<3, 1>(0, 1) = up * 0.3f;
         model.Block<3, 1>(0, 2) = front * 0.3f;
 
