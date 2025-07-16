@@ -10,16 +10,16 @@
 #include "Geometry/Mesh.h"
 #include "Rendering/Camera.h"
 #include "Rendering/OpenGL/OpenGLShader.h"
-#include "Rendering/OpenGL/OpenGLTexture2D.h"
 #include "ViewportGrid.h"
+#include "ViewportCompass.h"
 
 namespace TG::Rendering
 {
-    class LightExample final : public Example
+    class BasicLightExample final : public Example
     {
     public:
-        LightExample(const std::weak_ptr<IDefaultVideoPort>& videoPort, const std::weak_ptr<ITimer> &timer);
-        ~LightExample() override;
+        BasicLightExample(const std::weak_ptr<IDefaultVideoPort>& videoPort, const std::weak_ptr<ITimer> &timer);
+        ~BasicLightExample() override;
 
         void Render() override;
 
@@ -32,13 +32,14 @@ namespace TG::Rendering
         GLuint m_VAO{};
         GLuint m_VBO{};
         GLuint m_EBO{};
-        bool m_wireframe{ false };
         GLuint m_pipeline{};
+        GLuint m_cameraUbo{};
+        GLuint m_lightUbo{};
+
         OpenGLShader m_vertexShader;
         OpenGLShader m_fragmentShader;
-        OpenGLShader m_geometryShader;
-        OpenGLTexture2D m_textures[2]{};
 
         ViewportGrid m_viewportGrid;
+        ViewportCompass m_viewportCompass;
     };
 }

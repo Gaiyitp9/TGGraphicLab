@@ -7,7 +7,7 @@
 #include "OpenGLExampleFactory.h"
 #include "Rendering/OpenGLExample/QuadExample.h"
 #include "Rendering/OpenGLExample/CubeExample.h"
-#include "Rendering/OpenGLExample/LightExample.h"
+#include "Rendering/OpenGLExample/BasicLightExample.h"
 
 namespace TG::Rendering
 {
@@ -24,7 +24,7 @@ namespace TG::Rendering
             case ExampleEnum::Cube:
                 return std::make_unique<CubeExample>(m_videoPort, m_timer);
             case ExampleEnum::BasicLight:
-                return std::make_unique<LightExample>(m_videoPort, m_timer);
+                return std::make_unique<BasicLightExample>(m_videoPort, m_timer);
             default:
                 return nullptr;
         }
