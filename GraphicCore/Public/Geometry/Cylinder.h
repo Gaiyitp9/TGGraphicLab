@@ -7,5 +7,8 @@
 
 namespace TG::Geometry
 {
+    class Cylinder
+    {
 
+    };
 }

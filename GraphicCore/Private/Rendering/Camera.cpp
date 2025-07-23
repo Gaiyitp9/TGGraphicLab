@@ -5,6 +5,8 @@
 *****************************************************************/
 
 #include "Rendering/Camera.h"
+
+#include "Diagnostic/Log.hpp"
 #include "Rendering/ViewProjectionMatrix.hpp"
 #include "Input/Devices.h"
 
@@ -97,18 +99,58 @@ namespace TG
 
         if (Input::GetKeyDown(Input::KeyCode::RightMouseButton))
         {
-            ShowCursor(false);
-            m_lastMouseX = Input::MousePositionX();
-            m_lastMouseY = Input::MousePositionY();
+            // ShowCursor(false);
+            m_clickMouseX = Input::MousePositionX();
+            m_clickMouseY = Input::MousePositionY();
+            m_lastMouseX = m_clickMouseX;
+            m_lastMouseY = m_clickMouseY;
         }
 
         if (Input::GetKey(Input::KeyCode::RightMouseButton))
         {
             const float xOffset = static_cast<float>(Input::MousePositionX() - m_lastMouseX) * m_mouseSensitivity;
             const float yOffset = static_cast<float>(Input::MousePositionY() - m_lastMouseY) * m_mouseSensitivity;
-            POINT screenPos{ m_lastMouseX, m_lastMouseY };
-            ClientToScreen(m_videoPort.lock()->Handle(), &screenPos);
-            SetCursorPos(screenPos.x, screenPos.y);
+            if (xOffset > 5.0f || xOffset < -5.0f)
+            {
+                short mouseX = Input::MousePositionX();
+                short mouseY = Input::MousePositionY();
+                LogInfo("x offset: {}", xOffset);
+            }
+            m_lastMouseX = Input::MousePositionX();
+            m_lastMouseY = Input::MousePositionY();
+            bool resetPosition = false;
+            if (m_lastMouseX > m_videoPort.lock()->Width())
+            {
+                m_lastMouseX = 0;
+                resetPosition = true;
+            }
+            if (m_lastMouseX < 0)
+            {
+                m_lastMouseX = static_cast<short>(m_videoPort.lock()->Width());
+                resetPosition = true;
+            }
+            if (m_lastMouseY > m_videoPort.lock()->Height())
+            {
+                m_lastMouseY = 0;
+                resetPosition = true;
+            }
+            if (m_lastMouseY < 0)
+            {
+                m_lastMouseY = static_cast<short>(m_videoPort.lock()->Height());
+                resetPosition = true;
+            }
+            if (resetPosition)
+            {
+                POINT screenPos{ m_lastMouseX, m_lastMouseY };
+                ClientToScreen(m_videoPort.lock()->Handle(), &screenPos);
+                SetCursorPos(screenPos.x, screenPos.y);
+                GetCursorPos(&screenPos);
+                ScreenToClient(m_videoPort.lock()->Handle(), &screenPos);
+                LogInfo("Cursor now at: {}, {}", screenPos.x, screenPos.y);  // 立即打印新坐标
+                // LPARAM lParam = MAKELPARAM(m_lastMouseX, m_lastMouseY);
+                // WPARAM wParam = 0; // 没有鼠标键按下
+                // PostMessage(m_videoPort.lock()->Handle(), WM_MOUSEMOVE, wParam, lParam);
+            }
 
             m_yaw -= xOffset;
             m_pitch = std::clamp(m_pitch - yOffset, -89.0f, 89.0f);
@@ -117,7 +159,12 @@ namespace TG
         }
 
         if (Input::GetKeyUp(Input::KeyCode::RightMouseButton))
-            ShowCursor(true);
+        {
+            // ShowCursor(true);
+            POINT screenPos{ m_clickMouseX, m_clickMouseY };
+            ClientToScreen(m_videoPort.lock()->Handle(), &screenPos);
+            SetCursorPos(screenPos.x, screenPos.y);
+        }
 
         m_fov = std::clamp(m_fov - static_cast<float>(Input::MouseWheelDelta()), 1.0f, 80.0f);
         m_orthoWidth = std::clamp(m_orthoWidth - static_cast<float>(Input::MouseWheelDelta()) * 0.1f, 0.2f, 20.0f);

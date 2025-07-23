@@ -55,6 +55,8 @@ namespace TG
 
         float m_yaw{ 0.0f };
         float m_pitch{ -5.0f };
+        short m_clickMouseX{ 0 };
+        short m_clickMouseY{ 0 };
         short m_lastMouseX{ 0 };
         short m_lastMouseY{ 0 };
 

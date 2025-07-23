@@ -29,7 +29,8 @@ def build_library(local_source_dir, local_build_dir, local_generator, build_type
     print(f"Running: {build_cmd_str}")
     with subprocess.Popen(build_cmd, text=True,
                           stdout=subprocess.PIPE,
-                          stderr=subprocess.STDOUT) as process:
+                          stderr=subprocess.STDOUT,
+                          encoding='utf-8') as process:
         for line in process.stdout:
             print(line.strip())
 
