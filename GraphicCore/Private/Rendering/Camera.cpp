@@ -99,58 +99,54 @@ namespace TG
 
         if (Input::GetKeyDown(Input::KeyCode::RightMouseButton))
         {
-            // ShowCursor(false);
-            m_clickMouseX = Input::MousePositionX();
-            m_clickMouseY = Input::MousePositionY();
+            ShowCursor(false);
+            POINT screenPos;
+            GetCursorPos(&screenPos);
+            m_clickMouseX = static_cast<short>(screenPos.x);
+            m_clickMouseY = static_cast<short>(screenPos.y);
             m_lastMouseX = m_clickMouseX;
             m_lastMouseY = m_clickMouseY;
         }
 
         if (Input::GetKey(Input::KeyCode::RightMouseButton))
         {
-            const float xOffset = static_cast<float>(Input::MousePositionX() - m_lastMouseX) * m_mouseSensitivity;
-            const float yOffset = static_cast<float>(Input::MousePositionY() - m_lastMouseY) * m_mouseSensitivity;
-            if (xOffset > 5.0f || xOffset < -5.0f)
-            {
-                short mouseX = Input::MousePositionX();
-                short mouseY = Input::MousePositionY();
-                LogInfo("x offset: {}", xOffset);
-            }
-            m_lastMouseX = Input::MousePositionX();
-            m_lastMouseY = Input::MousePositionY();
+            POINT screenPos;
+            GetCursorPos(&screenPos);
+            const float xOffset = static_cast<float>(screenPos.x - m_lastMouseX) * m_mouseSensitivity;
+            const float yOffset = static_cast<float>(screenPos.y - m_lastMouseY) * m_mouseSensitivity;
+
+            POINT clientPos = screenPos;
+            ScreenToClient(m_videoPort.lock()->Handle(), &clientPos);
             bool resetPosition = false;
-            if (m_lastMouseX > m_videoPort.lock()->Width())
+            if (clientPos.x > m_videoPort.lock()->Width())
             {
-                m_lastMouseX = 0;
+                clientPos.x = 0;
                 resetPosition = true;
             }
-            if (m_lastMouseX < 0)
+            if (clientPos.x < 0)
             {
-                m_lastMouseX = static_cast<short>(m_videoPort.lock()->Width());
+                clientPos.x = static_cast<short>(m_videoPort.lock()->Width());
                 resetPosition = true;
             }
-            if (m_lastMouseY > m_videoPort.lock()->Height())
+            if (clientPos.y > m_videoPort.lock()->Height())
             {
-                m_lastMouseY = 0;
+                clientPos.y = 0;
                 resetPosition = true;
             }
-            if (m_lastMouseY < 0)
+            if (clientPos.y < 0)
             {
-                m_lastMouseY = static_cast<short>(m_videoPort.lock()->Height());
+                clientPos.y = static_cast<short>(m_videoPort.lock()->Height());
                 resetPosition = true;
             }
             if (resetPosition)
             {
-                POINT screenPos{ m_lastMouseX, m_lastMouseY };
+                screenPos = clientPos;
                 ClientToScreen(m_videoPort.lock()->Handle(), &screenPos);
                 SetCursorPos(screenPos.x, screenPos.y);
-                GetCursorPos(&screenPos);
-                ScreenToClient(m_videoPort.lock()->Handle(), &screenPos);
-                LogInfo("Cursor now at: {}, {}", screenPos.x, screenPos.y);  // 立即打印新坐标
-                // LPARAM lParam = MAKELPARAM(m_lastMouseX, m_lastMouseY);
-                // WPARAM wParam = 0; // 没有鼠标键按下
-                // PostMessage(m_videoPort.lock()->Handle(), WM_MOUSEMOVE, wParam, lParam);
             }
+
+            m_lastMouseX = static_cast<short>(screenPos.x);
+            m_lastMouseY = static_cast<short>(screenPos.y);
 
             m_yaw -= xOffset;
             m_pitch = std::clamp(m_pitch - yOffset, -89.0f, 89.0f);
@@ -160,7 +156,7 @@ namespace TG
 
         if (Input::GetKeyUp(Input::KeyCode::RightMouseButton))
         {
-            // ShowCursor(true);
+            ShowCursor(true);
             POINT screenPos{ m_clickMouseX, m_clickMouseY };
             ClientToScreen(m_videoPort.lock()->Handle(), &screenPos);
             SetCursorPos(screenPos.x, screenPos.y);

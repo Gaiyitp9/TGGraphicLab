@@ -6,8 +6,6 @@
 
 #include "Input/Mouse.h"
 
-#include "Diagnostic/Log.hpp"
-
 namespace TG::Input
 {
 	void Mouse::Update()
@@ -37,7 +35,6 @@ namespace TG::Input
 
 		m_positionX = event.x;
 		m_positionY = event.y;
-		LogInfo("Mouse position {}, {}", m_positionX, m_positionY);
 		m_wheelDelta += event.wheelDelta;
     }
 

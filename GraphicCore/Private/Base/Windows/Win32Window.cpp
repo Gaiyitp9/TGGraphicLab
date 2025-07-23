@@ -8,8 +8,6 @@
 #include "Exception/Windows/Win32Exception.h"
 #include "Base/Utility.h"
 #include <format>
-
-#include "Diagnostic/Log.hpp"
 // #include <hidusage.h>
 
 namespace TG
@@ -453,7 +451,6 @@ namespace TG
 
 			case WM_MOUSEMOVE:
 			{
-				LogInfo("WM_MOUSEMOVE");
 				pWindow->cursorPosDelegate.ExecuteIfBound(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
 				return 0;
 			}

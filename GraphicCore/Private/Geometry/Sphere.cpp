@@ -20,7 +20,6 @@ namespace TG::Geometry
         const auto theta = static_cast<float>(std::numbers::pi / (m_rings + 1));
         const auto phi = static_cast<float>(std::numbers::pi * 2 / (m_segments + 1));
 
-        mesh.vertices.push_back({ 0, m_radius, 0 });
         for (unsigned int i = 1; i <= m_rings; ++i)
         {
             for (unsigned int j = 0; j < m_segments; ++j)
@@ -31,27 +30,39 @@ namespace TG::Geometry
                     m_radius * std::sin(phi * static_cast<float>(j)) });
             }
         }
+        mesh.vertices.push_back({ 0, m_radius, 0 });
         mesh.vertices.push_back({ 0, -m_radius, 0 });
 
-        for (unsigned int i = 1; i <= m_segments; ++i)
+        for (unsigned int i = 0; i < m_segments; ++i)
         {
-            mesh.indices.push_back(0);
-            mesh.indices.push_back(i % m_segments + 1);
+            mesh.indices.push_back(mesh.vertices.size() - 2);
+            mesh.indices.push_back((i + 1) % m_segments);
             mesh.indices.push_back(i);
         }
-        for (unsigned int i = 0; i < mesh.vertices.size(); ++i)
+        for (unsigned int i = 0; i < m_rings; ++i)
         {
             for (unsigned int j = 0; j < m_segments; ++j)
             {
-
+                const unsigned int offset0 = i * m_segments;
+                const unsigned int offset1 = (i + 1) * m_segments;
+                const unsigned int index0 = offset0 + j;
+                const unsigned int index1 = offset0 + (j + 1) % m_segments;
+                const unsigned int index2 = offset1 + j;
+                const unsigned int index3 = offset1 + (j + 1) % m_segments;
+                mesh.indices.push_back(index0);
+                mesh.indices.push_back(index3);
+                mesh.indices.push_back(index2);
+                mesh.indices.push_back(index0);
+                mesh.indices.push_back(index1);
+                mesh.indices.push_back(index3);
             }
         }
-        for (unsigned int i = 1; i <= m_segments; ++i)
+        for (unsigned int i = 0; i < m_segments; ++i)
         {
-            std::uint32_t southPoleIndex = mesh.vertices.size() - 1;
-            mesh.indices.push_back(southPoleIndex);
-            mesh.indices.push_back(southPoleIndex - i);
-            mesh.indices.push_back(southPoleIndex - i % m_segments - 1);
+            std::uint32_t offset = mesh.vertices.size() - 3;
+            mesh.indices.push_back(mesh.vertices.size() - 1);
+            mesh.indices.push_back(offset - i);
+            mesh.indices.push_back(offset - (i + 1) % m_segments);
         }
 
         for (unsigned int i = 0; i < mesh.vertices.size(); ++i)
