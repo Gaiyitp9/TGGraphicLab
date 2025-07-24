@@ -9,8 +9,8 @@
 
 namespace TG::Rendering
 {
-    SkyBox::SkyBox() : m_vertexShader("Shaders/GLSL/SkyBox.vert", ShaderStage::Vertex),
-        m_fragmentShader("Shaders/GLSL/SkyBox.frag", ShaderStage::Fragment)
+    SkyBox::SkyBox() : m_vertexShader("Assets/Shaders/GLSL/SkyBox.vert", ShaderStage::Vertex),
+        m_fragmentShader("Assets/Shaders/GLSL/SkyBox.frag", ShaderStage::Fragment)
     {
         m_cubeMesh = Geometry::CreatePrimitive(Geometry::PrimitiveType::Cube);
 
@@ -33,7 +33,7 @@ namespace TG::Rendering
 
         glBindVertexArray(0);
 
-        m_cubeMap.Upload("Resources/Textures/CubeMaps/Fjaderholmarna");
+        m_cubeMap.Upload("Assets/Textures/CubeMaps/Fjaderholmarna");
         m_fragmentShader.SetInt("skybox", 0);
 
         glGenProgramPipelines(1, &m_pipeline);

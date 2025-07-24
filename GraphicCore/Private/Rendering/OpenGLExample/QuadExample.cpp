@@ -16,10 +16,10 @@ namespace TG::Rendering
 {
     QuadExample::QuadExample(const std::weak_ptr<IDefaultVideoPort>& videoPort, const std::weak_ptr<ITimer> &timer)
 		: m_videoPort(videoPort), m_timer(timer),
-		m_vertexShader("Shaders/GLSL/Quad.vert", ShaderStage::Vertex),
-		m_fragmentShader("Shaders/GLSL/Quad.frag", ShaderStage::Fragment),
-		m_wireframeGeometryShader("Shaders/GLSL/Wireframe.geom", ShaderStage::Geometry),
-		m_wireframeFragmentShader("Shaders/GLSL/Wireframe.frag", ShaderStage::Fragment)
+		m_vertexShader("Assets/Shaders/GLSL/Quad.vert", ShaderStage::Vertex),
+		m_fragmentShader("Assets/Shaders/GLSL/Quad.frag", ShaderStage::Fragment),
+		m_wireframeGeometryShader("Assets/Shaders/GLSL/Wireframe.geom", ShaderStage::Geometry),
+		m_wireframeFragmentShader("Assets/Shaders/GLSL/Wireframe.frag", ShaderStage::Fragment)
     {
     	m_quadMesh = Geometry::CreatePrimitive(Geometry::PrimitiveType::Quad);
 		m_quadMesh.colors[0] = { 1.0f, 0.5f, 0.2f };
@@ -65,7 +65,7 @@ namespace TG::Rendering
     	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
     	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     	int width, height, nrChannels;
-    	unsigned char* data = stbi_load("Resources/Textures/wall.jpg", &width, &height, &nrChannels, 0);
+    	unsigned char* data = stbi_load("Assets/Textures/wall.jpg", &width, &height, &nrChannels, 0);
     	if (data)
     	{
     		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
@@ -82,7 +82,7 @@ namespace TG::Rendering
     	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
     	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
     	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		data = stbi_load("Resources/Textures/container.jpg", &width, &height, &nrChannels, 0);
+		data = stbi_load("Assets/Textures/container.jpg", &width, &height, &nrChannels, 0);
     	if (data)
     	{
     		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);

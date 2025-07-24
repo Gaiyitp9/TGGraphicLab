@@ -24,31 +24,36 @@ else()
     message(STATUS "Unknown generator: ${CMAKE_GENERATOR}")
 endif()
 
-set(mimallocLib ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_BINDIR}/mimalloc$<$<CONFIG:DEBUG>:-debug>.dll)
-set(mimallocRedirectLib ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_BINDIR}/mimalloc-redirect.dll)
-set(ICONS ${CMAKE_CURRENT_SOURCE_DIR}/maple-leaf.ico ${CMAKE_CURRENT_SOURCE_DIR}/maple-leaf2.ico)
-add_custom_command(
-    TARGET ${EXECUTABLE_NAME}
-    POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy_if_different ${mimallocLib} ${EXECUTABLE_OUTPUT_DIRECTORY}
-    COMMAND ${CMAKE_COMMAND} -E copy_if_different ${mimallocRedirectLib} ${EXECUTABLE_OUTPUT_DIRECTORY}
-    COMMAND ${CMAKE_COMMAND} -E copy_if_different ${ICONS} ${EXECUTABLE_OUTPUT_DIRECTORY}
-    COMMENT "Copying dynamic libraries and icon resources to executable output directory"
-)
-
-set(SHADER_DIR ${CMAKE_SOURCE_DIR}/Shaders)
-set(RESOURCES_DIR ${CMAKE_SOURCE_DIR}/Resources)
-add_custom_command(
-    TARGET ${EXECUTABLE_NAME}
-    POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy_directory ${SHADER_DIR} ${EXECUTABLE_OUTPUT_DIRECTORY}/Shaders
-    COMMAND ${CMAKE_COMMAND} -E copy_directory ${RESOURCES_DIR} ${EXECUTABLE_OUTPUT_DIRECTORY}/Resources
-    COMMENT "Copying shaders to executable output directory"
-)
-
 add_custom_command(
     TARGET ${EXECUTABLE_NAME}
     POST_BUILD
     COMMAND ${Python3_EXECUTABLE} ${CMAKE_SOURCE_DIR}/BuildTools/Version.py ${EXECUTABLE_OUTPUT_DIRECTORY}
     COMMENT "Generating GitLog.txt"
+    VERBATIM
 )
+
+set(mimallocLibs ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_BINDIR}/mimalloc$<$<CONFIG:DEBUG>:-debug>.dll
+        ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_BINDIR}/mimalloc-redirect.dll)
+add_custom_command(
+    TARGET ${EXECUTABLE_NAME}
+    POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different ${mimallocLibs} ${EXECUTABLE_OUTPUT_DIRECTORY}
+    VERBATIM
+)
+
+set(ASSET_DIR ${CMAKE_SOURCE_DIR}/Assets)
+file(GLOB_RECURSE ASSET_FILES ${ASSET_DIR}/*)
+set(OUTPUT_ASSET_DIR ${EXECUTABLE_OUTPUT_DIRECTORY}/Assets)
+foreach(ASSET_FILE ${ASSET_FILES})
+    file(RELATIVE_PATH ASSET_RELATIVE_PATH ${ASSET_DIR} ${ASSET_FILE})
+    set(ASSET_DEST_FILE ${OUTPUT_ASSET_DIR}/${ASSET_RELATIVE_PATH})
+    get_filename_component(ASSET_DEST_DIR ${ASSET_DEST_FILE} DIRECTORY)
+
+    add_custom_command(
+        TARGET ${EXECUTABLE_NAME}
+        POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E make_directory ${ASSET_DEST_DIR}
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different ${ASSET_FILE} ${ASSET_DEST_FILE}
+        VERBATIM
+    )
+endforeach ()

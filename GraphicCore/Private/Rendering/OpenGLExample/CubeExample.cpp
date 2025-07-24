@@ -15,10 +15,10 @@ namespace TG::Rendering
 {
     CubeExample::CubeExample(const std::weak_ptr<IDefaultVideoPort>& videoPort, const std::weak_ptr<ITimer>& timer)
         : m_camera(videoPort, timer),
-        m_vertexShader("Shaders/GLSL/Cube.vert", ShaderStage::Vertex),
-        m_fragmentShader("Shaders/GLSL/Cube.frag", ShaderStage::Fragment),
-        m_wireframeGeometryShader("Shaders/GLSL/Wireframe.geom", ShaderStage::Geometry),
-        m_wireframeFragmentShader("Shaders/GLSL/Wireframe.frag", ShaderStage::Fragment)
+        m_vertexShader("Assets/Shaders/GLSL/Cube.vert", ShaderStage::Vertex),
+        m_fragmentShader("Assets/Shaders/GLSL/Cube.frag", ShaderStage::Fragment),
+        m_wireframeGeometryShader("Assets/Shaders/GLSL/Wireframe.geom", ShaderStage::Geometry),
+        m_wireframeFragmentShader("Assets/Shaders/GLSL/Wireframe.frag", ShaderStage::Fragment)
     {
         m_cubeMesh = Geometry::CreatePrimitive(Geometry::PrimitiveType::Cube);
 
@@ -58,8 +58,8 @@ namespace TG::Rendering
 
         glBindVertexArray(0);
 
-        m_textures[0].Upload("Resources/Textures/wall.jpg");
-        m_textures[1].Upload("Resources/Textures/container.jpg");
+        m_textures[0].Upload("Assets/Textures/wall.jpg");
+        m_textures[1].Upload("Assets/Textures/container.jpg");
 
         m_fragmentShader.SetInt("albedo0", 0);
         m_fragmentShader.SetInt("albedo1", 1);

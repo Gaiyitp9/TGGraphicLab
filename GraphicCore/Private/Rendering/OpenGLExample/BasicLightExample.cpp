@@ -10,8 +10,8 @@ namespace TG::Rendering
 {
     BasicLightExample::BasicLightExample(const std::weak_ptr<IDefaultVideoPort> &videoPort,
         const std::weak_ptr<ITimer> &timer) : m_camera(videoPort, timer),
-        m_vertexShader("Shaders/GLSL/LightingModel/Phong/BasicLighting.vert", ShaderStage::Vertex),
-        m_fragmentShader("Shaders/GLSL/LightingModel/Phong/Phong.frag", ShaderStage::Fragment)
+        m_vertexShader("Assets/Shaders/GLSL/LightingModel/Phong/BasicLighting.vert", ShaderStage::Vertex),
+        m_fragmentShader("Assets/Shaders/GLSL/LightingModel/Phong/Phong.frag", ShaderStage::Fragment)
     {
 
     }

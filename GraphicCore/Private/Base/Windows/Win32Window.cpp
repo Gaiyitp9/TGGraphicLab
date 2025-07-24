@@ -573,7 +573,7 @@ namespace TG
     // 注册窗口类
     static char RegisterWindow()
     {
-		HANDLE icon = LoadImageW(nullptr, L"maple-leaf.ico", IMAGE_ICON, 0, 0,
+		HANDLE icon = LoadImageW(nullptr, L"Assets/Icons/maple-leaf.ico", IMAGE_ICON, 0, 0,
 			LR_DEFAULTSIZE | LR_LOADFROMFILE);
 
         WNDCLASSEXW wc = {};
