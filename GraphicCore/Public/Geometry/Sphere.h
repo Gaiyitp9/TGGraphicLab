@@ -15,20 +15,24 @@ namespace TG::Geometry
         Geodesic,
     };
 
-    class Sphere
+    class Sphere : public Mesh
     {
     public:
         Sphere();
         ~Sphere();
 
-        [[nodiscard]] Mesh ToMesh() const;
+        void Update();
 
     private:
+        static Math::Vector3F CalculateTangent(const Math::Vector3F& v1, const Math::Vector2F& uv1,
+            const Math::Vector3F& v2, const Math::Vector2F& uv2,
+            const Math::Vector3F& v3, const Math::Vector2F& uv3);
+
         SphereType m_type{ SphereType::UV };
 
         float m_radius{ 1.0f };
-        unsigned int m_segments{ 10 };
-        unsigned int m_rings{ 10 };
+        int m_columns{ 10 };
+        int m_rows{ 10 };
     };
 }
 

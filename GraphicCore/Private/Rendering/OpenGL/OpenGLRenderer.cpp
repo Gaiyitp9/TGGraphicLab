@@ -65,6 +65,12 @@ namespace TG::Rendering
     	GLfloat lineWidthRange[2];
     	glGetFloatv(GL_ALIASED_LINE_WIDTH_RANGE, lineWidthRange);
     	LogInfo("Line width range: {} - {}", lineWidthRange[0], lineWidthRange[1]);
+    	GLint maxUniformBufferBindings;
+    	glGetIntegerv(GL_MAX_UNIFORM_BUFFER_BINDINGS, &maxUniformBufferBindings);
+    	LogInfo("Max uniform buffer bindings: {}", maxUniformBufferBindings);
+    	GLint64 maxUniformBlockSize;
+    	glGetInteger64v(GL_MAX_UNIFORM_BLOCK_SIZE, &maxUniformBlockSize);
+    	LogInfo("Max uniform block size: {}", maxUniformBlockSize);
 
     	// 正面朝向设置为顺时针
     	// glFrontFace(GL_CW);

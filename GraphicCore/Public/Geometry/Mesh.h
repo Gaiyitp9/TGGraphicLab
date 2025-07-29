@@ -16,8 +16,8 @@ namespace TG::Geometry
         std::vector<Math::Vector3F> vertices;
         std::vector<std::uint32_t>  indices;
         std::vector<Math::Vector2F> uvs;
-        std::vector<Math::Vector3F> colors;
         std::vector<Math::Vector3F> normals;
         std::vector<Math::Vector3F> tangents;
+        std::vector<Math::Vector3F> colors;
     };
 }
