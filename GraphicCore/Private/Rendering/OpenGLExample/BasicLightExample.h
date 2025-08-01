@@ -7,7 +7,7 @@
 
 #include "Rendering/Example.h"
 #include "Base/CommonInterfaces.h"
-#include "Geometry/Mesh.h"
+#include "Geometry/Sphere.h"
 #include "Rendering/Camera.h"
 #include "Rendering/OpenGL/OpenGLShader.h"
 #include "ViewportGrid.h"
@@ -26,8 +26,8 @@ namespace TG::Rendering
     private:
         Camera m_camera;
 
-        Geometry::Mesh m_cubeMesh;
-        Math::Vector3F m_cubePositions[10];
+        Geometry::Sphere m_sphereMesh;
+        Math::Vector3F m_spherePositions[10];
 
         GLuint m_VAO{};
         GLuint m_VBO{};
