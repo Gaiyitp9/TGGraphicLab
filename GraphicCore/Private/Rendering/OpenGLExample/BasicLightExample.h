@@ -9,6 +9,8 @@
 #include "Base/CommonInterfaces.h"
 #include "Geometry/Sphere.h"
 #include "Rendering/Camera.h"
+#include "Color/Color.h"
+#include "Rendering/OpenGL/OpenGLTexture2D.h"
 #include "Rendering/OpenGL/OpenGLShader.h"
 #include "ViewportGrid.h"
 #include "ViewportCompass.h"
@@ -18,27 +20,44 @@ namespace TG::Rendering
     class BasicLightExample final : public Example
     {
     public:
-        BasicLightExample(const std::weak_ptr<IDefaultVideoPort>& videoPort, const std::weak_ptr<ITimer> &timer);
+        BasicLightExample(const std::weak_ptr<IDefaultVideoPort>& videoPort, const std::weak_ptr<ITimer>& timer);
         ~BasicLightExample() override;
 
         void Render() override;
 
     private:
+        struct ObjectProperty
+        {
+            Math::Vector3F position;
+            Color::Color color;
+            float ambientStrength;
+            float specularStrength;
+            float shininess;
+        };
+
         Camera m_camera;
 
         Geometry::Sphere m_sphereMesh;
-        Math::Vector3F m_spherePositions[10];
+        ObjectProperty m_sphereProperties[5];
+        Math::Vector4F m_lightDirection;
+        Color::Color m_lightColor;
 
         GLuint m_VAO{};
         GLuint m_VBO{};
         GLuint m_EBO{};
         GLuint m_pipeline{};
         GLuint m_cameraUbo{};
-        GLuint m_lightUbo{};
+        GLuint m_renderUbo{};
+
+        OpenGLTexture2D m_albedoTexture;
+        const unsigned char m_defaultAlbedo[4] = { 255, 255, 255, 255 };
 
         OpenGLShader m_vertexShader;
         OpenGLShader m_fragmentShader;
+        OpenGLShader m_wireframeGeometryShader;
+        OpenGLShader m_wireframeFragmentShader;
 
+        bool m_wireframe{ false };
         ViewportGrid m_viewportGrid;
         ViewportCompass m_viewportCompass;
     };

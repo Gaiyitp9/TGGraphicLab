@@ -16,6 +16,6 @@ namespace TG::Rendering
         ~OpenGLCubeMap() override = default;
 
         void Upload(std::string_view filePath) const override;
-        void Upload(unsigned char* data, int width, int height, TextureFormat textureFormat) const override;
+        void Upload(unsigned char const* data, int width, int height, TextureFormat textureFormat) const override;
     };
 }

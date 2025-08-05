@@ -21,7 +21,7 @@ namespace TG::Geometry
         Sphere();
         ~Sphere();
 
-        void Update();
+        void Regenerate();
 
     private:
         static Math::Vector3F CalculateTangent(const Math::Vector3F& v1, const Math::Vector2F& uv1,
@@ -31,8 +31,8 @@ namespace TG::Geometry
         SphereType m_type{ SphereType::UV };
 
         float m_radius{ 1.0f };
-        int m_columns{ 10 };
-        int m_rows{ 10 };
+        int m_columns{ 20 };
+        int m_rows{ 20 };
     };
 }
 

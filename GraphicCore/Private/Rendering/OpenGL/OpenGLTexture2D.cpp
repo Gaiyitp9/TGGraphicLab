@@ -47,7 +47,7 @@ namespace TG::Rendering
         }
     }
 
-    void OpenGLTexture2D::Upload(unsigned char* data, int width, int height, TextureFormat textureFormat) const
+    void OpenGLTexture2D::Upload(unsigned char const* data, int width, int height, TextureFormat textureFormat) const
     {
         GLint internalFormat;
         GLenum format;

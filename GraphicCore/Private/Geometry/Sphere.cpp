@@ -9,11 +9,14 @@
 
 namespace TG::Geometry
 {
-    Sphere::Sphere() = default;
+    Sphere::Sphere()
+    {
+        Regenerate();
+    }
 
     Sphere::~Sphere() = default;
 
-    void Sphere::Update()
+    void Sphere::Regenerate()
     {
         const auto deltaTheta = static_cast<float>(std::numbers::pi / m_rows);
         const auto deltaPhi = static_cast<float>(std::numbers::pi * 2 / m_columns);

@@ -40,15 +40,15 @@ namespace TG::Rendering
         glBindVertexArray(m_VAO);
 
         glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
-        const auto positionByteSize = static_cast<GLsizeiptr>(3 * sizeof(float) * m_cubeMesh.vertices.size());
+        const auto verticesByteSize = static_cast<GLsizeiptr>(3 * sizeof(float) * m_cubeMesh.vertices.size());
         const auto uvByteSize = static_cast<GLsizeiptr>(2 * sizeof(float) * m_cubeMesh.uvs.size());
-        glBufferData(GL_ARRAY_BUFFER, positionByteSize + uvByteSize, nullptr, GL_STATIC_DRAW);
-        glBufferSubData(GL_ARRAY_BUFFER, 0, positionByteSize, m_cubeMesh.vertices.data());
-        glBufferSubData(GL_ARRAY_BUFFER, positionByteSize, uvByteSize, m_cubeMesh.uvs.data());
+        glBufferData(GL_ARRAY_BUFFER, verticesByteSize + uvByteSize, nullptr, GL_STATIC_DRAW);
+        glBufferSubData(GL_ARRAY_BUFFER, 0, verticesByteSize, m_cubeMesh.vertices.data());
+        glBufferSubData(GL_ARRAY_BUFFER, verticesByteSize, uvByteSize, m_cubeMesh.uvs.data());
 
         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), nullptr);
         glEnableVertexAttribArray(0);
-        glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), reinterpret_cast<void*>(positionByteSize));
+        glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), reinterpret_cast<void*>(verticesByteSize));
         glEnableVertexAttribArray(1);
 
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_EBO);

@@ -80,17 +80,18 @@ namespace TG::Rendering
         {
             throw BaseException::Create("Failed to init font");
         }
+
+        // 保存当前对齐设置
+        GLint prevAlignment;
+        glGetIntegerv(GL_UNPACK_ALIGNMENT, &prevAlignment);
+        glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+
         // 设置字体大小和比例
         m_fontScale = stbtt_ScaleForPixelHeight(&m_font, m_fontSize);
         // 获取字体的位图
         int width, height;
         unsigned char* bitmap = stbtt_GetCodepointBitmap(&m_font, 0, m_fontScale, 'X', &width, &height,
                                                          nullptr, nullptr);
-        // 保存当前对齐设置
-        GLint prevAlignment;
-        glGetIntegerv(GL_UNPACK_ALIGNMENT, &prevAlignment);
-        glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-
         m_axisNameTextures[0].Upload(bitmap, width, height, TextureFormat::R);
         stbtt_FreeBitmap(bitmap, nullptr);
         bitmap = stbtt_GetCodepointBitmap(&m_font, 0, m_fontScale, 'Y', &width, &height, nullptr, nullptr);
@@ -99,10 +100,9 @@ namespace TG::Rendering
         bitmap = stbtt_GetCodepointBitmap(&m_font, 0, m_fontScale, 'Z', &width, &height, nullptr, nullptr);
         m_axisNameTextures[2].Upload(bitmap, width, height, TextureFormat::R);
         stbtt_FreeBitmap(bitmap, nullptr);
+
         // 恢复原来的对齐设置
         glPixelStorei(GL_UNPACK_ALIGNMENT, prevAlignment);
-
-        m_axisNameFragmentShader.SetInt("fontTexture", 0);
     }
 
     ViewportCompass::~ViewportCompass()

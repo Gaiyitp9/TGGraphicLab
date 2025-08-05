@@ -17,6 +17,16 @@ namespace TG::Color
 		explicit Color(float c);
 		Color(float r, float g, float b);
 
+		float operator[](std::size_t index) const
+		{
+			return m_channels[index];
+		}
+
+		float& operator[](std::size_t index)
+		{
+			return m_channels[index];
+		}
+
 		[[nodiscard]] float R() const { return m_channels[0]; }
 		[[nodiscard]] float G() const { return m_channels[1]; }
 		[[nodiscard]] float B() const { return m_channels[2]; }

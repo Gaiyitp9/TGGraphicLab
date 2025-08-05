@@ -28,6 +28,6 @@ namespace TG::Rendering
 
         std::unique_ptr<ExampleFactory> m_exampleFactory;
         std::unique_ptr<Example> m_example;
-        ExampleEnum m_exampleEnum = ExampleEnum::Cube;
+        ExampleEnum m_exampleEnum = ExampleEnum::BasicLight;
     };
 }

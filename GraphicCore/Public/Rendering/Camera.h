@@ -33,6 +33,8 @@ namespace TG
 
         void Update();
 
+        Math::Vector3F position{ 0.0f, 1.0f, 4.0f };
+
     private:
         void UpdateCameraVectors();
 
@@ -47,7 +49,6 @@ namespace TG
 
         float m_orthoWidth{ 3.0f };
 
-        Math::Vector3F m_position{ 0.0f, 1.0f, 4.0f };
         Math::Vector3F m_front;
         Math::Vector3F m_right;
         Math::Vector3F m_up;
@@ -60,7 +61,7 @@ namespace TG
         short m_lastMouseX{ 0 };
         short m_lastMouseY{ 0 };
 
-        float m_moveSpeed{ 2.5f };
+        float m_moveSpeed{ 5.0f };
         float m_mouseSensitivity{ 0.1f };
     };
 }

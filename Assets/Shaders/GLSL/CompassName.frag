@@ -1,9 +1,9 @@
-#version 410 core
+#version 420 core
 layout(location = 0) in vec2 fTexcoord;
 
 layout(location = 0) out vec4 FragColor;
 
-uniform sampler2D fontTexture;
+layout(binding = 0) uniform sampler2D fontTexture;
 uniform vec3 fontColor;
 
 void main()

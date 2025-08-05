@@ -22,7 +22,7 @@ namespace TG
 
     Math::Matrix4F Camera::ViewMatrix() const
     {
-        return Rendering::LookAt<float>(m_position, m_position + m_front, m_worldUp);
+        return Rendering::LookAt<float>(position, position + m_front, m_worldUp);
     }
 
     Math::Matrix4F Camera::ProjectionMatrix() const
@@ -65,14 +65,14 @@ namespace TG
         Math::Vector3F farRight = farUp.Norm() * aspectRatio * m_right;
 
         Frustum frustum;
-        frustum.corners[0] = m_position + nearFront - nearRight - nearUp;
-        frustum.corners[1] = m_position + nearFront + nearRight - nearUp;
-        frustum.corners[2] = m_position + nearFront + nearRight + nearUp;
-        frustum.corners[3] = m_position + nearFront - nearRight + nearUp;
-        frustum.corners[4] = m_position + farFront - farRight - farUp;
-        frustum.corners[5] = m_position + farFront - farRight + farUp;
-        frustum.corners[6] = m_position + farFront + farRight + farUp;
-        frustum.corners[7] = m_position + farFront - farRight + farUp;
+        frustum.corners[0] = position + nearFront - nearRight - nearUp;
+        frustum.corners[1] = position + nearFront + nearRight - nearUp;
+        frustum.corners[2] = position + nearFront + nearRight + nearUp;
+        frustum.corners[3] = position + nearFront - nearRight + nearUp;
+        frustum.corners[4] = position + farFront - farRight - farUp;
+        frustum.corners[5] = position + farFront - farRight + farUp;
+        frustum.corners[6] = position + farFront + farRight + farUp;
+        frustum.corners[7] = position + farFront - farRight + farUp;
 
         return frustum;
     }
@@ -85,17 +85,17 @@ namespace TG
         auto timer = m_timer.lock();
         float velocity = m_moveSpeed * timer->DeltaTime() * 0.001f;
         if (Input::GetKey(Input::KeyCode::W))
-            m_position += velocity * m_front;
+            position += velocity * m_front;
         if (Input::GetKey(Input::KeyCode::S))
-            m_position -= velocity * m_front;
+            position -= velocity * m_front;
         if (Input::GetKey(Input::KeyCode::A))
-            m_position -= velocity * m_right;
+            position -= velocity * m_right;
         if (Input::GetKey(Input::KeyCode::D))
-            m_position += velocity * m_right;
+            position += velocity * m_right;
         if (Input::GetKey(Input::KeyCode::Q))
-            m_position -= velocity * m_worldUp;
+            position -= velocity * m_worldUp;
         if (Input::GetKey(Input::KeyCode::E))
-            m_position += velocity * m_worldUp;
+            position += velocity * m_worldUp;
 
         if (Input::GetKeyDown(Input::KeyCode::RightMouseButton))
         {

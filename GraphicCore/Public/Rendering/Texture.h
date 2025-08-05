@@ -25,6 +25,6 @@ namespace TG::Rendering
 
         [[nodiscard]] virtual TextureID GetID() const = 0;
         virtual void Upload(std::string_view filePath) const = 0;
-        virtual void Upload(unsigned char* data, int width, int height, TextureFormat textureFormat) const = 0;
+        virtual void Upload(unsigned char const* data, int width, int height, TextureFormat textureFormat) const = 0;
     };
 }
