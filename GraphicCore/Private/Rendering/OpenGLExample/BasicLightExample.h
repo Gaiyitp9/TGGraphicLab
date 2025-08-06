@@ -28,7 +28,7 @@ namespace TG::Rendering
     private:
         struct ObjectProperty
         {
-            Math::Vector3F position;
+            Math::Vector3f position;
             Color::Color color;
             float ambientStrength;
             float specularStrength;
@@ -39,7 +39,7 @@ namespace TG::Rendering
 
         Geometry::Sphere m_sphereMesh;
         ObjectProperty m_sphereProperties[5];
-        Math::Vector4F m_lightDirection;
+        Math::Vector4f m_lightDirection;
         Color::Color m_lightColor;
 
         GLuint m_VAO{};

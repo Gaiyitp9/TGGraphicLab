@@ -13,11 +13,11 @@ namespace TG::Geometry
     class Mesh
     {
     public:
-        std::vector<Math::Vector3F> vertices;
+        std::vector<Math::Vector3f> vertices;
         std::vector<std::uint32_t>  indices;
-        std::vector<Math::Vector2F> uvs;
-        std::vector<Math::Vector3F> normals;
-        std::vector<Math::Vector3F> tangents;
-        std::vector<Math::Vector3F> colors;
+        std::vector<Math::Vector2f> uvs;
+        std::vector<Math::Vector3f> normals;
+        std::vector<Math::Vector3f> tangents;
+        std::vector<Math::Vector3f> colors;
     };
 }

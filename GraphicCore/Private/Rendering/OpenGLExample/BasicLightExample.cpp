@@ -13,15 +13,15 @@ namespace TG::Rendering
 {
     struct CameraData
     {
-        Math::Matrix4F view;
-        Math::Matrix4F projection;
+        Math::Matrix4f view;
+        Math::Matrix4f projection;
     };
 
     struct RenderData
     {
-        Math::Vector4F lightDirection;
-        Math::Vector4F lightColor;
-        Math::Vector4F viewPosition;
+        Math::Vector4f lightDirection;
+        Math::Vector4f lightColor;
+        Math::Vector4f viewPosition;
     };
 
     BasicLightExample::BasicLightExample(const std::weak_ptr<IDefaultVideoPort> &videoPort,
@@ -32,32 +32,32 @@ namespace TG::Rendering
         m_wireframeFragmentShader("Assets/Shaders/GLSL/Wireframe.frag", ShaderStage::Fragment)
     {
         m_sphereProperties[0] = {
-            Math::Vector3F{ -6.0f, 0.0f, -10.0f },
+            Math::Vector3f{ -6.0f, 1.0f, -10.0f },
             Color::SaddleBrown,
-            0.2f, 0.5f, 8.0f
+            0.3f, 0.5f, 8.0f
         };
         m_sphereProperties[1] = {
-            Math::Vector3F{ -3.0f, 0.0f, -10.0f },
+            Math::Vector3f{ -3.0f, 1.0f, -10.0f },
             Color::SaddleBrown,
-            0.2f, 0.5f, 16.0f
+            0.3f, 0.5f, 16.0f
         };
         m_sphereProperties[2] = {
-            Math::Vector3F{ 0.0f, 0.0f, -10.0f },
+            Math::Vector3f{ 0.0f, 1.0f, -10.0f },
             Color::SaddleBrown,
-            0.2f, 0.5f, 32.0f
+            0.3f, 0.5f, 32.0f
         };
         m_sphereProperties[3] = {
-            Math::Vector3F{ 3.0f, 0.0f, -10.0f },
+            Math::Vector3f{ 3.0f, 1.0f, -10.0f },
             Color::SaddleBrown,
-            0.2f, 0.5f, 64.0f
+            0.3f, 0.5f, 64.0f
         };
         m_sphereProperties[4] = {
-            Math::Vector3F{ 6.0f, 0.0f, -10.0f },
+            Math::Vector3f{ 6.0f, 1.0f, -10.0f },
             Color::SaddleBrown,
-            0.2f, 0.5f, 128.0f
+            0.3f, 0.5f, 128.0f
         };
 
-        m_lightDirection = Math::Vector4F{ 1.0f, 5.0f, 1.0f, 0.0f };
+        m_lightDirection = Math::Vector4f{ 1.0f, 5.0f, 1.0f, 0.0f };
         m_lightColor = Color::White;
 
         glGenBuffers(1, &m_VBO);
@@ -149,8 +149,7 @@ namespace TG::Rendering
         glBindBuffer(GL_UNIFORM_BUFFER, m_renderUbo);
         RenderData renderData;
         renderData.lightDirection = m_lightDirection;
-        for (int i = 0; i < 4; ++i)
-            renderData.lightColor[i] = m_lightColor[i];
+        renderData.lightColor = m_lightColor.ToVector4();
         renderData.viewPosition.Block<3, 1>(0, 0) = m_camera.position;
         glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(RenderData), &renderData);
 

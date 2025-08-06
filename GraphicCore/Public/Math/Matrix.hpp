@@ -40,7 +40,26 @@ namespace TG::Math
 
 		Matrix(std::initializer_list<Scalar> values)
         {
-	        Set(values);
+        	const std::size_t count = std::min(values.size(), Rows * Columns);
+        	auto it = values.begin();
+        	for (int i = 0; i < count; ++i)
+        	{
+        		std::size_t index = i;
+        		if constexpr (!HasFlag<Matrix, XprFlag::RowMajor>)
+        		{
+        			const std::size_t row = i / Columns;
+        			const std::size_t column = i % Columns;
+        			index = row + column * Rows;
+        		}
+        		m_storage[index] = *it++;
+        	}
+        }
+
+		template<typename... Args>
+		requires ((sizeof...(Args) > 0) && std::conjunction_v<std::is_convertible<Args, Scalar>...>)
+		explicit Matrix(Args... values)
+        {
+        	Assign(values...);
         }
 
 		template<typename Derived>
@@ -56,10 +75,11 @@ namespace TG::Math
 		 * 按照row major的形式填充矩阵，与矩阵保存数据的形式无关
 		 * @values 填充矩阵的数据
 		 */
-		void Set(std::initializer_list<Scalar> values)
+		template<typename... Args> requires std::conjunction_v<std::is_convertible<Args, Scalar>...>
+		void Assign(Args... values)
         {
-        	const std::size_t count = std::min(values.size(), Rows * Columns);
-        	auto it = values.begin();
+        	Scalar temp[] = { static_cast<Scalar>(values)... };
+        	constexpr std::size_t count = std::min(sizeof...(values), Rows * Columns);
         	for (int i = 0; i < count; ++i)
         	{
         		std::size_t index = i;
@@ -69,7 +89,7 @@ namespace TG::Math
         			const std::size_t column = i % Columns;
 					index = row + column * Rows;
         		}
-        		m_storage[index] = *it++;
+        		m_storage[index] = temp[i];
         	}
         }
 
@@ -122,56 +142,23 @@ namespace TG::Math
 	template<typename Scalar> using Matrix3 = Matrix<Scalar, 3, 3>;
 	template<typename Scalar> using Matrix4 = Matrix<Scalar, 4, 4>;
 
-	using Vector2F = Vector<float, 2>;
-	using Vector3F = Vector<float, 3>;
-	using Vector4F = Vector<float, 4>;
-	using RowVector2F = RowVector<float, 2>;
-	using RowVector3F = RowVector<float, 3>;
-	using RowVector4F = RowVector<float, 4>;
-	using Matrix2F = Matrix<float, 2, 2>;
-	using Matrix3F = Matrix<float, 3, 3>;
-	using Matrix4F = Matrix<float, 4, 4>;
+	using Vector2f = Vector<float, 2>;
+	using Vector3f = Vector<float, 3>;
+	using Vector4f = Vector<float, 4>;
+	using RowVector2f = RowVector<float, 2>;
+	using RowVector3f = RowVector<float, 3>;
+	using RowVector4f = RowVector<float, 4>;
+	using Matrix2f = Matrix<float, 2, 2>;
+	using Matrix3f = Matrix<float, 3, 3>;
+	using Matrix4f = Matrix<float, 4, 4>;
 
-	using Vector2D = Vector<double, 2>;
-	using Vector3D = Vector<double, 3>;
-	using Vector4D = Vector<double, 4>;
-	using RowVector2D = RowVector<double, 2>;
-	using RowVector3D = RowVector<double, 3>;
-	using RowVector4D = RowVector<double, 4>;
-	using Matrix2D = Matrix<double, 2, 2>;
-	using Matrix3D = Matrix<double, 3, 3>;
-	using Matrix4D = Matrix<double, 4, 4>;
-
-    template<typename Scalar, std::size_t Rows, std::size_t Columns, StorageOrder Order, bool IsConst>
-    class Evaluator<Matrix<Scalar, Rows, Columns, Order>, IsConst>
-    {
-        using Xpr = Matrix<Scalar, Rows, Columns, Order>;
-    	using InternalXpr = std::conditional_t<IsConst, const Xpr, Xpr>;
-
-    public:
-        explicit Evaluator(InternalXpr& matrix) : m_matrix(matrix) {}
-
-        [[nodiscard]] Scalar Entry(std::size_t index) const
-        {
-            return m_matrix[index];
-        }
-
-        [[nodiscard]] Scalar Entry(std::size_t row, std::size_t column) const
-        {
-            return m_matrix[row, column];
-        }
-
-    	Scalar& Entry(std::size_t index) requires !IsConst
-        {
-        	return m_matrix[index];
-        }
-
-    	Scalar& Entry(std::size_t row, std::size_t column) requires !IsConst
-        {
-        	return m_matrix[row, column];
-        }
-
-    private:
-        InternalXpr& m_matrix;
-    };
+	using Vector2d = Vector<double, 2>;
+	using Vector3d = Vector<double, 3>;
+	using Vector4d = Vector<double, 4>;
+	using RowVector2d = RowVector<double, 2>;
+	using RowVector3d = RowVector<double, 3>;
+	using RowVector4d = RowVector<double, 4>;
+	using Matrix2d = Matrix<double, 2, 2>;
+	using Matrix3d = Matrix<double, 3, 3>;
+	using Matrix4d = Matrix<double, 4, 4>;
 }

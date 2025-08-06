@@ -27,7 +27,7 @@ namespace TG::Geometry
             for (int j = 0; j <= m_columns; ++j)
             {
                 const float phi = deltaPhi * static_cast<float>(j);
-                Math::Vector3F v{
+                Math::Vector3f v{
                     std::sin(theta) * std::cos(phi),
                     std::cos(theta),
                     std::sin(theta) * std::sin(phi)
@@ -60,7 +60,7 @@ namespace TG::Geometry
                 indices.push_back(index3);
 
                 // 每个顶点累加三角面的切线
-                const Math::Vector3F tangent0 = CalculateTangent(
+                const Math::Vector3f tangent0 = CalculateTangent(
                     vertices[index0], uvs[index0],
                     vertices[index2], uvs[index2],
                     vertices[index3], uvs[index3]
@@ -69,7 +69,7 @@ namespace TG::Geometry
                 tangents[index2] += tangent0;
                 tangents[index3] += tangent0;
 
-                const Math::Vector3F tangent1 = CalculateTangent(
+                const Math::Vector3f tangent1 = CalculateTangent(
                     vertices[index0], uvs[index0],
                     vertices[index1], uvs[index1],
                     vertices[index3], uvs[index3]
@@ -85,10 +85,11 @@ namespace TG::Geometry
             tangents[i] = (tangents[i] - normals[i] * normals[i].Dot(tangents[i])).Normalized();
     }
 
-    Math::Vector3F Sphere::CalculateTangent(const Math::Vector3F& v1, const Math::Vector2F& uv1,
-            const Math::Vector3F& v2, const Math::Vector2F& uv2,
-            const Math::Vector3F& v3, const Math::Vector2F& uv3)
+    Math::Vector3f Sphere::CalculateTangent(const Math::Vector3f& v1, const Math::Vector2f& uv1,
+            const Math::Vector3f& v2, const Math::Vector2f& uv2,
+            const Math::Vector3f& v3, const Math::Vector2f& uv3)
     {
+        // Mikkt算法(也叫做MikktTSpace切线空间)
         // 理论上顶点的切平面上的线都是切线，图形学中规定切线平行于纹理坐标系的U轴，
         // 所以，切线是纹理坐标系的U轴，副切线是纹理坐标系的V轴
         // 纹理坐标(u, v, 0, 1)对应的世界坐标(x, y, z, 1)
@@ -107,10 +108,10 @@ namespace TG::Geometry
         //  Δx2]    Δu2, Δv2]    Bx]
         // 等式两边左乘逆矩阵可以解出[Tx, Bx]。yz分量同上
         // 每个三角形能计算出一条切线，对于每个顶点来说，需要加上所有共用该顶点的三角形切线并执行Gram-Schmidt正交化
-        Math::Vector3F deltaPosition1 = v2 - v1;
-        Math::Vector3F deltaPosition2 = v3 - v1;
-        Math::Vector2F deltaUV1 = uv2 - uv1;
-        Math::Vector2F deltaUV2 = uv3 - uv1;
+        Math::Vector3f deltaPosition1 = v2 - v1;
+        Math::Vector3f deltaPosition2 = v3 - v1;
+        Math::Vector2f deltaUV1 = uv2 - uv1;
+        Math::Vector2f deltaUV2 = uv3 - uv1;
 
         return 1.0f / (deltaUV1.X() * deltaUV2.Y() - deltaUV1.Y() * deltaUV2.X()) *
             (deltaPosition1 * deltaUV2.Y() - deltaPosition2 * deltaUV1.Y());

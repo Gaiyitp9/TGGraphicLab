@@ -124,9 +124,9 @@ namespace TG::Rendering
         glBindVertexArray(m_axisVAO);
         glBindProgramPipeline(m_axisPipeline);
 
-        Math::Matrix4F view = camera.ViewMatrix();
-        view.Block<3, 1>(0, 3) = Math::Vector3F::Zero();
-        Math::Matrix4F projection = Orthographic(-1.5f, 1.5f, -1.5f, 1.5f, -2.0f, 2.0f);
+        Math::Matrix4f view = camera.ViewMatrix();
+        view.Block<3, 1>(0, 3) = Math::Vector3f::Zero();
+        Math::Matrix4f projection = Orthographic(-1.5f, 1.5f, -1.5f, 1.5f, -2.0f, 2.0f);
         m_axisVertexShader.SetMat4("view", view);
         m_axisVertexShader.SetMat4("projection", projection);
 
@@ -139,10 +139,10 @@ namespace TG::Rendering
         m_axisNameVertexShader.SetMat4("view", view);
         m_axisNameVertexShader.SetMat4("projection", projection);
 
-        Math::Matrix4F model = Math::Matrix4F::Identity();
-        Math::Vector3F front = view.Block<1, 3>(2, 0).Transpose();
-        Math::Vector3F up{ 0.0f, 1.0f, 0.0f };
-        Math::Vector3F right = up.Cross(front).Normalized();
+        Math::Matrix4f model = Math::Matrix4f::Identity();
+        Math::Vector3f front = view.Block<1, 3>(2, 0).Transpose();
+        Math::Vector3f up{ 0.0f, 1.0f, 0.0f };
+        Math::Vector3f right = up.Cross(front).Normalized();
         up = front.Cross(right);
         model.Block<3, 1>(0, 0) = right * 0.3f;
         model.Block<3, 1>(0, 1) = up * 0.3f;

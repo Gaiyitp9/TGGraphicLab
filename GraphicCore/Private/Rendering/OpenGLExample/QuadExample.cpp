@@ -136,8 +136,8 @@ namespace TG::Rendering
     		m_fragmentShader.SetFloat4("ourColor", greyValue, greyValue, greyValue, 1.0f);
 
     		Math::Transform<float, 3> transform;
-    		transform.Translate(Math::Vector3F{ 0.5f, -0.5f, 0.0f });
-    		transform.Rotate(Math::AngleAxis{ timeValue, Math::Vector3F{ 0.0f, 0.0f, 1.0f }});
+    		transform.Translate(Math::Vector3f{ 0.5f, -0.5f, 0.0f });
+    		transform.Rotate(Math::AngleAxis{ timeValue, Math::Vector3f{ 0.0f, 0.0f, 1.0f }});
     		m_vertexShader.SetMat4("transform", transform.ToTransformMatrix());
     	}
 

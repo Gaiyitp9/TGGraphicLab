@@ -68,8 +68,8 @@ namespace TG::Rendering
         glBindVertexArray(m_VAO);
         glBindProgramPipeline(m_pipeline);
 
-        Math::Matrix4F view = camera.ViewMatrix();
-        view.Block<3, 1>(0, 3) = Math::Vector3F::Zero();
+        Math::Matrix4f view = camera.ViewMatrix();
+        view.Block<3, 1>(0, 3) = Math::Vector3f::Zero();
         m_vertexShader.SetMat4("view", view);
         m_vertexShader.SetMat4("projection", camera.ProjectionMatrix());
 

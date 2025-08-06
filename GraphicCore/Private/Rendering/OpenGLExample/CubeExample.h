@@ -29,7 +29,7 @@ namespace TG::Rendering
         Camera m_camera;
 
         Geometry::Mesh m_cubeMesh;
-        Math::Vector3F m_cubePositions[10];
+        Math::Vector3f m_cubePositions[10];
 
         GLuint m_VAO{};
         GLuint m_VBO{};

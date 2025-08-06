@@ -20,15 +20,15 @@ namespace TG
 
     Camera::~Camera() = default;
 
-    Math::Matrix4F Camera::ViewMatrix() const
+    Math::Matrix4f Camera::ViewMatrix() const
     {
         return Rendering::LookAt<float>(position, position + m_front, m_worldUp);
     }
 
-    Math::Matrix4F Camera::ProjectionMatrix() const
+    Math::Matrix4f Camera::ProjectionMatrix() const
     {
         if (m_videoPort.expired())
-            return Math::Matrix4F::Identity();
+            return Math::Matrix4f::Identity();
 
         const auto videoPortPtr = m_videoPort.lock();
         const float aspectRatio = static_cast<float>(videoPortPtr->Width()) /
@@ -46,7 +46,7 @@ namespace TG
             }
 
             default:
-                return Math::Matrix4F::Identity();
+                return Math::Matrix4f::Identity();
         }
     }
 
@@ -57,12 +57,12 @@ namespace TG
         const auto videoPortPtr = m_videoPort.lock();
         const float aspectRatio = static_cast<float>(videoPortPtr->Width()) /
             static_cast<float>(videoPortPtr->Height());
-        Math::Vector3F nearFront = m_front.Normalized() * m_nearPlane;
-        Math::Vector3F nearUp = m_nearPlane * std::tan(m_fov * Math::Deg2RadF * 0.5f) * m_up;
-        Math::Vector3F nearRight = nearUp.Norm() * aspectRatio * m_right;
-        Math::Vector3F farFront = m_front.Normalized() * m_farPlane;
-        Math::Vector3F farUp = m_farPlane * std::tan(m_fov * Math::Deg2RadF * 0.5f) * m_up;
-        Math::Vector3F farRight = farUp.Norm() * aspectRatio * m_right;
+        Math::Vector3f nearFront = m_front.Normalized() * m_nearPlane;
+        Math::Vector3f nearUp = m_nearPlane * std::tan(m_fov * Math::Deg2RadF * 0.5f) * m_up;
+        Math::Vector3f nearRight = nearUp.Norm() * aspectRatio * m_right;
+        Math::Vector3f farFront = m_front.Normalized() * m_farPlane;
+        Math::Vector3f farUp = m_farPlane * std::tan(m_fov * Math::Deg2RadF * 0.5f) * m_up;
+        Math::Vector3f farRight = farUp.Norm() * aspectRatio * m_right;
 
         Frustum frustum;
         frustum.corners[0] = position + nearFront - nearRight - nearUp;

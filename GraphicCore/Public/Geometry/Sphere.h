@@ -12,7 +12,7 @@ namespace TG::Geometry
     enum class SphereType
     {
         UV,
-        Geodesic,
+        Icosahedron,
     };
 
     class Sphere : public Mesh
@@ -24,9 +24,9 @@ namespace TG::Geometry
         void Regenerate();
 
     private:
-        static Math::Vector3F CalculateTangent(const Math::Vector3F& v1, const Math::Vector2F& uv1,
-            const Math::Vector3F& v2, const Math::Vector2F& uv2,
-            const Math::Vector3F& v3, const Math::Vector2F& uv3);
+        static Math::Vector3f CalculateTangent(const Math::Vector3f& v1, const Math::Vector2f& uv1,
+            const Math::Vector3f& v2, const Math::Vector2f& uv2,
+            const Math::Vector3f& v3, const Math::Vector2f& uv3);
 
         SphereType m_type{ SphereType::UV };
 

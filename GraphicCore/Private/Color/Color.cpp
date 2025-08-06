@@ -8,7 +8,7 @@
 
 namespace TG::Color
 {
-    Color::Color(const Math::Vector4F& color)
+    Color::Color(const Math::Vector4f& color)
     {
         m_channels = color;
     }
@@ -25,6 +25,11 @@ namespace TG::Color
         m_channels[1] = g;
         m_channels[2] = b;
         m_channels[3] = 1.f;
+    }
+
+    Math::Vector4f Color::ToVector4() const
+    {
+        return { m_channels[0], m_channels[1], m_channels[2], m_channels[3] };
     }
 
     Color Color::operator*(const Color& color) const

@@ -112,7 +112,7 @@ namespace TG::Rendering
             GL_FALSE, glm::value_ptr(value));
     }
 
-    void OpenGLShader::SetMat4(std::string_view name, const Math::Matrix4F& value) const
+    void OpenGLShader::SetMat4(std::string_view name, const Math::Matrix4f& value) const
     {
         glProgramUniformMatrix4fv(m_shader, glGetUniformLocation(m_shader, name.data()), 1,
             GL_FALSE, value.Data());

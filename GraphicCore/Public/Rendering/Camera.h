@@ -18,7 +18,7 @@ namespace TG
 
     struct Frustum
     {
-        Math::Vector3F corners[8];
+        Math::Vector3f corners[8];
     };
 
     class Camera
@@ -27,13 +27,13 @@ namespace TG
         Camera(const std::weak_ptr<IDefaultVideoPort>& videoPort, const std::weak_ptr<ITimer>& timer);
         ~Camera();
 
-        [[nodiscard]] Math::Matrix4F ViewMatrix() const;
-        [[nodiscard]] Math::Matrix4F ProjectionMatrix() const;
+        [[nodiscard]] Math::Matrix4f ViewMatrix() const;
+        [[nodiscard]] Math::Matrix4f ProjectionMatrix() const;
         [[nodiscard]] Frustum ViewFrustum() const;
 
         void Update();
 
-        Math::Vector3F position{ 0.0f, 1.0f, 4.0f };
+        Math::Vector3f position{ 0.0f, 1.0f, 4.0f };
 
     private:
         void UpdateCameraVectors();
@@ -49,10 +49,10 @@ namespace TG
 
         float m_orthoWidth{ 3.0f };
 
-        Math::Vector3F m_front;
-        Math::Vector3F m_right;
-        Math::Vector3F m_up;
-        Math::Vector3F m_worldUp{ 0.0f, 1.0f, 0.0f };
+        Math::Vector3f m_front;
+        Math::Vector3f m_right;
+        Math::Vector3f m_up;
+        Math::Vector3f m_worldUp{ 0.0f, 1.0f, 0.0f };
 
         float m_yaw{ 0.0f };
         float m_pitch{ -5.0f };

@@ -55,7 +55,7 @@ namespace TG::Math
 #ifdef TG_ROW_MAJOR_MATRIX
     inline constexpr auto DefaultOrder = StorageOrder::RowMajor;
 #else
-    inline constexpr StorageOrder DefaultOrder = StorageOrder::ColumnMajor;
+    inline constexpr auto DefaultOrder = StorageOrder::ColumnMajor;
 #endif
 
     // 矩阵表达式标志
@@ -126,6 +126,19 @@ namespace TG::Math
         }
     );
 
+    // 矩阵逐元素二元运算，要求矩阵元素类型相同以及行列相等
+    template<typename LhsXpr, typename RhsXpr>
+    concept CWiseOperable =
+        std::convertible_to<typename Traits<LhsXpr>::Scalar, typename Traits<RhsXpr>::Scalar> &&
+        Traits<LhsXpr>::Rows == Traits<RhsXpr>::Rows &&
+        Traits<LhsXpr>::Columns == Traits<RhsXpr>::Columns;
+
+    // 两个表达式是否可以执行矩阵乘法，左边表达式的列数要等于右边表达式的行数
+    template<typename LhsXpr, typename RhsXpr>
+    concept MatrixMultipliable =
+        std::convertible_to<typename Traits<LhsXpr>::Scalar, typename Traits<RhsXpr>::Scalar> &&
+        Traits<LhsXpr>::Columns == Traits<RhsXpr>::Rows;
+
     // 表达式基类
     template<typename Derived> requires IsMatrixExpression<Derived>
     class MatrixBase;
@@ -133,7 +146,7 @@ namespace TG::Math
 	template<typename Scalar, std::size_t Rows, std::size_t Cols, StorageOrder Order = DefaultOrder>
 	class Matrix;
     // 二元表达式
-    template<typename BinaryOp, typename LhsXpr, typename RhsXpr>
+    template<typename BinaryOp, typename LhsXpr, typename RhsXpr> requires CWiseOperable<LhsXpr, RhsXpr>
     class CWiseBinaryOp;
     // 二元运算
     template<typename Scalar> struct ScalarAddOp;
@@ -145,7 +158,7 @@ namespace TG::Math
     template<typename Scalar> struct AddAssignOp;
     template<typename Scalar> struct SubtractAssignOp;
     // 矩阵乘法表达式
-    template<typename LhsXpr, typename RhsXpr, ProductType Type>
+    template<typename LhsXpr, typename RhsXpr, ProductType Type> requires MatrixMultipliable<LhsXpr, RhsXpr>
     class Product;
     // 矩阵块表达式
     template<typename Xpr, std::size_t BlockRows, std::size_t BlockColumns>
@@ -180,11 +193,9 @@ namespace TG::Math
     template<typename Derived, int Dimension>
     class RotationBase;
     // 旋转轴和旋转角表示的旋转
-    template<typename Scalar>
-    class AngleAxis;
+    template<typename Scalar> class AngleAxis;
     // 四元数表示的旋转
-    template<typename Scalar>
-    class Quaternion;
+    template<typename Scalar> class Quaternion;
     // 物体变换
     template<typename Scalar, std::size_t Dimension, StorageOrder Order = DefaultOrder>
     class Transform;

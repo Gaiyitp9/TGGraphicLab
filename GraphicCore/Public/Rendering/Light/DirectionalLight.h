@@ -18,8 +18,8 @@ namespace TG::Rendering
         LightType GetType() const override { return LightType::Directional; }
 
     private:
-        Math::Vector3F m_lightPosition;
-        Math::Vector3F m_lightDirection;
+        Math::Vector3f m_lightPosition;
+        Math::Vector3f m_lightDirection;
         Color::Color m_lightColor;
     };
 }

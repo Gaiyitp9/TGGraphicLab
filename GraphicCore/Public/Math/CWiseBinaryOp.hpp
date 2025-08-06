@@ -22,7 +22,7 @@ namespace TG::Math
     };
 
     // 二元表达式
-	template<typename BinaryOp, typename LhsXpr, typename RhsXpr>
+	template<typename BinaryOp, typename LhsXpr, typename RhsXpr> requires CWiseOperable<LhsXpr, RhsXpr>
 	class CWiseBinaryOp final : public MatrixBase<CWiseBinaryOp<BinaryOp, LhsXpr, RhsXpr>>
 	{
 	    using NestedLhsXpr = RefSelector<LhsXpr>::Type;
@@ -41,38 +41,6 @@ namespace TG::Math
         NestedLhsXpr m_lhs;
         NestedRhsXpr m_rhs;
 	};
-
-    // 矩阵逐元素二元运算，要求矩阵元素类型相同以及行列相等
-    template<typename LhsXpr, typename RhsXpr>
-    concept CWiseOperable =
-        std::convertible_to<typename Traits<LhsXpr>::Scalar, typename Traits<RhsXpr>::Scalar> &&
-        Traits<LhsXpr>::Rows == Traits<RhsXpr>::Rows &&
-        Traits<LhsXpr>::Columns == Traits<RhsXpr>::Columns;
-
-    template<typename BinaryOp, typename LhsXpr, typename RhsXpr> requires CWiseOperable<LhsXpr, RhsXpr>
-    class Evaluator<CWiseBinaryOp<BinaryOp, LhsXpr, RhsXpr>>
-    {
-        using Xpr = CWiseBinaryOp<BinaryOp, LhsXpr, RhsXpr>;
-        using Scalar = Traits<Xpr>::Scalar;
-
-    public:
-        explicit Evaluator(const Xpr& xpr) : m_functor(xpr.Functor()),
-            m_lhsEvaluator(xpr.LhsExpression()), m_rhsEvaluator(xpr.RhsExpression()) {}
-
-        [[nodiscard]] Scalar Entry(std::size_t index) const requires HasFlag<Xpr, XprFlag::LinearAccess>
-        {
-            return m_functor(m_lhsEvaluator.Entry(index), m_rhsEvaluator.Entry(index));
-        }
-        [[nodiscard]] Scalar Entry(std::size_t row, std::size_t col) const
-        {
-            return m_functor(m_lhsEvaluator.Entry(row, col), m_rhsEvaluator.Entry(row, col));
-        }
-
-    private:
-        const BinaryOp m_functor;
-        Evaluator<LhsXpr> m_lhsEvaluator;
-        Evaluator<RhsXpr> m_rhsEvaluator;
-    };
 
     template<typename Scalar>
     struct ScalarAddOp
@@ -110,7 +78,8 @@ namespace TG::Math
 
     // 常量左乘矩阵
     template<typename Derived> requires std::derived_from<Derived, MatrixBase<Derived>>
-    CWiseBinaryOp<ScalarProductOp<typename Traits<Derived>::Scalar>, Derived,
+    CWiseBinaryOp<ScalarProductOp<typename Traits<Derived>::Scalar>,
+        Derived,
         CWiseNullaryOp<ScalarConstantOp<typename Traits<Derived>::Scalar>, Derived>>
     operator*(typename Traits<Derived>::Scalar scalar, const Derived& other)
     {

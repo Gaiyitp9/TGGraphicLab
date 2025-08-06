@@ -24,7 +24,7 @@ namespace TG::Rendering
         void SetFloat2(std::string_view name, float v0, float v1) const override;
         void SetFloat3(std::string_view name, float v0, float v1, float v3) const override;
         void SetFloat4(std::string_view name, float v0, float v1, float v2, float v3) const override;
-        void SetMat4(std::string_view name, const Math::Matrix4F& value) const override;
+        void SetMat4(std::string_view name, const Math::Matrix4f& value) const override;
         void SetMat4(std::string_view name, const glm::mat4& value) const override;
 
     private:

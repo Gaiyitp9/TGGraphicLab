@@ -13,7 +13,7 @@ namespace TG::Color
 	{
 	public:
 		Color() = default;
-		explicit Color(const Math::Vector4F& color);
+		explicit Color(const Math::Vector4f& color);
 		explicit Color(float c);
 		Color(float r, float g, float b);
 
@@ -37,12 +37,13 @@ namespace TG::Color
 		float& A() { return m_channels[3]; }
 
 		[[nodiscard]] float const* RGBA() const { return m_channels.Data(); }
+		[[nodiscard]] Math::Vector4f ToVector4() const;
 
 		Color operator*(const Color& color) const;
 		Color operator*(float c) const;
 
 	private:
-		Math::Vector4F m_channels;
+		Math::Vector4f m_channels;
 	};
 
 	inline Color operator*(float c, const Color& color)

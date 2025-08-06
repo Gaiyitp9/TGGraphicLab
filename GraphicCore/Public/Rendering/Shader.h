@@ -33,7 +33,7 @@ namespace TG::Rendering
         virtual void SetFloat2(std::string_view name, float v0, float v1) const = 0;
         virtual void SetFloat3(std::string_view name, float v0, float v1, float v3) const = 0;
         virtual void SetFloat4(std::string_view name, float v0, float v1, float v2, float v3) const = 0;
-        virtual void SetMat4(std::string_view name, const Math::Matrix4F& value) const = 0;
+        virtual void SetMat4(std::string_view name, const Math::Matrix4f& value) const = 0;
         virtual void SetMat4(std::string_view name, const glm::mat4& value) const = 0;
     };
 }

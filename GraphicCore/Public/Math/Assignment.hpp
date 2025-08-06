@@ -71,7 +71,7 @@ namespace TG::Math
         CallAssignmentNoAlias(dst, temp, func);
     }
 
-    template<typename Dst, typename Src, typename AssignFunctor> requires !EvaluatorAssumeAliasing<Src>
+    template<typename Dst, typename Src, typename AssignFunctor> requires (!EvaluatorAssumeAliasing<Src>)
     void CallAssignment(Dst& dst, const Src& src, const AssignFunctor& func)
     {
         CallAssignmentNoAlias(dst, src, func);

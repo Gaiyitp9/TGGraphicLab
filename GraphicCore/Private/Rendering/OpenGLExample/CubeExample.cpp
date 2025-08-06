@@ -22,16 +22,16 @@ namespace TG::Rendering
     {
         m_cubeMesh = Geometry::CreatePrimitive(Geometry::PrimitiveType::Cube);
 
-        m_cubePositions[0] = Math::Vector3F{ 0.0f, 0.0f, 0.0f };
-        m_cubePositions[1] = Math::Vector3F{ 2.0f, 5.0f, -15.0f };
-        m_cubePositions[2] = Math::Vector3F{ -1.5f, -2.2f, -2.5f };
-        m_cubePositions[3] = Math::Vector3F{ -3.8f, -2.0f, -12.3f };
-        m_cubePositions[4] = Math::Vector3F{ 2.4f, -0.4f, -3.5f };
-        m_cubePositions[5] = Math::Vector3F{ -1.7f, 3.0f, -7.5f };
-        m_cubePositions[6] = Math::Vector3F{ 1.3f, -2.0f, -2.5f };
-        m_cubePositions[7] = Math::Vector3F{ 1.5f, 2.0f, -2.5f };
-        m_cubePositions[8] = Math::Vector3F{ 1.5f, 0.2f, -1.5f };
-        m_cubePositions[9] = Math::Vector3F{ -1.3f, 1.0f, -1.5f };
+        m_cubePositions[0] = Math::Vector3f{ 0.0f, 0.0f, 0.0f };
+        m_cubePositions[1] = Math::Vector3f{ 2.0f, 5.0f, -15.0f };
+        m_cubePositions[2] = Math::Vector3f{ -1.5f, -2.2f, -2.5f };
+        m_cubePositions[3] = Math::Vector3f{ -3.8f, -2.0f, -12.3f };
+        m_cubePositions[4] = Math::Vector3f{ 2.4f, -0.4f, -3.5f };
+        m_cubePositions[5] = Math::Vector3f{ -1.7f, 3.0f, -7.5f };
+        m_cubePositions[6] = Math::Vector3f{ 1.3f, -2.0f, -2.5f };
+        m_cubePositions[7] = Math::Vector3f{ 1.5f, 2.0f, -2.5f };
+        m_cubePositions[8] = Math::Vector3f{ 1.5f, 0.2f, -1.5f };
+        m_cubePositions[9] = Math::Vector3f{ -1.3f, 1.0f, -1.5f };
 
         glGenBuffers(1, &m_VBO);
         glGenBuffers(1, &m_EBO);
@@ -115,7 +115,7 @@ namespace TG::Rendering
             Math::Transform<float, 3> modelTransform;
             modelTransform.Translate(m_cubePositions[i]);
             const float angle = 20.0f * static_cast<float>(i);
-            modelTransform.Rotate(Math::AngleAxis{ angle, Math::Vector3F{ 1.0f, 0.3f, 0.5f }});
+            modelTransform.Rotate(Math::AngleAxis{ angle, Math::Vector3f{ 1.0f, 0.3f, 0.5f }});
             m_vertexShader.SetMat4("model", modelTransform.ToTransformMatrix());
 
     	    glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(m_cubeMesh.indices.size()), GL_UNSIGNED_INT, nullptr);
