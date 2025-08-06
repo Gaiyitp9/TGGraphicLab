@@ -70,7 +70,7 @@ namespace TG
         frustum.corners[2] = position + nearFront + nearRight + nearUp;
         frustum.corners[3] = position + nearFront - nearRight + nearUp;
         frustum.corners[4] = position + farFront - farRight - farUp;
-        frustum.corners[5] = position + farFront - farRight + farUp;
+        frustum.corners[5] = position + farFront + farRight - farUp;
         frustum.corners[6] = position + farFront + farRight + farUp;
         frustum.corners[7] = position + farFront - farRight + farUp;
 
@@ -171,7 +171,7 @@ namespace TG
         m_front.X() = -std::cos(m_pitch * Math::Deg2RadF) * std::sin(m_yaw * Math::Deg2RadF);
         m_front.Y() = std::sin(m_pitch * Math::Deg2RadF);
         m_front.Z() = -std::cos(m_pitch * Math::Deg2RadF) * std::cos(m_yaw * Math::Deg2RadF);
-        m_right = m_front.Cross(m_worldUp);
+        m_right = m_front.Cross(m_worldUp).Normalized();
         m_up = m_right.Cross(m_front);
     }
 }

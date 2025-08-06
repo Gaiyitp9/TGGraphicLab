@@ -38,6 +38,10 @@ namespace TG::Math
             CallAssignmentNoAlias(this->Expression(), other.Expression());
         }
 
+		/**
+		 * 按照row major的形式填充矩阵，与矩阵保存数据的形式无关
+		 * @param values 填充矩阵的数据
+		 */
 		Matrix(std::initializer_list<Scalar> values)
         {
         	const std::size_t count = std::min(values.size(), Rows * Columns);
@@ -73,7 +77,7 @@ namespace TG::Math
 
 		/**
 		 * 按照row major的形式填充矩阵，与矩阵保存数据的形式无关
-		 * @values 填充矩阵的数据
+		 * @param values 填充矩阵的数据
 		 */
 		template<typename... Args> requires std::conjunction_v<std::is_convertible<Args, Scalar>...>
 		void Assign(Args... values)
