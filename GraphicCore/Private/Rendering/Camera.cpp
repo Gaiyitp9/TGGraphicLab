@@ -157,9 +157,7 @@ namespace TG
         if (Input::GetKeyUp(Input::KeyCode::RightMouseButton))
         {
             ShowCursor(true);
-            POINT screenPos{ m_clickMouseX, m_clickMouseY };
-            ClientToScreen(m_videoPort.lock()->Handle(), &screenPos);
-            SetCursorPos(screenPos.x, screenPos.y);
+            SetCursorPos(m_clickMouseX, m_clickMouseY);
         }
 
         m_fov = std::clamp(m_fov - static_cast<float>(Input::MouseWheelDelta()), 1.0f, 80.0f);

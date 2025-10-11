@@ -6,12 +6,8 @@
 #pragma once
 
 #include "Rendering/Example.h"
-#include "Base/CommonInterfaces.h"
 #include "Geometry/Sphere.h"
-#include "Rendering/Camera.h"
 #include "Color/Color.h"
-#include "Rendering/OpenGL/OpenGLTexture2D.h"
-#include "Rendering/OpenGL/OpenGLShader.h"
 #include "ViewportGrid.h"
 #include "ViewportCompass.h"
 

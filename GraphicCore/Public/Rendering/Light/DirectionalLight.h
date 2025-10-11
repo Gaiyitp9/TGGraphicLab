@@ -15,7 +15,7 @@ namespace TG::Rendering
         DirectionalLight();
         ~DirectionalLight() override;
 
-        LightType GetType() const override { return LightType::Directional; }
+        [[nodiscard]] LightType GetType() const override { return LightType::Directional; }
 
     private:
         Math::Vector3f m_lightPosition;

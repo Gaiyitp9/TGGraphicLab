@@ -16,9 +16,8 @@ namespace TG
         using Super = PlatformTraits::Window;
 
     public:
-        Window(int x, int y, int width, int height, std::string_view name, WindowType type)
-            : Super(x, y, width, height, name, type),
-              m_posX(x), m_posY(y), m_width(width), m_height(height)
+        Window(int x, int y, unsigned int width, unsigned int height, std::string_view name, WindowType type)
+            : Super(x, y, width, height, name, type)
         {}
         Window(const Window&) = delete;
         Window& operator=(const Window&) = delete;
@@ -32,10 +31,10 @@ namespace TG
             return Super::PollEvents();
         }
 
-        [[nodiscard]] int PositionX() const noexcept { return m_posX; }
-        [[nodiscard]] int PositionY() const noexcept { return m_posY; }
-        [[nodiscard]] int Width() const noexcept override { return m_width; }
-        [[nodiscard]] int Height() const noexcept override { return m_height; }
+        [[nodiscard]] int PositionX() const noexcept { return Super::posX; }
+        [[nodiscard]] int PositionY() const noexcept { return Super::posY; }
+        [[nodiscard]] int Width() const noexcept override { return Super::width; }
+        [[nodiscard]] int Height() const noexcept override { return Super::height; }
 
         [[nodiscard]] PlatformTraits::WindowHandle Handle() const noexcept override
         {
@@ -56,14 +55,10 @@ namespace TG
         }
         void SetPosition(int x, int y)
         {
-            m_posX = x;
-            m_posY = y;
             Super::SetPosition(x, y);
         }
         void SetSize(unsigned int width, unsigned int height)
         {
-            m_width = width;
-            m_height = height;
             Super::SetSize(width, height);
         }
         void Show(bool show) const
@@ -108,12 +103,6 @@ namespace TG
         {
             Super::scrollDelegate = delegate;
         }
-
-    private:
-        int m_posX;
-        int m_posY;
-        unsigned int m_width;
-        unsigned int m_height;
     };
 
     using WindowBase = Window<DefaultPlatformTraits>;

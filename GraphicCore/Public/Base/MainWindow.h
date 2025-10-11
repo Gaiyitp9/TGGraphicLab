@@ -12,7 +12,7 @@ namespace TG
     class MainWindow final : public WindowBase
     {
     public:
-        MainWindow(int x, int y, int width, int height, std::string_view name);
+        MainWindow(int x, int y, unsigned int width, unsigned int height, std::string_view name);
         MainWindow(const MainWindow&) = delete;
         MainWindow(MainWindow&&) = delete;
         MainWindow& operator=(const MainWindow&) = delete;

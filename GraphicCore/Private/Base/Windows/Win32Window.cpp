@@ -12,8 +12,8 @@
 
 namespace TG
 {
-	Win32Window::Win32Window(int x, int y, int width, int height, std::string_view name, WindowType type)
-		: name(name)
+	Win32Window::Win32Window(int x, int y, unsigned int width, unsigned int height, std::string_view name,
+	    WindowType type) : name{ name }, posX{ x }, posY{ y }, width{ width }, height{ height }
 	{
 		DWORD dwStyle = WS_OVERLAPPEDWINDOW;
 		DWORD dwExStyle = WS_EX_OVERLAPPEDWINDOW;
@@ -31,7 +31,7 @@ namespace TG
 		}
 
 		// 客户端区域大小
-		RECT rect = { 0, 0, width, height };
+		RECT rect = { 0, 0, static_cast<LONG>(width), static_cast<LONG>(height) };
 		// 根据客户区域宽和高计算整个窗口的宽和高
 		if (!AdjustWindowRect(&rect, dwStyle, false))
 			throw Win32Exception::Create();
@@ -96,9 +96,9 @@ namespace TG
 		SetWindowPos(handle, HWND_TOP, x, y, 0, 0, SWP_NOSIZE);
 	}
 
-	void Win32Window::SetSize(unsigned int width, unsigned int height) const
+	void Win32Window::SetSize(unsigned int w, unsigned int h) const
 	{
-		SetWindowPos(handle, HWND_TOP, 0, 0, static_cast<int>(width), static_cast<int>(height), SWP_NOMOVE);
+		SetWindowPos(handle, HWND_TOP, 0, 0, static_cast<int>(w), static_cast<int>(h), SWP_NOMOVE);
 	}
 
 	void Win32Window::Show(bool show) const
@@ -511,13 +511,19 @@ namespace TG
 
 			case WM_MOVE:
 			{
-				pWindow->windowPosDelegate.ExecuteIfBound(LOWORD(lParam), HIWORD(lParam));
+			    pWindow->posX = LOWORD(lParam);
+			    pWindow->posY = HIWORD(lParam);
+
+				pWindow->windowPosDelegate.ExecuteIfBound(pWindow->posX, pWindow->posY);
 				return 0;
 			}
 
 			case WM_SIZE:
 			{
-				pWindow->windowSizeDelegate.ExecuteIfBound(LOWORD(lParam), HIWORD(lParam));
+			    pWindow->width = LOWORD(lParam);
+			    pWindow->height = HIWORD(lParam);
+
+				pWindow->windowSizeDelegate.ExecuteIfBound(pWindow->width, pWindow->height);
 				if (wParam == SIZE_MINIMIZED)
 					pWindow->suspendDelegate.ExecuteIfBound();
 				if (wParam == SIZE_RESTORED)

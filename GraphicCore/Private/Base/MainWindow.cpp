@@ -8,7 +8,7 @@
 
 namespace TG
 {
-    MainWindow::MainWindow(int x, int y, int width, int height, std::string_view name)
+    MainWindow::MainWindow(int x, int y, unsigned int width, unsigned int height, std::string_view name)
         : WindowBase(x, y, width, height, name, WindowType::Default)
     {}
 }

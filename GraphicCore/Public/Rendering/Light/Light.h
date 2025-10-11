@@ -25,7 +25,7 @@ namespace TG::Rendering
         Light();
         virtual ~Light();
 
-        virtual LightType GetType() const = 0;
+        [[nodiscard]] virtual LightType GetType() const = 0;
 
     private:
         Color::Color m_color;
