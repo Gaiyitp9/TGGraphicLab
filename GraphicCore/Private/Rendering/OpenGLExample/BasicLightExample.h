@@ -56,5 +56,9 @@ namespace TG::Rendering
         bool m_wireframe{ false };
         ViewportGrid m_viewportGrid;
         ViewportCompass m_viewportCompass;
+
+        std::unique_ptr<std::thread> m_renderThread;
+        std::atomic<float> m_renderProcess{ 0.0f };
+        std::atomic_bool m_renderDone{ true };
     };
 }

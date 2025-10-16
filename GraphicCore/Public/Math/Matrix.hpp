@@ -44,7 +44,7 @@ namespace TG::Math
 		 */
 		Matrix(std::initializer_list<Scalar> values)
         {
-        	const std::size_t count = std::min(values.size(), Rows * Columns);
+        	const std::size_t count = std::min(values.size(), Size);
         	auto it = values.begin();
         	for (int i = 0; i < count; ++i)
         	{
@@ -83,7 +83,7 @@ namespace TG::Math
 		void Assign(Args... values)
         {
         	Scalar temp[] = { static_cast<Scalar>(values)... };
-        	constexpr std::size_t count = std::min(sizeof...(values), Rows * Columns);
+        	constexpr std::size_t count = std::min(sizeof...(values), Size);
         	for (int i = 0; i < count; ++i)
         	{
         		std::size_t index = i;
@@ -130,7 +130,7 @@ namespace TG::Math
 		}
 
 	private:
-		Scalar m_storage[Rows * Columns]{};
+		Scalar m_storage[Size]{};
 	};
 
 	template<typename Scalar, std::size_t Size> using Vector = Matrix<Scalar, Size, 1>;

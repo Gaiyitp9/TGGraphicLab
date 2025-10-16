@@ -8,6 +8,7 @@
 #include "Color/StandardColors.h"
 #include "imgui_impl_opengl3.h"
 #include "imgui_impl_win32.h"
+#include "RayTracing/PathTracer.h"
 
 namespace TG::Rendering
 {
@@ -118,6 +119,9 @@ namespace TG::Rendering
         glDeleteVertexArrays(1, &m_VAO);
         glDeleteBuffers(1, &m_VBO);
         glDeleteBuffers(1, &m_EBO);
+
+        if (m_renderThread)
+            m_renderThread->join();
     }
 
     void BasicLightExample::Render()
@@ -184,8 +188,23 @@ namespace TG::Rendering
         ImGui::NewFrame();
 
         const ImGuiIO& io = ImGui::GetIO();
-        ImGui::Begin("Settings");
+        ImGui::Begin("General");
         ImGui::Checkbox("Draw wireframe", &m_wireframe);
+        ImGui::BeginDisabled(!m_renderDone);
+        if (ImGui::Button("Render"))
+        {
+            if (m_renderThread)
+            {
+                m_renderThread->join();
+                m_renderThread.reset();
+            }
+            m_renderThread = std::make_unique<std::thread>([this] {
+                RunPathTracer(m_renderProcess, m_renderDone);
+            });
+        }
+        ImGui::EndDisabled();
+        ImGui::SameLine();
+        ImGui::ProgressBar(m_renderProcess, ImVec2(200.0f, 0.0f));
         ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
         ImGui::End();
 

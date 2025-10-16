@@ -5,7 +5,7 @@
 *****************************************************************/
 
 #include "Diagnostic/Log.hpp"
-#include "spdlog/sinks/basic_file_sink.h"
+#include "spdlog/sinks/rotating_file_sink.h"
 #include "spdlog/sinks/stdout_color_sinks.h"
 #include <print>
 
@@ -18,9 +18,18 @@ namespace TG
         // https://github.com/gabime/spdlog/wiki/Error-handling
         try
         {
-            m_logger = spdlog::basic_logger_mt("AsyncLogger", "DefaultLog.txt", true);
-            auto consoleSink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
-            m_logger->sinks().emplace_back(consoleSink);
+            auto console_sink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
+            console_sink->set_level(spdlog::level::info);
+            console_sink->set_pattern("[%Y-%m-%d %H:%M:%S.%e] [thread %t] [%n] [%^%l%$] %v");
+
+            // Create a file rotating logger with 5mb size max and 3 rotated files.
+            auto file_sink = std::make_shared<spdlog::sinks::rotating_file_sink_mt>("Logs/DefaultLog.txt",
+                1024 * 1024 * 5, 3);
+            file_sink->set_level(spdlog::level::trace);
+            file_sink->set_pattern("[%Y-%m-%d %H:%M:%S.%e] [thread %t] [%n] [%^%l%$] %v");
+
+            m_logger = std::make_shared<spdlog::logger>("TGLogger",
+                spdlog::sinks_init_list{ console_sink, file_sink });
         }
         catch (const spdlog::spdlog_ex::exception& e)
         {
