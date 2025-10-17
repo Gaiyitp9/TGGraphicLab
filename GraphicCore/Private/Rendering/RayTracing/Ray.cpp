@@ -3,11 +3,16 @@
 * Copyright (c) Gaiyitp9. All rights reserved.					*
 * This code is licensed under the MIT License (MIT).			*
 *****************************************************************/
-#pragma once
 
-#include <memory>
+#include "Rendering/RayTracing/Ray.h"
 
 namespace TG
 {
-    void RunPathTracer(std::atomic<float>& process, std::atomic<bool>& renderDone);
+    Ray::Ray(const Math::Vector3f& origin, const Math::Vector3f& direction)
+        : m_origin(origin), m_direction(direction) {}
+
+    Math::Vector3f Ray::At(float t) const
+    {
+        return m_origin + t * m_direction;
+    }
 }

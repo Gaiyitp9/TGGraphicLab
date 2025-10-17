@@ -8,7 +8,7 @@
 #include "Color/StandardColors.h"
 #include "imgui_impl_opengl3.h"
 #include "imgui_impl_win32.h"
-#include "RayTracing/PathTracer.h"
+#include "Rendering/RayTracing/PathTracer.h"
 
 namespace TG::Rendering
 {
@@ -199,7 +199,15 @@ namespace TG::Rendering
                 m_renderThread.reset();
             }
             m_renderThread = std::make_unique<std::thread>([this] {
-                RunPathTracer(m_renderProcess, m_renderDone);
+                PathTraceData pathTraceData;
+                pathTraceData.aspectRatio = m_camera.AspectRatio();
+                pathTraceData.focalLength = m_camera.nearPlane;
+                pathTraceData.fov = m_camera.fov;
+                pathTraceData.cameraPosition = m_camera.position;
+                pathTraceData.front = m_camera.front;
+                pathTraceData.right = m_camera.right;
+                pathTraceData.up = m_camera.up;
+                RunPathTracer(m_renderProcess, m_renderDone, pathTraceData);
             });
         }
         ImGui::EndDisabled();

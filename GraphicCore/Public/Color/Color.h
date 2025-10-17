@@ -42,6 +42,8 @@ namespace TG::Color
 		Color operator*(const Color& color) const;
 		Color operator*(float c) const;
 
+	    Color operator+(const Color& color) const;
+
 	private:
 		Math::Vector4f m_channels;
 	};

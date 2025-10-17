@@ -22,7 +22,7 @@ namespace TG
 
     Math::Matrix4f Camera::ViewMatrix() const
     {
-        return Rendering::LookAt<float>(position, position + m_front, m_worldUp);
+        return Rendering::LookAt<float>(position, position + front, m_worldUp);
     }
 
     Math::Matrix4f Camera::ProjectionMatrix() const
@@ -33,16 +33,16 @@ namespace TG
         const auto videoPortPtr = m_videoPort.lock();
         const float aspectRatio = static_cast<float>(videoPortPtr->Width()) /
             static_cast<float>(videoPortPtr->Height());
-        switch (m_cameraType)
+        switch (cameraType)
         {
             case CameraType::Perspective:
-                return Rendering::Perspective(m_fov * Math::Deg2RadF, aspectRatio, m_nearPlane, m_farPlane);
+                return Rendering::Perspective(fov * Math::Deg2RadF, aspectRatio, nearPlane, farPlane);
 
             case CameraType::Orthographic:
             {
-                float orthoHeight = m_orthoWidth / aspectRatio;
-                return Rendering::Orthographic(-m_orthoWidth, m_orthoWidth, -orthoHeight, orthoHeight,
-                    m_nearPlane, m_farPlane);
+                float orthoHeight = orthoWidth / aspectRatio;
+                return Rendering::Orthographic(-orthoWidth, orthoWidth, -orthoHeight, orthoHeight,
+                    nearPlane, farPlane);
             }
 
             default:
@@ -57,12 +57,12 @@ namespace TG
         const auto videoPortPtr = m_videoPort.lock();
         const float aspectRatio = static_cast<float>(videoPortPtr->Width()) /
             static_cast<float>(videoPortPtr->Height());
-        Math::Vector3f nearFront = m_front.Normalized() * m_nearPlane;
-        Math::Vector3f nearUp = m_nearPlane * std::tan(m_fov * Math::Deg2RadF * 0.5f) * m_up;
-        Math::Vector3f nearRight = nearUp.Norm() * aspectRatio * m_right;
-        Math::Vector3f farFront = m_front.Normalized() * m_farPlane;
-        Math::Vector3f farUp = m_farPlane * std::tan(m_fov * Math::Deg2RadF * 0.5f) * m_up;
-        Math::Vector3f farRight = farUp.Norm() * aspectRatio * m_right;
+        Math::Vector3f nearFront = front.Normalized() * nearPlane;
+        Math::Vector3f nearUp = nearPlane * std::tan(fov * Math::Deg2RadF * 0.5f) * up;
+        Math::Vector3f nearRight = nearUp.Norm() * aspectRatio * right;
+        Math::Vector3f farFront = front.Normalized() * farPlane;
+        Math::Vector3f farUp = farPlane * std::tan(fov * Math::Deg2RadF * 0.5f) * up;
+        Math::Vector3f farRight = farUp.Norm() * aspectRatio * right;
 
         Frustum frustum;
         frustum.corners[0] = position + nearFront - nearRight - nearUp;
@@ -77,6 +77,17 @@ namespace TG
         return frustum;
     }
 
+    float Camera::AspectRatio() const
+    {
+        if (m_videoPort.expired())
+            return 0.0f;
+
+        const auto videoPortPtr = m_videoPort.lock();
+        const float aspectRatio = static_cast<float>(videoPortPtr->Width()) /
+            static_cast<float>(videoPortPtr->Height());
+        return aspectRatio;
+    }
+
     void Camera::Update()
     {
         if (m_timer.expired())
@@ -85,13 +96,13 @@ namespace TG
         auto timer = m_timer.lock();
         float velocity = m_moveSpeed * timer->DeltaTime() * 0.001f;
         if (Input::GetKey(Input::KeyCode::W))
-            position += velocity * m_front;
+            position += velocity * front;
         if (Input::GetKey(Input::KeyCode::S))
-            position -= velocity * m_front;
+            position -= velocity * front;
         if (Input::GetKey(Input::KeyCode::A))
-            position -= velocity * m_right;
+            position -= velocity * right;
         if (Input::GetKey(Input::KeyCode::D))
-            position += velocity * m_right;
+            position += velocity * right;
         if (Input::GetKey(Input::KeyCode::Q))
             position -= velocity * m_worldUp;
         if (Input::GetKey(Input::KeyCode::E))
@@ -160,16 +171,16 @@ namespace TG
             SetCursorPos(m_clickMouseX, m_clickMouseY);
         }
 
-        m_fov = std::clamp(m_fov - static_cast<float>(Input::MouseWheelDelta()), 1.0f, 80.0f);
-        m_orthoWidth = std::clamp(m_orthoWidth - static_cast<float>(Input::MouseWheelDelta()) * 0.1f, 0.2f, 20.0f);
+        fov = std::clamp(fov - static_cast<float>(Input::MouseWheelDelta()), 1.0f, 80.0f);
+        orthoWidth = std::clamp(orthoWidth - static_cast<float>(Input::MouseWheelDelta()) * 0.1f, 0.2f, 20.0f);
     }
 
     void Camera::UpdateCameraVectors()
     {
-        m_front.X() = -std::cos(m_pitch * Math::Deg2RadF) * std::sin(m_yaw * Math::Deg2RadF);
-        m_front.Y() = std::sin(m_pitch * Math::Deg2RadF);
-        m_front.Z() = -std::cos(m_pitch * Math::Deg2RadF) * std::cos(m_yaw * Math::Deg2RadF);
-        m_right = m_front.Cross(m_worldUp).Normalized();
-        m_up = m_right.Cross(m_front);
+        front.X() = -std::cos(m_pitch * Math::Deg2RadF) * std::sin(m_yaw * Math::Deg2RadF);
+        front.Y() = std::sin(m_pitch * Math::Deg2RadF);
+        front.Z() = -std::cos(m_pitch * Math::Deg2RadF) * std::cos(m_yaw * Math::Deg2RadF);
+        right = front.Cross(m_worldUp).Normalized();
+        up = right.Cross(front);
     }
 }

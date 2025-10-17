@@ -41,4 +41,9 @@ namespace TG::Color
     {
         return Color(m_channels * c);
     }
+
+    Color Color::operator+(const Color& color) const
+    {
+        return Color(m_channels + color.m_channels);
+    }
 }

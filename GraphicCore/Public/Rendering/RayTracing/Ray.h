@@ -13,15 +13,15 @@ namespace TG
     {
     public:
         Ray() = default;
-        Ray(const Math::Vector3d& origin, const Math::Vector3d& direction);
+        Ray(const Math::Vector3f& origin, const Math::Vector3f& direction);
 
-        [[nodiscard]] Math::Vector3f At(double t) const;
+        [[nodiscard]] Math::Vector3f At(float t) const;
 
-        [[nodiscard]] Math::Vector3d Origin() const { return m_origin; }
-        [[nodiscard]] Math::Vector3d Direction() const { return m_direction; }
+        [[nodiscard]] Math::Vector3f Origin() const { return m_origin; }
+        [[nodiscard]] Math::Vector3f Direction() const { return m_direction; }
 
     private:
-        Math::Vector3d m_origin;
-        Math::Vector3d m_direction;
+        Math::Vector3f m_origin;
+        Math::Vector3f m_direction;
     };
 }

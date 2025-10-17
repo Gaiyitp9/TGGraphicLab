@@ -30,10 +30,21 @@ namespace TG
         [[nodiscard]] Math::Matrix4f ViewMatrix() const;
         [[nodiscard]] Math::Matrix4f ProjectionMatrix() const;
         [[nodiscard]] Frustum ViewFrustum() const;
+        [[nodiscard]] float AspectRatio() const;
 
         void Update();
 
+        CameraType cameraType{ CameraType::Perspective };
+
         Math::Vector3f position{ 0.0f, 1.0f, 4.0f };
+        float fov{ 45.0 };
+        float nearPlane{ 0.1f };
+        float farPlane{ 100.0f };
+        float orthoWidth{ 3.0f };
+
+        Math::Vector3f front;
+        Math::Vector3f right;
+        Math::Vector3f up;
 
     private:
         void UpdateCameraVectors();
@@ -41,17 +52,6 @@ namespace TG
         std::weak_ptr<IDefaultVideoPort> m_videoPort;
         std::weak_ptr<ITimer> m_timer;
 
-        CameraType m_cameraType{ CameraType::Perspective };
-
-        float m_fov{ 45.0 };
-        float m_nearPlane{ 0.1f };
-        float m_farPlane{ 100.0f };
-
-        float m_orthoWidth{ 3.0f };
-
-        Math::Vector3f m_front;
-        Math::Vector3f m_right;
-        Math::Vector3f m_up;
         Math::Vector3f m_worldUp{ 0.0f, 1.0f, 0.0f };
 
         float m_yaw{ 0.0f };
