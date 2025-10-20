@@ -5,14 +5,14 @@
 *****************************************************************/
 
 #include "Rendering/OpenGLExample/SkyBox.h"
-#include "Geometry/Primitives.h"
+#include "Rendering/Mesh/Primitives.h"
 
 namespace TG::Rendering
 {
     SkyBox::SkyBox() : m_vertexShader("Assets/Shaders/GLSL/SkyBox.vert", ShaderStage::Vertex),
         m_fragmentShader("Assets/Shaders/GLSL/SkyBox.frag", ShaderStage::Fragment)
     {
-        m_cubeMesh = Geometry::CreatePrimitive(Geometry::PrimitiveType::Cube);
+        m_cubeMesh = CreatePrimitive(PrimitiveType::Cube);
 
         glGenBuffers(1, &m_VBO);
         glGenBuffers(1, &m_EBO);

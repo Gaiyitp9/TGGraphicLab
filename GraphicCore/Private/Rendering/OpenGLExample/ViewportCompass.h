@@ -8,7 +8,7 @@
 #include "Rendering/Camera.h"
 #include "Rendering/OpenGL/OpenGLShader.h"
 #include "Rendering/OpenGL/OpenGLTexture2D.h"
-#include "Geometry/Primitives.h"
+#include "Rendering/Mesh/Primitives.h"
 #include "stb_truetype.h"
 #include <array>
 
@@ -35,7 +35,7 @@ namespace TG::Rendering
         OpenGLShader m_axisNameVertexShader;
         OpenGLShader m_axisNameFragmentShader;
 
-        Geometry::Mesh m_axisNameMesh;
+        Mesh m_axisNameMesh;
 
         GLuint m_axisNameVBO{};
         GLuint m_axisNameEBO{};

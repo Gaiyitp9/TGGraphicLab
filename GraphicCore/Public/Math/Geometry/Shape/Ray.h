@@ -7,21 +7,21 @@
 
 #include "Math/Core.hpp"
 
-namespace TG
+namespace TG::Math::Geometry
 {
     class Ray
     {
     public:
         Ray() = default;
-        Ray(const Math::Vector3f& origin, const Math::Vector3f& direction);
+        Ray(const Vector3f& origin, const Vector3f& direction);
 
-        [[nodiscard]] Math::Vector3f At(float t) const;
+        [[nodiscard]] Vector3f Origin() const;
+        [[nodiscard]] Vector3f Direction() const;
 
-        [[nodiscard]] Math::Vector3f Origin() const { return m_origin; }
-        [[nodiscard]] Math::Vector3f Direction() const { return m_direction; }
+        [[nodiscard]] Vector3f At(float t) const;
 
     private:
-        Math::Vector3f m_origin;
-        Math::Vector3f m_direction;
+        Vector3f m_origin;
+        Vector3f m_direction{ 1.0f, 0.0f, 0.0f };
     };
 }

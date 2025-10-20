@@ -3,10 +3,12 @@
 * Copyright (c) Gaiyitp9. All rights reserved.					*
 * This code is licensed under the MIT License (MIT).			*
 *****************************************************************/
+#pragma once
 
-#include "Geometry/Mesh.h"
-
-namespace TG
+namespace TG::Rendering
 {
+    class Capsule
+    {
 
+    };
 }

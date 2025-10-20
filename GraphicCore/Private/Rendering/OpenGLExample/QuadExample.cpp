@@ -5,9 +5,9 @@
 *****************************************************************/
 
 #include "QuadExample.h"
-#include "Color/StandardColors.h"
+#include "Rendering/Color/StandardColors.h"
 #include "Exception/BaseException.h"
-#include "Geometry/Primitives.h"
+#include "Rendering/Mesh/Primitives.h"
 #include "imgui_impl_opengl3.h"
 #include "imgui_impl_win32.h"
 #include "stb_image.h"
@@ -21,7 +21,7 @@ namespace TG::Rendering
 		m_wireframeGeometryShader("Assets/Shaders/GLSL/Wireframe.geom", ShaderStage::Geometry),
 		m_wireframeFragmentShader("Assets/Shaders/GLSL/Wireframe.frag", ShaderStage::Fragment)
     {
-    	m_quadMesh = Geometry::CreatePrimitive(Geometry::PrimitiveType::Quad);
+    	m_quadMesh = CreatePrimitive(PrimitiveType::Quad);
 		m_quadMesh.colors[0] = { 1.0f, 0.5f, 0.2f };
 		m_quadMesh.colors[1] = { 1.0f, 0.0f, 0.0f };
 		m_quadMesh.colors[2] = { 0.0f, 1.0f, 0.0f };
@@ -113,7 +113,7 @@ namespace TG::Rendering
 
     void QuadExample::Render()
     {
-    	Color::Color clearColor = Color::AliceBlue;
+    	Color clearColor = AliceBlue;
 
     	glClearColor(clearColor.R(), clearColor.G(), clearColor.B(), clearColor.A());
     	glClear(GL_COLOR_BUFFER_BIT);

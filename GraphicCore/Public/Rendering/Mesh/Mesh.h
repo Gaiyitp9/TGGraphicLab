@@ -8,7 +8,7 @@
 #include "Math/Core.hpp"
 #include <vector>
 
-namespace TG::Geometry
+namespace TG::Rendering
 {
     class Mesh
     {

@@ -5,21 +5,10 @@
 *****************************************************************/
 #pragma once
 
-#include "Mesh.h"
+#include "Math/Geometry/Shape/Ray.h"
+#include "Math/Geometry/Shape/Sphere.h"
 
-namespace TG::Geometry
+namespace TG::Math::Geometry
 {
-    class Plane
-    {
-    public:
-        Plane();
-
-    private:
-        Mesh m_mesh;
-
-        float m_width;
-        float m_height;
-        unsigned int m_rows;
-        unsigned int m_columns;
-    };
+    bool RaySphereIntersection(const Ray& ray, const Sphere& sphere, float& tMin, float& tMax);
 }

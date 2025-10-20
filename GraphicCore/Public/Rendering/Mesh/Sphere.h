@@ -7,7 +7,7 @@
 
 #include "Mesh.h"
 
-namespace TG::Geometry
+namespace TG::Rendering
 {
     enum class SphereType
     {

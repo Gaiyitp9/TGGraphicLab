@@ -5,7 +5,7 @@
 *****************************************************************/
 
 #include "Rendering/OpenGLExample/BasicLightExample.h"
-#include "Color/StandardColors.h"
+#include "Rendering/Color/StandardColors.h"
 #include "imgui_impl_opengl3.h"
 #include "imgui_impl_win32.h"
 #include "Rendering/RayTracing/PathTracer.h"
@@ -34,32 +34,32 @@ namespace TG::Rendering
     {
         m_sphereProperties[0] = {
             Math::Vector3f{ -6.0f, 1.0f, -10.0f },
-            Color::SaddleBrown,
+            SaddleBrown,
             0.3f, 0.5f, 8.0f
         };
         m_sphereProperties[1] = {
             Math::Vector3f{ -3.0f, 1.0f, -10.0f },
-            Color::SaddleBrown,
+            SaddleBrown,
             0.3f, 0.5f, 16.0f
         };
         m_sphereProperties[2] = {
             Math::Vector3f{ 0.0f, 1.0f, -10.0f },
-            Color::SaddleBrown,
+            SaddleBrown,
             0.3f, 0.5f, 32.0f
         };
         m_sphereProperties[3] = {
             Math::Vector3f{ 3.0f, 1.0f, -10.0f },
-            Color::SaddleBrown,
+            SaddleBrown,
             0.3f, 0.5f, 64.0f
         };
         m_sphereProperties[4] = {
             Math::Vector3f{ 6.0f, 1.0f, -10.0f },
-            Color::SaddleBrown,
+            SaddleBrown,
             0.3f, 0.5f, 128.0f
         };
 
         m_lightDirection = Math::Vector4f{ 1.0f, 5.0f, 1.0f, 0.0f };
-        m_lightColor = Color::White;
+        m_lightColor = White;
 
         glGenBuffers(1, &m_VBO);
         glGenBuffers(1, &m_EBO);
@@ -128,7 +128,7 @@ namespace TG::Rendering
     {
         m_camera.Update();
 
-        Color::Color clearColor = Color::DimGray;
+        Color clearColor = DimGray;
         glClearColor(clearColor.R(), clearColor.G(), clearColor.B(), clearColor.A());
         glClearDepth(1.0);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);

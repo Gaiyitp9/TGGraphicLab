@@ -6,8 +6,8 @@
 #pragma once
 
 #include "Rendering/Example.h"
-#include "Geometry/Sphere.h"
-#include "Color/Color.h"
+#include "Rendering/Mesh/Sphere.h"
+#include "Rendering/Color/Color.h"
 #include "ViewportGrid.h"
 #include "ViewportCompass.h"
 
@@ -25,7 +25,7 @@ namespace TG::Rendering
         struct ObjectProperty
         {
             Math::Vector3f position;
-            Color::Color color;
+            Color color;
             float ambientStrength;
             float specularStrength;
             float shininess;
@@ -33,10 +33,10 @@ namespace TG::Rendering
 
         Camera m_camera;
 
-        Geometry::Sphere m_sphereMesh;
+        Sphere m_sphereMesh;
         ObjectProperty m_sphereProperties[5];
         Math::Vector4f m_lightDirection;
-        Color::Color m_lightColor;
+        Color m_lightColor;
 
         GLuint m_VAO{};
         GLuint m_VBO{};

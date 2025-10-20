@@ -5,7 +5,7 @@
 *****************************************************************/
 #pragma once
 
-namespace TG::Geometry
+namespace TG::Rendering
 {
     class Cylinder
     {

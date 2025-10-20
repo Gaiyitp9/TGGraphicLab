@@ -45,7 +45,7 @@ namespace TG::Rendering
 
         glBindVertexArray(0);
 
-        m_axisNameMesh = Geometry::CreatePrimitive(Geometry::PrimitiveType::Quad);
+        m_axisNameMesh = CreatePrimitive(PrimitiveType::Quad);
 
         glGenBuffers(1, &m_axisNameVBO);
         glGenBuffers(1, &m_axisNameEBO);

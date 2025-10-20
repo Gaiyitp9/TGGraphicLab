@@ -4,9 +4,9 @@
 * This code is licensed under the MIT License (MIT).			*
 *****************************************************************/
 
-#include "Geometry/Cylinder.h"
+#include "Rendering/Mesh/Plane.h"
 
-namespace TG::Geometry
+namespace TG::Rendering
 {
 
 }

@@ -5,8 +5,8 @@
 *****************************************************************/
 
 #include "CubeExample.h"
-#include "Color/StandardColors.h"
-#include "Geometry/Primitives.h"
+#include "Rendering/Color/StandardColors.h"
+#include "Rendering/Mesh/Primitives.h"
 #include "Rendering/ViewProjectionMatrix.hpp"
 #include "imgui_impl_opengl3.h"
 #include "imgui_impl_win32.h"
@@ -20,7 +20,7 @@ namespace TG::Rendering
         m_wireframeGeometryShader("Assets/Shaders/GLSL/Wireframe.geom", ShaderStage::Geometry),
         m_wireframeFragmentShader("Assets/Shaders/GLSL/Wireframe.frag", ShaderStage::Fragment)
     {
-        m_cubeMesh = Geometry::CreatePrimitive(Geometry::PrimitiveType::Cube);
+        m_cubeMesh = CreatePrimitive(PrimitiveType::Cube);
 
         m_cubePositions[0] = Math::Vector3f{ 0.0f, 0.0f, 0.0f };
         m_cubePositions[1] = Math::Vector3f{ 2.0f, 5.0f, -15.0f };
@@ -83,7 +83,7 @@ namespace TG::Rendering
     {
         m_camera.Update();
 
-        Color::Color clearColor = Color::DimGray;
+        Color clearColor = DimGray;
 
         glClearColor(clearColor.R(), clearColor.G(), clearColor.B(), clearColor.A());
         glClearDepth(1.0);

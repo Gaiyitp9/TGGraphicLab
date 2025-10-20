@@ -7,7 +7,7 @@
 
 #include "Color.h"
 
-namespace TG::Color
+namespace TG::Rendering
 {
 	//-----------------------------------------------------------------
 	//	颜色取自	DirectXColors.h -- C++ Color Math library

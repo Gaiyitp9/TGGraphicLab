@@ -7,7 +7,7 @@
 
 #include "Rendering/Example.h"
 #include "Base/CommonInterfaces.h"
-#include "Geometry/Mesh.h"
+#include "Rendering/Mesh/Mesh.h"
 #include "Rendering/OpenGL/OpenGLShader.h"
 
 namespace TG::Rendering
@@ -24,7 +24,7 @@ namespace TG::Rendering
         std::weak_ptr<IDefaultVideoPort> m_videoPort;
         std::weak_ptr<ITimer> m_timer;
 
-        Geometry::Mesh m_quadMesh;
+        Mesh m_quadMesh;
 
         GLuint m_VAO{};
         GLuint m_VBO{};

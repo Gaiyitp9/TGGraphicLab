@@ -7,7 +7,7 @@
 
 #include "Math/Core.hpp"
 
-namespace TG::Color
+namespace TG::Rendering
 {
 	class Color
 	{

@@ -4,9 +4,9 @@
 * This code is licensed under the MIT License (MIT).			*
 *****************************************************************/
 
-#include "Color/Color.h"
+#include "Rendering/Color/Color.h"
 
-namespace TG::Color
+namespace TG::Rendering
 {
     Color::Color(const Math::Vector4f& color)
     {

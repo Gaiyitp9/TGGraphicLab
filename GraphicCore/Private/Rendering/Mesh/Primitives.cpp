@@ -4,9 +4,9 @@
 * This code is licensed under the MIT License (MIT).			*
 *****************************************************************/
 
-#include "Geometry/Primitives.h"
+#include "Rendering/Mesh/Primitives.h"
 
-namespace TG::Geometry
+namespace TG::Rendering
 {
     Mesh CreateQuad()
     {

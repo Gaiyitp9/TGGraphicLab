@@ -32,11 +32,7 @@ namespace TG
         // 打印日期
         LogInfo(Chronometer::Date());
 
-        int windowWidth = m_screenWidth * 3 / 4;
-        int windowHeight = m_screenHeight * 4 / 5;
-        int windowPosX = windowWidth / 8;
-        int windowPosY = windowHeight / 10;
-        m_mainWindow = std::make_shared<MainWindow>(windowPosX, windowPosY, windowWidth, windowHeight, "天工渲染器");
+        m_mainWindow = std::make_shared<MainWindow>(0, 0, 1600, 900, "天工渲染器");
         m_mainWindow->Show(true);
         m_mainWindow->SetKeyCallback(
             [&keyboardEventDelegate = onKeyboardEvent](Input::KeyCode key, int scanCode, Input::Action action) {

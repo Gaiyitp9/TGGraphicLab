@@ -15,13 +15,13 @@ namespace TG
 	Win32Window::Win32Window(int x, int y, unsigned int width, unsigned int height, std::string_view name,
 	    WindowType type) : name{ name }, posX{ x }, posY{ y }, width{ width }, height{ height }
 	{
-		DWORD dwStyle = WS_OVERLAPPEDWINDOW;
-		DWORD dwExStyle = WS_EX_OVERLAPPEDWINDOW;
+		DWORD dwStyle = 0;
+		DWORD dwExStyle = 0;
 		switch (type)
 		{
 			case WindowType::Default:
+		    case WindowType::Main:
 				dwStyle = WS_OVERLAPPEDWINDOW;
-				dwExStyle = WS_EX_OVERLAPPEDWINDOW;
 				break;
 			case WindowType::Load:
 				dwStyle = WS_POPUP;
@@ -30,14 +30,27 @@ namespace TG
 				break;
 		}
 
-		// 客户端区域大小
-		RECT rect = { 0, 0, static_cast<LONG>(width), static_cast<LONG>(height) };
+		// 初始化为客户端区域大小
+		RECT windowRect = { 0, 0, static_cast<LONG>(width), static_cast<LONG>(height) };
 		// 根据客户区域宽和高计算整个窗口的宽和高
-		if (!AdjustWindowRect(&rect, dwStyle, false))
+		if (!AdjustWindowRect(&windowRect, dwStyle, false))
 			throw Win32Exception::Create();
+	    int windowWidth = windowRect.right - windowRect.left;
+	    int windowHeight = windowRect.bottom - windowRect.top;
+	    // 主窗口屏幕居中
+	    if (type == WindowType::Main)
+	    {
+	        // 获取桌面工作区尺寸(也就是去掉任务栏部分的区域)
+	        RECT workAreaRect;
+	        if (!SystemParametersInfoA(SPI_GETWORKAREA, 0, &workAreaRect, 0))
+	            throw Win32Exception::Create();
+	        int workAreaWidth = workAreaRect.right - workAreaRect.left;
+	        int workAreaHeight = workAreaRect.bottom - workAreaRect.top;
+	        posX = (workAreaWidth - windowWidth) / 2;
+	        posY = (workAreaHeight - windowHeight) / 2;
+	    }
 		handle = CreateWindowExW(dwExStyle, L"Default", MultiBytesToWideChars(name).c_str(), dwStyle,
-							   x, y, rect.right - rect.left, rect.bottom - rect.top,
-							   nullptr, nullptr, nullptr, this);
+							   posX, posY, windowWidth, windowHeight, nullptr, nullptr, nullptr, this);
 		if (handle == nullptr)
 			throw Win32Exception::Create();
 

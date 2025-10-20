@@ -4,10 +4,10 @@
 * This code is licensed under the MIT License (MIT).			*
 *****************************************************************/
 
-#include "Geometry/Sphere.h"
+#include "Rendering/Mesh/Sphere.h"
 #include <numbers>
 
-namespace TG::Geometry
+namespace TG::Rendering
 {
     Sphere::Sphere()
     {

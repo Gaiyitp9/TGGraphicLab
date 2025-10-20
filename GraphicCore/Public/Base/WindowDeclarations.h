@@ -14,6 +14,7 @@ namespace TG
     enum class WindowType : unsigned char
     {
         Default,
+        Main,
         Load,
     };
     // 窗口消息委托类型

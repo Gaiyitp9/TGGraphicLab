@@ -8,7 +8,7 @@
 #include "Rendering/Camera.h"
 #include "Rendering/OpenGL/OpenGLShader.h"
 #include "Rendering/OpenGL/OpenGLCubeMap.h"
-#include "Geometry/Mesh.h"
+#include "Rendering/Mesh/Mesh.h"
 
 namespace TG::Rendering
 {
@@ -21,7 +21,7 @@ namespace TG::Rendering
         void Render(const Camera& camera) const;
 
     private:
-        Geometry::Mesh m_cubeMesh;
+        Mesh m_cubeMesh;
         OpenGLCubeMap m_cubeMap;
 
         GLuint m_VBO{};
