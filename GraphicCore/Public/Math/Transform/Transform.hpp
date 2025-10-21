@@ -21,24 +21,24 @@ namespace TG::Math
 
         const MatrixType& ToTransformMatrix() const noexcept { return m_matrix; }
 
-        Block<MatrixType, HDimension, Dimension> LinearExt()
+        Block<MatrixType, Dimension, Dimension> LinearExt()
         {
-            return m_matrix.Block<HDimension, Dimension>(0, 0);
+            return m_matrix.Block<Dimension, Dimension>(0, 0);
         }
 
-        Block<const MatrixType, HDimension, Dimension> LinearExt() const
+        Block<const MatrixType, Dimension, Dimension> LinearExt() const
         {
-            return m_matrix.Block<HDimension, Dimension>(0, 0);
+            return m_matrix.Block<Dimension, Dimension>(0, 0);
         }
 
-        Block<MatrixType, HDimension, 1> TranslationExt()
+        Block<MatrixType, Dimension, 1> TranslationExt()
         {
-            return m_matrix.Block<HDimension, 1>(0, Dimension);
+            return m_matrix.Block<Dimension, 1>(0, Dimension);
         }
 
-        Block<const MatrixType, HDimension, 1> TranslationExt() const
+        Block<const MatrixType, Dimension, 1> TranslationExt() const
         {
-            return m_matrix.Block<HDimension, 1>(0, Dimension);
+            return m_matrix.Block<Dimension, 1>(0, Dimension);
         }
 
         template<typename Derived>
@@ -52,6 +52,18 @@ namespace TG::Math
         Transform& Rotate(const RotationBase<Derived, 3>& rotation)
         {
             LinearExt() *= rotation.ToRotationMatrix();
+            return *this;
+        }
+
+        Transform& Scale(const Scalar& s)
+        {
+            LinearExt() *= s;
+            return *this;
+        }
+
+        Transform& PreScale(const Scalar& s)
+        {
+            m_matrix.Block<Dimension, HDimension>(0, 0) *= s;
             return *this;
         }
 

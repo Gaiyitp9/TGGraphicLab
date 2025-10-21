@@ -19,6 +19,7 @@ namespace TG::Rendering
     {
     public:
         Sphere();
+        Sphere(float radius, int columns, int rows);
         ~Sphere();
 
         void Regenerate();

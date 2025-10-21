@@ -10,6 +10,14 @@ namespace TG::Math::Geometry
 {
     bool RaySphereIntersection(const Ray &ray, const Sphere &sphere, float &tMin, float &tMax)
     {
+        // 光线与球相交时，交点在球面上
+        // 设O为光线起点，D为光线方向，C为球心，r为半径，P为光线和球的交点，
+        // 对于P，满足
+        // 1) (P-C)^2=r^2
+        // 2) P=O+tD
+        // 联立两个等式，得到
+        // D^2*t^2 + 2*(O-C)*D*t+(O-C)^2-r^2=0
+        // 求解二元一次方程得到t，再带入射线表达式得到交点
         const Vector3f oc = ray.Origin() - sphere.Center();
         const float a = ray.Direction().SquaredNorm();
         const float halfB = oc.Dot(ray.Direction());

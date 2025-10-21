@@ -14,6 +14,12 @@ namespace TG::Rendering
         Regenerate();
     }
 
+    Sphere::Sphere(float radius, int columns, int rows)
+        : m_radius(radius), m_columns(columns), m_rows(rows)
+    {
+        Regenerate();
+    }
+
     Sphere::~Sphere() = default;
 
     void Sphere::Regenerate()
@@ -34,10 +40,10 @@ namespace TG::Rendering
                 };
 
                 vertices.emplace_back(m_radius * v);
-                uvs.push_back({
+                uvs.emplace_back(
                     static_cast<float>(j) / static_cast<float>(m_columns),
                     static_cast<float>(i) / static_cast<float>(m_rows)
-                });
+                );
                 normals.emplace_back(v);
                 tangents.emplace_back();
                 colors.push_back({ 1.0f, 1.0f, 1.0f });
@@ -80,7 +86,7 @@ namespace TG::Rendering
             }
         }
 
-        // 对法线执行Gram-Schmidt正交化
+        // 对切线执行Gram-Schmidt正交化
         for (int i = 0; i < vertices.size(); ++i)
             tangents[i] = (tangents[i] - normals[i] * normals[i].Dot(tangents[i])).Normalized();
     }
@@ -92,7 +98,7 @@ namespace TG::Rendering
         // Mikkt算法(也叫做MikktTSpace切线空间)
         // 理论上顶点的切平面上的线都是切线，图形学中规定切线平行于纹理坐标系的U轴，
         // 所以，切线是纹理坐标系的U轴，副切线是纹理坐标系的V轴
-        // 纹理坐标(u, v, 0, 1)对应的世界坐标(x, y, z, 1)
+        // 设纹理坐标(u, v, 0, 1)对应的世界坐标为(x, y, z, 1)
         // 注意，切线和副切线在UV平面上，法线垂直UV平面，所以对应z坐标为0
         // 满足以下变换:
         // [x   [Tx Bx Nx Dx   [u

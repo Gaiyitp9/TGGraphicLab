@@ -9,17 +9,19 @@
 
 namespace TG::Rendering
 {
-    class Plane
+    class Plane : public Mesh
     {
     public:
         Plane();
+        Plane(float width, float height, int rows, int columns);
+        ~Plane();
+
+        void Regenerate();
 
     private:
-        Mesh m_mesh;
-
-        float m_width;
-        float m_height;
-        unsigned int m_rows;
-        unsigned int m_columns;
+        float m_width{ 1.0f };
+        float m_height{ 1.0f };
+        unsigned int m_rows{ 1 };
+        unsigned int m_columns{ 1 };
     };
 }

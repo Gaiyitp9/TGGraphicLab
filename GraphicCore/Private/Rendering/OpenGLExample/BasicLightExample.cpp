@@ -6,9 +6,9 @@
 
 #include "Rendering/OpenGLExample/BasicLightExample.h"
 #include "Rendering/Color/StandardColors.h"
+#include "Rendering/RayTracing/PathTracer.h"
 #include "imgui_impl_opengl3.h"
 #include "imgui_impl_win32.h"
-#include "Rendering/RayTracing/PathTracer.h"
 
 namespace TG::Rendering
 {
@@ -30,7 +30,12 @@ namespace TG::Rendering
         m_vertexShader("Assets/Shaders/GLSL/LightingModel/Phong/BasicLighting.vert", ShaderStage::Vertex),
         m_fragmentShader("Assets/Shaders/GLSL/LightingModel/Phong/Phong.frag", ShaderStage::Fragment),
         m_wireframeGeometryShader("Assets/Shaders/GLSL/Wireframe.geom", ShaderStage::Geometry),
-        m_wireframeFragmentShader("Assets/Shaders/GLSL/Wireframe.frag", ShaderStage::Fragment)
+        m_wireframeFragmentShader("Assets/Shaders/GLSL/Wireframe.frag", ShaderStage::Fragment),
+        m_planeMesh(20.0f, 20.0f, 20, 20),
+        m_planeProperty{
+            Math::Vector3f{ 0.0f, 0.0f, -10.0f },
+            SlateGray,
+            0.3f, 0.5f, 8.0f }
     {
         m_sphereProperties[0] = {
             Math::Vector3f{ -6.0f, 1.0f, -10.0f },
@@ -61,15 +66,15 @@ namespace TG::Rendering
         m_lightDirection = Math::Vector4f{ 1.0f, 5.0f, 1.0f, 0.0f };
         m_lightColor = White;
 
-        glGenBuffers(1, &m_VBO);
-        glGenBuffers(1, &m_EBO);
-        glGenVertexArrays(1, &m_VAO);
+        glGenBuffers(1, &m_sphereVBO);
+        glGenBuffers(1, &m_sphereEBO);
+        glGenVertexArrays(1, &m_sphereVAO);
 
-        glBindVertexArray(m_VAO);
-        glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
-        const auto verticesByteSize = static_cast<GLsizeiptr>(3 * sizeof(float) * m_sphereMesh.vertices.size());
-        const auto uvByteSize = static_cast<GLsizeiptr>(2 * sizeof(float) * m_sphereMesh.uvs.size());
-        const auto normalByteSize = static_cast<GLsizeiptr>(3 * sizeof(float) * m_sphereMesh.normals.size());
+        glBindVertexArray(m_sphereVAO);
+        glBindBuffer(GL_ARRAY_BUFFER, m_sphereVBO);
+        auto verticesByteSize = static_cast<GLsizeiptr>(3 * sizeof(float) * m_sphereMesh.vertices.size());
+        auto uvByteSize = static_cast<GLsizeiptr>(2 * sizeof(float) * m_sphereMesh.uvs.size());
+        auto normalByteSize = static_cast<GLsizeiptr>(3 * sizeof(float) * m_sphereMesh.normals.size());
         glBufferData(GL_ARRAY_BUFFER, verticesByteSize + uvByteSize + normalByteSize, nullptr, GL_STATIC_DRAW);
         glBufferSubData(GL_ARRAY_BUFFER, 0, verticesByteSize, m_sphereMesh.vertices.data());
         glBufferSubData(GL_ARRAY_BUFFER, verticesByteSize, uvByteSize, m_sphereMesh.uvs.data());
@@ -84,10 +89,39 @@ namespace TG::Rendering
             reinterpret_cast<void*>(verticesByteSize + uvByteSize));
         glEnableVertexAttribArray(2);
 
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_EBO);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_sphereEBO);
         glBufferData(GL_ELEMENT_ARRAY_BUFFER,
             static_cast<GLsizeiptr>(sizeof(std::uint32_t) * m_sphereMesh.indices.size()),
             m_sphereMesh.indices.data(), GL_STATIC_DRAW);
+        glBindVertexArray(0);
+
+        glGenBuffers(1, &m_planeVBO);
+        glGenBuffers(1, &m_planeEBO);
+        glGenVertexArrays(1, &m_planeVAO);
+
+        glBindVertexArray(m_planeVAO);
+        glBindBuffer(GL_ARRAY_BUFFER, m_planeVBO);
+        verticesByteSize = static_cast<GLsizeiptr>(3 * sizeof(float) * m_planeMesh.vertices.size());
+        uvByteSize = static_cast<GLsizeiptr>(2 * sizeof(float) * m_planeMesh.uvs.size());
+        normalByteSize = static_cast<GLsizeiptr>(3 * sizeof(float) * m_planeMesh.normals.size());
+        glBufferData(GL_ARRAY_BUFFER, verticesByteSize + uvByteSize + normalByteSize, nullptr, GL_STATIC_DRAW);
+        glBufferSubData(GL_ARRAY_BUFFER, 0, verticesByteSize, m_planeMesh.vertices.data());
+        glBufferSubData(GL_ARRAY_BUFFER, verticesByteSize, uvByteSize, m_planeMesh.uvs.data());
+        glBufferSubData(GL_ARRAY_BUFFER, verticesByteSize + uvByteSize, normalByteSize, m_planeMesh.normals.data());
+
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), nullptr);
+        glEnableVertexAttribArray(0);
+        glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float),
+            reinterpret_cast<void*>(verticesByteSize));
+        glEnableVertexAttribArray(1);
+        glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float),
+            reinterpret_cast<void*>(verticesByteSize + uvByteSize));
+        glEnableVertexAttribArray(2);
+
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_planeEBO);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER,
+            static_cast<GLsizeiptr>(sizeof(std::uint32_t) * m_planeMesh.indices.size()),
+            m_planeMesh.indices.data(), GL_STATIC_DRAW);
         glBindVertexArray(0);
 
         glGenBuffers(1, &m_cameraUbo);
@@ -116,9 +150,12 @@ namespace TG::Rendering
         glDeleteProgramPipelines(1, &m_pipeline);
         glDeleteBuffers(1, &m_renderUbo);
         glDeleteBuffers(1, &m_cameraUbo);
-        glDeleteVertexArrays(1, &m_VAO);
-        glDeleteBuffers(1, &m_VBO);
-        glDeleteBuffers(1, &m_EBO);
+        glDeleteVertexArrays(1, &m_planeVAO);
+        glDeleteBuffers(1, &m_planeVBO);
+        glDeleteBuffers(1, &m_planeEBO);
+        glDeleteVertexArrays(1, &m_sphereVAO);
+        glDeleteBuffers(1, &m_sphereVBO);
+        glDeleteBuffers(1, &m_sphereEBO);
 
         if (m_renderThread)
             m_renderThread->join();
@@ -163,7 +200,7 @@ namespace TG::Rendering
         glBindTexture(GL_TEXTURE_2D, CastID<GLuint>(m_albedoTexture.GetID()));
 
         glBindProgramPipeline(m_pipeline);
-        glBindVertexArray(m_VAO);
+        glBindVertexArray(m_sphereVAO);
         for (const auto& [position, color, ambientStrength, specularStrength, shininess] : m_sphereProperties)
         {
             Math::Transform<float, 3> modelTransform;
@@ -178,6 +215,20 @@ namespace TG::Rendering
             glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(m_sphereMesh.indices.size()),
                 GL_UNSIGNED_INT, nullptr);
         }
+
+        glBindVertexArray(m_planeVAO);
+        Math::Transform<float, 3> planeModelTransform;
+        planeModelTransform.Translate(m_planeProperty.position);
+        m_vertexShader.SetMat4("model", planeModelTransform.ToTransformMatrix());
+
+        m_fragmentShader.SetFloat3("objectColor",
+            m_planeProperty.color.R(), m_planeProperty.color.G(), m_planeProperty.color.B());
+        m_fragmentShader.SetFloat("ambientStrength", m_planeProperty.ambientStrength);
+        m_fragmentShader.SetFloat("specularStrength", m_planeProperty.specularStrength);
+        m_fragmentShader.SetFloat("shininess", m_planeProperty.shininess);
+
+        glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(m_planeMesh.indices.size()),
+            GL_UNSIGNED_INT, nullptr);
         glBindVertexArray(0);
 
         m_viewportGrid.Render(m_camera);
@@ -190,7 +241,7 @@ namespace TG::Rendering
         const ImGuiIO& io = ImGui::GetIO();
         ImGui::Begin("General");
         ImGui::Checkbox("Draw wireframe", &m_wireframe);
-        ImGui::BeginDisabled(!m_renderDone);
+        ImGui::BeginDisabled(!m_pathTracer.IsReady());
         if (ImGui::Button("Render"))
         {
             if (m_renderThread)
@@ -207,12 +258,12 @@ namespace TG::Rendering
                 pathTraceData.front = m_camera.front;
                 pathTraceData.right = m_camera.right;
                 pathTraceData.up = m_camera.up;
-                RunPathTracer(m_renderProcess, m_renderDone, pathTraceData);
+                m_pathTracer.Run(pathTraceData);
             });
         }
         ImGui::EndDisabled();
         ImGui::SameLine();
-        ImGui::ProgressBar(m_renderProcess, ImVec2(200.0f, 0.0f));
+        ImGui::ProgressBar(m_pathTracer.Process(), ImVec2(200.0f, 0.0f));
         ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
         ImGui::End();
 

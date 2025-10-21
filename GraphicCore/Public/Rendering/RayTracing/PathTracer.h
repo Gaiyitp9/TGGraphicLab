@@ -5,9 +5,11 @@
 *****************************************************************/
 #pragma once
 
-#include "Rendering/Camera.h"
+#include "Math/Geometry/Shape/Ray.h"
+#include "Rendering/Color/Color.h"
+#include <atomic>
 
-namespace TG
+namespace TG::Rendering
 {
     struct PathTraceData
     {
@@ -20,5 +22,21 @@ namespace TG
         Math::Vector3f right;
     };
 
-    void RunPathTracer(std::atomic<float>& process, std::atomic<bool>& renderDone, PathTraceData pathTraceData);
+    class PathTracer
+    {
+    public:
+        PathTracer() = default;
+        ~PathTracer() = default;
+
+        void Run(const PathTraceData& pathTraceData);
+
+        bool IsReady() const { return m_renderCompleted; }
+        float Process() const { return m_process; }
+
+    private:
+        Color RayColor(const Math::Geometry::Ray& ray) const;
+
+        float m_process{ 0 };
+        std::atomic_bool m_renderCompleted{ true };
+    };
 }

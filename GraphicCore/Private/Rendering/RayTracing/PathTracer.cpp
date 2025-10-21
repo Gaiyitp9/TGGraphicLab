@@ -5,33 +5,18 @@
 *****************************************************************/
 
 #include "Rendering/RayTracing/PathTracer.h"
-#include "Math/Geometry/Shape/Ray.h"
 #include "Math/Geometry/Intersection/Intersection.h"
-#include "Rendering/Color/Color.h"
 #include "Rendering/Color/StandardColors.h"
 #include "Diagnostic/Log.hpp"
 #include "stb_image_write.h"
 
-namespace TG
+namespace TG::Rendering
 {
-    Rendering::Color RayColor(const Math::Geometry::Ray& ray)
+    void PathTracer::Run(const PathTraceData& pathTraceData)
     {
-        const Math::Geometry::Sphere sphere{ { 0.0f, 1.0f, -10.0f }, 1.0f };
-        float tMin, tMax;
-        if (Math::Geometry::RaySphereIntersection(ray, sphere, tMin, tMax) && tMin > 0)
-        {
-            Math::Vector3f normal = (ray.At(tMin) - sphere.Center()) / sphere.Radius();
-            return Rendering::Color(normal.X() + 1.0f, normal.Y() + 1.0f, normal.Z() + 1.0f) * 0.5f;
-        }
+        m_renderCompleted = false;
 
-        const float a = 0.5f * (ray.Direction().Normalized().Y() + 1.0f);
-        return a * Rendering::Color(0.5, 0.7, 1.0) + (1 - a) * Rendering::White;
-    }
-
-    void RunPathTracer(std::atomic<float>& process, std::atomic<bool>& renderDone, PathTraceData pathTraceData)
-    {
         LogInfo("Start path tracing");
-        renderDone = false;
 
         constexpr int imageWidth = 1600;
         const int imageHeight = static_cast<int>(std::floor(static_cast<float>(imageWidth) /
@@ -62,18 +47,32 @@ namespace TG
                     static_cast<float>(i) * pixelDeltaV;
                 Math::Vector3f rayDirection = pixelCenter - pathTraceData.cameraPosition;
                 Math::Geometry::Ray ray(pathTraceData.cameraPosition, rayDirection);
-                Rendering::Color pixelColor = RayColor(ray);
+                Color pixelColor = RayColor(ray);
 
                 const int offset = (imageWidth * i + j) * 3;
                 imageData[offset] = static_cast<char>(pixelColor.R() * 255);
                 imageData[offset + 1] = static_cast<char>(pixelColor.G() * 255);
                 imageData[offset + 2] = static_cast<char>(pixelColor.B() * 255);
 
-                process = static_cast<float>(offset) / static_cast<float>(imageDataSize);
+                m_process = static_cast<float>(offset) / static_cast<float>(imageDataSize);
             }
         }
         stbi_write_bmp("image.bmp", imageWidth, imageHeight, 3, imageData.data());
 
-        renderDone = true;
+        m_renderCompleted = true;
+    }
+
+    Color PathTracer::RayColor(const Math::Geometry::Ray& ray) const
+    {
+        const Math::Geometry::Sphere sphere{ { 0.0f, 1.0f, -10.0f }, 1.0f };
+        float tMin, tMax;
+        if (Math::Geometry::RaySphereIntersection(ray, sphere, tMin, tMax) && tMin > 0)
+        {
+            Math::Vector3f normal = (ray.At(tMin) - sphere.Center()) / sphere.Radius();
+            return Color(normal.X() + 1.0f, normal.Y() + 1.0f, normal.Z() + 1.0f) * 0.5f;
+        }
+
+        const float a = 0.5f * (ray.Direction().Normalized().Y() + 1.0f);
+        return a * Color(0.5, 0.7, 1.0) + (1 - a) * White;
     }
 }

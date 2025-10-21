@@ -7,7 +7,8 @@
 
 #include "Rendering/Example.h"
 #include "Rendering/Mesh/Sphere.h"
-#include "Rendering/Color/Color.h"
+#include "Rendering/Mesh/Plane.h"
+#include "Rendering/RayTracing/PathTracer.h"
 #include "ViewportGrid.h"
 #include "ViewportCompass.h"
 
@@ -35,12 +36,19 @@ namespace TG::Rendering
 
         Sphere m_sphereMesh;
         ObjectProperty m_sphereProperties[5];
+        Plane m_planeMesh;
+        ObjectProperty m_planeProperty;
         Math::Vector4f m_lightDirection;
         Color m_lightColor;
 
-        GLuint m_VAO{};
-        GLuint m_VBO{};
-        GLuint m_EBO{};
+        GLuint m_sphereVAO{};
+        GLuint m_sphereVBO{};
+        GLuint m_sphereEBO{};
+
+        GLuint m_planeVAO{};
+        GLuint m_planeVBO{};
+        GLuint m_planeEBO{};
+
         GLuint m_pipeline{};
         GLuint m_cameraUbo{};
         GLuint m_renderUbo{};
@@ -58,7 +66,6 @@ namespace TG::Rendering
         ViewportCompass m_viewportCompass;
 
         std::unique_ptr<std::thread> m_renderThread;
-        std::atomic<float> m_renderProcess{ 0.0f };
-        std::atomic_bool m_renderDone{ true };
+        PathTracer m_pathTracer;
     };
 }
