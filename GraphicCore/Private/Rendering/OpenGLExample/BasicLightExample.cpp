@@ -33,9 +33,9 @@ namespace TG::Rendering
         m_wireframeFragmentShader("Assets/Shaders/GLSL/Wireframe.frag", ShaderStage::Fragment),
         m_planeMesh(20.0f, 20.0f, 20, 20),
         m_planeProperty{
-            Math::Vector3f{ 0.0f, 0.0f, -10.0f },
+            Math::Vector3f{ 0.0f, 0.01f, -10.0f },
             SlateGray,
-            0.3f, 0.5f, 8.0f }
+            0.3f, 0.5f, 64.0f }
     {
         m_sphereProperties[0] = {
             Math::Vector3f{ -6.0f, 1.0f, -10.0f },
@@ -63,7 +63,7 @@ namespace TG::Rendering
             0.3f, 0.5f, 128.0f
         };
 
-        m_lightDirection = Math::Vector4f{ 1.0f, 5.0f, 1.0f, 0.0f };
+        m_lightDirection = Math::Vector4f{ 1.0f, 1.0f, 1.0f, 0.0f };
         m_lightColor = White;
 
         glGenBuffers(1, &m_sphereVBO);
@@ -164,6 +164,12 @@ namespace TG::Rendering
     void BasicLightExample::Render()
     {
         m_camera.Update();
+
+        // 开启面剔除，剔除背面
+        glEnable(GL_CULL_FACE);
+        glCullFace(GL_BACK);
+        // 正面朝向设置为顺时针
+        // glFrontFace(GL_CW);
 
         Color clearColor = DimGray;
         glClearColor(clearColor.R(), clearColor.G(), clearColor.B(), clearColor.A());

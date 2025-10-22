@@ -72,12 +72,6 @@ namespace TG::Rendering
     	glGetInteger64v(GL_MAX_UNIFORM_BLOCK_SIZE, &maxUniformBlockSize);
     	LogInfo("Max uniform block size: {}", maxUniformBlockSize);
 
-        // 开启面剔除，剔除背面
-        glEnable(GL_CULL_FACE);
-        glCullFace(GL_BACK);
-    	// 正面朝向设置为顺时针
-    	// glFrontFace(GL_CW);
-
     	m_exampleFactory = std::make_unique<OpenGlExampleFactory>(videoPort, timer);
     	m_example = m_exampleFactory->CreateExample(m_exampleEnum);
     }

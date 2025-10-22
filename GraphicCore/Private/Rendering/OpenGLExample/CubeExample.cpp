@@ -83,6 +83,12 @@ namespace TG::Rendering
     {
         m_camera.Update();
 
+        // 开启面剔除，剔除背面
+        glEnable(GL_CULL_FACE);
+        glCullFace(GL_BACK);
+        // 正面朝向设置为顺时针
+        // glFrontFace(GL_CW);
+
         Color clearColor = DimGray;
 
         glClearColor(clearColor.R(), clearColor.G(), clearColor.B(), clearColor.A());

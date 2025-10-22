@@ -17,7 +17,6 @@ namespace TG::Rendering
         glUseProgramStages(m_pipeline, GL_VERTEX_SHADER_BIT, CastID<GLuint>(m_vertexShader.GetID()));
         glUseProgramStages(m_pipeline, GL_FRAGMENT_SHADER_BIT, CastID<GLuint>(m_fragmentShader.GetID()));
         glUseProgramStages(m_pipeline, GL_GEOMETRY_SHADER_BIT, CastID<GLuint>(m_geometryShader.GetID()));
-
     }
 
     ViewportGrid::~ViewportGrid()
@@ -28,6 +27,9 @@ namespace TG::Rendering
 
     void ViewportGrid::Render(const Camera& camera) const
     {
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
         Frustum frustum = camera.ViewFrustum();
         // 计算xz平面的aabb
         float minX = frustum.corners[0].X();
@@ -53,7 +55,7 @@ namespace TG::Rendering
 
         m_geometryShader.SetMat4("view", camera.ViewMatrix());
         m_geometryShader.SetMat4("projection", camera.ProjectionMatrix());
-        m_fragmentShader.SetFloat3("gridColor", 0.6f, 0.6f, 0.6f);
+        m_fragmentShader.SetFloat4("gridColor", 1.0f, 1.0f, 1.0f, 0.1f);
 
         glBindVertexArray(m_VAO);
         glBindProgramPipeline(m_pipeline);

@@ -57,10 +57,11 @@ namespace TG::Rendering
         if (!prevDepthTest)
             glEnable(GL_DEPTH_TEST);
         else
-        {
             glGetIntegerv(GL_DEPTH_FUNC, &prevDepthFunc);
-            glDepthFunc(GL_LEQUAL);
-        }
+        glDepthFunc(GL_LEQUAL);
+
+        glDisable(GL_BLEND);
+        glDisable(GL_CULL_FACE);
 
         glActiveTexture(GL_TEXTURE_CUBE_MAP);
         glBindTexture(GL_TEXTURE_CUBE_MAP, CastID<GLuint>(m_cubeMap.GetID()));
