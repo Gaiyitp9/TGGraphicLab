@@ -3,12 +3,18 @@
 * Copyright (c) Gaiyitp9. All rights reserved.					*
 * This code is licensed under the MIT License (MIT).			*
 *****************************************************************/
-#pragma once
 
-#include "Math/Geometry/Shape/Ray.h"
-#include "Math/Geometry/Shape/Sphere.h"
+#include "Math/Geometry/Shape/Triangle.h"
 
 namespace TG::Math::Geometry
 {
-    bool RaySphereIntersection(const Ray& ray, const Sphere& sphere, float& tMin, float& tMax);
+    Triangle::Triangle(const Vector3f &point0, const Vector3f &point1, const Vector3f &point2)
+    {
+
+    }
+
+    bool Triangle::Contains(const Vector3f& point) const
+    {
+        return false;
+    }
 }

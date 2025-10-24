@@ -5,7 +5,7 @@
 *****************************************************************/
 
 #include "Rendering/RayTracing/PathTracer.h"
-#include "Math/Geometry/Intersection/Intersection.h"
+#include "Math/Geometry/Intersection.h"
 #include "Rendering/Color/StandardColors.h"
 #include "Diagnostic/Log.hpp"
 #include "stb_image_write.h"
@@ -66,7 +66,7 @@ namespace TG::Rendering
     {
         const Math::Geometry::Sphere sphere{ { 0.0f, 1.0f, -10.0f }, 1.0f };
         float tMin, tMax;
-        if (Math::Geometry::RaySphereIntersection(ray, sphere, tMin, tMax) && tMin > 0)
+        if (Math::Geometry::Intersection::RaySphere(ray, sphere, tMin, tMax) && tMin > 0)
         {
             Math::Vector3f normal = (ray.At(tMin) - sphere.Center()) / sphere.Radius();
             return Color(normal.X() + 1.0f, normal.Y() + 1.0f, normal.Z() + 1.0f) * 0.5f;

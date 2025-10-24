@@ -4,11 +4,11 @@
 * This code is licensed under the MIT License (MIT).			*
 *****************************************************************/
 
-#include "Math/Geometry/Intersection/Intersection.h"
+#include "../../../Public/Math/Geometry/Intersection.h"
 
-namespace TG::Math::Geometry
+namespace TG::Math::Geometry::Intersection
 {
-    bool RaySphereIntersection(const Ray &ray, const Sphere &sphere, float &tMin, float &tMax)
+    bool RaySphere(const Ray &ray, const Sphere &sphere, float &tMin, float &tMax)
     {
         // 光线与球相交时，交点在球面上
         // 设O为光线起点，D为光线方向，C为球心，r为半径，P为光线和球的交点，
@@ -25,7 +25,7 @@ namespace TG::Math::Geometry
 
         if (const float discriminant = halfB * halfB - a * c; discriminant < 0)
         {
-            tMin = tMax = std::numeric_limits<double>::infinity();
+            tMin = tMax = std::numeric_limits<float>::infinity();
             return false;
         }
         else
