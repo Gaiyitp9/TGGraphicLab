@@ -1,9 +1,11 @@
 #version 410 core
+layout(location = 0) in float gridAlpha;
+
 layout(location = 0) out vec4 FragColor;
 
-uniform vec4 gridColor;
+uniform vec3 gridColor;
 
 void main()
 {
-    FragColor = gridColor;
+    FragColor = vec4(gridColor, gridAlpha);
 }

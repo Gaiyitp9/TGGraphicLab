@@ -50,12 +50,13 @@ namespace TG::Rendering
         float size = maxX - minX;
         size = std::max(size, maxZ - minZ);
 
-        constexpr int drawSize = 63;
+        constexpr int drawSize = 31;
         const int drawCount = static_cast<int>(std::ceil(size / drawSize));
 
         m_geometryShader.SetMat4("view", camera.ViewMatrix());
         m_geometryShader.SetMat4("projection", camera.ProjectionMatrix());
-        m_fragmentShader.SetFloat4("gridColor", 1.0f, 1.0f, 1.0f, 0.1f);
+        m_geometryShader.SetFloat3("eyePosition", camera.position.X(), camera.position.Y(), camera.position.Z());
+        m_fragmentShader.SetFloat3("gridColor", 1.0f, 1.0f, 1.0f);
 
         glBindVertexArray(m_VAO);
         glBindProgramPipeline(m_pipeline);
