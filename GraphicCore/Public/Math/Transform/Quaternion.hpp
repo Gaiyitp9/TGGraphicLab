@@ -5,6 +5,8 @@
 *****************************************************************/
 #pragma once
 
+#include "Math/Transform/RotationBase.hpp"
+
 namespace TG::Math
 {
 	template<typename Scalar>
@@ -82,7 +84,7 @@ namespace TG::Math
 		}
 		
 		Quaternion Conjugate() const { return { -X(), -Y(), -Z(), W() }; }
-		Quaternion Inverse() const { return Vector<Scalar, 4>({ -X(), -Y(), -Z(), W() }) / m_elements.SquaredNorm(); }
+		Quaternion Inverse() const { return Vector4<Scalar>({ -X(), -Y(), -Z(), W() }) / m_elements.SquaredNorm(); }
 		Quaternion Normalized() const { return Quaternion(m_elements.Normalized()); }
 		void Normalize() { m_elements.Normalize(); }
 

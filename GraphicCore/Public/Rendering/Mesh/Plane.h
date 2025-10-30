@@ -21,7 +21,7 @@ namespace TG::Rendering
     private:
         float m_width{ 1.0f };
         float m_height{ 1.0f };
-        unsigned int m_rows{ 1 };
-        unsigned int m_columns{ 1 };
+        int m_rows{ 1 };
+        int m_columns{ 1 };
     };
 }

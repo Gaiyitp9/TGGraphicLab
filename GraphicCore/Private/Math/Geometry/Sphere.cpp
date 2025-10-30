@@ -4,7 +4,7 @@
 * This code is licensed under the MIT License (MIT).			*
 *****************************************************************/
 
-#include "Math/Geometry/Shape/Sphere.h"
+#include "Math/Geometry/Sphere.h"
 
 namespace TG::Math::Geometry
 {

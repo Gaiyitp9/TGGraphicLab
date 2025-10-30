@@ -8,6 +8,8 @@
 #include "Rendering/Color/StandardColors.h"
 #include "Rendering/Mesh/Primitives.h"
 #include "Rendering/ViewProjectionMatrix.hpp"
+#include "Math/Transform/Transform.hpp"
+#include "Math/Transform/AngleAxis.hpp"
 #include "imgui_impl_opengl3.h"
 #include "imgui_impl_win32.h"
 

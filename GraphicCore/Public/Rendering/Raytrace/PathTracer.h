@@ -5,7 +5,7 @@
 *****************************************************************/
 #pragma once
 
-#include "Math/Geometry/Shape/Ray.h"
+#include "Math/Geometry/Ray.h"
 #include "Rendering/Color/Color.h"
 #include <atomic>
 

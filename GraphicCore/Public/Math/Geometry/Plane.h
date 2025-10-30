@@ -14,9 +14,13 @@ namespace TG::Math::Geometry
     public:
         Plane() = default;
         Plane(const Vector3f& point, const Vector3f& normal);
-        Plane(float a, float b, float c, float d);
+
+        [[nodiscard]] Vector3f Normal() const;
+        [[nodiscard]] float SignedDistance(const Vector3f& point) const;
+        [[nodiscard]] float Distance(const Vector3f& point) const;
 
     private:
-        float m_a, m_b, m_c, m_d;
+        Vector3f m_normal{ 0, 1, 0 };
+        float m_d{ 0 };
     };
 }

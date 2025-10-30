@@ -4,7 +4,7 @@
 * This code is licensed under the MIT License (MIT).			*
 *****************************************************************/
 
-#include "Rendering/RayTracing/PathTracer.h"
+#include "Rendering/Raytrace/PathTracer.h"
 #include "Math/Geometry/Intersection.h"
 #include "Rendering/Color/StandardColors.h"
 #include "Diagnostic/Log.hpp"
@@ -72,7 +72,23 @@ namespace TG::Rendering
             return Color(normal.X() + 1.0f, normal.Y() + 1.0f, normal.Z() + 1.0f) * 0.5f;
         }
 
+        const Math::Geometry::Plane plane{ { 0.0f, 0.01f, 0.0f }, { 0.0f, 1.0f, 0.0f } };
+        const Math::Geometry::ConvexPolygon convex{
+            plane,
+            {
+                { -10.0f, 0.01f, -20.0f },
+                {  10.0f, 0.01f, -20.0f },
+                {  10.0f, 0.01f,  0.0f },
+                { -10.0f, 0.01f,  0.0f },
+            }
+        };
+        float t;
+        if (Math::Geometry::Intersection::RayConvexPolygon(ray, convex, t) && t > 0)
+        {
+            return { 0.0f, 1.0f, 0.0f };
+        }
+
         const float a = 0.5f * (ray.Direction().Normalized().Y() + 1.0f);
-        return a * Color(0.5, 0.7, 1.0) + (1 - a) * White;
+        return a * Color(0.5f, 0.7f, 1.0f) + (1 - a) * White;
     }
 }

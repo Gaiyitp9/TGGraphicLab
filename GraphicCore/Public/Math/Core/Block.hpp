@@ -49,10 +49,6 @@ namespace TG::Math
             return *this;
         }
 
-        // 解决MatrixBase的Block方法和Block类重名问题
-        // 不添加using声明时，Block对象无法调用基类的Block方法，会识别为类名
-        using Base::Block;
-
         RawXpr& NestedExpression() noexcept requires (!IsConst) { return m_xpr; }
         [[nodiscard]] const RawXpr& NestedExpression() const noexcept { return m_xpr; }
 

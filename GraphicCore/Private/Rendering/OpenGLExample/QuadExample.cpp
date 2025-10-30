@@ -8,6 +8,8 @@
 #include "Rendering/Color/StandardColors.h"
 #include "Exception/BaseException.h"
 #include "Rendering/Mesh/Primitives.h"
+#include "Math/Transform/Transform.hpp"
+#include "Math/Transform/AngleAxis.hpp"
 #include "imgui_impl_opengl3.h"
 #include "imgui_impl_win32.h"
 #include "stb_image.h"

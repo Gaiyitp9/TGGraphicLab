@@ -5,7 +5,7 @@
 *****************************************************************/
 #pragma once
 
-// 参考Eigen的实现，使用Expression template
+// 参考了Eigen的实现，使用Expression template
 
 #include <concepts>
 #include <utility>
@@ -26,9 +26,6 @@
 #include "Core/Block.hpp"
 #include "Core/Product.hpp"
 #include "Core/CWiseNullaryOp.hpp"
+#include "Core/CWiseUnaryOp.hpp"
 #include "Core/Inverse.hpp"
-#include "Transform/RotationBase.hpp"
-#include "Transform/Quaternion.hpp"
-#include "Transform/AngleAxis.hpp"
-#include "Transform/Transform.hpp"
 #include "Core/Evaluator/CoreEvaluators.hpp"

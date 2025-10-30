@@ -13,13 +13,13 @@ namespace TG::Math::Geometry
     {
     public:
         Triangle() = default;
-        Triangle(const Vector3f& point0, const Vector3f& point1, const Vector3f& point2);
+        Triangle(const Vector3f& pointA, const Vector3f& pointB, const Vector3f& pointC);
 
         [[nodiscard]] bool Contains(const Vector3f& point) const;
 
     private:
-        Vector3f m_point0;
-        Vector3f m_point1;
-        Vector3f m_point2;
+        Vector3f m_pointA;
+        Vector3f m_pointB;
+        Vector3f m_pointC;
     };
 }

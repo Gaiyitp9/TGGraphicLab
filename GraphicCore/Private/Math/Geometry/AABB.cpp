@@ -4,7 +4,7 @@
 * This code is licensed under the MIT License (MIT).			*
 *****************************************************************/
 
-#include "Math/Geometry/Shape/AABB.h"
+#include "Math/Geometry/AABB.h"
 
 namespace TG::Math::Geometry
 {

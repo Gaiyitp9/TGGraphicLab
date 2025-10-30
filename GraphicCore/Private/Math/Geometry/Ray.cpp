@@ -4,7 +4,7 @@
 * This code is licensed under the MIT License (MIT).			*
 *****************************************************************/
 
-#include "Math/Geometry/Shape/Ray.h"
+#include "Math/Geometry/Ray.h"
 
 namespace TG::Math::Geometry
 {

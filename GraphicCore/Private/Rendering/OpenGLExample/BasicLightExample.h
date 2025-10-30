@@ -8,7 +8,7 @@
 #include "Rendering/Example.h"
 #include "Rendering/Mesh/Sphere.h"
 #include "Rendering/Mesh/Plane.h"
-#include "Rendering/RayTracing/PathTracer.h"
+#include "Rendering/Raytrace/PathTracer.h"
 #include "ViewportGrid.h"
 #include "ViewportCompass.h"
 

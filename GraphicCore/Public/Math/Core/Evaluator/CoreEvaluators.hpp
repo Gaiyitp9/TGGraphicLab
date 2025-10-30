@@ -9,5 +9,6 @@
 #include "BlockEvaluator.hpp"
 #include "CWiseBinaryOpEvaluator.hpp"
 #include "CWiseNullaryOpEvaluator.hpp"
+#include "CWiseUnaryOpEvaluator.hpp"
 #include "ProductEvaluator.hpp"
 #include "TransposeEvaluator.hpp"

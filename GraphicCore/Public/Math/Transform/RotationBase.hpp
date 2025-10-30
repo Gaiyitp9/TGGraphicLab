@@ -5,8 +5,15 @@
 *****************************************************************/
 #pragma once
 
+#include "Math/Core.hpp"
+
 namespace TG::Math
 {
+    /**
+     * \brief 旋转基类
+     * \tparam Derived 旋转表达式
+     * \tparam Dimension 维度
+     */
     template<typename Derived, int Dimension>
     class RotationBase
     {

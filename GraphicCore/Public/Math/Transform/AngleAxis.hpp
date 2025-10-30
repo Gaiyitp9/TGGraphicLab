@@ -5,14 +5,10 @@
 *****************************************************************/
 #pragma once
 
+#include "Math/Transform/RotationBase.hpp"
+
 namespace TG::Math
 {
-    template<typename ScalarT>
-    struct Traits<AngleAxis<ScalarT>>
-    {
-		using Scalar = ScalarT;
-    };
-
     template<typename Scalar>
     class AngleAxis final : public RotationBase<AngleAxis<Scalar>, 3>
     {
@@ -46,5 +42,11 @@ namespace TG::Math
     private:
         Scalar m_angle{ 0 };
         Vector3<Scalar> m_axis{ 0, 1, 0 };
+    };
+
+    template<typename ScalarT>
+    struct Traits<AngleAxis<ScalarT>>
+    {
+        using Scalar = ScalarT;
     };
 }

@@ -52,6 +52,11 @@ namespace TG::Math
             return { Expression(), other.Expression() };
         }
 
+        CWiseUnaryOp<ScalarOppositeOp<Scalar>, Derived> operator-() const
+        {
+            return { Expression(), {} };
+        }
+
         template<typename OtherDerived>
         Derived& operator+=(const MatrixBase<OtherDerived>& other)
         {

@@ -38,6 +38,6 @@ namespace TG::Math
         }
 
     private:
-        NullaryOp m_nullaryOp;
+        const NullaryOp m_nullaryOp;
     };
 }

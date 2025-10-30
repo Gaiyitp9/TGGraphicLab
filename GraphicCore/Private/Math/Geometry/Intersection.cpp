@@ -4,11 +4,11 @@
 * This code is licensed under the MIT License (MIT).			*
 *****************************************************************/
 
-#include "../../../Public/Math/Geometry/Intersection.h"
+#include "Math/Geometry/Intersection.h"
 
 namespace TG::Math::Geometry::Intersection
 {
-    bool RaySphere(const Ray &ray, const Sphere &sphere, float &tMin, float &tMax)
+    bool RaySphere(const Ray& ray, const Sphere& sphere, float& tMin, float& tMax)
     {
         // 光线与球相交时，交点在球面上
         // 设O为光线起点，D为光线方向，C为球心，r为半径，P为光线和球的交点，
@@ -35,5 +35,17 @@ namespace TG::Math::Geometry::Intersection
             tMax = (-halfB + sqrtDiscriminant) / a;
             return true;
         }
+    }
+
+    bool RayConvexPolygon(const Ray& ray, const ConvexPolygon& convex, float& t)
+    {
+        const Plane& plane = convex.GetPlane();
+        const float temp = -plane.SignedDistance(ray.Origin()) / plane.Normal().Dot(ray.Direction());
+
+        if (!convex.Contains(ray.At(temp)))
+            return false;
+
+        t = temp;
+        return true;
     }
 }

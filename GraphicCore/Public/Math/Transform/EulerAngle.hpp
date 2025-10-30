@@ -5,7 +5,7 @@
 *****************************************************************/
 #pragma once
 
-#include "Math/Core.hpp"
+#include "Math/Transform/RotationBase.hpp"
 
 namespace TG::Math
 {

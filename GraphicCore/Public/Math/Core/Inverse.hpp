@@ -28,10 +28,6 @@ namespace TG::Math
     public:
         explicit Inverse(const Xpr& xpr) : m_xpr(xpr) {}
 
-        // 解决MatrixBase的Inverse方法和Inverse类重名问题
-        // 不添加using声明时，Inverse对象无法调用基类的Inverse方法，会识别为类名
-        using Base::Inverse;
-
         [[nodiscard]] const Xpr& NestedExpression() const noexcept { return m_xpr; }
 
     private:

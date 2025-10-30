@@ -51,7 +51,7 @@ namespace TG::Rendering
         size = std::max(size, maxZ - minZ);
 
         constexpr int drawSize = 63;
-        const int drawCount = std::ceil(size / drawSize);
+        const int drawCount = static_cast<int>(std::ceil(size / drawSize));
 
         m_geometryShader.SetMat4("view", camera.ViewMatrix());
         m_geometryShader.SetMat4("projection", camera.ProjectionMatrix());

@@ -5,40 +5,39 @@
 *****************************************************************/
 #pragma once
 
+#include "Math/Transform/RotationBase.hpp"
+
 namespace TG::Math
 {
-    template<typename Scalar, std::size_t Dimension, StorageOrder Order>
+    template<typename Scalar, std::size_t Dimension>
     class Transform
     {
         static constexpr std::size_t HDimension = Dimension + 1;    // size of a respective homogeneous vector
-        using MatrixType = Matrix<Scalar, HDimension, HDimension, Order>;
+        using MatrixType = Matrix<Scalar, HDimension, HDimension>;
 
     public:
-        Transform()
-        {
-            m_matrix = MatrixType::Identity();
-        }
+        Transform() : m_matrix{ MatrixType::Identity() } {}
 
         const MatrixType& ToTransformMatrix() const noexcept { return m_matrix; }
 
         Block<MatrixType, Dimension, Dimension> LinearExt()
         {
-            return m_matrix.Block<Dimension, Dimension>(0, 0);
+            return m_matrix.template Block<Dimension, Dimension>(0, 0);
         }
 
         Block<const MatrixType, Dimension, Dimension> LinearExt() const
         {
-            return m_matrix.Block<Dimension, Dimension>(0, 0);
+            return m_matrix.template Block<Dimension, Dimension>(0, 0);
         }
 
         Block<MatrixType, Dimension, 1> TranslationExt()
         {
-            return m_matrix.Block<Dimension, 1>(0, Dimension);
+            return m_matrix.template Block<Dimension, 1>(0, Dimension);
         }
 
         Block<const MatrixType, Dimension, 1> TranslationExt() const
         {
-            return m_matrix.Block<Dimension, 1>(0, Dimension);
+            return m_matrix.template Block<Dimension, 1>(0, Dimension);
         }
 
         template<typename Derived>
@@ -63,7 +62,7 @@ namespace TG::Math
 
         Transform& PreScale(const Scalar& s)
         {
-            m_matrix.Block<Dimension, HDimension>(0, 0) *= s;
+            m_matrix.template Block<Dimension, HDimension>(0, 0) *= s;
             return *this;
         }
 

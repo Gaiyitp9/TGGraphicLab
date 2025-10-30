@@ -53,7 +53,7 @@ namespace TG::Rendering
     void SkyBox::Render(const Camera& camera) const
     {
         const bool prevDepthTest = glIsEnabled(GL_DEPTH_TEST);
-        GLint prevDepthFunc;
+        GLint prevDepthFunc = 0;
         if (!prevDepthTest)
             glEnable(GL_DEPTH_TEST);
         else

@@ -23,7 +23,7 @@ namespace TG::Math
     public:
         explicit CWiseNullaryOp(NullaryOp nullaryOp) : m_nullaryOp(nullaryOp) {}
 
-        NullaryOp Functor() const { return m_nullaryOp; }
+        [[nodiscard]] NullaryOp Functor() const { return m_nullaryOp; }
 
     private:
         NullaryOp m_nullaryOp;
@@ -43,7 +43,7 @@ namespace TG::Math
     {
         explicit ScalarConstantOp(Scalar constant) : m_constant(constant) {}
 
-        Scalar operator()(std::size_t row, std::size_t column) const
+        Scalar operator()(std::size_t, std::size_t) const
         {
             return m_constant;
         }
