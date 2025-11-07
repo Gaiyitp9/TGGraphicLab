@@ -5,14 +5,19 @@
 *****************************************************************/
 #pragma once
 
-namespace TG::Rendering::Raytrace
+#include <vector>
+#include <memory>
+
+namespace TG
 {
-    class Scene
+    class RenderPass;
+
+    class RenderPipeline
     {
     public:
-        Scene();
+        void Render();
 
     private:
-
+        std::vector<std::shared_ptr<RenderPass>> m_renderPasses;
     };
 }

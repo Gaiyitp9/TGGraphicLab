@@ -55,11 +55,11 @@ namespace TG
     };
 
     /**
-     * 必须使用辅助结构体来表示类成员函数的类型
-     * 否则Delegate的Bind在绑定类成员函数时，如果没有传递VarTypes，编译无法通过，找不到重载函数
-     * 但是静态函数或普通函数可以直接用RetType(*function)(Args..., std::decay_t<VarTypes>...)，
-     * 这里先记录一下，以后再仔细查原因
-     * 这里的辅助结构体参考了UE的实现
+     * \brief 必须使用辅助结构体来表示类成员函数的类型
+     *        否则Delegate的Bind在绑定类成员函数时，如果没有传递VarTypes，编译无法通过，找不到重载函数
+     *        但是静态函数或普通函数可以直接用RetType(*function)(Args..., std::decay_t<VarTypes>...)，
+     *        这里先记录一下，以后再仔细查原因
+     *        这里的辅助结构体参考了UE的实现
      */
     template <bool Const, typename Class, typename FuncType>
     struct MemFunPtrType;

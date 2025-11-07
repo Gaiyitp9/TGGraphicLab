@@ -27,16 +27,16 @@ namespace TG::Rendering
     };
 
     BasicLightExample::BasicLightExample(const std::weak_ptr<IDefaultVideoPort> &videoPort,
-        const std::weak_ptr<ITimer> &timer) : m_camera(videoPort, timer),
-        m_vertexShader("Assets/Shaders/GLSL/LightingModel/Phong/BasicLighting.vert", ShaderStage::Vertex),
-        m_fragmentShader("Assets/Shaders/GLSL/LightingModel/Phong/Phong.frag", ShaderStage::Fragment),
-        m_wireframeGeometryShader("Assets/Shaders/GLSL/Wireframe.geom", ShaderStage::Geometry),
-        m_wireframeFragmentShader("Assets/Shaders/GLSL/Wireframe.frag", ShaderStage::Fragment),
+        const std::weak_ptr<ITimer> &timer) : m_timer(timer), m_camera(videoPort, timer),
         m_planeMesh(20.0f, 20.0f, 20, 20),
         m_planeProperty{
             Math::Vector3f{ 0.0f, 0.01f, -10.0f },
             SlateGray,
-            0.3f, 0.5f, 64.0f }
+            0.3f, 0.5f, 64.0f },
+        m_vertexShader("Assets/Shaders/GLSL/LightingModel/Phong/BasicLighting.vert", ShaderStage::Vertex),
+        m_fragmentShader("Assets/Shaders/GLSL/LightingModel/Phong/Phong.frag", ShaderStage::Fragment),
+        m_wireframeGeometryShader("Assets/Shaders/GLSL/Wireframe.geom", ShaderStage::Geometry),
+        m_wireframeFragmentShader("Assets/Shaders/GLSL/Wireframe.frag", ShaderStage::Fragment)
     {
         m_sphereProperties[0] = {
             Math::Vector3f{ -6.0f, 1.0f, -10.0f },
@@ -211,7 +211,9 @@ namespace TG::Rendering
         for (const auto& [position, color, ambientStrength, specularStrength, shininess] : m_sphereProperties)
         {
             Math::Transform<float, 3> modelTransform;
-            modelTransform.Translate(position);
+            Math::Vector3f movingPosition = position;
+            movingPosition.X() += 3.0f * std::sin(m_timer.lock()->TotalTime() * 0.002f);
+            modelTransform.Translate(movingPosition);
             m_vertexShader.SetMat4("model", modelTransform.ToTransformMatrix());
 
             m_fragmentShader.SetFloat3("objectColor", color.R(), color.G(), color.B());

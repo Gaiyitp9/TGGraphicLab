@@ -28,6 +28,10 @@ namespace TG::Math
     public:
         explicit Transpose(const Xpr& xpr) : m_xpr(xpr) {}
 
+        // 解决MatrixBase的Block方法和Block类重名问题
+        // 不添加using声明时，Block对象无法调用基类的Block方法，会识别为类名
+        using Base::Transpose;
+
         [[nodiscard]] const Xpr& NestedExpression() const noexcept { return m_xpr; }
 
     private:

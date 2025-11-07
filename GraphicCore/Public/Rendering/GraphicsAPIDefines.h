@@ -12,7 +12,6 @@ namespace TG::Rendering
 {
     enum class GraphicsAPI : unsigned char
     {
-        OpenGLES,
         OpenGL,
         Vulkan,
         DirectX11,

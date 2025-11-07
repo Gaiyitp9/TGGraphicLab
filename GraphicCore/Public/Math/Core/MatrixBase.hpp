@@ -134,6 +134,11 @@ namespace TG::Math
             return Reduce(ScalarAddOp<Scalar>{});
         }
 
+        [[nodiscard]] bool All() const
+        {
+
+        }
+
         template<typename OtherDerived>
         [[nodiscard]] Scalar Dot(const MatrixBase<OtherDerived>& other) const
         {

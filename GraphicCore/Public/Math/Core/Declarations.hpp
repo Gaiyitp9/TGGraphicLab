@@ -153,6 +153,7 @@ namespace TG::Math
     template<typename Scalar> struct ScalarSubtractOp;
     template<typename Scalar> struct ScalarProductOp;
     template<typename Scalar> struct ScalarDivideOp;
+    template<typename Scalar> struct ScalarCompareOp;
     // 复制运算
     template<typename Scalar, typename Functor> struct CompoundAssignOp;
     template<typename Scalar> struct AddAssignOp;

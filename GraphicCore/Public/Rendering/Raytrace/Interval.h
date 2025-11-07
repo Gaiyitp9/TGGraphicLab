@@ -9,7 +9,6 @@
 
 namespace TG::Rendering
 {
-
     class Interval
     {
     public:

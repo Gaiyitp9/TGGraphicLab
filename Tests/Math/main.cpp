@@ -233,8 +233,8 @@ namespace TG::Math
         };
         Matrix2f invMat2 = mat2.Inverse();
         EXPECT_NEAR(invMat2[0], -1.5f, gEpsilon);
-        EXPECT_NEAR(invMat2[1],  0.5f, gEpsilon);
-        EXPECT_NEAR(invMat2[2],  1.0f, gEpsilon);
+        EXPECT_NEAR(invMat2[1],  1.0f, gEpsilon);
+        EXPECT_NEAR(invMat2[2],  0.5f, gEpsilon);
         EXPECT_NEAR(invMat2[3],  0.0f, gEpsilon);
 
         Matrix3f mat3{

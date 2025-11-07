@@ -32,6 +32,7 @@ namespace TG::Rendering
             float shininess;
         };
 
+        std::weak_ptr<ITimer> m_timer;
         Camera m_camera;
 
         Sphere m_sphereMesh;

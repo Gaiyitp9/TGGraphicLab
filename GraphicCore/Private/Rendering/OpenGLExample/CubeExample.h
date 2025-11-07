@@ -42,8 +42,8 @@ namespace TG::Rendering
         OpenGLShader m_wireframeFragmentShader;
         OpenGLTexture2D m_textures[2]{};
 
-        ViewportGrid m_viewportGrid;
         SkyBox m_skyBox;
+        ViewportGrid m_viewportGrid;
         ViewportCompass m_viewportCompass;
     };
 }
