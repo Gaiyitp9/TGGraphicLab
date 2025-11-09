@@ -26,7 +26,7 @@ namespace TG::Reflection
         { std::end(t) } -> std::input_or_output_iterator;
     };
 
-    namespace Details
+    namespace Detail
     {
         template<typename T>
         struct IsInstance : std::false_type {};
@@ -63,20 +63,20 @@ namespace TG::Reflection
      * \brief 检查类型T是否是一个实例
      */
     template<typename T>
-    static constexpr bool IsInstance = Details::IsInstance<T>::value;
+    static constexpr bool IsInstance = Detail::IsInstance<T>::value;
     /**
      * \brief 检测类型T是否是U的一个实例
      */
     template<template<typename...> class T, typename U>
-    static constexpr bool IsInstanceOf = Details::IsInstanceOf<T, U>::value;
+    static constexpr bool IsInstanceOf = Detail::IsInstanceOf<T, U>::value;
     /**
      * \brief 萃取模板参数列表并转换为TypeList
      */
     template<typename T>
-    using AsTypeList = Details::AsTypeList<T>::Type;
+    using AsTypeList = Detail::AsTypeList<T>::Type;
     /**
      * \brief 萃取模板参数列表并转换为tuple
      */
     template<typename T>
-    using AsTuple = Details::AsTuple<T>::Type;
+    using AsTuple = Detail::AsTuple<T>::Type;
 }

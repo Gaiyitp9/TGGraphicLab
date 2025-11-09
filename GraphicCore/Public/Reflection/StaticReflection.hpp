@@ -18,3 +18,5 @@ namespace TG::Reflection
 #include "Static/TypeInfo.hpp"
 #include "Static/TypeTraits.hpp"
 #include "Static/TypeList.hpp"
+#include "Static/Attributes.hpp"
+#include "Static/TypeDescriptor.hpp"

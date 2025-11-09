@@ -7,7 +7,7 @@
 
 namespace TG::Reflection
 {
-    namespace Details
+    namespace Detail
     {
         template<std::size_t N, typename... Ts>
         struct Get;
@@ -229,12 +229,12 @@ namespace TG::Reflection
          * \brief 返回类型T在列表中的索引，不存在时返回-1
          */
         template<typename T>
-        static constexpr std::int64_t IndexOf = Details::IndexOf<T, 0, Types...>();
+        static constexpr std::int64_t IndexOf = Detail::IndexOf<T, 0, Types...>();
         /**
          * \brief 返回列表中模板T实例的索引，不存在时返回-1
          */
         template<template<typename...> class T>
-        static constexpr std::int64_t IndexOfInstance = Details::IndexOfInstance<T, 0, Types...>();
+        static constexpr std::int64_t IndexOfInstance = Detail::IndexOfInstance<T, 0, Types...>();
         /**
          * \brief 是否包含类型T的派生类
          */
@@ -245,12 +245,12 @@ namespace TG::Reflection
          * \brief 返回列表中类型T派生类的索引，不存在时返回-1
          */
         template<typename T>
-        static constexpr std::int64_t IndexOfBase = Details::IndexOfBase<T, 0, Types...>();
+        static constexpr std::int64_t IndexOfBase = Detail::IndexOfBase<T, 0, Types...>();
         /**
          * \brief 获取列表中第N个类型
          */
         template<std::size_t N>
-        using Get = Details::Get<N, Types...>::Type;
+        using Get = Detail::Get<N, Types...>::Type;
         /**
          * \brief 列表中第一个类型
          */
@@ -263,46 +263,46 @@ namespace TG::Reflection
          * \brief 获取除了前N个类型组成的类型列表
          */
         template<std::size_t N>
-        using Skip = Details::Skip<N, Types...>::Type;
+        using Skip = Detail::Skip<N, Types...>::Type;
         using Tail = Skip<1>;
         /**
          * \brief 获取前N个类型组成的类型列表
          */
         template<std::size_t N>
-        using Take = Details::Take<N, Types...>::Type;
+        using Take = Detail::Take<N, Types...>::Type;
         using Init = Take<Size - 1>;
         /**
          * \brief 拼接类型列表
          */
         template<typename... TypeLists>
-        using Concat = Details::Concat<TypeList, TypeLists...>::Type;
+        using Concat = Detail::Concat<TypeList, TypeLists...>::Type;
         /**
          * \brief 向类型列表后添加类型T
          */
         template<typename T>
-        using Append = Details::Append<T, TypeList>::Type;
+        using Append = Detail::Append<T, TypeList>::Type;
         /**
          * \brief 向类型列表前添加类型T
          */
         template<typename T>
-        using Prepend = Details::Prepend<T, TypeList>::Type;
+        using Prepend = Detail::Prepend<T, TypeList>::Type;
         /**
          * \brief 翻转类型列表
          */
-        using Reverse = Details::Reverse<TypeList>::Type;
+        using Reverse = Detail::Reverse<TypeList>::Type;
         /**
          * \brief 筛选类型列表
          */
         template<template<typename> class Predicate>
-        using Filter = Details::Filter<Predicate, Types...>::Type;
+        using Filter = Detail::Filter<Predicate, Types...>::Type;
         /**
          * \brief 映射类型列表，比如移除元素的引用
          */
         template<template<typename> class Mapper>
-        using Map = Details::Map<Mapper, Types...>::Type;
+        using Map = Detail::Map<Mapper, Types...>::Type;
         /**
          * \brief 无重复类型的列表
          */
-        using Unique = Details::Unique<Types...>::Type;
+        using Unique = Detail::Unique<Types...>::Type;
     };
 }
