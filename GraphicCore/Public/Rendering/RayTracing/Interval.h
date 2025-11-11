@@ -20,8 +20,7 @@ namespace TG::Rendering
         [[nodiscard]] bool Surrounds(float x) const;
         [[nodiscard]] float Clamp(float x) const;
 
-    private:
-        float m_min{ std::numeric_limits<float>::infinity() };
-        float m_max{ std::numeric_limits<float>::infinity() };
+        float min{ std::numeric_limits<float>::infinity() };
+        float max{ std::numeric_limits<float>::infinity() };
     };
 }

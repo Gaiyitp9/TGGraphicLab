@@ -13,9 +13,10 @@ namespace TG::Rendering
 	{
 	public:
 		Color() = default;
-		explicit Color(const Math::Vector4f& color);
-		explicit Color(float c);
 		Color(float r, float g, float b);
+		explicit Color(float c);
+		explicit Color(const Math::Vector3f& color);
+		explicit Color(const Math::Vector4f& color);
 
 		float operator[](std::size_t index) const
 		{
@@ -43,6 +44,11 @@ namespace TG::Rendering
 		Color operator*(float c) const;
 
 	    Color operator+(const Color& color) const;
+	    Color& operator+=(const Color& color);
+	    Color& operator/=(float c);
+
+	    Color LinearToGamma(float gamma = 2.2f);
+	    Color GammaToLinear(float gamma = 2.2f);
 
 	private:
 		Math::Vector4f m_channels;

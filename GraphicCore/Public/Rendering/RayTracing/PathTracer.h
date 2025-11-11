@@ -5,27 +5,15 @@
 *****************************************************************/
 #pragma once
 
-#include "Math/Geometry/Ray.h"
-#include "Rendering/Color/Color.h"
+#include "Rendering/RayTracing/Camera.h"
 #include <atomic>
 
-namespace TG::Rendering
+namespace TG::Rendering::RayTracing
 {
-    struct PathTraceData
-    {
-        float aspectRatio;
-        float focalLength;
-        float fov;
-        Math::Vector3f cameraPosition;
-        Math::Vector3f front;
-        Math::Vector3f up;
-        Math::Vector3f right;
-    };
-
     class PathTracer
     {
     public:
-        PathTracer() = default;
+        PathTracer();
         ~PathTracer() = default;
 
         void Run(const PathTraceData& pathTraceData);
@@ -34,7 +22,8 @@ namespace TG::Rendering
         float Process() const { return m_process; }
 
     private:
-        Color RayColor(const Math::Geometry::Ray& ray) const;
+        Camera m_camera;
+        Scene m_scene;
 
         float m_process{ 0 };
         std::atomic_bool m_renderCompleted{ true };

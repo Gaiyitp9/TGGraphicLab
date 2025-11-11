@@ -69,4 +69,7 @@ namespace TG::Math
     private:
         MatrixType m_matrix;
     };
+
+    using Transform3f = Transform<float, 3>;
+    using Transform3d = Transform<double, 3>;
 }

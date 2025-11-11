@@ -8,7 +8,7 @@
 #include "Rendering/Example.h"
 #include "Rendering/Mesh/Sphere.h"
 #include "Rendering/Mesh/Plane.h"
-#include "Rendering/Raytrace/PathTracer.h"
+#include "Rendering/RayTracing/PathTracer.h"
 #include "ViewportGrid.h"
 #include "ViewportCompass.h"
 
@@ -67,6 +67,6 @@ namespace TG::Rendering
         ViewportCompass m_viewportCompass;
 
         std::unique_ptr<std::thread> m_renderThread;
-        PathTracer m_pathTracer;
+        RayTracing::PathTracer m_pathTracer;
     };
 }

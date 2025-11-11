@@ -5,8 +5,7 @@
 *****************************************************************/
 #pragma once
 
-#include "Rendering/Raytrace/Interval.h"
-#include "Math/Core.hpp"
+#include "Rendering/RayTracing/Interval.h"
 #include "Math/Geometry/Ray.h"
 
 namespace TG::Rendering
@@ -24,25 +23,26 @@ namespace TG::Rendering
         {
             frontFace = r.Direction().Dot(outwardNormal) < 0;
             normal = frontFace ? outwardNormal : -outwardNormal;
-            // float d = normal.Dot(position);
-            // if (std::abs(normal.X()) > Epsilon)
-            // {
-            //     tangent.SetY(p.Y() - 1.0);
-            //     tangent.SetZ(p.Z() - 1.0);
-            //     tangent.SetX((d - normal.Y() * tangent.Y() - normal.Z() * tangent.Z()) / normal.X());
-            // }
-            // else if (std::abs(normal.Y()) > Epsilon)
-            // {
-            //     tangent.SetX(p.X() - 1.0);
-            //     tangent.SetZ(p.Z() - 1.0);
-            //     tangent.SetY((d - normal.X() * tangent.X() - normal.Z() * tangent.Z()) / normal.Y());
-            // }
-            // else
-            // {
-            //     tangent.SetX(p.X() - 1.0);
-            //     tangent.SetY(p.Y() - 1.0);
-            //     tangent.SetZ((d - normal.X() * tangent.X() - normal.Y() * tangent.Y()) / normal.Z());
-            // }
+            float d = normal.Dot(position);
+            if (std::abs(normal.X()) > Math::EpsilonF)
+            {
+                tangent.Y() = position.Y() - 1.0f;
+                tangent.Z() = position.Z() - 1.0f;
+                tangent.X() = (d - normal.Y() * tangent.Y() - normal.Z() * tangent.Z()) / normal.X();
+            }
+            else if (std::abs(normal.Y()) > Math::EpsilonF)
+            {
+                tangent.X() = position.X() - 1.0f;
+                tangent.Z() = position.Z() - 1.0f;
+                tangent.Y() = (d - normal.X() * tangent.X() - normal.Z() * tangent.Z()) / normal.Y();
+            }
+            else
+            {
+                tangent.X() = position.X() - 1.0f;
+                tangent.Y() = position.Y() - 1.0f;
+                tangent.Z() = (d - normal.X() * tangent.X() - normal.Y() * tangent.Y()) / normal.Z();
+            }
+            tangent -= position;
             tangent.Normalize();
             binormal = tangent.Cross(normal);
         }

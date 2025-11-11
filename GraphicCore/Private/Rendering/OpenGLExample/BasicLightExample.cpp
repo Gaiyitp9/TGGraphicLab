@@ -6,7 +6,7 @@
 
 #include "Rendering/OpenGLExample/BasicLightExample.h"
 #include "Rendering/Color/StandardColors.h"
-#include "Rendering/Raytrace/PathTracer.h"
+#include "Rendering/RayTracing/PathTracer.h"
 #include "Math/Transform/Transform.hpp"
 #include "imgui_impl_opengl3.h"
 #include "imgui_impl_win32.h"
@@ -212,7 +212,7 @@ namespace TG::Rendering
         {
             Math::Transform<float, 3> modelTransform;
             Math::Vector3f movingPosition = position;
-            movingPosition.X() += 3.0f * std::sin(m_timer.lock()->TotalTime() * 0.002f);
+            // movingPosition.X() += 3.0f * std::sin(m_timer.lock()->TotalTime() * 0.002f);
             modelTransform.Translate(movingPosition);
             m_vertexShader.SetMat4("model", modelTransform.ToTransformMatrix());
 
@@ -259,14 +259,18 @@ namespace TG::Rendering
                 m_renderThread.reset();
             }
             m_renderThread = std::make_unique<std::thread>([this] {
-                PathTraceData pathTraceData;
+                RayTracing::PathTraceData pathTraceData;
+                pathTraceData.imageWidth = 1600;
+                pathTraceData.imageHeight = 900;
+                pathTraceData.cameraPosition = m_camera.position;
+                pathTraceData.front = m_camera.front;
+                pathTraceData.up = m_camera.up;
+                pathTraceData.right = m_camera.right;
                 pathTraceData.aspectRatio = m_camera.AspectRatio();
                 pathTraceData.focalLength = m_camera.nearPlane;
                 pathTraceData.fov = m_camera.fov;
-                pathTraceData.cameraPosition = m_camera.position;
-                pathTraceData.front = m_camera.front;
-                pathTraceData.right = m_camera.right;
-                pathTraceData.up = m_camera.up;
+                pathTraceData.samplesPerPixel = 10;
+                pathTraceData.maxDepth = 50;
                 m_pathTracer.Run(pathTraceData);
             });
         }

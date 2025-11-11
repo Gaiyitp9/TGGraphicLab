@@ -8,9 +8,12 @@
 
 namespace TG::Rendering
 {
-    Color::Color(const Math::Vector4f& color)
+    Color::Color(float r, float g, float b)
     {
-        m_channels = color;
+        m_channels[0] = r;
+        m_channels[1] = g;
+        m_channels[2] = b;
+        m_channels[3] = 1.f;
     }
 
     Color::Color(float c)
@@ -19,12 +22,14 @@ namespace TG::Rendering
         m_channels[3] = 1.f;
     }
 
-    Color::Color(float r, float g, float b)
+    Color::Color(const Math::Vector3f& color)
     {
-        m_channels[0] = r;
-        m_channels[1] = g;
-        m_channels[2] = b;
-        m_channels[3] = 1.f;
+        m_channels.Block<3, 1>(0, 0) = color;
+    }
+
+    Color::Color(const Math::Vector4f& color)
+    {
+        m_channels = color;
     }
 
     Math::Vector4f Color::ToVector4() const
@@ -34,16 +39,45 @@ namespace TG::Rendering
 
     Color Color::operator*(const Color& color) const
     {
-        return Color(m_channels.CWiseProduct(color.m_channels));
+        return Color(Math::Vector4f(m_channels.CWiseProduct(color.m_channels)));
     }
 
     Color Color::operator*(float c) const
     {
-        return Color(m_channels * c);
+        return Color(Math::Vector4f(m_channels * c));
     }
 
     Color Color::operator+(const Color& color) const
     {
-        return Color(m_channels + color.m_channels);
+        return Color(Math::Vector4f(m_channels + color.m_channels));
+    }
+
+    Color& Color::operator+=(const Color& color)
+    {
+        m_channels += color.m_channels;
+        return *this;
+    }
+
+    Color& Color::operator/=(float c)
+    {
+        m_channels *= (1.0f / c);
+        return *this;
+    }
+
+    Color Color::LinearToGamma(float gamma)
+    {
+        const float pow = 1.0f / gamma;
+        float r = std::pow(m_channels[0], pow);
+        float g = std::pow(m_channels[1], pow);
+        float b = std::pow(m_channels[2], pow);
+        return { r, g, b };
+    }
+
+    Color Color::GammaToLinear(float gamma)
+    {
+        float r = std::pow(m_channels[0], gamma);
+        float g = std::pow(m_channels[1], gamma);
+        float b = std::pow(m_channels[2], gamma);
+        return { r, g, b };
     }
 }

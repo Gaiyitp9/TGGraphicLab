@@ -4,35 +4,35 @@
 * This code is licensed under the MIT License (MIT).			*
 *****************************************************************/
 
-#include "Rendering/Raytrace/Interval.h"
+#include "Rendering/RayTracing/Interval.h"
 
 namespace TG::Rendering
 {
     Interval::Interval(float min, float max)
-        : m_min(min), m_max(max)
+        : min(min), max(max)
     {
 
     }
 
     float Interval::Size() const
     {
-        return m_max - m_min;
+        return max - min;
     }
 
     bool Interval::Contains(float x) const
     {
-        return m_min <= x && x <= m_max;
+        return min <= x && x <= max;
     }
 
     bool Interval::Surrounds(float x) const
     {
-        return m_min < x && x < m_max;
+        return min < x && x < max;
     }
 
     float Interval::Clamp(float x) const
     {
-        if (x < m_min) return m_min;
-        if (x > m_max) return m_max;
+        if (x < min) return min;
+        if (x > max) return max;
         return x;
     }
 }
