@@ -8,16 +8,23 @@
 #include "Diagnostic/Log.hpp"
 #include "Rendering/RayTracing/Sphere.h"
 #include "Rendering/RayTracing/Plane.h"
+#include "Rendering/RayTracing/Material.h"
 
 namespace TG::Rendering::RayTracing
 {
     PathTracer::PathTracer()
     {
-        m_scene.Add(std::make_shared<Sphere>(Math::Vector3f{ -6.0f, 1.0f, -10.0f }, 1.0f));
-        m_scene.Add(std::make_shared<Sphere>(Math::Vector3f{ -3.0f, 1.0f, -10.0f }, 1.0f));
-        m_scene.Add(std::make_shared<Sphere>(Math::Vector3f{  0.0f, 1.0f, -10.0f }, 1.0f));
-        m_scene.Add(std::make_shared<Sphere>(Math::Vector3f{  3.0f, 1.0f, -10.0f }, 1.0f));
-        m_scene.Add(std::make_shared<Sphere>(Math::Vector3f{  6.0f, 1.0f, -10.0f }, 1.0f));
+        auto materialGround = std::make_shared<Lambert>(Color(0.8f, 0.8f, 0.0f));
+        auto materialCenter = std::make_shared<Lambert>(Color(0.1f, 0.2f, 0.5f));
+        auto materialLeft = std::make_shared<Dielectric>(1.5f);
+        auto materialBubble = std::make_shared<Dielectric>(1.0f / 1.50f);
+        auto materialRight = std::make_shared<Metal>(Color(0.8f, 0.6f, 0.2f), 0.0f);
+        m_scene.Add(std::make_shared<Sphere>(Math::Vector3f{ -6.0f, 1.0f, -10.0f }, 1.0f, materialCenter));
+        m_scene.Add(std::make_shared<Sphere>(Math::Vector3f{ -3.0f, 1.0f, -10.0f }, 1.0f, materialLeft));
+        m_scene.Add(std::make_shared<Sphere>(Math::Vector3f{ -3.0f, 1.0f, -10.0f }, 0.8f, materialBubble));
+        m_scene.Add(std::make_shared<Sphere>(Math::Vector3f{  0.0f, 1.0f, -10.0f }, 1.0f, materialCenter));
+        m_scene.Add(std::make_shared<Sphere>(Math::Vector3f{  3.0f, 1.0f, -10.0f }, 1.0f, materialRight));
+        m_scene.Add(std::make_shared<Sphere>(Math::Vector3f{  6.0f, 1.0f, -10.0f }, 1.0f, materialCenter));
         m_scene.Add(std::make_shared<Plane>(
             Math::Vector3f{ 0.0f, 1.0f, 0.0f },
             std::vector<Math::Vector3f>
@@ -26,7 +33,8 @@ namespace TG::Rendering::RayTracing
                 {  10.0f, 0.01f, -20.0f },
                 {  10.0f, 0.01f,  0.0f },
                 { -10.0f, 0.01f,  0.0f }
-            }
+            },
+            materialGround
         ));
     }
 

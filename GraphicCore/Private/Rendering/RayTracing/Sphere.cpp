@@ -9,7 +9,9 @@
 
 namespace TG::Rendering::RayTracing
 {
-    Sphere::Sphere(const Math::Vector3f& center, float radius) : m_sphere(center, radius) {}
+    Sphere::Sphere(const Math::Vector3f& center, float radius, const std::shared_ptr<Material>& material)
+        : m_sphere(center, radius), m_material(material)
+    {}
 
     bool Sphere::Hit(const Math::Geometry::Ray& ray, const Interval& rayInterval, HitRecord& record) const
     {
@@ -21,6 +23,7 @@ namespace TG::Rendering::RayTracing
         {
             record.t = tMin;
             record.position = ray.At(tMin);
+            record.material = m_material;
             const Math::Vector3f outwardNormal = (record.position - m_sphere.Center()) / m_sphere.Radius();
             record.SetFaceNormal(ray, outwardNormal);
             return true;
@@ -29,6 +32,7 @@ namespace TG::Rendering::RayTracing
         {
             record.t = tMax;
             record.position = ray.At(tMax);
+            record.material = m_material;
             const Math::Vector3f outwardNormal = (record.position - m_sphere.Center()) / m_sphere.Radius();
             record.SetFaceNormal(ray, outwardNormal);
             return true;

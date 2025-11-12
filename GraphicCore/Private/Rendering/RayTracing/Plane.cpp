@@ -9,8 +9,9 @@
 
 namespace TG::Rendering::RayTracing
 {
-    Plane::Plane(const Math::Vector3f& normal, const std::vector<Math::Vector3f>& points)
-        : m_plane(points[0], normal), m_convex(m_plane, points)
+    Plane::Plane(const Math::Vector3f& normal, const std::vector<Math::Vector3f>& points,
+        const std::shared_ptr<Material>& material) : m_plane(points[0], normal),
+            m_convex(m_plane, points), m_material(material)
     {}
 
     bool Plane::Hit(const Math::Geometry::Ray &ray, const Interval &rayInterval, HitRecord &record) const
@@ -23,6 +24,7 @@ namespace TG::Rendering::RayTracing
         {
             record.t = t;
             record.position = ray.At(t);
+            record.material = m_material;
             record.SetFaceNormal(ray, m_plane.Normal());
             return true;
         }

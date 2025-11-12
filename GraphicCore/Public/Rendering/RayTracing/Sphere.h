@@ -14,12 +14,13 @@ namespace TG::Rendering::RayTracing
     {
     public:
         Sphere() = default;
-        Sphere(const Math::Vector3f& center, float radius);
+        Sphere(const Math::Vector3f& center, float radius, const std::shared_ptr<Material>& material);
         ~Sphere() override = default;
 
         bool Hit(const Math::Geometry::Ray& ray, const Interval& rayInterval, HitRecord& record) const override;
 
     private:
         Math::Geometry::Sphere m_sphere;
+        std::shared_ptr<Material> m_material;
     };
 }

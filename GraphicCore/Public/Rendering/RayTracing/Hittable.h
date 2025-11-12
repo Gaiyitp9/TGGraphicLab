@@ -8,14 +8,17 @@
 #include "Rendering/RayTracing/Interval.h"
 #include "Math/Geometry/Ray.h"
 
-namespace TG::Rendering
+namespace TG::Rendering::RayTracing
 {
+    class Material;
+
     struct HitRecord
     {
         Math::Vector3f  position;
         Math::Vector3f  normal;
         Math::Vector3f  tangent;
         Math::Vector3f  binormal;
+        std::shared_ptr<Material> material;
         float           t = 0;
         bool            frontFace = true;
 

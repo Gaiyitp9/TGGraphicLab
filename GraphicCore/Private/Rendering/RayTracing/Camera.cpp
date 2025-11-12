@@ -49,9 +49,9 @@ namespace TG::Rendering::RayTracing
                 pixelColor = pixelColor.LinearToGamma();
 
                 const std::size_t offset = (m_imageWidth * i + j) * 3;
-                imageData[offset] = static_cast<char>(pixelColor.R() * 255);
-                imageData[offset + 1] = static_cast<char>(pixelColor.G() * 255);
-                imageData[offset + 2] = static_cast<char>(pixelColor.B() * 255);
+                imageData[offset] = static_cast<char>(std::clamp(pixelColor.R(), 0.0f, 1.0f) * 255);
+                imageData[offset + 1] = static_cast<char>(std::clamp(pixelColor.G(), 0.0f, 1.0f) * 255);
+                imageData[offset + 2] = static_cast<char>(std::clamp(pixelColor.B(), 0.0f, 1.0f) * 255);
 
                 process = static_cast<float>(offset) / static_cast<float>(imageDataSize);
             }

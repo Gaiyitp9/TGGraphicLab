@@ -14,7 +14,8 @@ namespace TG::Rendering::RayTracing
     {
     public:
         Plane() = default;
-        Plane(const Math::Vector3f& normal, const std::vector<Math::Vector3f>& points);
+        Plane(const Math::Vector3f& normal, const std::vector<Math::Vector3f>& points,
+            const std::shared_ptr<Material>& material);
         ~Plane() override = default;
 
         bool Hit(const Math::Geometry::Ray &ray, const Interval &rayInterval, HitRecord &record) const override;
@@ -30,5 +31,6 @@ namespace TG::Rendering::RayTracing
                     { -10.0f, 0.01f,  0.0f },
             }
         };
+        std::shared_ptr<Material> m_material;
     };
 }

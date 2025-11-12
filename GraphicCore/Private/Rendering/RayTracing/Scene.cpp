@@ -8,6 +8,7 @@
 #include "Math/Geometry/Sphere.h"
 #include "Math/Geometry/Intersection.h"
 #include "Rendering/Color/StandardColors.h"
+#include "Rendering/RayTracing/Material.h"
 
 namespace TG::Rendering::RayTracing
 {
@@ -20,11 +21,11 @@ namespace TG::Rendering::RayTracing
 
         if (HitRecord record; Hit(ray, Interval(0.001f, std::numeric_limits<float>::max()), record))
         {
-            Math::Vector3f direction = Math::g_random.RandomOnHemisphere();
-            // 采样变量变换到世界空间
-            direction = direction.X() * record.binormal + direction.Y() * record.tangent +
-                direction.Z() * record.normal;
-            return 0.5f * RayColor({ record.position, direction }, depth - 1);
+            Math::Geometry::Ray scattered;
+            Color attenuation;
+            if (record.material->Scatter(ray, record, attenuation, scattered))
+                return attenuation * RayColor(scattered, depth - 1);
+            return Black;
         }
 
         Math::Vector3f unitDirection = ray.Direction().Normalized();

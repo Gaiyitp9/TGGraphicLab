@@ -39,13 +39,13 @@ namespace TG::Math
          * \return 球面上的点坐标
          */
         template<std::floating_point T = float>
-        Vector3<T> RandomOnUnitSphere()
+        Vector3<T> UniformSampleOnSphere()
         {
             T zeta1 = Float<T>();
             T zeta2 = Float<T>();
-            T phi = 2 * std::numbers::pi * zeta2;
             T cosTheta = 1 - 2 * zeta1;
             T sinTheta = std::sqrt(1 - cosTheta * cosTheta);
+            T phi = 2 * std::numbers::pi * zeta2;
             return { sinTheta * std::cos(phi), sinTheta * std::sin(phi), cosTheta };
         }
 
@@ -54,13 +54,24 @@ namespace TG::Math
          * \return 球面上的点坐标
          */
         template<std::floating_point T = float>
-        Vector3<T> RandomOnHemisphere()
+        Vector3<T> UniformSampleOnHemisphere()
+        {
+            // https://www.pbr-book.org/3ed-2018/Monte_Carlo_Integration/2D_Sampling_with_Multidimensional_Transformations
+            T zeta1 = Float<T>();
+            T zeta2 = Float<T>();
+            T sinTheta = std::sqrt(1 - zeta1 * zeta1);
+            T phi = 2 * std::numbers::pi_v<T> * zeta2;
+            return { sinTheta * std::cos(phi), sinTheta * std::sin(phi), zeta1 };
+        }
+
+        template<std::floating_point T = float>
+        Vector3<T> CosineWeightedSampleOnHemisphere()
         {
             T zeta1 = Float<T>();
             T zeta2 = Float<T>();
+            T sinTheta = std::sqrt(zeta1);
             T phi = 2 * std::numbers::pi_v<T> * zeta2;
-            T sinTheta = std::sqrt(1 - zeta1 * zeta1);
-            return { sinTheta * std::cos(phi), sinTheta * std::sin(phi), zeta1 };
+            return { sinTheta * std::cos(phi), sinTheta * std::sin(phi), std::sqrt(1 - zeta1) };
         }
 
     private:
