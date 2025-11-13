@@ -10,9 +10,9 @@
 
 namespace TG::Rendering::RayTracing
 {
-    Camera::Camera(unsigned int imageWidth, Math::Vector3f cameraPosition, float aspectRatio, float focalLength,
-        float fov, Math::Vector3f front, Math::Vector3f up, Math::Vector3f right, unsigned int samplesPerPixel,
-        unsigned int maxDepth) :
+    Camera::Camera(unsigned int imageWidth, Math::Vector3f cameraPosition, float aspectRatio, float focalDistance,
+        float fov, float defocusAngle, Math::Vector3f front, Math::Vector3f up, Math::Vector3f right,
+        unsigned int samplesPerPixel, unsigned int maxDepth) :
             m_imageWidth(imageWidth),
             m_imageHeight(std::max(1, static_cast<int>(static_cast<float>(m_imageWidth) / aspectRatio))),
             m_position(cameraPosition),
@@ -20,13 +20,17 @@ namespace TG::Rendering::RayTracing
             m_up(up),
             m_right(right),
             m_aspectRatio(aspectRatio),
-            m_focalLength(focalLength), m_fov(fov),
-            m_viewportHeight(focalLength * std::tan(fov * Math::Deg2RadF * 0.5f) * 2.0f),
+            m_focalDistance(focalDistance),
+            m_fov(fov),
+            m_defocusAngle(defocusAngle),
+            m_viewportHeight(focalDistance * std::tan(fov * Math::Deg2RadF * 0.5f) * 2.0f),
             m_viewportWidth(m_viewportHeight * aspectRatio),
             m_viewportU(m_viewportWidth * right),
             m_viewportV(-m_viewportHeight * up),
-            m_viewportUpperLeft(m_position + front * focalLength - (m_viewportU + m_viewportV) * 0.5f),
+            m_viewportUpperLeft(m_position + front * focalDistance - (m_viewportU + m_viewportV) * 0.5f),
             m_pixel00Location(m_viewportUpperLeft + (m_pixelDeltaU + m_pixelDeltaV) * 0.5f),
+            m_defocusDiskU(std::tan(m_defocusAngle * Math::Deg2RadF * 0.5f) * right),
+            m_defocusDiskV(std::tan(m_defocusAngle * Math::Deg2RadF * 0.5f) * up),
             m_samplesPerPixel(samplesPerPixel),
             m_maxDepth(maxDepth)
     {}
@@ -71,22 +75,22 @@ namespace TG::Rendering::RayTracing
         m_right = data.right;
 
         m_aspectRatio = data.aspectRatio;
-        m_focalLength = data.focalLength;
+        m_focalDistance = data.focalDistance;
         m_fov = data.fov;
-        m_viewportHeight = m_focalLength * std::tan(m_fov * Math::Deg2RadF * 0.5f) * 2.0f;
+        m_viewportHeight = m_focalDistance * std::tan(m_fov * Math::Deg2RadF * 0.5f) * 2.0f;
         m_viewportWidth = m_viewportHeight * m_aspectRatio;
         m_viewportU = m_viewportWidth * m_right;
         m_viewportV = -m_viewportHeight * m_up;
         m_pixelDeltaU = m_viewportU / static_cast<float>(m_imageWidth);
         m_pixelDeltaV = m_viewportV / static_cast<float>(m_imageHeight);
-        m_viewportUpperLeft = m_position + m_front * m_focalLength - (m_viewportU + m_viewportV) * 0.5f;
+        m_viewportUpperLeft = m_position + m_front * m_focalDistance - (m_viewportU + m_viewportV) * 0.5f;
         m_pixel00Location = m_viewportUpperLeft + (m_pixelDeltaU + m_pixelDeltaV) * 0.5f;
 
         m_samplesPerPixel = data.samplesPerPixel;
         m_maxDepth = data.maxDepth;
     }
 
-    Math::Geometry::Ray Camera::GetRay(unsigned int row, unsigned int column)
+    Math::Geometry::Ray Camera::GetRay(unsigned int row, unsigned int column) const
     {
         Math::Vector3f pixelCenter = m_pixel00Location + static_cast<float>(row) * m_pixelDeltaV +
             static_cast<float>(column) * m_pixelDeltaU;
@@ -94,7 +98,13 @@ namespace TG::Rendering::RayTracing
         float py = Math::g_random.Float(-0.5f, 0.5f);
         // 在(row, column)像素内随机取一个采样点
         Math::Vector3f pixelSample = pixelCenter + px * m_pixelDeltaU + py * m_pixelDeltaV;
-        Math::Vector3f rayDirection = pixelSample - m_position;
-        return { m_position, rayDirection };
+
+        // 获取相机透镜上随机的一个点
+        // Math::Vector2f p = Math::g_random.ConcentricSampleOnDisk();
+        // Math::Vector3f rayOrigin = m_position + p.X() * m_defocusDiskU + p.Y() * m_defocusDiskV;
+        Math::Vector3f rayOrigin = m_position;
+
+        Math::Vector3f rayDirection = pixelSample - rayOrigin;
+        return { rayOrigin, rayDirection };
     }
 }

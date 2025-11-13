@@ -267,8 +267,9 @@ namespace TG::Rendering
                 pathTraceData.up = m_camera.up;
                 pathTraceData.right = m_camera.right;
                 pathTraceData.aspectRatio = m_camera.AspectRatio();
-                pathTraceData.focalLength = m_camera.nearPlane;
+                pathTraceData.focalDistance = m_camera.nearPlane;
                 pathTraceData.fov = m_camera.fov;
+                pathTraceData.defocusAngle = 10.0f;
                 pathTraceData.samplesPerPixel = 10;
                 pathTraceData.maxDepth = 50;
                 m_pathTracer.Run(pathTraceData);

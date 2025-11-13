@@ -18,8 +18,9 @@ namespace TG::Rendering::RayTracing
         Math::Vector3f up;
         Math::Vector3f right;
         float aspectRatio;
-        float focalLength;
+        float focalDistance;
         float fov;
+        float defocusAngle;
         unsigned int samplesPerPixel;
         unsigned int maxDepth;
     };

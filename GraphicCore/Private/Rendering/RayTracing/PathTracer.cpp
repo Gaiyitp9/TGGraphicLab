@@ -19,7 +19,7 @@ namespace TG::Rendering::RayTracing
         auto materialLeft = std::make_shared<Dielectric>(1.5f);
         auto materialBubble = std::make_shared<Dielectric>(1.0f / 1.50f);
         auto materialRight = std::make_shared<Metal>(Color(0.8f, 0.6f, 0.2f), 0.0f);
-        m_scene.Add(std::make_shared<Sphere>(Math::Vector3f{ -6.0f, 1.0f, -10.0f }, 1.0f, materialCenter));
+        m_scene.Add(std::make_shared<Sphere>(Math::Vector3f{ -6.0f, 1.0f, -10.0f }, 1.0f, materialLeft));
         m_scene.Add(std::make_shared<Sphere>(Math::Vector3f{ -3.0f, 1.0f, -10.0f }, 1.0f, materialLeft));
         m_scene.Add(std::make_shared<Sphere>(Math::Vector3f{ -3.0f, 1.0f, -10.0f }, 0.8f, materialBubble));
         m_scene.Add(std::make_shared<Sphere>(Math::Vector3f{  0.0f, 1.0f, -10.0f }, 1.0f, materialCenter));
