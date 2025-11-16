@@ -100,9 +100,8 @@ namespace TG::Rendering::RayTracing
         Math::Vector3f pixelSample = pixelCenter + px * m_pixelDeltaU + py * m_pixelDeltaV;
 
         // 获取相机透镜上随机的一个点
-        // Math::Vector2f p = Math::g_random.ConcentricSampleOnDisk();
-        // Math::Vector3f rayOrigin = m_position + p.X() * m_defocusDiskU + p.Y() * m_defocusDiskV;
-        Math::Vector3f rayOrigin = m_position;
+        Math::Vector2f p = Math::g_random.ConcentricSampleOnDisk();
+        Math::Vector3f rayOrigin = m_position + p.X() * m_defocusDiskU + p.Y() * m_defocusDiskV;
 
         Math::Vector3f rayDirection = pixelSample - rayOrigin;
         return { rayOrigin, rayDirection };

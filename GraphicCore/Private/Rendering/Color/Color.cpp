@@ -80,4 +80,14 @@ namespace TG::Rendering
         float b = std::pow(m_channels[2], gamma);
         return { r, g, b };
     }
+
+    Color Color::Random(float min, float max)
+    {
+        return {
+            Math::g_random.Float(min, max),
+            Math::g_random.Float(min, max),
+            Math::g_random.Float(min, max)
+        };
+    }
+
 }

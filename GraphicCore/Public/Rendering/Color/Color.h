@@ -50,6 +50,8 @@ namespace TG::Rendering
 	    Color LinearToGamma(float gamma = 2.2f);
 	    Color GammaToLinear(float gamma = 2.2f);
 
+	    static Color Random(float min = 0.0f, float max = 1.0f);
+
 	private:
 		Math::Vector4f m_channels;
 	};
