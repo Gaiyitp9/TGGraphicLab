@@ -7,16 +7,12 @@
 
 #include <string>
 #include <type_traits>
-
-namespace TG::Reflection
-{
-    template<typename T> struct TypeInfo;
-    template<typename... Types> struct TypeList;
-}
-
 #include "Static/ConstString.hpp"
+#include "Static/Declarations.hpp"
 #include "Static/TypeInfo.hpp"
 #include "Static/TypeTraits.hpp"
 #include "Static/TypeList.hpp"
+#include "Static/Util.hpp"
 #include "Static/Attributes.hpp"
+#include "Static/MemberDescriptor.hpp"
 #include "Static/TypeDescriptor.hpp"

@@ -7,6 +7,7 @@
 
 #include "Rendering/Color/Color.h"
 #include "Rendering/RayTracing/Hittable.h"
+#include <vector>
 
 namespace TG::Rendering::RayTracing
 {

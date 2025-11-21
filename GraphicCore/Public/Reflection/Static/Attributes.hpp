@@ -40,9 +40,9 @@ namespace TG::Reflection::Attribute
      */
     struct Property : Usage::Function
     {
-        constexpr Property() = default;
+        constexpr Property() noexcept = default;
 
-        explicit constexpr Property(const char* friendlyName) : friendlyName(friendlyName) {}
+        constexpr Property(const char* friendlyName) noexcept : friendlyName{ friendlyName } {}
 
         const std::optional<const char*> friendlyName{};
     };
@@ -61,6 +61,29 @@ namespace TG::Reflection::Attribute
     template<typename... Ts>
     struct BaseTypes : Usage::Type
     {
-        using List = TypeList<Ts...>;
+        using ListType = TypeList<Ts...>;
+
+        static constexpr ListType List{};
     };
+
+
+    constexpr bool ValidateAttributeUnique(TypeList<>) noexcept
+    {
+        return true;
+    }
+    template<typename T, typename... Ts>
+    constexpr bool ValidateAttributeUnique(TypeList<T, Ts...>) noexcept
+    {
+        return (... && (!std::is_same_v<T, Ts> && ValidateAttributeUnique(TypeList<Ts>{})));
+    }
+
+    template<typename Usage, typename... Args>
+    requires (... && std::is_base_of_v<Usage, std::remove_cvref_t<Args>>)
+    constexpr auto MakeAttributes(Args&&... args)
+    {
+        constexpr bool checkUnique = ValidateAttributeUnique(TypeList<Args...>{});
+        static_assert(checkUnique, "Some of the attributes provided have duplicate types!");
+
+        return std::make_tuple(std::forward<Args>(args)...);
+    }
 }

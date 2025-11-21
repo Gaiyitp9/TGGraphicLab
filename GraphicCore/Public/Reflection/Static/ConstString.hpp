@@ -18,10 +18,10 @@ namespace TG::Reflection
         constexpr ConstString() noexcept : m_data{}
         {}
         constexpr explicit ConstString(const char(&str)[N + 1])
-            : ConstString(str, std::make_index_sequence<N>())
+            : ConstString(str, std::make_index_sequence<N>{})
         {}
         constexpr ConstString(const ConstString& other)
-            : ConstString(other, std::make_index_sequence<N>())
+            : ConstString(other, std::make_index_sequence<N>{})
         {}
 
         static constexpr ConstString CreateFromCString(const char* const str)
@@ -96,14 +96,14 @@ namespace TG::Reflection
         }
 
     private:
-        template<std::size_t... Idx>
-        constexpr ConstString(const char(&str)[sizeof...(Idx) + 1], std::index_sequence<Idx...>)
-            : m_data{ str[Idx]..., 0 }
+        template<std::size_t... Index>
+        constexpr ConstString(const char(&str)[sizeof...(Index) + 1], std::index_sequence<Index...>)
+            : m_data{ str[Index]..., 0 }
         {}
 
-        template<std::size_t... Idx>
-        constexpr ConstString(const ConstString& other, std::index_sequence<Idx...>)
-            : m_data{ other.m_data[Idx]..., 0 }
+        template<std::size_t... Index>
+        constexpr ConstString(const ConstString& other, std::index_sequence<Index...>)
+            : m_data{ other.m_data[Index]..., 0 }
         {}
 
         char m_data[N + 1];

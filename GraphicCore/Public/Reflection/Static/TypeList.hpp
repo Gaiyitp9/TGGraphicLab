@@ -119,30 +119,63 @@ namespace TG::Reflection
             using Type = Reverse<TypeList<Ts...>, TypeList<T, Us...>>::Type;
         };
 
-        template<template<typename> class Predicate, typename... Ts>
-        struct Filter;
-        template<template<typename> class Predicate>
-        struct Filter<Predicate>
+        template<template<typename> typename Predicate, typename... Ts>
+        struct FilterByTypeTrait;
+        template<template<typename> typename Predicate>
+        struct FilterByTypeTrait<Predicate>
         {
             using Type = TypeList<>;
         };
-        template<template<typename> class Predicate, typename T, typename... Ts>
-        struct Filter<Predicate, T, Ts...>
+        template<template<typename> typename Predicate, typename T, typename... Ts>
+        requires IsCustomTypeTrait<Predicate, T>
+        struct FilterByTypeTrait<Predicate, T, Ts...>
+        {
+            using Type = std::conditional_t<Predicate<T>::Value,
+                typename Prepend<T, typename FilterByTypeTrait<Predicate, Ts...>::Type>::Type,
+                typename FilterByTypeTrait<Predicate, Ts...>::Type
+            >;
+        };
+        template<template<typename> typename Predicate, typename T, typename... Ts>
+        struct FilterByTypeTrait<Predicate, T, Ts...>
         {
             using Type = std::conditional_t<Predicate<T>::value,
-                typename Prepend<T, typename Filter<Predicate, Ts...>::Type>::Type,
-                typename Filter<Predicate, Ts...>::Type
+                typename Prepend<T, typename FilterByTypeTrait<Predicate, Ts...>::Type>::Type,
+                typename FilterByTypeTrait<Predicate, Ts...>::Type
             >;
         };
 
-        template<template<typename> class Mapper, typename... Ts>
+        template<typename T, bool... Bs>
+        struct ApplyMask;
+        template<>
+        struct ApplyMask<TypeList<>>
+        {
+            using Type = TypeList<>;
+        };
+        template<typename T, typename... Ts, bool... Bs>
+        struct ApplyMask<TypeList<T, Ts...>, true, Bs...>
+        {
+            using Type = Prepend<T, typename ApplyMask<TypeList<Ts...>, Bs...>::Type>::Type;
+        };
+        template<typename T, typename... Ts, bool... Bs>
+        struct ApplyMask<TypeList<T, Ts...>, false, Bs...>
+        {
+            using Type = ApplyMask<TypeList<Ts...>, Bs...>::Type;
+        };
+
+        template<template<typename> typename Mapper, typename... Ts>
         struct Map;
-        template<template<typename> class Mapper>
+        template<template<typename> typename Mapper>
         struct Map<Mapper>
         {
             using Type = TypeList<>;
         };
-        template<template<typename> class Mapper, typename T, typename... Ts>
+        template<template<typename> typename Mapper, typename T, typename... Ts>
+        requires IsCustomTypeTrait<Mapper, T>
+        struct Map<Mapper, T, Ts...>
+        {
+            using Type = Prepend<typename Mapper<T>::Type, typename Map<Mapper, Ts...>::Type>::Type;
+        };
+        template<template<typename> typename Mapper, typename T, typename... Ts>
         struct Map<Mapper, T, Ts...>
         {
             using Type = Prepend<typename Mapper<T>::type, typename Map<Mapper, Ts...>::Type>::Type;
@@ -153,7 +186,7 @@ namespace TG::Reflection
         {
             if constexpr (sizeof...(Ts) <= N)
                 return -1;
-            else if constexpr (std::is_same_v<T, typename Get<N, Ts...>::Type>)
+            else if constexpr (std::is_same_v<T, std::tuple_element_t<N, std::tuple<Ts...>>>)
                 return N;
             else
                 return IndexOf<T, N + 1, Ts...>();
@@ -164,7 +197,7 @@ namespace TG::Reflection
         {
             if constexpr (sizeof...(Ts) <= N)
                 return -1;
-            else if constexpr (Reflection::IsInstanceOf<T, typename Get<N, Ts...>::Type>)
+            else if constexpr (Reflection::IsInstanceOf<T, std::tuple_element_t<N, std::tuple<Ts...>>>)
                 return N;
             else
                 return IndexOfInstance<T, N + 1, Ts...>();
@@ -175,7 +208,7 @@ namespace TG::Reflection
         {
             if constexpr (sizeof...(Ts) <= N)
                 return -1;
-            else if constexpr (std::is_base_of_v<T, typename Get<N, Ts...>::Type>)
+            else if constexpr (std::is_base_of_v<T, std::tuple_element_t<N, std::tuple<Ts...>>>)
                 return N;
             else
                 return IndexOfBase<T, N + 1, Ts...>();
@@ -192,9 +225,9 @@ namespace TG::Reflection
         struct UniqueImplement<UniqueTypeList, T, Ts...>
         {
             using Type = std::conditional_t<
-                UniqueTypeList::template Contains<T>,
+                UniqueTypeList::template Contains<T>(),
                 typename UniqueImplement<UniqueTypeList, Ts...>::Type,
-                typename UniqueImplement<typename UniqueTypeList::template Append<T>, Ts...>::Type
+                typename UniqueImplement<typename UniqueTypeList::template AppendT<T>, Ts...>::Type
             >;
         };
         template<typename... Ts>
@@ -214,95 +247,196 @@ namespace TG::Reflection
          * \brief 列表中类型数量
          */
         static constexpr std::size_t Size = sizeof...(Types);
+
         /**
          * \brief 是否包含类型T
          */
         template<typename T>
-        static constexpr bool Contains =
-            (... || std::is_same_v<std::remove_cvref_t<T>, std::remove_cvref_t<Types>>);
+        static constexpr bool Contains() noexcept
+        {
+            return (... || std::is_same_v<std::remove_cvref_t<T>, std::remove_cvref_t<Types>>);
+        }
+
         /**
          * \brief 是否包含模板T的实例
          */
         template<template<typename...> class T>
-        static constexpr bool ContainsInstance = (... || IsInstanceOf<T, std::remove_cvref_t<Types>>);
+        static constexpr bool ContainsInstance() noexcept
+        {
+            return (... || IsInstanceOf<T, std::remove_cvref_t<Types>>);
+        }
+
         /**
          * \brief 返回类型T在列表中的索引，不存在时返回-1
          */
         template<typename T>
-        static constexpr std::int64_t IndexOf = Detail::IndexOf<T, 0, Types...>();
+        static constexpr std::int64_t IndexOf() noexcept
+        {
+            return Detail::IndexOf<T, 0, Types...>();
+        }
+
         /**
          * \brief 返回列表中模板T实例的索引，不存在时返回-1
          */
         template<template<typename...> class T>
-        static constexpr std::int64_t IndexOfInstance = Detail::IndexOfInstance<T, 0, Types...>();
+        static constexpr std::int64_t IndexOfInstance() noexcept
+        {
+            return Detail::IndexOfInstance<T, 0, Types...>();
+        }
+
         /**
          * \brief 是否包含类型T的派生类
          */
         template<typename T>
-        static constexpr bool ContainsBase =
-            (... || std::is_base_of_v<std::remove_cvref_t<T>, std::remove_cvref_t<Types>>);
+        static constexpr bool ContainsBase() noexcept
+        {
+            return (... || std::is_base_of_v<std::remove_cvref_t<T>, std::remove_cvref_t<Types>>);
+        }
+
         /**
          * \brief 返回列表中类型T派生类的索引，不存在时返回-1
          */
         template<typename T>
-        static constexpr std::int64_t IndexOfBase = Detail::IndexOfBase<T, 0, Types...>();
+        static constexpr std::int64_t IndexOfBase() noexcept
+        {
+            return Detail::IndexOfBase<T, 0, Types...>();
+        }
+
         /**
          * \brief 获取列表中第N个类型
          */
         template<std::size_t N>
-        using Get = Detail::Get<N, Types...>::Type;
+        static constexpr auto Get() noexcept
+        {
+            return Detail::Get<N, Types...>{};
+        }
+        template<std::size_t N>
+        using GetT = Detail::Get<N, Types...>::Type;
+
         /**
          * \brief 列表中第一个类型
          */
-        using First = Get<0>;
+        static constexpr auto First() noexcept
+        {
+            return Detail::Get<0, Types...>{};
+        }
+        using FirstT = Detail::Get<0, Types...>::Type;
+
         /**
          * \brief 列表中最后一个类型
          */
-        using Last = Get<Size - 1>;
+        static constexpr auto Last() noexcept
+        {
+            return Detail::Get<Size - 1, Types...>{};
+        }
+        using LastT = Detail::Get<Size - 1, Types...>::Type;
+
         /**
          * \brief 获取除了前N个类型组成的类型列表
          */
         template<std::size_t N>
-        using Skip = Detail::Skip<N, Types...>::Type;
-        using Tail = Skip<1>;
+        static constexpr auto Skip() noexcept
+        {
+            return typename Detail::Skip<N, Types...>::Type{};
+        }
+        template<std::size_t N>
+        using SkipT = Detail::Skip<N, Types...>::Type;
+
         /**
          * \brief 获取前N个类型组成的类型列表
          */
         template<std::size_t N>
-        using Take = Detail::Take<N, Types...>::Type;
-        using Init = Take<Size - 1>;
+        static constexpr auto Take() noexcept
+        {
+            return typename Detail::Take<N, Types...>::Type{};
+        }
+        template<std::size_t N>
+        using TakeT = Detail::Take<N, Types...>::Type;
+
         /**
          * \brief 拼接类型列表
          */
         template<typename... TypeLists>
-        using Concat = Detail::Concat<TypeList, TypeLists...>::Type;
+        static constexpr auto Concat() noexcept
+        {
+            return typename Detail::Concat<TypeList, TypeLists...>::Type{};
+        }
+        template<typename... TypeLists>
+        using ConcatT = Detail::Concat<TypeList, TypeLists...>::Type;
+
         /**
          * \brief 向类型列表后添加类型T
          */
         template<typename T>
-        using Append = Detail::Append<T, TypeList>::Type;
+        static constexpr auto Append() noexcept
+        {
+            return typename Detail::Append<T, TypeList>::Type{};
+        }
+        template<typename T>
+        using AppendT = Detail::Append<T, TypeList>::Type;
+
         /**
          * \brief 向类型列表前添加类型T
          */
         template<typename T>
-        using Prepend = Detail::Prepend<T, TypeList>::Type;
+        static constexpr auto Prepend() noexcept
+        {
+            return typename Detail::Prepend<T, TypeList>::Type{};
+        }
+        template<typename T>
+        using PrependT = Detail::Prepend<T, TypeList>::Type;
+
         /**
          * \brief 翻转类型列表
          */
-        using Reverse = Detail::Reverse<TypeList>::Type;
+        static constexpr auto Reverse() noexcept
+        {
+            return typename Detail::Reverse<TypeList>::Type{};
+        }
+        using ReverseT = Detail::Reverse<TypeList>::Type;
+
         /**
-         * \brief 筛选类型列表
+         * \brief 根据type trait过滤类型列表
          */
-        template<template<typename> class Predicate>
-        using Filter = Detail::Filter<Predicate, Types...>::Type;
+        template<template<typename> typename Predicate>
+        static constexpr auto FilterByTypeTrait() noexcept
+        {
+            return typename Detail::FilterByTypeTrait<Predicate, Types...>::Type{};
+        }
+        template<template<typename> typename Predicate>
+        using FilterByTypeTraitT = Detail::FilterByTypeTrait<Predicate, Types...>::Type;
+
+        /**
+         * \brief 根据Predicate过滤类型列表
+         */
+        template<typename F>
+        requires (... &&
+            (std::is_default_constructible_v<Types> &&
+            std::invocable<F, Types> &&
+            std::same_as<std::invoke_result_t<F, Types>, bool>))
+        static constexpr auto FilterByPredicate(F f)
+        {
+            return typename Detail::ApplyMask<TypeList, f(Types{})...>::Type{};
+        }
+
         /**
          * \brief 映射类型列表，比如移除元素的引用
          */
-        template<template<typename> class Mapper>
-        using Map = Detail::Map<Mapper, Types...>::Type;
+        template<template<typename> typename Mapper>
+        static constexpr auto Map() noexcept
+        {
+            return typename Detail::Map<Mapper, Types...>::Type{};
+        }
+        template<template<typename> typename Mapper>
+        using MapT = Detail::Map<Mapper, Types...>::Type;
+
         /**
          * \brief 无重复类型的列表
          */
-        using Unique = Detail::Unique<Types...>::Type;
+        static constexpr auto Unique() noexcept
+        {
+            return typename Detail::Unique<Types...>::Type{};
+        }
+        using UniqueT = Detail::Unique<Types...>::Type;
     };
 }

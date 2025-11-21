@@ -7,6 +7,7 @@
 
 #include "Rendering/RayTracing/Interval.h"
 #include "Math/Geometry/Ray.h"
+#include <memory>
 
 namespace TG::Rendering::RayTracing
 {

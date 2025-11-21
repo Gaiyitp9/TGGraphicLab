@@ -6,6 +6,7 @@
 
 #include "Rendering/RayTracing/Camera.h"
 #include "Rendering/Color/Color.h"
+#include "Math/Random.hpp"
 #include "stb_image_write.h"
 
 namespace TG::Rendering::RayTracing

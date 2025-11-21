@@ -5,6 +5,8 @@
 *****************************************************************/
 
 #include "Rendering/RayTracing/Material.h"
+#include "Math/Random.hpp"
+#include "Math/Common.hpp"
 
 namespace TG::Rendering::RayTracing
 {

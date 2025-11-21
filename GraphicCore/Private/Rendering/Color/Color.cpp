@@ -5,6 +5,7 @@
 *****************************************************************/
 
 #include "Rendering/Color/Color.h"
+#include "Math/Random.hpp"
 
 namespace TG::Rendering
 {
