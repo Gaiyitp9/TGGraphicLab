@@ -30,48 +30,71 @@ namespace TG::Reflection
             template<typename T>
             static constexpr auto Invoke(T&& target)
             {
-                return target.*(Member::Pointer);
+                return target.*Member::Pointer;
             }
 
             template<typename T, typename U> requires (!Member::IsConst)
             static constexpr auto Invoke(T&& target, U&& value)
             {
-                return target.*(Member::Pointer) = std::forward<U>(value);
+                return target.*Member::Pointer = std::forward<U>(value);
             }
         };
+
+        template <typename Member>
+        constexpr auto GetFunctionPointer()
+        {
+            if constexpr (requires { Member::Pointer(); })
+                return Member::Pointer();
+            else
+                return nullptr;
+        }
     }
 
     /**
-     * \brief 类成员类型
+     * \brief 成员类型
      */
     enum class MemberType : unsigned char
     {
         Void,
         Field,
-        Function
+        Function,
+        Enumerator,
     };
 
     /**
-     * \brief 判断类型T是否是类成员
+     * \brief 访问修饰符
+     */
+    enum class AccessSpecifier : unsigned char
+    {
+        Public,
+        Protected,
+        Private,
+    };
+
+    /**
+     * \brief 判断类型T是否是成员
      */
     template<typename T>
     concept IsMember = requires
     {
-        { T::Type } -> std::same_as<MemberType>;
-    };
+        T::MemberType;
+    } && std::same_as<std::remove_cvref_t<decltype(T::MemberType)>, MemberType>;
 
     /**
      * \brief 判断类型T是否是字段
      */
     template<typename T>
-    concept IsField = IsMember<T> && (T::Type == MemberType::Field);
+    concept IsField = IsMember<T> && (T::MemberType == MemberType::Field);
 
     /**
      * \brief 判断类型T是否是函数
      */
     template<typename T>
-    concept IsFunction = IsMember<T> && (T::Type == MemberType::Function);
+    concept IsFunction = IsMember<T> && (T::MemberType == MemberType::Function);
 
+    /**
+     * \brief 成员描述符基类
+     */
     template<typename T, std::size_t N>
     struct MemberDescriptorBase
     {
@@ -81,7 +104,7 @@ namespace TG::Reflection
 
         using AttributeTypes = AsTypeList<std::remove_cvref_t<decltype(Member::Attributes)>>;
 
-        static constexpr auto Type{ MemberType::Void };
+        static constexpr auto Type{ Member::MemberType };
 
         static constexpr TypeDescriptor<T> Declarator{};
 
@@ -97,15 +120,23 @@ namespace TG::Reflection
 
         using ValueType = Member::ValueType;
 
-        static constexpr bool IsStatic{ !std::is_member_object_pointer_v<decltype(Member::Pointer)> };
+        static constexpr auto Pointer{ Member::Pointer };
+
+        static constexpr AccessSpecifier Access{ Member::Accessibility };
+
+        static constexpr bool IsStatic{ !std::is_member_object_pointer_v<decltype(Pointer)> };
 
         static constexpr bool IsConst{ !std::is_const_v<ValueType> };
-
-        static constexpr auto Pointer{ Member::Pointer };
 
         static constexpr auto Get() noexcept
         {
             return *Pointer;
+        }
+
+        template<typename U> requires (!IsConst)
+        static constexpr void Set(U&& value) noexcept
+        {
+            *Member::Pointer = std::forward<U>(value);
         }
 
         template<typename U>
@@ -114,15 +145,20 @@ namespace TG::Reflection
             return target.*(Pointer);
         }
 
-        using Invoker = std::conditional_t<
-            IsStatic,
-            Detail::StaticFieldInvoker<FieldDescriptor>,
-            Detail::InstanceFieldInvoker<FieldDescriptor>
-        >;
+        template<typename U, typename V> requires (!IsConst)
+        static constexpr void Set(U&& target, V&& value) noexcept
+        {
+            target.*Member::Pointer = std::forward<V>(value);
+        }
 
         template<typename... Args>
         constexpr auto operator()(Args&&... args) const noexcept
         {
+            using Invoker = std::conditional_t<
+                IsStatic,
+                Detail::StaticFieldInvoker<FieldDescriptor>,
+                Detail::InstanceFieldInvoker<FieldDescriptor>
+            >;
             return Invoker::Invoke(std::forward<Args>(args)...);
         }
     };
@@ -131,6 +167,10 @@ namespace TG::Reflection
     struct FunctionDescriptor : MemberDescriptorBase<T, N>
     {
         using typename MemberDescriptorBase<T, N>::Member;
+
+        static constexpr auto Pointer{ Detail::GetFunctionPointer<Member>() };
+
+        static constexpr AccessSpecifier Access{ Member::Accessibility };
 
         template<typename... Args>
         static constexpr auto Invoke(Args&&... args)
@@ -144,9 +184,17 @@ namespace TG::Reflection
         template<typename... Args>
         constexpr auto operator()(Args&&... args) const
         {
-            return Member::Invoke(std::forward<Args>(args)...);
+            return Invoke(std::forward<Args>(args)...);
         }
+    };
 
-        static constexpr auto Pointer{ Member::Pointer() };
+    template<typename T, std::size_t N>
+    struct EnumeratorDescriptor : MemberDescriptorBase<T, N>
+    {
+        using typename MemberDescriptorBase<T, N>::Member;
+
+        using ValueType = Member::ValueType;
+
+        static constexpr ValueType Value{ Member::Value };
     };
 }

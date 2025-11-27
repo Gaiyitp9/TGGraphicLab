@@ -20,24 +20,28 @@ namespace TG::Reflection
             using Type = Concat<TypeLists...>::Type;
         };
 
+        template<typename T, bool HasBases>
+        struct EnumerateDeclaredBaseTypeList;
         template<typename T>
-        static constexpr auto GetDeclaredBaseTypeList()
+        struct EnumerateDeclaredBaseTypeList<T, false>
         {
-            if constexpr (AttributeTypes<T>::template ContainsInstance<Attribute::BaseTypes>())
-            {
-                return typename std::remove_cvref_t<
+            using Type = TypeList<>;
+        };
+        template<typename T>
+        struct EnumerateDeclaredBaseTypeList<T, true>
+        {
+            using Type = std::remove_cvref_t<
                     decltype(Util::GetInstance<Attribute::BaseTypes>(TypeInfo<T>::Attributes))
-                >::ListType{};
-            }
-            else
-            {
-                return TypeList{};
-            }
-        }
+                >::ListType;
+        };
+
         template<typename T>
         struct DeclaredBaseTypeList
         {
-            using Type = decltype(GetDeclaredBaseTypeList<T>());
+            using Type = EnumerateDeclaredBaseTypeList<
+                T,
+                AttributeTypes<T>::template ContainsInstance<Attribute::BaseTypes>()
+            >::Type;
         };
 
         template<typename T>
@@ -46,11 +50,7 @@ namespace TG::Reflection
             using DeclaredBases = DeclaredBaseTypeList<T>::Type;
             using RecursiveBases = Flatten<typename DeclaredBases::template MapT<BaseTypeList>>::Type;
 
-            using Type = std::conditional_t<
-                AttributeTypes<T>::template ContainsInstance<Attribute::BaseTypes>(),
-                typename DeclaredBases::template ConcatT<RecursiveBases>::UniqueT,
-                TypeList<>
-            >;
+            using Type = DeclaredBases::template ConcatT<RecursiveBases>::UniqueT;
         };
 
         template<typename T, std::size_t N>
@@ -63,16 +63,23 @@ namespace TG::Reflection
                 void
             >
         >;
-
+        template<typename T, typename IndexSequence>
+        struct EnumerateMembers;
         template<typename T>
-        TypeList<> EnumerateMembers(std::index_sequence<>);
-        template<typename T, std::size_t... Index>
-        TypeList<MakeDescriptor<T, Index>...> EnumerateMembers(std::index_sequence<Index...>);
+        struct EnumerateMembers<T, std::index_sequence<>>
+        {
+            using Type = TypeList<>;
+        };
+        template<typename T, std::size_t... Indices>
+        struct EnumerateMembers<T, std::index_sequence<Indices...>>
+        {
+            using Type = TypeList<MakeDescriptor<T, Indices>...>;
+        };
 
         template<typename T>
         struct DeclaredMemberList
         {
-            using Type = decltype(EnumerateMembers<T>(std::make_index_sequence<TypeInfo<T>::MemberCount>{}));
+            using Type = EnumerateMembers<T, std::make_index_sequence<TypeInfo<T>::MemberCount>>::Type;
         };
 
         template<typename T>
@@ -104,11 +111,11 @@ namespace TG::Reflection
         using DeclaredBaseTypes = Detail::DeclaredBaseTypeList<T>::Type;
 
         using BaseTypes = Detail::BaseTypeList<T>::Type;
-        //
-        // using DeclaredMemberTypes = Detail::DeclaredMemberList<T>::Type;
-        //
-        // using MemberTypes = Detail::MemberList<T>::Type;
-        //
+
+        using DeclaredMemberTypes = Detail::DeclaredMemberList<T>::Type;
+
+        using MemberTypes = Detail::MemberList<T>::Type;
+
         using AttributeTypes = Detail::AttributeTypes<T>;
 
         static constexpr auto Name{ TypeInfo<T>::Name };
@@ -116,10 +123,10 @@ namespace TG::Reflection
         static constexpr DeclaredBaseTypes DeclaredBases{};
 
         static constexpr BaseTypes Bases{};
-        //
-        // static constexpr DeclaredMemberTypes DeclaredMembers{};
-        //
-        // static constexpr MemberTypes Members{};
+
+        static constexpr DeclaredMemberTypes DeclaredMembers{};
+
+        static constexpr MemberTypes Members{};
 
         static constexpr auto Attributes{ TypeInfo<T>::Attributes };
     };

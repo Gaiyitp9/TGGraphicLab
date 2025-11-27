@@ -7,19 +7,13 @@
 
 namespace TG::Reflection
 {
+    template<typename T, std::size_t N>
+    struct MemberInfo;
+
     template<typename T>
     struct TypeInfo
     {
         struct InvalidMarker {};
-
-        template<std::size_t>
-        struct Member;
-
-        static constexpr std::size_t MemberCount{ 0 };
-
-        static constexpr ConstString Name{};
-
-        static constexpr std::tuple<> Attributes{};
     };
 
     template<typename T>
@@ -30,7 +24,4 @@ namespace TG::Reflection
 
     template<typename T>
     struct TypeInfo<const volatile T> : TypeInfo<T> {};
-
-    template<typename T, std::size_t N>
-    using MemberInfo = TypeInfo<T>::template Member<N>;
 }

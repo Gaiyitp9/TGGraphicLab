@@ -14,16 +14,30 @@
 
 namespace TG
 {
-    std::vector<std::string_view> SplitString(std::string_view str, std::string_view delim)
+    std::vector<std::string_view> SplitString(std::string_view str, std::string_view delimiter, bool skipEmpty)
     {
         std::vector<std::string_view> tokens;
-        std::size_t start = 0, end = 0;
-        while ((end = str.find(delim, start)) != std::string_view::npos)
+
+        if (str.empty())
+            return tokens;
+        if (delimiter.empty())
         {
-            tokens.push_back(str.substr(start, end - start));
-            start = end + delim.size();
+            tokens.emplace_back(str);
+            return tokens;
         }
-        tokens.push_back(str.substr(start));
+
+        std::size_t pos = 0, next = 0;
+        while ((next = str.find(delimiter, pos)) != std::string_view::npos)
+        {
+            std::string_view token = str.substr(pos, next - pos);
+            if (!skipEmpty || !token.empty())
+                tokens.push_back(token);
+            pos = next + delimiter.size();
+        }
+        std::string_view last = str.substr(pos);
+        if (!skipEmpty || !last.empty())
+            tokens.push_back(last);
+
         return tokens;
     }
 

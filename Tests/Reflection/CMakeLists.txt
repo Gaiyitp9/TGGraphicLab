@@ -1,17 +1,20 @@
-#find_package(Clang REQUIRED CONFIG)
-#
-#message(STATUS "Found LLVM ${LLVM_PACKAGE_VERSION}")
-#message(STATUS "Using LLVMConfig.cmake in: ${LLVM_DIR}")
-#message(STATUS "LLVM include: ${LLVM_INCLUDE_DIRS}")
+find_package(Clang REQUIRED CONFIG)
 
-source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES main.cpp)
+message(STATUS "Found LLVM ${LLVM_PACKAGE_VERSION}")
+message(STATUS "Using LLVMConfig.cmake in: ${LLVM_DIR}")
+message(STATUS "LLVM include: ${LLVM_INCLUDE_DIRS}")
 
-add_executable(Reflection main.cpp)
+file(GLOB_RECURSE HEADERS *.hpp *.h)
+file(GLOB_RECURSE SOURCES *.cpp *.c)
+
+list(REMOVE_ITEM SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/test.cpp)
+
+source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${HEADERS} ${SOURCES})
+
+add_executable(Reflection ${HEADERS} ${SOURCES})
 # vs项目放在Tests目录下
 set_target_properties(Reflection PROPERTIES FOLDER ${TestsFolderName})
 
-target_include_directories(Reflection PRIVATE ${LLVM_INCLUDE_DIRS} ../../RenderCore/Include)
-#target_link_libraries(Reflection PRIVATE clangTooling)
-target_link_libraries(Reflection PRIVATE GTest::gtest_main GraphicCore)
+target_link_libraries(Reflection PRIVATE clangTooling GTest::gtest_main GraphicCore)
 
 gtest_discover_tests(Reflection)

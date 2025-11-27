@@ -12,7 +12,7 @@
 namespace TG
 {
     // 分隔字符串
-    std::vector<std::string_view> SplitString(std::string_view str, std::string_view delim);
+    std::vector<std::string_view> SplitString(std::string_view str, std::string_view delimiter, bool skipEmpty = true);
 
     // Windows上char使用gbk或者utf-8(在msvc中传入/utf-8选项)，大小为1字节；wchar_t使用utf-16编码，大小为2字节
     // Linux上char使用utf-8，大小为1字节；wchar_t使用utf-32编码，大小为4字节

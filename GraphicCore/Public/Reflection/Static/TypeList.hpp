@@ -308,7 +308,7 @@ namespace TG::Reflection
         template<std::size_t N>
         static constexpr auto Get() noexcept
         {
-            return Detail::Get<N, Types...>{};
+            return typename Detail::Get<N, Types...>::Type{};
         }
         template<std::size_t N>
         using GetT = Detail::Get<N, Types...>::Type;
@@ -318,7 +318,7 @@ namespace TG::Reflection
          */
         static constexpr auto First() noexcept
         {
-            return Detail::Get<0, Types...>{};
+            return typename Detail::Get<0, Types...>::Type{};
         }
         using FirstT = Detail::Get<0, Types...>::Type;
 
@@ -327,7 +327,7 @@ namespace TG::Reflection
          */
         static constexpr auto Last() noexcept
         {
-            return Detail::Get<Size - 1, Types...>{};
+            return typename Detail::Get<Size - 1, Types...>::Type{};
         }
         using LastT = Detail::Get<Size - 1, Types...>::Type;
 

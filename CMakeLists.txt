@@ -32,16 +32,18 @@ endif()
 
 # add_library是否默认编译成动态库
 option(BUILD_SHARED_LIBS "Build using shared libraries" OFF)
+# 是否输出compile_commands.json文件
+option(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 # 开启使用文件夹选项，vs项目可以分类放在不同文件夹下
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
 # 安装目录设置为install
-set(CMAKE_INSTALL_PREFIX ${CMAKE_SOURCE_DIR}/install CACHE PATH "Installation directory" FORCE)
+set(CMAKE_INSTALL_PREFIX ${CMAKE_SOURCE_DIR}/install/${CMAKE_BUILD_TYPE} CACHE PATH "Installation directory" FORCE)
 message(STATUS "Third party install path: ${CMAKE_INSTALL_PREFIX}")
 # 三方库查找目录
-set(CMAKE_PREFIX_PATH ${CMAKE_SOURCE_DIR}/install)
+set(CMAKE_PREFIX_PATH ${CMAKE_SOURCE_DIR}/install/${CMAKE_BUILD_TYPE})
 
 add_subdirectory(GraphicCore)
-add_subdirectory(TGRenderer)
 add_subdirectory(Tests)
+add_subdirectory(TGRenderer)

@@ -40,6 +40,46 @@ namespace TG::Reflection
         };
         template<typename T>
         struct AsTuple : AsTuple<std::remove_cvref_t<T>> {};
+
+        template<typename T, typename U>
+        struct TransferConst
+        {
+            using Type = std::conditional_t<std::is_const_v<T>, std::add_const_t<U>, U>;
+        };
+        template<typename T, typename U>
+        struct TransferVolatile
+        {
+            using Type = std::conditional_t<std::is_volatile_v<T>, std::add_volatile_t<U>, U>;
+        };
+        template<typename T, typename U>
+        struct TransferCV : TransferConst<T, typename TransferVolatile<T, U>::Type>
+        {};
+        template<typename T, typename U>
+        struct TransferLvalueRef
+        {
+            using Type = std::conditional_t<std::is_lvalue_reference_v<T>, std::add_rvalue_reference_t<U>, U>;
+        };
+        template<typename T, typename U>
+        struct TransferRvalueRef
+        {
+            using Type = std::conditional_t<std::is_rvalue_reference_v<T>, std::add_rvalue_reference_t<U>, U>;
+        };
+        template<typename T, typename U>
+        struct TransferRef : TransferRvalueRef<T, typename TransferLvalueRef<T, U>::Type>
+        {};
+        template<typename T, typename U>
+        struct TransferCVRef : TransferRef<T, typename TransferCV<std::remove_reference_t<T>, U>::Type>
+        {};
+        template<typename T, typename U>
+        constexpr auto ForwardCast(std::remove_reference_t<T>& t)
+        {
+            return static_cast<TransferCVRef<T, U>::Type&&>(t);
+        }
+        template<typename T, typename U>
+        constexpr auto ForwardCast(std::remove_reference_t<T>&& t)
+        {
+            return static_cast<TransferCVRef<T, U>::Type&&>(t);
+        }
     }
 
     template<template<typename> typename Trait, typename T>

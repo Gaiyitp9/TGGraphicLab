@@ -96,14 +96,14 @@ namespace TG::Reflection
         }
 
     private:
-        template<std::size_t... Index>
-        constexpr ConstString(const char(&str)[sizeof...(Index) + 1], std::index_sequence<Index...>)
-            : m_data{ str[Index]..., 0 }
+        template<std::size_t... Indices>
+        constexpr ConstString(const char(&str)[sizeof...(Indices) + 1], std::index_sequence<Indices...>)
+            : m_data{ str[Indices]..., 0 }
         {}
 
-        template<std::size_t... Index>
-        constexpr ConstString(const ConstString& other, std::index_sequence<Index...>)
-            : m_data{ other.m_data[Index]..., 0 }
+        template<std::size_t... Indices>
+        constexpr ConstString(const ConstString& other, std::index_sequence<Indices...>)
+            : m_data{ other.m_data[Indices]..., 0 }
         {}
 
         char m_data[N + 1];

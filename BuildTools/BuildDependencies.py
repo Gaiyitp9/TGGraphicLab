@@ -4,6 +4,9 @@ from pathlib import Path
 
 def build_library(local_source_dir, local_build_dir, local_generator, build_type,
                   local_cmake_options, local_install_dir):
+    # Debug和Release编译文件放在对应目录下
+    local_build_dir = str(Path(local_build_dir) / build_type)
+    local_install_dir = str(Path(local_install_dir) / build_type)
     os.makedirs(local_build_dir, exist_ok=True)
     # 运行CMake配置命令
     cmake_cmd = ["cmake", "-S", local_source_dir, "-B", local_build_dir, "-G", local_generator,
@@ -56,10 +59,10 @@ def build_library(local_source_dir, local_build_dir, local_generator, build_type
 if __name__ == "__main__":
     root_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-    install_dir = Path(root_dir) / "install"
+    install_dir = str(Path(root_dir) / "install")
     print(f"Install directory: {install_dir}")
 
-    generator = "Visual Studio 17 2022"
+    generator = "Visual Studio 18 2026"
     print(f"Generator: {generator}")
 
     source_dir = str(Path(root_dir) / "ThirdParty" / "mimalloc")
