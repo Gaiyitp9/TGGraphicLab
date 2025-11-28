@@ -7,9 +7,6 @@
 
 namespace TG::Reflection
 {
-    template<typename T, std::size_t N>
-    struct MemberInfo;
-
     template<typename T>
     struct TypeInfo
     {
@@ -24,4 +21,7 @@ namespace TG::Reflection
 
     template<typename T>
     struct TypeInfo<const volatile T> : TypeInfo<T> {};
+
+    template<typename T, std::size_t N>
+    using MemberInfo = TypeInfo<T>::template Member<N>;
 }

@@ -30,5 +30,6 @@ namespace TG
     struct Base
     {
         void Function();
+        void Function(int);
     };
 }
