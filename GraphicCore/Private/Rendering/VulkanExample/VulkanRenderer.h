@@ -9,7 +9,7 @@
 #include "Base/CommonInterfaces.h"
 #include "vulkan/vulkan.h"
 
-namespace TG
+namespace TG::Rendering
 {
     enum class VkQueueType
     {
@@ -22,7 +22,7 @@ namespace TG
     class VulkanRenderer final : public Renderer
     {
     public:
-        explicit VulkanRenderer(const std::weak_ptr<IDefaultVideoPort>& videoPort);
+        explicit VulkanRenderer(const IDefaultVideoPort& videoPort);
         ~VulkanRenderer() override;
 
         void Render() override;

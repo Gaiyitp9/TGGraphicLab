@@ -15,7 +15,7 @@
 
 namespace TG::Rendering
 {
-    CubeExample::CubeExample(const std::weak_ptr<IDefaultVideoPort>& videoPort, const std::weak_ptr<ITimer>& timer)
+    CubeExample::CubeExample(const IDefaultVideoPort& videoPort, const ITimer& timer)
         : m_camera(videoPort, timer),
         m_vertexShader("Assets/Shaders/GLSL/Cube.vert", ShaderStage::Vertex),
         m_fragmentShader("Assets/Shaders/GLSL/Cube.frag", ShaderStage::Fragment),

@@ -17,7 +17,7 @@ namespace TG::Rendering
     class BasicLightExample final : public Example
     {
     public:
-        BasicLightExample(const std::weak_ptr<IDefaultVideoPort>& videoPort, const std::weak_ptr<ITimer>& timer);
+        BasicLightExample(const IDefaultVideoPort& videoPort, const ITimer& timer);
         ~BasicLightExample() override;
 
         void Render() override;
@@ -32,7 +32,7 @@ namespace TG::Rendering
             float shininess;
         };
 
-        std::weak_ptr<ITimer> m_timer;
+        const ITimer& m_timer;
         Camera m_camera;
 
         Sphere m_sphereMesh;

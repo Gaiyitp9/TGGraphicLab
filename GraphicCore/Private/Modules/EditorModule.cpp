@@ -5,10 +5,10 @@
 *****************************************************************/
 
 #include "Modules/EditorModule.h"
+#include "Exception/Windows/Win32Exception.h"
 #include "glad/wgl.h"
 #include "imgui_impl_win32.h"
 #include "imgui_impl_opengl3.h"
-#include "Exception/Windows/Win32Exception.h"
 // #include "imgui_impl_vulkan.h"
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
@@ -27,7 +27,7 @@ namespace TG
     	}
     }
 
-	void EditorModule::SetRenderer(const std::weak_ptr<Renderer>& renderer)
+	void EditorModule::SetRenderer(Renderer* renderer)
 	{
 		m_renderer = renderer;
 	}
@@ -146,26 +146,21 @@ namespace TG
 		HGLRC hglrc;
 	};
 
-    void EditorModule::PlugInVideoPort(const std::weak_ptr<IDefaultVideoPort>& display)
+    void EditorModule::PlugInVideoPort(const IDefaultVideoPort& display)
     {
-    	if (display.expired())
-    		throw BaseException::Create("Interfaces are not valid");
-
-    	auto displayPtr = display.lock();
-
     	// 初始化IMGUI
     	IMGUI_CHECKVERSION();
     	ImGui::CreateContext();
-    	ImGui_ImplWin32_InitForOpenGL(displayPtr->Handle());
+    	ImGui_ImplWin32_InitForOpenGL(display.Handle());
     	ImGui_ImplOpenGL3_Init();
     	m_isInitialized = true;
 
         // 窗口程序插入ImGui处理输入事件的代码
-    	g_prevWndProc = reinterpret_cast<Win32Proc>(GetWindowLongPtrW(displayPtr->Handle(), GWLP_WNDPROC));
+    	g_prevWndProc = reinterpret_cast<Win32Proc>(GetWindowLongPtrW(display.Handle(), GWLP_WNDPROC));
     	if (!g_prevWndProc)
     		throw Win32Exception::Create("Failed to get window procedure");
     	SetLastError(0);
-	    if (SetWindowLongPtrW(displayPtr->Handle(), GWLP_WNDPROC, reinterpret_cast<LONG_PTR>(ImGuiWindowProc)) == 0
+	    if (SetWindowLongPtrW(display.Handle(), GWLP_WNDPROC, reinterpret_cast<LONG_PTR>(ImGuiWindowProc)) == 0
 	    	&& GetLastError() != 0)
 	    {
     		throw Win32Exception::Create("Failed to set window procedure");
@@ -191,20 +186,22 @@ namespace TG
 
     		auto wglData = TG_NEW WGLWindowData;
     		wglData->hdc = GetDC(static_cast<HWND>(viewport->PlatformHandle));
-    		PIXELFORMATDESCRIPTOR pfd{
-    			sizeof(PIXELFORMATDESCRIPTOR),
-				1,
-				PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL | PFD_DOUBLEBUFFER,
-				PFD_TYPE_RGBA,
-				24,
-				0, 0, 0, 0, 0, 0, 0, 0,
-				0, 0, 0, 0, 0,
-				24,
-				8,
-				0,
-				0,
-				0, 0, 0, 0
-			};
+    	    // 这里的PIXELFORMATDESCRIPTOR要与OpenGLContext类构造函数里的PIXELFORMATDESCRIPTOR一致
+    	    // 可能是因为需要共用HGLRC
+    	    PIXELFORMATDESCRIPTOR pfd{
+    	        sizeof(PIXELFORMATDESCRIPTOR),
+                1,
+                PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL | PFD_DOUBLEBUFFER,
+                PFD_TYPE_RGBA,
+                32,
+                0, 0, 0, 0, 0, 0, 8, 0,
+                0, 0, 0, 0, 0,
+                24,
+                8,
+                0,
+                0,
+                0, 0, 0, 0
+            };
     		int pixelFormat = ChoosePixelFormat(wglData->hdc, &pfd);
     		if (pixelFormat == 0)
     			throw BaseException::Create("Failed to get a valid ChoosePixelFormat");

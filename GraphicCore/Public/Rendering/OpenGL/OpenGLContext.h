@@ -12,7 +12,7 @@ namespace TG::Rendering
     class OpenGLContext
     {
     public:
-        OpenGLContext(const std::weak_ptr<IDefaultVideoPort>& videoPort);
+        explicit OpenGLContext(const IDefaultVideoPort& videoPort);
         ~OpenGLContext();
 
         void MakeCurrent() const;

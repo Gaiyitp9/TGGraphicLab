@@ -41,19 +41,19 @@ namespace TG::Input
             return static_cast<Devices&>(Instance());
         }
 
-        std::weak_ptr<Mouse> m_mouse;
-        std::weak_ptr<Keyboard> m_keyboard;
+        Mouse const* m_mouse{ nullptr };
+        Keyboard const* m_keyboard{ nullptr };
 
-        friend void SetMouse(const std::shared_ptr<Mouse> &mouse);
-        friend void SetKeyboard(const std::shared_ptr<Keyboard> &keyboard);
+        friend void SetMouse(Mouse const* mouse);
+        friend void SetKeyboard(Keyboard const* keyboard);
     };
 
-    inline void SetMouse(const std::shared_ptr<Mouse>& mouse)
+    inline void SetMouse(Mouse const* mouse)
     {
         Devices::Self().m_mouse = mouse;
     }
 
-    inline void SetKeyboard(const std::shared_ptr<Keyboard>& keyboard)
+    inline void SetKeyboard(Keyboard const* keyboard)
     {
         Devices::Self().m_keyboard = keyboard;
     }

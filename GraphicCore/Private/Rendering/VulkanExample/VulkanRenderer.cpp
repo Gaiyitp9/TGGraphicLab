@@ -12,18 +12,14 @@
 #include <ranges>
 #include <unordered_set>
 
-namespace TG
+namespace TG::Rendering
 {
-    VulkanRenderer::VulkanRenderer(const std::weak_ptr<IDefaultVideoPort>& videoPort)
+    VulkanRenderer::VulkanRenderer(const IDefaultVideoPort& videoPort)
     {
-        if (videoPort.expired())
-            throw BaseException::Create("Interfaces are not valid");
-        auto videoPortPtr = videoPort.lock();
-
         CheckLayerAndExtension();
         CreateInstance();
         SetupDebugMessenger();
-        CreateSurface(videoPortPtr->Handle());
+        CreateSurface(videoPort.Handle());
         SelectPhysicalDevice();
         CreateLogicalDevice();
         CreateSwapChain();

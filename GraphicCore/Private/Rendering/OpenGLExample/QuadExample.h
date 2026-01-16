@@ -15,14 +15,14 @@ namespace TG::Rendering
     class QuadExample final : public Example
     {
     public:
-        explicit QuadExample(const std::weak_ptr<IDefaultVideoPort>& videoPort, const std::weak_ptr<ITimer> &timer);
+        QuadExample(const IDefaultVideoPort& videoPort, const ITimer& timer);
         ~QuadExample() override;
 
         void Render() override;
 
     private:
-        std::weak_ptr<IDefaultVideoPort> m_videoPort;
-        std::weak_ptr<ITimer> m_timer;
+        const IDefaultVideoPort& m_videoPort;
+        const ITimer& m_timer;
 
         Mesh m_quadMesh;
 

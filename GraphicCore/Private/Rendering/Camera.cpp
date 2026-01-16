@@ -12,7 +12,7 @@
 
 namespace TG
 {
-    Camera::Camera(const std::weak_ptr<IDefaultVideoPort>& videoPort, const std::weak_ptr<ITimer>& timer)
+    Camera::Camera(const IDefaultVideoPort& videoPort, const ITimer& timer)
         : m_videoPort(videoPort), m_timer(timer)
     {
         UpdateCameraVectors();
@@ -27,12 +27,8 @@ namespace TG
 
     Math::Matrix4f Camera::ProjectionMatrix() const
     {
-        if (m_videoPort.expired())
-            return Math::Matrix4f::Identity();
-
-        const auto videoPortPtr = m_videoPort.lock();
-        const float aspectRatio = static_cast<float>(videoPortPtr->Width()) /
-            static_cast<float>(videoPortPtr->Height());
+        const float aspectRatio = static_cast<float>(m_videoPort.Width()) /
+            static_cast<float>(m_videoPort.Height());
         switch (cameraType)
         {
             case CameraType::Perspective:
@@ -52,11 +48,8 @@ namespace TG
 
     Frustum Camera::ViewFrustum() const
     {
-        if (m_videoPort.expired())
-            return {};
-        const auto videoPortPtr = m_videoPort.lock();
-        const float aspectRatio = static_cast<float>(videoPortPtr->Width()) /
-            static_cast<float>(videoPortPtr->Height());
+        const float aspectRatio = static_cast<float>(m_videoPort.Width()) /
+            static_cast<float>(m_videoPort.Height());
         Math::Vector3f nearFront = front.Normalized() * nearPlane;
         Math::Vector3f nearUp = nearPlane * std::tan(fov * Math::Deg2RadF * 0.5f) * up;
         Math::Vector3f nearRight = nearUp.Norm() * aspectRatio * right;
@@ -79,22 +72,12 @@ namespace TG
 
     float Camera::AspectRatio() const
     {
-        if (m_videoPort.expired())
-            return 0.0f;
-
-        const auto videoPortPtr = m_videoPort.lock();
-        const float aspectRatio = static_cast<float>(videoPortPtr->Width()) /
-            static_cast<float>(videoPortPtr->Height());
-        return aspectRatio;
+        return static_cast<float>(m_videoPort.Width()) / static_cast<float>(m_videoPort.Height());
     }
 
     void Camera::Update()
     {
-        if (m_timer.expired())
-            return;
-
-        auto timer = m_timer.lock();
-        float velocity = m_moveSpeed * timer->DeltaTime() * 0.001f;
+        float velocity = m_moveSpeed * m_timer.DeltaTime() * 0.001f;
         if (Input::GetKey(Input::KeyCode::W))
             position += velocity * front;
         if (Input::GetKey(Input::KeyCode::S))
@@ -127,32 +110,32 @@ namespace TG
             const float yOffset = static_cast<float>(screenPos.y - m_lastMouseY) * m_mouseSensitivity;
 
             POINT clientPos = screenPos;
-            ScreenToClient(m_videoPort.lock()->Handle(), &clientPos);
+            ScreenToClient(m_videoPort.Handle(), &clientPos);
             bool resetPosition = false;
-            if (clientPos.x > m_videoPort.lock()->Width())
+            if (clientPos.x > m_videoPort.Width())
             {
                 clientPos.x = 0;
                 resetPosition = true;
             }
             if (clientPos.x < 0)
             {
-                clientPos.x = static_cast<short>(m_videoPort.lock()->Width());
+                clientPos.x = static_cast<short>(m_videoPort.Width());
                 resetPosition = true;
             }
-            if (clientPos.y > m_videoPort.lock()->Height())
+            if (clientPos.y > m_videoPort.Height())
             {
                 clientPos.y = 0;
                 resetPosition = true;
             }
             if (clientPos.y < 0)
             {
-                clientPos.y = static_cast<short>(m_videoPort.lock()->Height());
+                clientPos.y = static_cast<short>(m_videoPort.Height());
                 resetPosition = true;
             }
             if (resetPosition)
             {
                 screenPos = clientPos;
-                ClientToScreen(m_videoPort.lock()->Handle(), &screenPos);
+                ClientToScreen(m_videoPort.Handle(), &screenPos);
                 SetCursorPos(screenPos.x, screenPos.y);
             }
 

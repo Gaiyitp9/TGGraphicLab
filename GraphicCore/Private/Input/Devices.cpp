@@ -10,40 +10,40 @@ namespace TG::Input
 {
     bool Devices::GetKey(KeyCode key) const
     {
-        return (!m_mouse.expired() && m_mouse.lock()->GetKey(key)) ||
-            (!m_keyboard.expired() && m_keyboard.lock()->GetKey(key));
+        return (m_mouse && m_mouse->GetKey(key)) ||
+            (m_keyboard && m_keyboard->GetKey(key));
     }
 
     bool Devices::GetKeyDown(KeyCode key) const
     {
-        return (!m_mouse.expired() && m_mouse.lock()->GetKeyDown(key)) ||
-            (!m_keyboard.expired() && m_keyboard.lock()->GetKeyDown(key));
+        return (m_mouse && m_mouse->GetKeyDown(key)) ||
+            (m_keyboard && m_keyboard->GetKeyDown(key));
     }
 
     bool Devices::GetKeyUp(KeyCode key) const
     {
-        return (!m_mouse.expired() && m_mouse.lock()->GetKeyUp(key)) ||
-            (!m_keyboard.expired() && m_keyboard.lock()->GetKeyUp(key));
+        return (m_mouse && m_mouse->GetKeyUp(key)) ||
+            (m_keyboard && m_keyboard->GetKeyUp(key));
     }
 
     short Devices::MousePositionX() const
     {
-        if (auto mouse = m_mouse.lock())
-            return mouse->PositionX();
+        if (m_mouse)
+            return m_mouse->PositionX();
         return 0;
     }
 
     short Devices::MousePositionY() const
     {
-        if (auto mouse = m_mouse.lock())
-            return mouse->PositionY();
+        if (m_mouse)
+            return m_mouse->PositionY();
         return 0;
     }
 
     short Devices::MouseWheelDelta() const
     {
-        if (auto mouse = m_mouse.lock())
-            return mouse->WheelDelta();
+        if (m_mouse)
+            return m_mouse->WheelDelta();
         return 0;
     }
 }

@@ -13,13 +13,13 @@ namespace TG::Rendering
     class OpenGlExampleFactory : public ExampleFactory
     {
     public:
-        OpenGlExampleFactory(const std::weak_ptr<IDefaultVideoPort>& videoPort, const std::weak_ptr<ITimer>& timer);
+        OpenGlExampleFactory(const IDefaultVideoPort& videoPort, const ITimer& timer);
         ~OpenGlExampleFactory() override = default;
 
         std::unique_ptr<Example> CreateExample(ExampleEnum example) override;
 
     private:
-        std::weak_ptr<IDefaultVideoPort> m_videoPort;
-        std::weak_ptr<ITimer> m_timer;
+        const IDefaultVideoPort& m_videoPort;
+        const ITimer& m_timer;
     };
 }

@@ -16,7 +16,7 @@
 
 namespace TG::Rendering
 {
-    QuadExample::QuadExample(const std::weak_ptr<IDefaultVideoPort>& videoPort, const std::weak_ptr<ITimer> &timer)
+    QuadExample::QuadExample(const IDefaultVideoPort& videoPort, const ITimer& timer)
 		: m_videoPort(videoPort), m_timer(timer),
 		m_vertexShader("Assets/Shaders/GLSL/Quad.vert", ShaderStage::Vertex),
 		m_fragmentShader("Assets/Shaders/GLSL/Quad.frag", ShaderStage::Fragment),
@@ -131,17 +131,14 @@ namespace TG::Rendering
     		glUseProgramStages(m_pipeline, GL_FRAGMENT_SHADER_BIT, CastID<GLuint>(m_fragmentShader.GetID()));
     	}
 
-    	if (auto timerPtr = m_timer.lock())
-    	{
-    		const float timeValue = timerPtr->TotalTime() * 0.001f;
-    		const float greyValue = std::sin(timeValue) * 0.5f + 0.5f;
-    		m_fragmentShader.SetFloat4("ourColor", greyValue, greyValue, greyValue, 1.0f);
+    	const float timeValue = m_timer.TotalTime() * 0.001f;
+    	const float greyValue = std::sin(timeValue) * 0.5f + 0.5f;
+    	m_fragmentShader.SetFloat4("ourColor", greyValue, greyValue, greyValue, 1.0f);
 
-    		Math::Transform<float, 3> transform;
-    		transform.Translate(Math::Vector3f{ 0.5f, -0.5f, 0.0f });
-    		transform.Rotate(Math::AngleAxis{ timeValue, Math::Vector3f{ 0.0f, 0.0f, 1.0f }});
-    		m_vertexShader.SetMat4("transform", transform.ToTransformMatrix());
-    	}
+    	Math::Transform<float, 3> transform;
+    	transform.Translate(Math::Vector3f{ 0.5f, -0.5f, 0.0f });
+    	transform.Rotate(Math::AngleAxis{ timeValue, Math::Vector3f{ 0.0f, 0.0f, 1.0f }});
+    	m_vertexShader.SetMat4("transform", transform.ToTransformMatrix());
 
     	glActiveTexture(GL_TEXTURE0);
     	glBindTexture(GL_TEXTURE_2D, m_albedo[0]);

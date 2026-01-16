@@ -8,7 +8,6 @@
 #include "Module.h"
 #include "Base/CommonInterfaces.h"
 #include "Rendering/Renderer.h"
-#include <memory>
 
 namespace TG
 {
@@ -22,14 +21,14 @@ namespace TG
         EditorModule& operator=(EditorModule&&) = delete;
         ~EditorModule() override;
 
-        void SetRenderer(const std::weak_ptr<Renderer>& renderer);
-        void PlugInVideoPort(const std::weak_ptr<IDefaultVideoPort>& display);
+        void SetRenderer(Renderer* renderer);
+        void PlugInVideoPort(const IDefaultVideoPort& display);
 
         void Update() override;
         void PostUpdate() override;
 
     private:
-        std::weak_ptr<Renderer> m_renderer;
+        Renderer* m_renderer{ nullptr };
         bool m_isInitialized{ false };
         // bool m_showDemoWindow{ true };
         // bool m_showAnotherWindow{ false };

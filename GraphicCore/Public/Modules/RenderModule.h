@@ -8,6 +8,7 @@
 #include "Module.h"
 #include "Rendering/Renderer.h"
 #include "Base/CommonInterfaces.h"
+#include "Rendering/GraphicsAPIDefines.h"
 #include <memory>
 
 namespace TG
@@ -22,16 +23,16 @@ namespace TG
         RenderModule& operator=(RenderModule&&) = delete;
         ~RenderModule() override;
 
-        void Initialize(const std::weak_ptr<IDefaultVideoPort>& videoPort, const std::weak_ptr<ITimer>& timer);
+        void SetupRenderer(const IDefaultVideoPort& videoPort, const ITimer& timer);
+        void Subscribe(MulticastDelegate<void(unsigned, unsigned)>& windowResizeDelegate);
 
-        [[nodiscard]] std::weak_ptr<Renderer> GetRenderer() const noexcept { return m_Renderer; }
-
-        void Subscribe(MulticastDelegate<void(unsigned int, unsigned int)>& windowResizeDelegate);
+        [[nodiscard]] Renderer* GetRenderer() const noexcept { return m_Renderer.get(); }
 
         void Update() override;
         void PostUpdate() override;
 
     private:
-        std::shared_ptr<Renderer> m_Renderer;
+        Rendering::GraphicsAPI m_GraphicsAPI{ Rendering::GraphicsAPI::OpenGL };
+        std::unique_ptr<Renderer> m_Renderer;
     };
 }

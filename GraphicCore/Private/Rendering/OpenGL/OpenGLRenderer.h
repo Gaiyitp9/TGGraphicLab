@@ -16,7 +16,7 @@ namespace TG::Rendering
     class OpenGLRenderer final : public Renderer
     {
     public:
-        OpenGLRenderer(const std::weak_ptr<IDefaultVideoPort>& videoPort, const std::weak_ptr<ITimer>& timer);
+        OpenGLRenderer(const IDefaultVideoPort& videoPort, const ITimer& timer);
         ~OpenGLRenderer() override;
 
         void Render() override;

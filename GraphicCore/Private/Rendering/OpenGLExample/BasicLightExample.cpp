@@ -26,8 +26,8 @@ namespace TG::Rendering
         Math::Vector4f viewPosition;
     };
 
-    BasicLightExample::BasicLightExample(const std::weak_ptr<IDefaultVideoPort> &videoPort,
-        const std::weak_ptr<ITimer> &timer) : m_timer(timer), m_camera(videoPort, timer),
+    BasicLightExample::BasicLightExample(const IDefaultVideoPort& videoPort, const ITimer& timer)
+        : m_timer(timer), m_camera(videoPort, timer),
         m_planeMesh(20.0f, 20.0f, 20, 20),
         m_planeProperty{
             Math::Vector3f{ 0.0f, 0.01f, -10.0f },

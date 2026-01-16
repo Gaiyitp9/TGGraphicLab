@@ -9,11 +9,8 @@
 
 namespace TG::Rendering
 {
-    OpenGLContext::OpenGLContext(const std::weak_ptr<IDefaultVideoPort> &videoPort)
+    OpenGLContext::OpenGLContext(const IDefaultVideoPort& videoPort)
     {
-        if (videoPort.expired())
-            throw BaseException::Create("Interfaces are not valid");
-
         PIXELFORMATDESCRIPTOR pfd{
             sizeof(PIXELFORMATDESCRIPTOR),
             1,
@@ -28,7 +25,7 @@ namespace TG::Rendering
             0,
             0, 0, 0, 0
         };
-        m_hdc = videoPort.lock()->Context();
+        m_hdc = videoPort.Context();
         int pixelFormat = ChoosePixelFormat(m_hdc, &pfd);
         if (pixelFormat == 0)
             throw BaseException::Create("Failed to get a valid ChoosePixelFormat");
@@ -43,8 +40,9 @@ namespace TG::Rendering
         // 加载wgl扩展函数，需要创建wgl context才能完成
         gladLoaderLoadWGL(m_hdc);
 
-        // 指定OpenGL版本，重新创建wgl context
         wglMakeCurrent(nullptr, nullptr);
+        wglDeleteContext(m_wglContext);
+        // 指定OpenGL版本，重新创建wgl context
         int contextAttribList[] =
         {
             WGL_CONTEXT_MAJOR_VERSION_ARB, 4,

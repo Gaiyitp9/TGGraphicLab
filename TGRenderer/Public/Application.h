@@ -6,7 +6,6 @@
 #pragma once
 
 #include "Modules/PlatformModule.h"
-#include "Modules/InputModule.h"
 #include "Modules/RenderModule.h"
 #include "Modules/EditorModule.h"
 #include <vector>
@@ -26,10 +25,7 @@ namespace TG
 		int Run();
 
 	private:
-		std::shared_ptr<PlatformModule> m_platformModule;
-		std::shared_ptr<InputModule> m_inputModule;
-		std::shared_ptr<RenderModule> m_renderModule;
-		std::shared_ptr<EditorModule> m_editorModule;
-		std::vector<std::shared_ptr<Module>> m_modules;
+		std::unique_ptr<PlatformModule> m_platformModule;
+		std::vector<std::unique_ptr<Module>> m_modules;
 	};
 }

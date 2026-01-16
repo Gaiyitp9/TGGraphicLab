@@ -11,8 +11,8 @@
 
 namespace TG::Rendering
 {
-    OpenGlExampleFactory::OpenGlExampleFactory(const std::weak_ptr<IDefaultVideoPort>& videoPort,
-        const std::weak_ptr<ITimer>& timer) : m_videoPort(videoPort), m_timer(timer)
+    OpenGlExampleFactory::OpenGlExampleFactory(const IDefaultVideoPort& videoPort,
+        const ITimer& timer) : m_videoPort(videoPort), m_timer(timer)
     {}
 
     std::unique_ptr<Example> OpenGlExampleFactory::CreateExample(ExampleEnum example)

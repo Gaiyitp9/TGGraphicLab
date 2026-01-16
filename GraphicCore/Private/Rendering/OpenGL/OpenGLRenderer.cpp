@@ -12,12 +12,9 @@
 
 namespace TG::Rendering
 {
-    OpenGLRenderer::OpenGLRenderer(const std::weak_ptr<IDefaultVideoPort>& videoPort,
-    	const std::weak_ptr<ITimer>& timer) : m_context(videoPort)
+    OpenGLRenderer::OpenGLRenderer(const IDefaultVideoPort& videoPort,
+    	const ITimer& timer) : m_context(videoPort)
     {
-    	if (videoPort.expired() || timer.expired())
-    		throw BaseException::Create("Interfaces are not valid");
-
     	// 查询OpenGL相关信息
     	auto glVersion = reinterpret_cast<char const*>(glGetString(GL_VERSION));
     	if (glVersion == nullptr)

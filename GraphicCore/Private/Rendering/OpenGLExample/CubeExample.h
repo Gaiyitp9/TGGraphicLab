@@ -20,7 +20,7 @@ namespace TG::Rendering
     class CubeExample final : public Example
     {
     public:
-        CubeExample(const std::weak_ptr<IDefaultVideoPort>& videoPort, const std::weak_ptr<ITimer> &timer);
+        CubeExample(const IDefaultVideoPort& videoPort, const ITimer& timer);
         ~CubeExample() override;
 
         void Render() override;

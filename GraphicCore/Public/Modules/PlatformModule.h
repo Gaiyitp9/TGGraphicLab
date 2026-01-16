@@ -8,7 +8,8 @@
 #include "Module.h"
 #include "Base/MainWindow.h"
 #include "Base/Chronometer.h"
-#include "Input/Event.h"
+#include "Input/Mouse.h"
+#include "Input/Keyboard.h"
 
 namespace TG
 {
@@ -27,24 +28,23 @@ namespace TG
 
         [[nodiscard]] bool ShouldExit() const;
         [[nodiscard]] int ExitCode() const;
-        [[nodiscard]] std::weak_ptr<IDefaultVideoPort> GetVideoPort() const { return m_mainWindow; }
-        [[nodiscard]] std::weak_ptr<ITimer> GetTimer() const { return m_timer; };
+        [[nodiscard]] const IDefaultVideoPort& GetVideoPort() const { return m_mainWindow; }
+        [[nodiscard]] const ITimer& GetTimer() const { return m_timer; };
 
-        // 鼠标事件委托
-        MulticastDelegate<void(const Input::Event<Input::Mouse>&)> onMouseEvent;
-        // 键盘事件委托
-        MulticastDelegate<void(const Input::Event<Input::Keyboard>&)> onKeyboardEvent;
         // 窗口尺寸变化委托
-        MulticastDelegate<void(unsigned int, unsigned int)> onWindowResize;
+        MulticastDelegate<void(unsigned, unsigned)> onWindowResize;
 
     private:
         // 主显示器的尺寸
         int m_screenWidth{ 0 };
         int m_screenHeight{ 0 };
-        // 高精度计时器
-        std::shared_ptr<Chronometer> m_timer;
         // 主窗口
-        std::shared_ptr<MainWindow> m_mainWindow;
+        MainWindow m_mainWindow;
         std::optional<int> m_exitCode;
+        // 高精度计时器
+        Chronometer m_timer;
+        // 输入设备
+        Input::Mouse m_mouse;
+        Input::Keyboard m_keyboard;
     };
 }

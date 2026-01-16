@@ -11,25 +11,19 @@ namespace TG
 {
 	Application::Application()
 	{
-		m_platformModule = std::make_shared<PlatformModule>();
-		m_inputModule = std::make_shared<InputModule>();
-		m_renderModule = std::make_shared<RenderModule>();
-		m_editorModule  = std::make_shared<EditorModule>();
+	    m_platformModule = std::make_unique<PlatformModule>();
+	    std::unique_ptr<RenderModule> renderModule = std::make_unique<RenderModule>();
+	    std::unique_ptr<EditorModule> editorModule = std::make_unique<EditorModule>();
 
-		// 输入模块订阅输入事件委托
-		m_inputModule->Subscribe(m_platformModule->onMouseEvent);
-		m_inputModule->Subscribe(m_platformModule->onKeyboardEvent);
 		// 初始化渲染模块，接入视频接口和计时器接口
-		m_renderModule->Initialize(m_platformModule->GetVideoPort(), m_platformModule->GetTimer());
-		m_renderModule->Subscribe(m_platformModule->onWindowResize);
+		renderModule->SetupRenderer(m_platformModule->GetVideoPort(), m_platformModule->GetTimer());
+		renderModule->Subscribe(m_platformModule->onWindowResize);
 		// 编辑器模块设置渲染器，并接入视频接口
-		m_editorModule->SetRenderer(m_renderModule->GetRenderer());
-		m_editorModule->PlugInVideoPort(m_platformModule->GetVideoPort());
+		editorModule->SetRenderer(renderModule->GetRenderer());
+		editorModule->PlugInVideoPort(m_platformModule->GetVideoPort());
 
-		m_modules.emplace_back(m_platformModule);
-		m_modules.emplace_back(m_inputModule);
-		m_modules.emplace_back(m_renderModule);
-		m_modules.emplace_back(m_editorModule);
+		m_modules.emplace_back(std::move(renderModule));
+		m_modules.emplace_back(std::move(editorModule));
 
 		// std::string_view mbstr = "z\u00df\u6c34\U0001f34c";
 		// std::wstring_view wcstr = L"z\u00df\u6c34\U0001f34c";
@@ -41,6 +35,7 @@ namespace TG
 	{
 		while (true)
 		{
+		    m_platformModule->Update();
 			if (m_platformModule->ShouldExit())
 				return m_platformModule->ExitCode();
 
