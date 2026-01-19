@@ -16,7 +16,7 @@ target_link_libraries(${EXECUTABLE_NAME} PRIVATE GraphicCore)
 
 include(GNUInstallDirs)
 
-if (CMAKE_GENERATOR STREQUAL "Visual Studio 17 2022")
+if (CMAKE_GENERATOR STREQUAL "Visual Studio 18 2026")
     set(EXECUTABLE_OUTPUT_DIRECTORY $<TARGET_FILE_DIR:${EXECUTABLE_NAME}>/..)
 elseif (CMAKE_GENERATOR STREQUAL "Ninja")
     set(EXECUTABLE_OUTPUT_DIRECTORY $<TARGET_FILE_DIR:${EXECUTABLE_NAME}>)
@@ -32,7 +32,7 @@ add_custom_command(
     VERBATIM
 )
 
-set(mimallocLibs ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_BINDIR}/mimalloc$<$<CONFIG:DEBUG>:-debug>.dll
+set(mimallocLibs ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_BINDIR}/mimalloc.dll
         ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_BINDIR}/mimalloc-redirect.dll)
 add_custom_command(
     TARGET ${EXECUTABLE_NAME}

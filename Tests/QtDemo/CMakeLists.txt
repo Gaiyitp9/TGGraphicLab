@@ -14,7 +14,7 @@ find_package(Qt6 COMPONENTS Core OpenGLWidgets Widgets REQUIRED)
 add_executable(QtDemo main.cpp OpenGLWidget.cpp OpenGLWidget.h)
 target_link_libraries(QtDemo PRIVATE Qt6::Core Qt6::OpenGLWidgets Qt6::Widgets)
 
-if (CMAKE_GENERATOR STREQUAL "Visual Studio 17 2022")
+if (CMAKE_GENERATOR STREQUAL "Visual Studio 18 2026")
     set(WORKING_DIRECTORY $<TARGET_FILE_DIR:QtDemo/..)
 elseif (CMAKE_GENERATOR STREQUAL "Ninja")
     set(WORKING_DIRECTORY $<TARGET_FILE_DIR:QtDemo>)

@@ -1,93 +1,94 @@
 import os
 import subprocess
 from pathlib import Path
+import shlex
 
-def build_library(local_source_dir, local_build_dir, local_generator, build_type,
-                  local_cmake_options, local_install_dir):
-    # Debug和Release编译文件放在对应目录下
-    local_build_dir = str(Path(local_build_dir) / build_type)
-    local_install_dir = str(Path(local_install_dir) / build_type)
-    os.makedirs(local_build_dir, exist_ok=True)
-    # 运行CMake配置命令
-    cmake_cmd = ["cmake", "-S", local_source_dir, "-B", local_build_dir, "-G", local_generator,
-                f"-DCMAKE_BUILD_TYPE={build_type}",
-                f"-DCMAKE_INSTALL_PREFIX={local_install_dir}",
-                "-DCMAKE_VERBOSE_MAKEFILE=OFF"]
-    cmake_cmd.extend(local_cmake_options)
-    cmake_cmd_str = " ".join(cmake_cmd)
-    print(f"Running: {cmake_cmd_str}")
-    with subprocess.Popen(cmake_cmd, text=True,
-                          stdout=subprocess.PIPE,
-                          stderr=subprocess.STDOUT) as process:
-        for line in process.stdout:
-            print(line.strip())
 
-        return_code = process.wait()
-        if return_code != 0:
-            raise subprocess.CalledProcessError(return_code, process.args)
-    # 运行CMake构建命令
-    print("Building the project...")
-    build_cmd = ["cmake", "--build", local_build_dir, "--config", build_type]
-    build_cmd_str = " ".join(build_cmd)
-    print(f"Running: {build_cmd_str}")
-    with subprocess.Popen(build_cmd, text=True,
+def run_subprocess(cmd):
+    cmd_str = shlex.join(cmd)
+    print(f"Running: {cmd_str}")
+    with subprocess.Popen(cmd,
                           stdout=subprocess.PIPE,
                           stderr=subprocess.STDOUT,
+                          text=True,
                           encoding='utf-8') as process:
         for line in process.stdout:
             print(line.strip())
 
         return_code = process.wait()
+        stdout, stderr = process.communicate()
         if return_code != 0:
-            raise subprocess.CalledProcessError(return_code, process.args)
+            print("run subprocess failed")
+            print(f"return code: {return_code}")
+            print(f"stderr: {stderr}")
+            print(f"stdout: {stdout}")
+
+
+def build_library(local_source_dir, local_build_dir, local_generator, local_cmake_options, local_install_dir):
+    try:
+        local_source_dir = os.fspath(local_source_dir)
+
+        local_build_dir = os.fspath(local_build_dir)
+
+        local_install_dir = os.fspath(local_install_dir)
+    except TypeError as e:
+        print(e)
+
+    # 运行CMake配置命令
+    print("Configuring the project...")
+    configure_cmd = ["cmake", "-S", local_source_dir, "-B", local_build_dir, "-G", local_generator,
+                     "-DCMAKE_VERBOSE_MAKEFILE=OFF"]
+    configure_cmd.extend(local_cmake_options)
+    run_subprocess(configure_cmd)
+
+    # 运行CMake构建命令
+    print("Building the project...")
+    build_cmd = ["cmake", "--build", local_build_dir, "--config", "Debug"]
+    run_subprocess(build_cmd)
+    build_cmd = ["cmake", "--build", local_build_dir, "--config", "Release"]
+    run_subprocess(build_cmd)
+
     # 安装
     print(f"Installing the project to {local_install_dir}...")
-    install_cmd = ["cmake", "--install", local_build_dir, "--config", build_type]
-    install_cmd_str = " ".join(install_cmd)
-    print(f"Running: {install_cmd_str}")
-    with subprocess.Popen(install_cmd, text=True,
-                          stdout=subprocess.PIPE,
-                          stderr=subprocess.STDOUT) as process:
-        for line in process.stdout:
-            print(line.strip())
-
-        return_code = process.wait()
-        if return_code != 0:
-            raise subprocess.CalledProcessError(return_code, process.args)
+    install_dir_debug = str(Path(local_install_dir) / "Debug")
+    install_cmd = ["cmake", "--install", local_build_dir, "--config", "Debug", "--prefix", install_dir_debug]
+    run_subprocess(install_cmd)
+    install_dir_release = str(Path(local_install_dir) / "Release")
+    install_cmd = ["cmake", "--install", local_build_dir, "--config", "Release", "--prefix", install_dir_release]
+    run_subprocess(install_cmd)
 
 
-if __name__ == "__main__":
-    root_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+def build_dependencies():
+    root_dir = Path(__file__).parent.parent.resolve()
 
-    install_dir = str(Path(root_dir) / "install")
+    install_dir = root_dir / "install"
     print(f"Install directory: {install_dir}")
 
     generator = "Visual Studio 18 2026"
     print(f"Generator: {generator}")
 
-    source_dir = str(Path(root_dir) / "ThirdParty" / "mimalloc")
-    build_dir = str(Path(root_dir) / "build" / "mimalloc")
+    source_dir = root_dir / "ThirdParty" / "mimalloc"
+    build_dir = root_dir / "build" / "mimalloc"
     cmake_options = ["-DMI_BUILD_TESTS=OFF"]
-    build_library(source_dir, build_dir, generator, "Debug", cmake_options, install_dir)
-    build_library(source_dir, build_dir, generator, "Release", cmake_options, install_dir)
+    build_library(source_dir, build_dir, generator, cmake_options, install_dir)
 
-    source_dir = str(Path(root_dir) / "ThirdParty" / "spdlog")
-    build_dir = str(Path(root_dir) / "build" / "spdlog")
+    source_dir = root_dir / "ThirdParty" / "spdlog"
+    build_dir = root_dir / "build" / "spdlog"
     cmake_options = ["-DSPDLOG_USE_STD_FORMAT=ON", "-DSPDLOG_INSTALL=ON"]
-    build_library(source_dir, build_dir, generator, "Debug", cmake_options, install_dir)
-    build_library(source_dir, build_dir, generator, "Release", cmake_options, install_dir)
+    build_library(source_dir, build_dir, generator, cmake_options, install_dir)
 
-    source_dir = str(Path(root_dir) / "ThirdParty" / "glad")
-    build_dir = str(Path(root_dir) / "build" / "glad")
+    source_dir = root_dir / "ThirdParty" / "glad"
+    build_dir = root_dir / "build" / "glad"
     cmake_options = []
-    build_library(source_dir, build_dir, generator, "Debug", cmake_options, install_dir)
-    build_library(source_dir, build_dir, generator, "Release", cmake_options, install_dir)
+    build_library(source_dir, build_dir, generator, cmake_options, install_dir)
 
-    source_dir = str(Path(root_dir) / "ThirdParty" / "glm")
-    build_dir = str(Path(root_dir) / "build" / "glm")
+    source_dir = root_dir / "ThirdParty" / "glm"
+    build_dir = root_dir / "build" / "glm"
     cmake_options = ["-DGLM_BUILD_TESTS=OFF", "-DBUILD_SHARED_LIBS=OFF"]
-    build_library(source_dir, build_dir, generator, "Debug", cmake_options, install_dir)
-    build_library(source_dir, build_dir, generator, "Release", cmake_options, install_dir)
+    build_library(source_dir, build_dir, generator, cmake_options, install_dir)
 
     print("Configuration and generation completed")
 
+
+if __name__ == "__main__":
+    build_dependencies()

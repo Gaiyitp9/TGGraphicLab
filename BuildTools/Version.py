@@ -1,7 +1,8 @@
 import subprocess
 import argparse
 from pathlib import Path
-from datetime import datetime, timezone
+from datetime import datetime
+
 
 def get_git_info():
     commit_hash = subprocess.check_output(
@@ -37,4 +38,3 @@ def write_git_log():
 
 if __name__ == "__main__":
     write_git_log()
-
