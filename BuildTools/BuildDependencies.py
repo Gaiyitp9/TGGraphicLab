@@ -45,7 +45,11 @@ def build_library(local_source_dir, local_build_dir, local_generator, local_cmak
     print("Building the project...")
     build_cmd = ["cmake", "--build", local_build_dir, "--config", "Debug"]
     run_subprocess(build_cmd)
+    build_cmd = ["cmake", "--build", local_build_dir, "--config", "RelWithDebInfo"]
+    run_subprocess(build_cmd)
     build_cmd = ["cmake", "--build", local_build_dir, "--config", "Release"]
+    run_subprocess(build_cmd)
+    build_cmd = ["cmake", "--build", local_build_dir, "--config", "MinSizeRel"]
     run_subprocess(build_cmd)
 
     # 安装
@@ -53,8 +57,14 @@ def build_library(local_source_dir, local_build_dir, local_generator, local_cmak
     install_dir_debug = str(Path(local_install_dir) / "Debug")
     install_cmd = ["cmake", "--install", local_build_dir, "--config", "Debug", "--prefix", install_dir_debug]
     run_subprocess(install_cmd)
+    install_dir_relWithDebInfo = str(Path(local_install_dir) / "RelWithDebInfo")
+    install_cmd = ["cmake", "--install", local_build_dir, "--config", "RelWithDebInfo", "--prefix", install_dir_relWithDebInfo]
+    run_subprocess(install_cmd)
     install_dir_release = str(Path(local_install_dir) / "Release")
     install_cmd = ["cmake", "--install", local_build_dir, "--config", "Release", "--prefix", install_dir_release]
+    run_subprocess(install_cmd)
+    install_dir_minSizeRel = str(Path(local_install_dir) / "MinSizeRel")
+    install_cmd = ["cmake", "--install", local_build_dir, "--config", "MinSizeRel", "--prefix", install_dir_minSizeRel]
     run_subprocess(install_cmd)
 
 

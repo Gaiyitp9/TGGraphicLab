@@ -12,8 +12,8 @@ namespace TG
 	Application::Application()
 	{
 	    m_platformModule = std::make_unique<PlatformModule>();
-	    std::unique_ptr<RenderModule> renderModule = std::make_unique<RenderModule>();
-	    std::unique_ptr<EditorModule> editorModule = std::make_unique<EditorModule>();
+	    auto renderModule = std::make_unique<RenderModule>();
+	    auto editorModule = std::make_unique<EditorModule>();
 
 		// 初始化渲染模块，接入视频接口和计时器接口
 		renderModule->SetupRenderer(m_platformModule->GetVideoPort(), m_platformModule->GetTimer());

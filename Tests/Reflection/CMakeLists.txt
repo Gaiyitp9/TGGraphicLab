@@ -1,7 +1,12 @@
-find_package(Clang REQUIRED CONFIG)
+find_package(Clang CONFIG)
+
+if (NOT Clang_FOUND)
+    message(STATUS "Clang not found. Reflection test disabled")
+    return()
+endif()
 
 message(STATUS "Found LLVM ${LLVM_PACKAGE_VERSION}")
-message(STATUS "Using LLVMConfig.cmake in: ${LLVM_DIR}")
+message(STATUS "Found Clang ${Clang_VERSION}")
 message(STATUS "LLVM include: ${LLVM_INCLUDE_DIRS}")
 
 file(GLOB_RECURSE HEADERS *.hpp *.h)

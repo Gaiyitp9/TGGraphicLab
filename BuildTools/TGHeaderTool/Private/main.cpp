@@ -4,16 +4,7 @@
 * This code is licensed under the MIT License (MIT).			*
 *****************************************************************/
 
-#include "gtest/gtest.h"
-#include "GlobalArgs.h"
-
-int main(int argc, char** argv)
+int main()
 {
-    testing::InitGoogleTest(&argc, argv);
-
-    for (int i = 0; i < argc; ++i)
-        gArgv.emplace_back(argv[i]);
-    gArgv.emplace_back();
-
-    return RUN_ALL_TESTS();
+    return 0;
 }

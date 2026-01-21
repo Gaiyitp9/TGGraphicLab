@@ -44,6 +44,7 @@ message(STATUS "Third party install path: ${CMAKE_INSTALL_PREFIX}")
 # 三方库查找目录
 set(CMAKE_PREFIX_PATH ${CMAKE_SOURCE_DIR}/install/${CMAKE_BUILD_TYPE})
 
+add_subdirectory(BuildTools/TGHeaderTool)
 add_subdirectory(GraphicCore)
 add_subdirectory(Tests)
 add_subdirectory(TGRenderer)

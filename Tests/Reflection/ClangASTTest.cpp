@@ -145,7 +145,7 @@ namespace TG::Reflection
         //     nullptr
         // };
 
-        int argc = gArgv.size() - 1;
+        int argc = static_cast<int>(gArgv.size() - 1);
         const char** argv = gArgv.data();
         auto expectedParser = CommonOptionsParser::create(argc, argv, myToolCategory);
         if (!expectedParser)

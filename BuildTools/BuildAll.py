@@ -1,6 +1,7 @@
 from pathlib import Path
 import os
 from BuildDependencies import build_dependencies, run_subprocess
+import argparse
 
 
 def build_project(build_type):
@@ -24,6 +25,18 @@ def build_project(build_type):
 
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Python script for building TGGraphicLab project")
+    parser.add_argument("configuration",
+                        nargs="?", default="Debug",
+                        choices=["Debug", "RelWithDebInfo", "Release", "MinSizeRel", "All"],
+                        help="Build configuration")
+    args = parser.parse_args()
+
     build_dependencies()
-    build_project("Debug")
-    build_project("Release")
+    if args.configuration == "All":
+        build_project("Debug")
+        build_project("RelWithDebInfo")
+        build_project("Release")
+        build_project("MinSizeRel")
+    else:
+        build_project(args.configuration)
