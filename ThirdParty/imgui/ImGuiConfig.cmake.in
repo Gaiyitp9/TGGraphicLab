@@ -2,7 +2,6 @@
 
 include(CMakeFindDependencyMacro)
 
-find_dependency(glad 2.0.8 REQUIRED)
 find_dependency(Vulkan)
 
 include("${CMAKE_CURRENT_LIST_DIR}/@CONFIG_TARGETS_FILE@")

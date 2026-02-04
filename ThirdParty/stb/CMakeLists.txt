@@ -5,16 +5,6 @@ message(STATUS "stb version: ${PROJECT_VERSION}")
 
 include(GNUInstallDirs)
 
-# 使用c++23
-set(CMAKE_CXX_STANDARD 23)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-# 禁用编译器扩展
-set(CMAKE_CXX_EXTENSIONS OFF)
-# 使用utf-8编码，开启并行编译
-if(MSVC)
-    add_compile_options(/utf-8 /MP)
-endif()
-
 file(GLOB_RECURSE HEADERS *.h)
 file(GLOB_RECURSE SOURCES *.cpp)
 

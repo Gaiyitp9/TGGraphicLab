@@ -3,14 +3,13 @@
 * Copyright (c) Gaiyitp9. All rights reserved.					*
 * This code is licensed under the MIT License (MIT).			*
 *****************************************************************/
-
 #include "ViewportGrid.h"
 
 namespace TG::Rendering
 {
-    ViewportGrid::ViewportGrid() : m_vertexShader("Assets/Shaders/GLSL/ViewportGrid.vert", ShaderStage::Vertex),
-        m_fragmentShader("Assets/Shaders/GLSL/ViewportGrid.frag", ShaderStage::Fragment),
-        m_geometryShader("Assets/Shaders/GLSL/ViewportGrid.geom", ShaderStage::Geometry)
+    ViewportGrid::ViewportGrid() : m_vertexShader("Assets/Shaders/GLSL/viewport_grid.vert", ShaderStage::Vertex),
+        m_fragmentShader("Assets/Shaders/GLSL/viewport_grid.frag", ShaderStage::Fragment),
+        m_geometryShader("Assets/Shaders/GLSL/viewport_grid.geom", ShaderStage::Geometry)
     {
         glGenVertexArrays(1, &m_VAO);
         glGenProgramPipelines(1, &m_pipeline);

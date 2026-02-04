@@ -26,6 +26,8 @@ namespace TG
 
 	private:
 		std::unique_ptr<PlatformModule> m_platformModule;
-		std::vector<std::unique_ptr<Module>> m_modules;
+		std::unique_ptr<RenderModule> m_renderModule;
+		std::unique_ptr<EditorModule> m_editorModule;
+		std::vector<Module*> m_modules;
 	};
 }

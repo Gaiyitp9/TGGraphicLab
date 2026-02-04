@@ -3,7 +3,6 @@
 * Copyright (c) Gaiyitp9. All rights reserved.					*
 * This code is licensed under the MIT License (MIT).			*
 *****************************************************************/
-
 #include "Rendering/OpenGL/OpenGLContext.h"
 #include "glad/wgl.h"
 

@@ -3,7 +3,6 @@
 * Copyright (c) Gaiyitp9. All rights reserved.					*
 * This code is licensed under the MIT License (MIT).			*
 *****************************************************************/
-
 #include "Base/Windows/Win32Window.h"
 #include "Exception/Windows/Win32Exception.h"
 #include "Base/Utility.h"
@@ -335,9 +334,7 @@ namespace TG
 		{
 			case WM_DESTROY:
 			{
-	            // 窗口被销毁后，窗口类也需要被销毁
-	            pWindow->destroyed = true;
-				// 基础窗口作为主窗口，销毁后要退出线程
+				// 向当前线程发送WM_QUIT消息
 				PostQuitMessage(0);
 				return 0;
 			}
@@ -592,7 +589,7 @@ namespace TG
     // 注册窗口类
     static char RegisterWindow()
     {
-		HANDLE icon = LoadImageW(nullptr, L"Assets/Icons/maple-leaf.ico", IMAGE_ICON, 0, 0,
+		HANDLE icon = LoadImageW(nullptr, L"Assets/Icons/maple_leaf.ico", IMAGE_ICON, 0, 0,
 			LR_DEFAULTSIZE | LR_LOADFROMFILE);
 
         WNDCLASSEXW wc = {};

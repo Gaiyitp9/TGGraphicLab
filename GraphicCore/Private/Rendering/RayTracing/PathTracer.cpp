@@ -3,7 +3,6 @@
 * Copyright (c) Gaiyitp9. All rights reserved.					*
 * This code is licensed under the MIT License (MIT).			*
 *****************************************************************/
-
 #include "Rendering/RayTracing/PathTracer.h"
 #include "Diagnostic/Log.hpp"
 #include "Rendering/RayTracing/Sphere.h"

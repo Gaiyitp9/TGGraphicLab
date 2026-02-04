@@ -3,7 +3,6 @@
 * Copyright (c) Gaiyitp9. All rights reserved.					*
 * This code is licensed under the MIT License (MIT).			*
 *****************************************************************/
-
 #include "QuadExample.h"
 #include "Rendering/Color/StandardColors.h"
 #include "Exception/BaseException.h"
@@ -18,10 +17,10 @@ namespace TG::Rendering
 {
     QuadExample::QuadExample(const IDefaultVideoPort& videoPort, const ITimer& timer)
 		: m_videoPort(videoPort), m_timer(timer),
-		m_vertexShader("Assets/Shaders/GLSL/Quad.vert", ShaderStage::Vertex),
-		m_fragmentShader("Assets/Shaders/GLSL/Quad.frag", ShaderStage::Fragment),
-		m_wireframeGeometryShader("Assets/Shaders/GLSL/Wireframe.geom", ShaderStage::Geometry),
-		m_wireframeFragmentShader("Assets/Shaders/GLSL/Wireframe.frag", ShaderStage::Fragment)
+		m_vertexShader("Assets/Shaders/GLSL/quad.vert", ShaderStage::Vertex),
+		m_fragmentShader("Assets/Shaders/GLSL/quad.frag", ShaderStage::Fragment),
+		m_wireframeGeometryShader("Assets/Shaders/GLSL/wireframe.geom", ShaderStage::Geometry),
+		m_wireframeFragmentShader("Assets/Shaders/GLSL/wireframe.frag", ShaderStage::Fragment)
     {
     	m_quadMesh = CreatePrimitive(PrimitiveType::Quad);
 		m_quadMesh.colors[0] = { 1.0f, 0.5f, 0.2f };

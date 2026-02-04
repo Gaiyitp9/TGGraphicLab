@@ -12,6 +12,13 @@
 #include "ViewportGrid.h"
 #include "ViewportCompass.h"
 
+namespace tinygltf
+{
+    class Model;
+    class Node;
+    class Mesh;
+}
+
 namespace TG::Rendering
 {
     class BasicLightExample final : public Example
@@ -23,6 +30,8 @@ namespace TG::Rendering
         void Render() override;
 
     private:
+        void LoadRubberToy();
+
         struct ObjectProperty
         {
             Math::Vector3f position;
@@ -35,12 +44,22 @@ namespace TG::Rendering
         const ITimer& m_timer;
         Camera m_camera;
 
+        Mesh m_rubberToyMesh;
+        ObjectProperty m_rubberToyProperty;
+
         Sphere m_sphereMesh;
         ObjectProperty m_sphereProperties[5];
+
         Plane m_planeMesh;
         ObjectProperty m_planeProperty;
+
         Math::Vector4f m_lightDirection;
         Color m_lightColor;
+
+        GLuint m_rubberToyVAO{};
+        GLuint m_rubberToyVBO{};
+        GLuint m_rubberToyEBO{};
+        OpenGLTexture2D m_rubberToyAlbedo{};
 
         GLuint m_sphereVAO{};
         GLuint m_sphereVBO{};

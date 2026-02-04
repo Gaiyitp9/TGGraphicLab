@@ -3,7 +3,6 @@
 * Copyright (c) Gaiyitp9. All rights reserved.					*
 * This code is licensed under the MIT License (MIT).			*
 *****************************************************************/
-
 #include "Rendering/OpenGL/OpenGLTexture2D.h"
 #include "Exception/BaseException.h"
 #include "stb_image.h"

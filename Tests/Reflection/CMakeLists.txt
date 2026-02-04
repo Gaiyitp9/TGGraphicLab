@@ -1,7 +1,7 @@
 find_package(Clang CONFIG)
 
 if (NOT Clang_FOUND)
-    message(STATUS "Clang not found. Reflection test disabled")
+    message(STATUS "Reflection test disabled")
     return()
 endif()
 

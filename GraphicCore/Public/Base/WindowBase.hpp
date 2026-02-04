@@ -44,10 +44,6 @@ namespace TG
         {
             return Super::deviceContext;
         }
-        [[nodiscard]] bool IsDestroyed() const noexcept
-        {
-            return Super::destroyed;
-        }
 
         void SetIcon(std::string_view iconPath) const
         {

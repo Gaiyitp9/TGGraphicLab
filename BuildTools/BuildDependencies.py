@@ -27,9 +27,7 @@ def run_subprocess(cmd):
 def build_library(local_source_dir, local_build_dir, local_generator, local_cmake_options, local_install_dir):
     try:
         local_source_dir = os.fspath(local_source_dir)
-
         local_build_dir = os.fspath(local_build_dir)
-
         local_install_dir = os.fspath(local_install_dir)
     except TypeError as e:
         print(e)
@@ -57,14 +55,14 @@ def build_library(local_source_dir, local_build_dir, local_generator, local_cmak
     install_dir_debug = str(Path(local_install_dir) / "Debug")
     install_cmd = ["cmake", "--install", local_build_dir, "--config", "Debug", "--prefix", install_dir_debug]
     run_subprocess(install_cmd)
-    install_dir_relWithDebInfo = str(Path(local_install_dir) / "RelWithDebInfo")
-    install_cmd = ["cmake", "--install", local_build_dir, "--config", "RelWithDebInfo", "--prefix", install_dir_relWithDebInfo]
+    install_dir_rel_with_deb_info = str(Path(local_install_dir) / "RelWithDebInfo")
+    install_cmd = ["cmake", "--install", local_build_dir, "--config", "RelWithDebInfo", "--prefix", install_dir_rel_with_deb_info]
     run_subprocess(install_cmd)
     install_dir_release = str(Path(local_install_dir) / "Release")
     install_cmd = ["cmake", "--install", local_build_dir, "--config", "Release", "--prefix", install_dir_release]
     run_subprocess(install_cmd)
-    install_dir_minSizeRel = str(Path(local_install_dir) / "MinSizeRel")
-    install_cmd = ["cmake", "--install", local_build_dir, "--config", "MinSizeRel", "--prefix", install_dir_minSizeRel]
+    install_dir_min_size_rel = str(Path(local_install_dir) / "MinSizeRel")
+    install_cmd = ["cmake", "--install", local_build_dir, "--config", "MinSizeRel", "--prefix", install_dir_min_size_rel]
     run_subprocess(install_cmd)
 
 
@@ -77,6 +75,11 @@ def build_dependencies():
     generator = "Visual Studio 18 2026"
     print(f"Generator: {generator}")
 
+    source_dir = root_dir / "ThirdParty" / "googletest"
+    build_dir = root_dir / "build" / "googletest"
+    cmake_options = []
+    build_library(source_dir, build_dir, generator, cmake_options, install_dir)
+
     source_dir = root_dir / "ThirdParty" / "mimalloc"
     build_dir = root_dir / "build" / "mimalloc"
     cmake_options = ["-DMI_BUILD_TESTS=OFF"]
@@ -85,11 +88,6 @@ def build_dependencies():
     source_dir = root_dir / "ThirdParty" / "spdlog"
     build_dir = root_dir / "build" / "spdlog"
     cmake_options = ["-DSPDLOG_USE_STD_FORMAT=ON", "-DSPDLOG_INSTALL=ON"]
-    build_library(source_dir, build_dir, generator, cmake_options, install_dir)
-
-    source_dir = root_dir / "ThirdParty" / "glad"
-    build_dir = root_dir / "build" / "glad"
-    cmake_options = []
     build_library(source_dir, build_dir, generator, cmake_options, install_dir)
 
     source_dir = root_dir / "ThirdParty" / "glm"

@@ -3,7 +3,6 @@
 * Copyright (c) Gaiyitp9. All rights reserved.					*
 * This code is licensed under the MIT License (MIT).			*
 *****************************************************************/
-
 #include "ViewportCompass.h"
 #include "Rendering/ViewProjectionMatrix.hpp"
 #include "Base/Utility.h"
@@ -11,8 +10,8 @@
 namespace TG::Rendering
 {
     ViewportCompass::ViewportCompass()
-        : m_axisVertexShader("Assets/Shaders/GLSL/ViewportCompass.vert", ShaderStage::Vertex),
-          m_axisFragmentShader("Assets/Shaders/GLSL/ViewportCompass.frag", ShaderStage::Fragment),
+        : m_axisVertexShader("Assets/Shaders/GLSL/viewport_compass.vert", ShaderStage::Vertex),
+          m_axisFragmentShader("Assets/Shaders/GLSL/viewport_compass.frag", ShaderStage::Fragment),
           m_axisVertices{
               // 位置           颜色
               0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f,
@@ -22,8 +21,8 @@ namespace TG::Rendering
               0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f,
               0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f,
           },
-          m_axisNameVertexShader("Assets/Shaders/GLSL/CompassName.vert", ShaderStage::Vertex),
-          m_axisNameFragmentShader("Assets/Shaders/GLSL/CompassName.frag", ShaderStage::Fragment),
+          m_axisNameVertexShader("Assets/Shaders/GLSL/compass_name.vert", ShaderStage::Vertex),
+          m_axisNameFragmentShader("Assets/Shaders/GLSL/compass_name.frag", ShaderStage::Fragment),
           m_fontBuffer(LoadBinaryFile("Assets/Fonts/consola.ttf"))
     {
         glGenBuffers(1, &m_axisVBO);

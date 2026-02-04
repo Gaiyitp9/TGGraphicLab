@@ -3,7 +3,6 @@
 * Copyright (c) Gaiyitp9. All rights reserved.					*
 * This code is licensed under the MIT License (MIT).			*
 *****************************************************************/
-
 #include "Modules/EditorModule.h"
 #include "Exception/Windows/Win32Exception.h"
 #include "glad/wgl.h"

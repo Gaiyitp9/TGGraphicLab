@@ -3,7 +3,6 @@
 * Copyright (c) Gaiyitp9. All rights reserved.					*
 * This code is licensed under the MIT License (MIT).			*
 *****************************************************************/
-
 #include "CubeExample.h"
 #include "Rendering/Color/StandardColors.h"
 #include "Rendering/Mesh/Primitives.h"
@@ -17,10 +16,10 @@ namespace TG::Rendering
 {
     CubeExample::CubeExample(const IDefaultVideoPort& videoPort, const ITimer& timer)
         : m_camera(videoPort, timer),
-        m_vertexShader("Assets/Shaders/GLSL/Cube.vert", ShaderStage::Vertex),
-        m_fragmentShader("Assets/Shaders/GLSL/Cube.frag", ShaderStage::Fragment),
-        m_wireframeGeometryShader("Assets/Shaders/GLSL/Wireframe.geom", ShaderStage::Geometry),
-        m_wireframeFragmentShader("Assets/Shaders/GLSL/Wireframe.frag", ShaderStage::Fragment)
+        m_vertexShader("Assets/Shaders/GLSL/cube.vert", ShaderStage::Vertex),
+        m_fragmentShader("Assets/Shaders/GLSL/cube.frag", ShaderStage::Fragment),
+        m_wireframeGeometryShader("Assets/Shaders/GLSL/wireframe.geom", ShaderStage::Geometry),
+        m_wireframeFragmentShader("Assets/Shaders/GLSL/wireframe.frag", ShaderStage::Fragment)
     {
         m_cubeMesh = CreatePrimitive(PrimitiveType::Cube);
 

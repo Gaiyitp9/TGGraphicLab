@@ -3,18 +3,13 @@ cmake_minimum_required(VERSION 3.29)
 project(ImGui VERSION 1.92.0)
 message(STATUS "ImGui version: ${PROJECT_VERSION}")
 
-# 使用c++23
-set(CMAKE_CXX_STANDARD 23)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-# 禁用编译器扩展
-set(CMAKE_CXX_EXTENSIONS OFF)
-# 使用utf-8编码，开启并行编译
-if(MSVC)
-    add_compile_options(/utf-8 /MP)
-endif()
-
-find_package(glad 2.0.8 REQUIRED)
 find_package(Vulkan REQUIRED)
+
+FetchContent_Declare(
+    glad
+    SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../glad"
+)
+FetchContent_MakeAvailable(glad)
 
 file(GLOB_RECURSE HEADERS *.h)
 file(GLOB_RECURSE SOURCES *.cpp)

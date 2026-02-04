@@ -29,7 +29,6 @@ namespace TG
         std::string name;
         HWND handle{ nullptr };
         HDC deviceContext{ nullptr };
-        bool destroyed{ false };
         int posX;
         int posY;
         unsigned int width;

@@ -3,7 +3,6 @@
 * Copyright (c) Gaiyitp9. All rights reserved.					*
 * This code is licensed under the MIT License (MIT).			*
 *****************************************************************/
-
 #include "Modules/PlatformModule.h"
 #include "Diagnostic/Log.hpp"
 #include "Input/Devices.h"
@@ -100,7 +99,7 @@ namespace TG
 
     bool PlatformModule::ShouldExit() const
     {
-        return m_mainWindow.IsDestroyed();
+        return m_exitCode.has_value();
     }
 
     int PlatformModule::ExitCode() const

@@ -3,9 +3,7 @@
 * Copyright (c) Gaiyitp9. All rights reserved.					*
 * This code is licensed under the MIT License (MIT).			*
 *****************************************************************/
-
 #include "Rendering/Camera.h"
-
 #include "Diagnostic/Log.hpp"
 #include "Rendering/ViewProjectionMatrix.hpp"
 #include "Input/Devices.h"

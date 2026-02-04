@@ -1,7 +1,7 @@
 find_package(Clang CONFIG)
 
 if (NOT Clang_FOUND)
-    message(STATUS "Clang not found. TG Header Tool project disabled")
+    message(STATUS "TG Header Tool project disabled")
     return()
 endif()
 

@@ -3,7 +3,6 @@
 * Copyright (c) Gaiyitp9. All rights reserved.					*
 * This code is licensed under the MIT License (MIT).			*
 *****************************************************************/
-
 #include "Application.h"
 #include "Diagnostic/Log.hpp"
 #include "mimalloc.h"

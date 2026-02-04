@@ -3,14 +3,13 @@
 * Copyright (c) Gaiyitp9. All rights reserved.					*
 * This code is licensed under the MIT License (MIT).			*
 *****************************************************************/
-
 #include "Rendering/OpenGLExample/SkyBox.h"
 #include "Rendering/Mesh/Primitives.h"
 
 namespace TG::Rendering
 {
-    SkyBox::SkyBox() : m_vertexShader("Assets/Shaders/GLSL/SkyBox.vert", ShaderStage::Vertex),
-        m_fragmentShader("Assets/Shaders/GLSL/SkyBox.frag", ShaderStage::Fragment)
+    SkyBox::SkyBox() : m_vertexShader("Assets/Shaders/GLSL/skybox.vert", ShaderStage::Vertex),
+        m_fragmentShader("Assets/Shaders/GLSL/skybox.frag", ShaderStage::Fragment)
     {
         m_cubeMesh = CreatePrimitive(PrimitiveType::Cube);
 
