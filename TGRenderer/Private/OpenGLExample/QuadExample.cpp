@@ -13,16 +13,16 @@
 #include "imgui_impl_win32.h"
 #include "stb_image.h"
 
-namespace TG::Rendering
+namespace TG
 {
     QuadExample::QuadExample(const IDefaultVideoPort& videoPort, const ITimer& timer)
 		: m_videoPort(videoPort), m_timer(timer),
-		m_vertexShader("Assets/Shaders/GLSL/quad.vert", ShaderStage::Vertex),
-		m_fragmentShader("Assets/Shaders/GLSL/quad.frag", ShaderStage::Fragment),
-		m_wireframeGeometryShader("Assets/Shaders/GLSL/wireframe.geom", ShaderStage::Geometry),
-		m_wireframeFragmentShader("Assets/Shaders/GLSL/wireframe.frag", ShaderStage::Fragment)
+		m_vertexShader("Assets/Shaders/GLSL/quad.vert", Rendering::ShaderStage::Vertex),
+		m_fragmentShader("Assets/Shaders/GLSL/quad.frag", Rendering::ShaderStage::Fragment),
+		m_wireframeGeometryShader("Assets/Shaders/GLSL/wireframe.geom", Rendering::ShaderStage::Geometry),
+		m_wireframeFragmentShader("Assets/Shaders/GLSL/wireframe.frag", Rendering::ShaderStage::Fragment)
     {
-    	m_quadMesh = CreatePrimitive(PrimitiveType::Quad);
+    	m_quadMesh = Rendering::CreatePrimitive(Rendering::PrimitiveType::Quad);
 		m_quadMesh.colors[0] = { 1.0f, 0.5f, 0.2f };
 		m_quadMesh.colors[1] = { 1.0f, 0.0f, 0.0f };
 		m_quadMesh.colors[2] = { 0.0f, 1.0f, 0.0f };
@@ -100,7 +100,8 @@ namespace TG::Rendering
 
     	glGenProgramPipelines(1, &m_pipeline);
     	glBindProgramPipeline(m_pipeline);
-    	glUseProgramStages(m_pipeline, GL_VERTEX_SHADER_BIT, CastID<GLuint>(m_vertexShader.GetID()));
+    	glUseProgramStages(m_pipeline, GL_VERTEX_SHADER_BIT,
+    		Rendering::CastID<Rendering::OpenGLID>(m_vertexShader.GetID()));
     }
 
     QuadExample::~QuadExample()
@@ -112,22 +113,25 @@ namespace TG::Rendering
     	glDeleteProgramPipelines(1, &m_pipeline);
     }
 
-    void QuadExample::Render()
+    void QuadExample::Draw()
     {
-    	Color clearColor = AliceBlue;
+    	Rendering::Color clearColor = Rendering::AliceBlue;
 
     	glClearColor(clearColor.R(), clearColor.G(), clearColor.B(), clearColor.A());
     	glClear(GL_COLOR_BUFFER_BIT);
 
     	if (m_wireframe)
     	{
-    		glUseProgramStages(m_pipeline, GL_GEOMETRY_SHADER_BIT, CastID<GLuint>(m_wireframeGeometryShader.GetID()));
-    		glUseProgramStages(m_pipeline, GL_FRAGMENT_SHADER_BIT, CastID<GLuint>(m_wireframeFragmentShader.GetID()));
+    		glUseProgramStages(m_pipeline, GL_GEOMETRY_SHADER_BIT,
+    			Rendering::CastID<Rendering::OpenGLID>(m_wireframeGeometryShader.GetID()));
+    		glUseProgramStages(m_pipeline, GL_FRAGMENT_SHADER_BIT,
+    			Rendering::CastID<Rendering::OpenGLID>(m_wireframeFragmentShader.GetID()));
     	}
     	else
     	{
     		glUseProgramStages(m_pipeline, GL_GEOMETRY_SHADER_BIT, 0);
-    		glUseProgramStages(m_pipeline, GL_FRAGMENT_SHADER_BIT, CastID<GLuint>(m_fragmentShader.GetID()));
+    		glUseProgramStages(m_pipeline, GL_FRAGMENT_SHADER_BIT,
+    			Rendering::CastID<Rendering::OpenGLID>(m_fragmentShader.GetID()));
     	}
 
     	const float timeValue = m_timer.TotalTime() * 0.001f;
@@ -147,22 +151,14 @@ namespace TG::Rendering
     	glBindVertexArray(m_VAO);
     	glBindProgramPipeline(m_pipeline);
     	glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(m_quadMesh.indices.size()), GL_UNSIGNED_INT, nullptr);
+    }
 
-    	ImGui_ImplOpenGL3_NewFrame();
-    	ImGui_ImplWin32_NewFrame();
-    	ImGui::NewFrame();
-
+    void QuadExample::DrawUI()
+    {
     	const ImGuiIO& io = ImGui::GetIO();
-		ImGui::Begin("Settings");
-		ImGui::Checkbox("Draw wireframe", &m_wireframe);
+    	ImGui::Begin("Settings");
+    	ImGui::Checkbox("Draw wireframe", &m_wireframe);
     	ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
     	ImGui::End();
-
-    	ImGui::Render();
-
-    	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-
-    	ImGui::UpdatePlatformWindows();
-    	ImGui::RenderPlatformWindowsDefault();
     }
 }

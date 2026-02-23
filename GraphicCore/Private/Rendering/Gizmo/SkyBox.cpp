@@ -3,7 +3,7 @@
 * Copyright (c) Gaiyitp9. All rights reserved.					*
 * This code is licensed under the MIT License (MIT).			*
 *****************************************************************/
-#include "Rendering/OpenGLExample/SkyBox.h"
+#include "Rendering/Gizmo/SkyBox.h"
 #include "Rendering/Mesh/Primitives.h"
 
 namespace TG::Rendering
@@ -37,8 +37,8 @@ namespace TG::Rendering
 
         glGenProgramPipelines(1, &m_pipeline);
         glBindProgramPipeline(m_pipeline);
-        glUseProgramStages(m_pipeline, GL_VERTEX_SHADER_BIT, CastID<GLuint>(m_vertexShader.GetID()));
-        glUseProgramStages(m_pipeline, GL_FRAGMENT_SHADER_BIT, CastID<GLuint>(m_fragmentShader.GetID()));
+        glUseProgramStages(m_pipeline, GL_VERTEX_SHADER_BIT, CastID<OpenGLID>(m_vertexShader.GetID()));
+        glUseProgramStages(m_pipeline, GL_FRAGMENT_SHADER_BIT, CastID<OpenGLID>(m_fragmentShader.GetID()));
     }
 
     SkyBox::~SkyBox()
@@ -63,7 +63,7 @@ namespace TG::Rendering
         glDisable(GL_CULL_FACE);
 
         glActiveTexture(GL_TEXTURE_CUBE_MAP);
-        glBindTexture(GL_TEXTURE_CUBE_MAP, CastID<GLuint>(m_cubeMap.GetID()));
+        glBindTexture(GL_TEXTURE_CUBE_MAP, CastID<OpenGLID>(m_cubeMap.GetID()));
 
         glBindVertexArray(m_VAO);
         glBindProgramPipeline(m_pipeline);

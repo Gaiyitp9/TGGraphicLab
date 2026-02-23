@@ -3,16 +3,15 @@
 * Copyright (c) Gaiyitp9. All rights reserved.					*
 * This code is licensed under the MIT License (MIT).			*
 *****************************************************************/
-#include "OpenGLRenderer.h"
-#include "glad/wgl.h"
+#include "Rendering/OpenGL/OpenGLRenderer.h"
 #include "Exception/OpenGLException.h"
 #include "Diagnostic/Log.hpp"
-#include "Rendering/OpenGLExample/OpenGLExampleFactory.h"
+#include "Rendering/Texture.h"
 
 namespace TG::Rendering
 {
-    OpenGLRenderer::OpenGLRenderer(const IDefaultVideoPort& videoPort,
-    	const ITimer& timer) : m_context(videoPort)
+    OpenGLRenderer::OpenGLRenderer(const IDefaultVideoPort& videoPort)
+		: m_context(videoPort)
     {
     	// 查询OpenGL相关信息
     	auto glVersion = reinterpret_cast<char const*>(glGetString(GL_VERSION));
@@ -68,20 +67,33 @@ namespace TG::Rendering
     	glGetInteger64v(GL_MAX_UNIFORM_BLOCK_SIZE, &maxUniformBlockSize);
     	LogInfo("Max uniform block size: {}", maxUniformBlockSize);
 
-    	m_exampleFactory = std::make_unique<OpenGlExampleFactory>(videoPort, timer);
-    	m_example = m_exampleFactory->CreateExample(m_exampleEnum);
+    	// 创建离屏帧缓存
+    	glGenFramebuffers(1, &m_fbo);
+    	// 创建深度模板缓存
+    	glGenRenderbuffers(1, &m_depthStencilBuffer);
+
+    	GLint viewport[4];
+    	glGetIntegerv(GL_VIEWPORT, viewport);
+    	m_screenWidth = viewport[2] - viewport[0];
+    	m_screenHeight = viewport[3] - viewport[1];
     }
 
     OpenGLRenderer::~OpenGLRenderer()
     {
-    	m_example.reset();
-    	m_exampleFactory.reset();
+		glDeleteFramebuffers(1, &m_fbo);
+    	glDeleteRenderbuffers(1, &m_depthStencilBuffer);
     }
 
-	void OpenGLRenderer::Render()
+	void OpenGLRenderer::PreRender()
 	{
     	m_context.MakeCurrent();
-    	m_example->Render();
+
+    	RenderToTexture();
+	}
+
+	void OpenGLRenderer::Draw(Mesh const* mesh, Material const* material)
+	{
+
 	}
 
 	void OpenGLRenderer::Present()
@@ -89,8 +101,56 @@ namespace TG::Rendering
     	m_context.SwapBuffers();
 	}
 
-	void OpenGLRenderer::FrameBufferResizeCallback(unsigned int width, unsigned int height)
+	void OpenGLRenderer::ScreenFrameBufferResizeCallback(unsigned int width, unsigned int height)
 	{
-		glViewport(0, 0, static_cast<int>(width), static_cast<int>(height));
+    	m_screenWidth = width;
+    	m_screenHeight = height;
+	}
+
+	void OpenGLRenderer::SceneFrameBufferResizeCallback(unsigned int width, unsigned int height)
+	{
+		m_sceneWidth = width;
+    	m_sceneHeight = height;
+    	ResizeFrameBuffer(width, height);
+	}
+
+	void OpenGLRenderer::RenderToTexture() const
+	{
+	    glBindFramebuffer(GL_FRAMEBUFFER, CastID<OpenGLID>(m_framebufferTexture.GetID()));
+		glViewport(0, 0, static_cast<GLsizei>(m_sceneWidth), static_cast<GLsizei>(m_sceneHeight));
+    }
+
+	void OpenGLRenderer::RenderToScreen() const
+	{
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		glViewport(0, 0, static_cast<GLsizei>(m_screenWidth), static_cast<GLsizei>(m_screenHeight));
+	}
+
+	Texture const* OpenGLRenderer::RenderTarget()
+	{
+		return &m_framebufferTexture;
+	}
+
+	void OpenGLRenderer::ResizeFrameBuffer(unsigned int width, unsigned int height)
+	{
+    	glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
+    	// 颜色附件
+    	m_framebufferTexture.Resize(static_cast<int>(width), static_cast<int>(height));
+    	m_framebufferTexture.FilteringMode(TextureFilteringMode::BILINEAR);
+    	m_framebufferTexture.WrapMode(TextureWrapMode::CLAMP_TO_EDGE);
+    	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D,
+    		CastID<OpenGLID>(m_framebufferTexture.GetID()), 0);
+
+    	// 深度和模板附件
+    	glBindRenderbuffer(GL_RENDERBUFFER, m_depthStencilBuffer);
+    	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8,
+    		static_cast<GLsizei>(width), static_cast<GLsizei>(height));
+    	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT,
+    		GL_RENDERBUFFER, m_depthStencilBuffer);
+    	glBindRenderbuffer(GL_RENDERBUFFER, 0);
+
+    	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+    		throw BaseException::Create("ERROR::FRAMEBUFFER:: Framebuffer is not complete!");
+    	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	}
 }

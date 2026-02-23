@@ -3,7 +3,7 @@
 * Copyright (c) Gaiyitp9. All rights reserved.					*
 * This code is licensed under the MIT License (MIT).			*
 *****************************************************************/
-#include "Rendering/OpenGLExample/BasicLightExample.h"
+#include "BasicLightExample.h"
 #include "Rendering/Color/StandardColors.h"
 #include "Rendering/RayTracing/PathTracer.h"
 #include "Math/Transform/Transform.hpp"
@@ -12,7 +12,7 @@
 #include "imgui_impl_win32.h"
 #include "tiny_gltf.h"
 
-namespace TG::Rendering
+namespace TG
 {
     struct CameraData
     {
@@ -32,48 +32,48 @@ namespace TG::Rendering
         m_planeMesh(20.0f, 20.0f, 20, 20),
         m_planeProperty{
             Math::Vector3f{ 0.0f, 0.01f, -10.0f },
-            SlateGray,
+            Rendering::SlateGray,
             0.3f, 0.5f, 64.0f },
-        m_vertexShader("Assets/Shaders/GLSL/LightingModel/Phong/basic_lighting.vert", ShaderStage::Vertex),
-        m_fragmentShader("Assets/Shaders/GLSL/LightingModel/Phong/phong.frag", ShaderStage::Fragment),
-        m_wireframeGeometryShader("Assets/Shaders/GLSL/wireframe.geom", ShaderStage::Geometry),
-        m_wireframeFragmentShader("Assets/Shaders/GLSL/wireframe.frag", ShaderStage::Fragment)
+        m_vertexShader("Assets/Shaders/GLSL/LightingModel/Phong/basic_lighting.vert", Rendering::ShaderStage::Vertex),
+        m_fragmentShader("Assets/Shaders/GLSL/LightingModel/Phong/phong.frag", Rendering::ShaderStage::Fragment),
+        m_wireframeGeometryShader("Assets/Shaders/GLSL/wireframe.geom", Rendering::ShaderStage::Geometry),
+        m_wireframeFragmentShader("Assets/Shaders/GLSL/wireframe.frag", Rendering::ShaderStage::Fragment)
     {
         LoadRubberToy();
         m_rubberToyProperty = {
             Math::Vector3f{ 0.0f, 1.0f, -14.0f },
-            White,
+            Rendering::White,
             0.3f, 0.5f, 64.0f
         };
 
         m_sphereProperties[0] = {
             Math::Vector3f{ -6.0f, 1.0f, -10.0f },
-            SaddleBrown,
+            Rendering::SaddleBrown,
             0.3f, 0.5f, 8.0f
         };
         m_sphereProperties[1] = {
             Math::Vector3f{ -3.0f, 1.0f, -10.0f },
-            SaddleBrown,
+            Rendering::SaddleBrown,
             0.3f, 0.5f, 16.0f
         };
         m_sphereProperties[2] = {
             Math::Vector3f{ 0.0f, 1.0f, -10.0f },
-            SaddleBrown,
+            Rendering::SaddleBrown,
             0.3f, 0.5f, 32.0f
         };
         m_sphereProperties[3] = {
             Math::Vector3f{ 3.0f, 1.0f, -10.0f },
-            SaddleBrown,
+            Rendering::SaddleBrown,
             0.3f, 0.5f, 64.0f
         };
         m_sphereProperties[4] = {
             Math::Vector3f{ 6.0f, 1.0f, -10.0f },
-            SaddleBrown,
+            Rendering::SaddleBrown,
             0.3f, 0.5f, 128.0f
         };
 
         m_lightDirection = Math::Vector4f{ 1.0f, 1.0f, 1.0f, 0.0f };
-        m_lightColor = White;
+        m_lightColor = Rendering::White;
 
         glGenBuffers(1, &m_sphereVBO);
         glGenBuffers(1, &m_sphereEBO);
@@ -145,13 +145,15 @@ namespace TG::Rendering
 
         glGenProgramPipelines(1, &m_pipeline);
         glBindProgramPipeline(m_pipeline);
-        glUseProgramStages(m_pipeline, GL_VERTEX_SHADER_BIT, CastID<GLuint>(m_vertexShader.GetID()));
-        glUseProgramStages(m_pipeline, GL_FRAGMENT_SHADER_BIT, CastID<GLuint>(m_fragmentShader.GetID()));
+        glUseProgramStages(m_pipeline, GL_VERTEX_SHADER_BIT,
+            Rendering::CastID<Rendering::OpenGLID>(m_vertexShader.GetID()));
+        glUseProgramStages(m_pipeline, GL_FRAGMENT_SHADER_BIT,
+            Rendering::CastID<Rendering::OpenGLID>(m_fragmentShader.GetID()));
 
         glEnable(GL_DEPTH_TEST);
 
         // m_albedoTexture.Upload("Assets/Textures/wall.jpg");
-        m_albedoTexture.Upload(m_defaultAlbedo, 1, 1, TextureFormat::RGBA);
+        m_albedoTexture.Upload(m_defaultAlbedo, 1, 1, Rendering::TextureFormat::RGBA);
     }
 
     BasicLightExample::~BasicLightExample()
@@ -173,7 +175,7 @@ namespace TG::Rendering
             m_renderThread->join();
     }
 
-    void BasicLightExample::Render()
+    void BasicLightExample::Draw()
     {
         m_camera.Update();
 
@@ -183,20 +185,23 @@ namespace TG::Rendering
         // 正面朝向设置为顺时针
         // glFrontFace(GL_CW);
 
-        Color clearColor = DimGray;
+        Rendering::Color clearColor = Rendering::DimGray;
         glClearColor(clearColor.R(), clearColor.G(), clearColor.B(), clearColor.A());
         glClearDepth(1.0);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         if (m_wireframe)
         {
-            glUseProgramStages(m_pipeline, GL_GEOMETRY_SHADER_BIT, CastID<GLuint>(m_wireframeGeometryShader.GetID()));
-            glUseProgramStages(m_pipeline, GL_FRAGMENT_SHADER_BIT, CastID<GLuint>(m_wireframeFragmentShader.GetID()));
+            glUseProgramStages(m_pipeline, GL_GEOMETRY_SHADER_BIT,
+                Rendering::CastID<Rendering::OpenGLID>(m_wireframeGeometryShader.GetID()));
+            glUseProgramStages(m_pipeline, GL_FRAGMENT_SHADER_BIT,
+                Rendering::CastID<Rendering::OpenGLID>(m_wireframeFragmentShader.GetID()));
         }
         else
         {
             glUseProgramStages(m_pipeline, GL_GEOMETRY_SHADER_BIT, 0);
-            glUseProgramStages(m_pipeline, GL_FRAGMENT_SHADER_BIT, CastID<GLuint>(m_fragmentShader.GetID()));
+            glUseProgramStages(m_pipeline, GL_FRAGMENT_SHADER_BIT,
+                Rendering::CastID<Rendering::OpenGLID>(m_fragmentShader.GetID()));
         }
 
         glBindBuffer(GL_UNIFORM_BUFFER, m_cameraUbo);
@@ -215,7 +220,7 @@ namespace TG::Rendering
         glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
         glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, CastID<GLuint>(m_albedoTexture.GetID()));
+        glBindTexture(GL_TEXTURE_2D, Rendering::CastID<Rendering::OpenGLID>(m_albedoTexture.GetID()));
 
         glBindProgramPipeline(m_pipeline);
         glBindVertexArray(m_sphereVAO);
@@ -252,7 +257,7 @@ namespace TG::Rendering
 
         // 绘制橡胶玩具
         glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, CastID<GLuint>(m_rubberToyAlbedo.GetID()));
+        glBindTexture(GL_TEXTURE_2D, Rendering::CastID<Rendering::OpenGLID>(m_rubberToyAlbedo.GetID()));
         glBindVertexArray(m_rubberToyVAO);
         Math::Transform<float, 3> rubberToyModelTransform;
         rubberToyModelTransform.Translate(m_rubberToyProperty.position);
@@ -271,14 +276,85 @@ namespace TG::Rendering
 
         m_viewportGrid.Render(m_camera);
         m_viewportCompass.Render(m_camera);
+    }
 
-        ImGui_ImplOpenGL3_NewFrame();
-        ImGui_ImplWin32_NewFrame();
-        ImGui::NewFrame();
-
+    void BasicLightExample::DrawUI()
+    {
         const ImGuiIO& io = ImGui::GetIO();
         ImGui::Begin("General");
-        ImGui::Checkbox("Draw wireframe", &m_wireframe);
+        ImGui::Text("Draw wireframe");
+        ImGui::SameLine();
+        ImGui::Checkbox("##Draw wireframe", &m_wireframe);
+        ImGui::Text("Camera Position");
+        ImGui::SameLine();
+        ImGui::SetNextItemWidth(120);
+        ImGui::InputFloat("##PosX", &m_camera.position[0], 0.1f, 1.0f, "%.2f");
+        ImGui::SameLine();
+        ImGui::SetNextItemWidth(120);
+        ImGui::InputFloat("##PosY", &m_camera.position[1], 0.1f, 1.0f, "%.2f");
+        ImGui::SameLine();
+        ImGui::SetNextItemWidth(120);
+        ImGui::InputFloat("##PosZ", &m_camera.position[2], 0.1f, 1.0f, "%.2f");
+        ImGui::Text("Camera Front");
+        ImGui::SameLine();
+        ImGui::SetNextItemWidth(120);
+        ImGui::InputFloat("##FrontX", &m_camera.front[0], 0.1f, 1.0f, "%.2f");
+        ImGui::SameLine();
+        ImGui::SetNextItemWidth(120);
+        ImGui::InputFloat("##FrontY", &m_camera.front[1], 0.1f, 1.0f, "%.2f");
+        ImGui::SameLine();
+        ImGui::SetNextItemWidth(120);
+        ImGui::InputFloat("##FrontZ", &m_camera.front[2], 0.1f, 1.0f, "%.2f");
+        ImGui::Text("Camera Right");
+        ImGui::SameLine();
+        ImGui::SetNextItemWidth(120);
+        ImGui::InputFloat("##RightX", &m_camera.right[0], 0.1f, 1.0f, "%.2f");
+        ImGui::SameLine();
+        ImGui::SetNextItemWidth(120);
+        ImGui::InputFloat("##RightY", &m_camera.right[1], 0.1f, 1.0f, "%.2f");
+        ImGui::SameLine();
+        ImGui::SetNextItemWidth(120);
+        ImGui::InputFloat("##RightZ", &m_camera.right[2], 0.1f, 1.0f, "%.2f");
+        ImGui::Text("Camera Up");
+        ImGui::SameLine();
+        ImGui::SetNextItemWidth(120);
+        ImGui::InputFloat("##UpX", &m_camera.up[0], 0.1f, 1.0f, "%.2f");
+        ImGui::SameLine();
+        ImGui::SetNextItemWidth(120);
+        ImGui::InputFloat("##UpY", &m_camera.up[1], 0.1f, 1.0f, "%.2f");
+        ImGui::SameLine();
+        ImGui::SetNextItemWidth(120);
+        ImGui::InputFloat("##UpZ", &m_camera.up[2], 0.1f, 1.0f, "%.2f");
+        ImGui::Text("Camera Type");
+        ImGui::SameLine();
+        ImGui::SetNextItemWidth(120);
+        if (ImGui::Combo("##Camera Type", &m_currentType, m_cameraType, 2))
+        {
+            if (m_currentType == 0)
+                m_camera.cameraType = CameraType::Perspective;
+            else
+                m_camera.cameraType = CameraType::Orthographic;
+        }
+        ImGui::Text("Camera FOV");
+        ImGui::SameLine();
+        ImGui::SetNextItemWidth(120);
+        ImGui::InputFloat("##Camera fov", &m_camera.fov);
+        ImGui::Text("Camera Focal");
+        ImGui::SameLine();
+        ImGui::SetNextItemWidth(120);
+        ImGui::InputFloat("##Camera focal", &m_focal);
+        ImGui::Text("Camera Defocus Angle");
+        ImGui::SameLine();
+        ImGui::SetNextItemWidth(120);
+        ImGui::InputFloat("##Camera defocus angle", &m_defocusAngle);
+        ImGui::Text("Sample per Pixels");
+        ImGui::SameLine();
+        ImGui::SetNextItemWidth(120);
+        ImGui::InputInt("##Sample per pixels", &m_samplesPerPixel);
+        ImGui::Text("Max Depth");
+        ImGui::SameLine();
+        ImGui::SetNextItemWidth(120);
+        ImGui::InputInt("##Max Depth", &m_maxDepth);
         ImGui::BeginDisabled(!m_pathTracer.IsReady());
         if (ImGui::Button("Render"))
         {
@@ -288,7 +364,7 @@ namespace TG::Rendering
                 m_renderThread.reset();
             }
             m_renderThread = std::make_unique<std::thread>([this] {
-                RayTracing::PathTraceData pathTraceData;
+                Rendering::RayTracing::PathTraceData pathTraceData;
                 pathTraceData.imageWidth = 1600;
                 pathTraceData.imageHeight = 900;
                 pathTraceData.cameraPosition = m_camera.position;
@@ -296,11 +372,11 @@ namespace TG::Rendering
                 pathTraceData.up = m_camera.up;
                 pathTraceData.right = m_camera.right;
                 pathTraceData.aspectRatio = m_camera.AspectRatio();
-                pathTraceData.focalDistance = 8.0f;
+                pathTraceData.focalDistance = m_focal;
                 pathTraceData.fov = m_camera.fov;
-                pathTraceData.defocusAngle = 10.0f;
-                pathTraceData.samplesPerPixel = 50;
-                pathTraceData.maxDepth = 50;
+                pathTraceData.defocusAngle = m_defocusAngle;
+                pathTraceData.samplesPerPixel = m_samplesPerPixel;
+                pathTraceData.maxDepth = m_maxDepth;
                 m_pathTracer.Run(pathTraceData);
             });
         }
@@ -309,13 +385,6 @@ namespace TG::Rendering
         ImGui::ProgressBar(m_pathTracer.Process(), ImVec2(200.0f, 0.0f));
         ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
         ImGui::End();
-
-        ImGui::Render();
-
-        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-
-        ImGui::UpdatePlatformWindows();
-        ImGui::RenderPlatformWindowsDefault();
     }
 
     void BasicLightExample::LoadRubberToy()
@@ -428,15 +497,15 @@ namespace TG::Rendering
         // 加载Albedo贴图
         tinygltf::Texture texture = model.textures[0];
         tinygltf::Image image = model.images[texture.source];
-        auto textureFormat = TextureFormat::RGB;
+        auto textureFormat = Rendering::TextureFormat::RGB;
         if (image.component == 1)
-            textureFormat = TextureFormat::R;
+            textureFormat = Rendering::TextureFormat::R;
         else if (image.component == 2)
-            textureFormat = TextureFormat::RG;
+            textureFormat = Rendering::TextureFormat::RG;
         else if (image.component == 3)
-            textureFormat = TextureFormat::RGB;
+            textureFormat = Rendering::TextureFormat::RGB;
         else if (image.component == 4)
-            textureFormat = TextureFormat::RGBA;
+            textureFormat = Rendering::TextureFormat::RGBA;
         m_rubberToyAlbedo.Upload(image.image.data(), image.width, image.height, textureFormat);
     }
 }

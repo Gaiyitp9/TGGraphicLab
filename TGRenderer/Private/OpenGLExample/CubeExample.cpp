@@ -12,16 +12,16 @@
 #include "imgui_impl_opengl3.h"
 #include "imgui_impl_win32.h"
 
-namespace TG::Rendering
+namespace TG
 {
     CubeExample::CubeExample(const IDefaultVideoPort& videoPort, const ITimer& timer)
         : m_camera(videoPort, timer),
-        m_vertexShader("Assets/Shaders/GLSL/cube.vert", ShaderStage::Vertex),
-        m_fragmentShader("Assets/Shaders/GLSL/cube.frag", ShaderStage::Fragment),
-        m_wireframeGeometryShader("Assets/Shaders/GLSL/wireframe.geom", ShaderStage::Geometry),
-        m_wireframeFragmentShader("Assets/Shaders/GLSL/wireframe.frag", ShaderStage::Fragment)
+        m_vertexShader("Assets/Shaders/GLSL/cube.vert", Rendering::ShaderStage::Vertex),
+        m_fragmentShader("Assets/Shaders/GLSL/cube.frag", Rendering::ShaderStage::Fragment),
+        m_wireframeGeometryShader("Assets/Shaders/GLSL/wireframe.geom", Rendering::ShaderStage::Geometry),
+        m_wireframeFragmentShader("Assets/Shaders/GLSL/wireframe.frag", Rendering::ShaderStage::Fragment)
     {
-        m_cubeMesh = CreatePrimitive(PrimitiveType::Cube);
+        m_cubeMesh = Rendering::CreatePrimitive(Rendering::PrimitiveType::Cube);
 
         m_cubePositions[0] = Math::Vector3f{ 0.0f, 0.0f, 0.0f };
         m_cubePositions[1] = Math::Vector3f{ 2.0f, 5.0f, -15.0f };
@@ -67,7 +67,8 @@ namespace TG::Rendering
 
         glGenProgramPipelines(1, &m_pipeline);
         glBindProgramPipeline(m_pipeline);
-        glUseProgramStages(m_pipeline, GL_VERTEX_SHADER_BIT, CastID<GLuint>(m_vertexShader.GetID()));
+        glUseProgramStages(m_pipeline, GL_VERTEX_SHADER_BIT,
+            Rendering::CastID<Rendering::OpenGLID>(m_vertexShader.GetID()));
 
         glEnable(GL_DEPTH_TEST);
     }
@@ -80,7 +81,7 @@ namespace TG::Rendering
         glDeleteProgramPipelines(1, &m_pipeline);
     }
 
-    void CubeExample::Render()
+    void CubeExample::Draw()
     {
         m_camera.Update();
 
@@ -90,7 +91,7 @@ namespace TG::Rendering
         // 正面朝向设置为顺时针
         // glFrontFace(GL_CW);
 
-        Color clearColor = DimGray;
+        Rendering::Color clearColor = Rendering::DimGray;
 
         glClearColor(clearColor.R(), clearColor.G(), clearColor.B(), clearColor.A());
         glClearDepth(1.0);
@@ -98,19 +99,22 @@ namespace TG::Rendering
 
         if (m_wireframe)
         {
-            glUseProgramStages(m_pipeline, GL_GEOMETRY_SHADER_BIT, CastID<GLuint>(m_wireframeGeometryShader.GetID()));
-            glUseProgramStages(m_pipeline, GL_FRAGMENT_SHADER_BIT, CastID<GLuint>(m_wireframeFragmentShader.GetID()));
+            glUseProgramStages(m_pipeline, GL_GEOMETRY_SHADER_BIT,
+                Rendering::CastID<Rendering::OpenGLID>(m_wireframeGeometryShader.GetID()));
+            glUseProgramStages(m_pipeline, GL_FRAGMENT_SHADER_BIT,
+                Rendering::CastID<Rendering::OpenGLID>(m_wireframeFragmentShader.GetID()));
         }
         else
         {
             glUseProgramStages(m_pipeline, GL_GEOMETRY_SHADER_BIT, 0);
-            glUseProgramStages(m_pipeline, GL_FRAGMENT_SHADER_BIT, CastID<GLuint>(m_fragmentShader.GetID()));
+            glUseProgramStages(m_pipeline, GL_FRAGMENT_SHADER_BIT,
+                Rendering::CastID<Rendering::OpenGLID>(m_fragmentShader.GetID()));
         }
 
         glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, CastID<GLuint>(m_textures[0].GetID()));
+        glBindTexture(GL_TEXTURE_2D, Rendering::CastID<Rendering::OpenGLID>(m_textures[0].GetID()));
         glActiveTexture(GL_TEXTURE1);
-        glBindTexture(GL_TEXTURE_2D, CastID<GLuint>(m_textures[1].GetID()));
+        glBindTexture(GL_TEXTURE_2D, Rendering::CastID<Rendering::OpenGLID>(m_textures[1].GetID()));
 
         m_vertexShader.SetMat4("view", m_camera.ViewMatrix());
         m_vertexShader.SetMat4("projection", m_camera.ProjectionMatrix());
@@ -132,22 +136,14 @@ namespace TG::Rendering
         m_skyBox.Render(m_camera);
         m_viewportGrid.Render(m_camera);
         m_viewportCompass.Render(m_camera);
+    }
 
-        ImGui_ImplOpenGL3_NewFrame();
-        ImGui_ImplWin32_NewFrame();
-        ImGui::NewFrame();
-
+    void CubeExample::DrawUI()
+    {
         const ImGuiIO& io = ImGui::GetIO();
         ImGui::Begin("Settings");
         ImGui::Checkbox("Draw wireframe", &m_wireframe);
         ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
         ImGui::End();
-
-        ImGui::Render();
-
-        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-
-        ImGui::UpdatePlatformWindows();
-        ImGui::RenderPlatformWindowsDefault();
     }
 }

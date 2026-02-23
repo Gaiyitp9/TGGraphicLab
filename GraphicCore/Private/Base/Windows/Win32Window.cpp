@@ -29,6 +29,12 @@ namespace TG
 				break;
 		}
 
+        // 获取桌面工作区尺寸(也就是去掉任务栏部分的区域)
+        RECT workAreaRect;
+        if (!SystemParametersInfoA(SPI_GETWORKAREA, 0, &workAreaRect, 0))
+            throw Win32Exception::Create();
+        int workAreaWidth = workAreaRect.right - workAreaRect.left;
+        int workAreaHeight = workAreaRect.bottom - workAreaRect.top;
 		// 初始化为客户端区域大小
 		RECT windowRect = { 0, 0, static_cast<LONG>(width), static_cast<LONG>(height) };
 		// 根据客户区域宽和高计算整个窗口的宽和高
@@ -36,18 +42,21 @@ namespace TG
 			throw Win32Exception::Create();
 	    int windowWidth = windowRect.right - windowRect.left;
 	    int windowHeight = windowRect.bottom - windowRect.top;
-	    // 主窗口屏幕居中
-	    if (type == WindowType::Main)
+		// 如果窗口的尺寸大于屏幕尺寸，那么重新设置窗口尺寸
+		while (workAreaWidth < windowWidth || workAreaHeight < windowHeight)
 	    {
-	        // 获取桌面工作区尺寸(也就是去掉任务栏部分的区域)
-	        RECT workAreaRect;
-	        if (!SystemParametersInfoA(SPI_GETWORKAREA, 0, &workAreaRect, 0))
-	            throw Win32Exception::Create();
-	        int workAreaWidth = workAreaRect.right - workAreaRect.left;
-	        int workAreaHeight = workAreaRect.bottom - workAreaRect.top;
-	        posX = (workAreaWidth - windowWidth) / 2;
-	        posY = (workAreaHeight - windowHeight) / 2;
+			this->width = this->width * 3 / 4;
+	    	this->height = this->height * 3 / 4;
+			windowRect.right = static_cast<LONG>(this->width);
+			windowRect.bottom = static_cast<LONG>(this->height);
+	    	if (!AdjustWindowRect(&windowRect, dwStyle, false))
+	    		throw Win32Exception::Create();
+	    	windowWidth = windowRect.right - windowRect.left;
+	    	windowHeight = windowRect.bottom - windowRect.top;
 	    }
+	    // 窗口屏幕居中
+        posX = (workAreaWidth - windowWidth) / 2;
+        posY = (workAreaHeight - windowHeight) / 2;
 		handle = CreateWindowExW(dwExStyle, L"Default", MultiBytesToWideChars(name).c_str(), dwStyle,
 							   posX, posY, windowWidth, windowHeight, nullptr, nullptr, nullptr, this);
 		if (handle == nullptr)

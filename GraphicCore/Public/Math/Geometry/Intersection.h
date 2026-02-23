@@ -8,9 +8,11 @@
 #include "Math/Geometry/Ray.h"
 #include "Sphere.h"
 #include "ConvexPolygon.h"
+#include "AABB.h"
 
 namespace TG::Math::Geometry::Intersection
 {
     bool RaySphere(const Ray& ray, const Sphere& sphere, float& tMin, float& tMax);
     bool RayConvexPolygon(const Ray& ray, const ConvexPolygon& convex, float& t);
+    bool AABBAABB(const AABB& aabb1, const AABB& aabb2);
 }

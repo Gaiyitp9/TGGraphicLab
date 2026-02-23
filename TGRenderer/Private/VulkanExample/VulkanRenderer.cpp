@@ -3,7 +3,7 @@
 * Copyright (c) Gaiyitp9. All rights reserved.					*
 * This code is licensed under the MIT License (MIT).			*
 *****************************************************************/
-#include "Rendering/VulkanExample/VulkanRenderer.h"
+#include "VulkanRenderer.h"
 #include "Base/Utility.h"
 #include "Diagnostic/Log.hpp"
 #include "Exception/BaseException.h"
@@ -63,9 +63,14 @@ namespace TG::Rendering
         vkDestroyInstance(m_instance, nullptr);
     }
 
-    void VulkanRenderer::Render()
+    void VulkanRenderer::PreRender()
     {
         DrawFrame();
+    }
+
+    void VulkanRenderer::Draw(Mesh const* mesh, Material const* material)
+    {
+
     }
 
     void VulkanRenderer::Present()
@@ -92,7 +97,7 @@ namespace TG::Rendering
         m_currentFrame = (m_currentFrame + 1) % MAX_FRAMES_IN_FLIGHT;
     }
 
-    void VulkanRenderer::FrameBufferResizeCallback(unsigned int width, unsigned int height)
+    void VulkanRenderer::ScreenFrameBufferResizeCallback(unsigned int width, unsigned int height)
     {
         m_framebufferResized = true;
         m_width = width;

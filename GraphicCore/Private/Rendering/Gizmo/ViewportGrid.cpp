@@ -3,7 +3,7 @@
 * Copyright (c) Gaiyitp9. All rights reserved.					*
 * This code is licensed under the MIT License (MIT).			*
 *****************************************************************/
-#include "ViewportGrid.h"
+#include "Rendering/Gizmo/ViewportGrid.h"
 
 namespace TG::Rendering
 {
@@ -13,9 +13,9 @@ namespace TG::Rendering
     {
         glGenVertexArrays(1, &m_VAO);
         glGenProgramPipelines(1, &m_pipeline);
-        glUseProgramStages(m_pipeline, GL_VERTEX_SHADER_BIT, CastID<GLuint>(m_vertexShader.GetID()));
-        glUseProgramStages(m_pipeline, GL_FRAGMENT_SHADER_BIT, CastID<GLuint>(m_fragmentShader.GetID()));
-        glUseProgramStages(m_pipeline, GL_GEOMETRY_SHADER_BIT, CastID<GLuint>(m_geometryShader.GetID()));
+        glUseProgramStages(m_pipeline, GL_VERTEX_SHADER_BIT, CastID<OpenGLID>(m_vertexShader.GetID()));
+        glUseProgramStages(m_pipeline, GL_FRAGMENT_SHADER_BIT, CastID<OpenGLID>(m_fragmentShader.GetID()));
+        glUseProgramStages(m_pipeline, GL_GEOMETRY_SHADER_BIT, CastID<OpenGLID>(m_geometryShader.GetID()));
     }
 
     ViewportGrid::~ViewportGrid()

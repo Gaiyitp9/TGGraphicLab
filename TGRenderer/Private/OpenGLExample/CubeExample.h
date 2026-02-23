@@ -5,17 +5,17 @@
 *****************************************************************/
 #pragma once
 
-#include "Rendering/Example.h"
+#include "Example.h"
 #include "Base/CommonInterfaces.h"
 #include "Rendering/Mesh/Mesh.h"
 #include "Rendering/Camera.h"
 #include "Rendering/OpenGL/OpenGLShader.h"
 #include "Rendering/OpenGL/OpenGLTexture2D.h"
-#include "ViewportGrid.h"
-#include "SkyBox.h"
-#include "ViewportCompass.h"
+#include "Rendering/Gizmo/ViewportGrid.h"
+#include "Rendering/Gizmo/SkyBox.h"
+#include "Rendering/Gizmo/ViewportCompass.h"
 
-namespace TG::Rendering
+namespace TG
 {
     class CubeExample final : public Example
     {
@@ -23,12 +23,13 @@ namespace TG::Rendering
         CubeExample(const IDefaultVideoPort& videoPort, const ITimer& timer);
         ~CubeExample() override;
 
-        void Render() override;
+        void Draw() override;
+        void DrawUI() override;
 
     private:
         Camera m_camera;
 
-        Mesh m_cubeMesh;
+        Rendering::Mesh m_cubeMesh;
         Math::Vector3f m_cubePositions[10];
 
         GLuint m_VAO{};
@@ -36,14 +37,14 @@ namespace TG::Rendering
         GLuint m_EBO{};
         bool m_wireframe{ false };
         GLuint m_pipeline{};
-        OpenGLShader m_vertexShader;
-        OpenGLShader m_fragmentShader;
-        OpenGLShader m_wireframeGeometryShader;
-        OpenGLShader m_wireframeFragmentShader;
-        OpenGLTexture2D m_textures[2]{};
+        Rendering::OpenGLShader m_vertexShader;
+        Rendering::OpenGLShader m_fragmentShader;
+        Rendering::OpenGLShader m_wireframeGeometryShader;
+        Rendering::OpenGLShader m_wireframeFragmentShader;
+        Rendering::OpenGLTexture2D m_textures[2]{};
 
-        SkyBox m_skyBox;
-        ViewportGrid m_viewportGrid;
-        ViewportCompass m_viewportCompass;
+        Rendering::SkyBox m_skyBox;
+        Rendering::ViewportGrid m_viewportGrid;
+        Rendering::ViewportCompass m_viewportCompass;
     };
 }

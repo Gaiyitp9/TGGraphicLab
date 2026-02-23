@@ -23,16 +23,20 @@ namespace TG
         RenderModule& operator=(RenderModule&&) = delete;
         ~RenderModule() override;
 
-        void SetupRenderer(const IDefaultVideoPort& videoPort, const ITimer& timer);
-        void Subscribe(MulticastDelegate<void(unsigned, unsigned)>& windowResizeDelegate);
+        void SetupRenderer(const IDefaultVideoPort& videoPort);
+        void Subscribe(MulticastDelegate<void(unsigned, unsigned)>& windowResizeDelegate,
+            MulticastDelegate<void(unsigned, unsigned)>& sceneResizeDelegate);
 
-        [[nodiscard]] Renderer* GetRenderer() const noexcept { return m_Renderer.get(); }
+        [[nodiscard]] Rendering::Renderer* GetRenderer() const noexcept { return m_Renderer.get(); }
 
         void Update() override;
         void PostUpdate() override;
 
+        // 绘制委托
+        MulticastDelegate<void()> onDraw;
+
     private:
         Rendering::GraphicsAPI m_GraphicsAPI{ Rendering::GraphicsAPI::OpenGL };
-        std::unique_ptr<Renderer> m_Renderer;
+        std::unique_ptr<Rendering::Renderer> m_Renderer;
     };
 }

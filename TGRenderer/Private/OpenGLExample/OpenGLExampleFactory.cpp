@@ -4,11 +4,11 @@
 * This code is licensed under the MIT License (MIT).			*
 *****************************************************************/
 #include "OpenGLExampleFactory.h"
-#include "Rendering/OpenGLExample/QuadExample.h"
-#include "Rendering/OpenGLExample/CubeExample.h"
-#include "Rendering/OpenGLExample/BasicLightExample.h"
+#include "QuadExample.h"
+#include "CubeExample.h"
+#include "BasicLightExample.h"
 
-namespace TG::Rendering
+namespace TG
 {
     OpenGlExampleFactory::OpenGlExampleFactory(const IDefaultVideoPort& videoPort,
         const ITimer& timer) : m_videoPort(videoPort), m_timer(timer)

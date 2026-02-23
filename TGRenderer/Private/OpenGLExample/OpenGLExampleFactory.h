@@ -5,10 +5,10 @@
 *****************************************************************/
 #pragma once
 
-#include "Rendering/Example.h"
+#include "Example.h"
 #include "Base/CommonInterfaces.h"
 
-namespace TG::Rendering
+namespace TG
 {
     class OpenGlExampleFactory : public ExampleFactory
     {

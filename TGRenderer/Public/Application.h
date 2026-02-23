@@ -8,6 +8,7 @@
 #include "Modules/PlatformModule.h"
 #include "Modules/RenderModule.h"
 #include "Modules/EditorModule.h"
+#include "OpenGLExample/OpenGLExampleFactory.h"
 #include <vector>
 
 namespace TG
@@ -29,5 +30,9 @@ namespace TG
 		std::unique_ptr<RenderModule> m_renderModule;
 		std::unique_ptr<EditorModule> m_editorModule;
 		std::vector<Module*> m_modules;
+
+		std::unique_ptr<ExampleFactory> m_exampleFactory;
+		std::unique_ptr<Example> m_example;
+		ExampleEnum m_exampleEnum = ExampleEnum::BasicLight;
 	};
 }

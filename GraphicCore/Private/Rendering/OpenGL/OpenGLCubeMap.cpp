@@ -12,7 +12,7 @@
 
 namespace TG::Rendering
 {
-    void OpenGLCubeMap::Upload(std::string_view filePath) const
+    void OpenGLCubeMap::Upload(std::string_view filePath)
     {
         std::array<std::string, 6> faces;
 
@@ -104,7 +104,22 @@ namespace TG::Rendering
         }
     }
 
-    void OpenGLCubeMap::Upload(unsigned char const*data, int width, int height, TextureFormat textureFormat) const
+    void OpenGLCubeMap::Upload(unsigned char const*data, int width, int height, TextureFormat textureFormat)
+    {
+
+    }
+
+    void OpenGLCubeMap::Resize(int width, int height)
+    {
+
+    }
+
+    void OpenGLCubeMap::FilteringMode(TextureFilteringMode filteringMode)
+    {
+
+    }
+
+    void OpenGLCubeMap::WrapMode(TextureWrapMode wrapMode)
     {
 
     }

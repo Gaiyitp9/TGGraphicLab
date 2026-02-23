@@ -23,8 +23,8 @@ namespace TG::Rendering
     using ShaderID = std::variant<OpenGLID>;
     using TextureID = std::variant<OpenGLID>;
 
-    template<typename T>
-    T CastID(ShaderID id)
+    template<typename T, typename ID>
+    T CastID(ID id)
     {
         return std::get<T>(id);
     }

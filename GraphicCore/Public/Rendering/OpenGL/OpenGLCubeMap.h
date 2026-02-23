@@ -15,7 +15,12 @@ namespace TG::Rendering
         OpenGLCubeMap() = default;
         ~OpenGLCubeMap() override = default;
 
-        void Upload(std::string_view filePath) const override;
-        void Upload(unsigned char const* data, int width, int height, TextureFormat textureFormat) const override;
+        void Upload(std::string_view filePath) override;
+        void Upload(unsigned char const* data, int width, int height,
+            TextureFormat textureFormat) override;
+
+        void Resize(int width, int height) override;
+        void FilteringMode(TextureFilteringMode filteringMode) override;
+        void WrapMode(TextureWrapMode wrapMode) override;
     };
 }

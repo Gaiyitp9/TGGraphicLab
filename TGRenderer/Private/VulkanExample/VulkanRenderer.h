@@ -25,9 +25,10 @@ namespace TG::Rendering
         explicit VulkanRenderer(const IDefaultVideoPort& videoPort);
         ~VulkanRenderer() override;
 
-        void Render() override;
+        void PreRender() override;
+        void Draw(Mesh const* mesh, Material const* material) override;
         void Present() override;
-        void FrameBufferResizeCallback(unsigned int width, unsigned int height) override;
+        void ScreenFrameBufferResizeCallback(unsigned int width, unsigned int height) override;
 
     private:
         void CheckLayerAndExtension();

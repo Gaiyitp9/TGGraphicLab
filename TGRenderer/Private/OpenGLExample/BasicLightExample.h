@@ -5,12 +5,12 @@
 *****************************************************************/
 #pragma once
 
-#include "Rendering/Example.h"
+#include "Example.h"
 #include "Rendering/Mesh/Sphere.h"
 #include "Rendering/Mesh/Plane.h"
 #include "Rendering/RayTracing/PathTracer.h"
-#include "ViewportGrid.h"
-#include "ViewportCompass.h"
+#include "Rendering/Gizmo/ViewportGrid.h"
+#include "Rendering/Gizmo/ViewportCompass.h"
 
 namespace tinygltf
 {
@@ -19,7 +19,7 @@ namespace tinygltf
     class Mesh;
 }
 
-namespace TG::Rendering
+namespace TG
 {
     class BasicLightExample final : public Example
     {
@@ -27,7 +27,8 @@ namespace TG::Rendering
         BasicLightExample(const IDefaultVideoPort& videoPort, const ITimer& timer);
         ~BasicLightExample() override;
 
-        void Render() override;
+        void Draw() override;
+        void DrawUI() override;
 
     private:
         void LoadRubberToy();
@@ -35,7 +36,7 @@ namespace TG::Rendering
         struct ObjectProperty
         {
             Math::Vector3f position;
-            Color color;
+            Rendering::Color color;
             float ambientStrength;
             float specularStrength;
             float shininess;
@@ -43,23 +44,25 @@ namespace TG::Rendering
 
         const ITimer& m_timer;
         Camera m_camera;
+        const char* m_cameraType[2]{ "Perspective", "Orthographic" };
+        int m_currentType = 0;
 
-        Mesh m_rubberToyMesh;
+        Rendering::Mesh m_rubberToyMesh;
         ObjectProperty m_rubberToyProperty;
 
-        Sphere m_sphereMesh;
+        Rendering::Sphere m_sphereMesh;
         ObjectProperty m_sphereProperties[5];
 
-        Plane m_planeMesh;
+        Rendering::Plane m_planeMesh;
         ObjectProperty m_planeProperty;
 
         Math::Vector4f m_lightDirection;
-        Color m_lightColor;
+        Rendering::Color m_lightColor;
 
         GLuint m_rubberToyVAO{};
         GLuint m_rubberToyVBO{};
         GLuint m_rubberToyEBO{};
-        OpenGLTexture2D m_rubberToyAlbedo{};
+        Rendering::OpenGLTexture2D m_rubberToyAlbedo{};
 
         GLuint m_sphereVAO{};
         GLuint m_sphereVBO{};
@@ -73,19 +76,23 @@ namespace TG::Rendering
         GLuint m_cameraUbo{};
         GLuint m_renderUbo{};
 
-        OpenGLTexture2D m_albedoTexture;
+        Rendering::OpenGLTexture2D m_albedoTexture;
         const unsigned char m_defaultAlbedo[4] = { 255, 255, 255, 255 };
 
-        OpenGLShader m_vertexShader;
-        OpenGLShader m_fragmentShader;
-        OpenGLShader m_wireframeGeometryShader;
-        OpenGLShader m_wireframeFragmentShader;
+        Rendering::OpenGLShader m_vertexShader;
+        Rendering::OpenGLShader m_fragmentShader;
+        Rendering::OpenGLShader m_wireframeGeometryShader;
+        Rendering::OpenGLShader m_wireframeFragmentShader;
 
         bool m_wireframe{ false };
-        ViewportGrid m_viewportGrid;
-        ViewportCompass m_viewportCompass;
+        Rendering::ViewportGrid m_viewportGrid;
+        Rendering::ViewportCompass m_viewportCompass;
 
         std::unique_ptr<std::thread> m_renderThread;
-        RayTracing::PathTracer m_pathTracer;
+        Rendering::RayTracing::PathTracer m_pathTracer;
+        float m_focal = 10.0f;
+        float m_defocusAngle = 0.6f;
+        int m_samplesPerPixel = 50;
+        int m_maxDepth = 50;
     };
 }

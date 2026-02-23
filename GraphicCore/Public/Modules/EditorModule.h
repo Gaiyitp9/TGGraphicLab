@@ -21,16 +21,22 @@ namespace TG
         EditorModule& operator=(EditorModule&&) = delete;
         ~EditorModule() override;
 
-        void SetRenderer(Renderer* renderer);
+        void SetRenderer(Rendering::Renderer* renderer);
         void PlugInVideoPort(const IDefaultVideoPort& display);
 
         void Update() override;
         void PostUpdate() override;
 
+        // Scene窗口尺寸变化委托
+        MulticastDelegate<void(unsigned, unsigned)> onSceneViewportResize;
+
+        // 绘制委托
+        MulticastDelegate<void()> onDrawUI;
+
     private:
-        Renderer* m_renderer{ nullptr };
+        Rendering::Renderer* m_renderer{ nullptr };
         bool m_isInitialized{ false };
-        // bool m_showDemoWindow{ true };
-        // bool m_showAnotherWindow{ false };
+        unsigned int m_sceneWidth{ 0 };
+        unsigned int m_sceneHeight{ 0 };
     };
 }

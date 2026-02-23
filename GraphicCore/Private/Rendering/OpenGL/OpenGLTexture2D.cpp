@@ -9,27 +9,25 @@
 
 namespace TG::Rendering
 {
-    void OpenGLTexture2D::Upload(std::string_view filePath) const
+    void OpenGLTexture2D::Upload(std::string_view filePath)
     {
-        int width, height, channels;
-        if (unsigned char* data = stbi_load(filePath.data(), &width, &height, &channels, 0))
+        int channels;
+        if (unsigned char* data = stbi_load(filePath.data(), &m_width, &m_height, &channels, 0))
         {
-            GLint internalFormat;
-            GLenum format;
             if (channels == 1)
             {
-                internalFormat = GL_RED;
-                format = GL_RED;
+                m_internalFormat = GL_RED;
+                m_format = GL_RED;
             }
             else if (channels == 3)
             {
-                internalFormat = GL_RGB;
-                format = GL_RGB;
+                m_internalFormat = GL_RGB;
+                m_format = GL_RGB;
             }
             else
             {
-                internalFormat = GL_RGBA;
-                format = GL_RGBA;
+                m_internalFormat = GL_RGBA;
+                m_format = GL_RGBA;
             }
 
             glBindTexture(GL_TEXTURE_2D, m_texture);
@@ -37,7 +35,7 @@ namespace TG::Rendering
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-            glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, width, height, 0, format, GL_UNSIGNED_BYTE, data);
+            glTexImage2D(GL_TEXTURE_2D, 0, m_internalFormat, m_width, m_height, 0, m_format, GL_UNSIGNED_BYTE, data);
             stbi_image_free(data);
         }
         else
@@ -46,40 +44,40 @@ namespace TG::Rendering
         }
     }
 
-    void OpenGLTexture2D::Upload(unsigned char const* data, int width, int height, TextureFormat textureFormat) const
+    void OpenGLTexture2D::Upload(unsigned char const* data, int width, int height, TextureFormat textureFormat)
     {
-        GLint internalFormat;
-        GLenum format;
+        m_width = width;
+        m_height = height;
         switch (textureFormat)
         {
             case TextureFormat::R:
             {
-                internalFormat = GL_RED;
-                format = GL_RED;
+                m_internalFormat = GL_RED;
+                m_format = GL_RED;
                 break;
             }
             case TextureFormat::RG:
             {
-                internalFormat = GL_RG;
-                format = GL_RG;
+                m_internalFormat = GL_RG;
+                m_format = GL_RG;
                 break;
             }
             case TextureFormat::RGB:
             {
-                internalFormat = GL_RGB;
-                format = GL_RGB;
+                m_internalFormat = GL_RGB;
+                m_format = GL_RGB;
                 break;
             }
             case TextureFormat::RGBA:
             {
-                internalFormat = GL_RGBA;
-                format = GL_RGBA;
+                m_internalFormat = GL_RGBA;
+                m_format = GL_RGBA;
                 break;
             }
             default:
             {
-                internalFormat = GL_RGBA;
-                format = GL_RGBA;
+                m_internalFormat = GL_RGBA;
+                m_format = GL_RGBA;
             }
         }
 
@@ -88,6 +86,70 @@ namespace TG::Rendering
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, width, height, 0, format, GL_UNSIGNED_BYTE, data);
+        glTexImage2D(GL_TEXTURE_2D, 0, m_internalFormat, m_width, m_height, 0, m_format, GL_UNSIGNED_BYTE, data);
+    }
+
+    void OpenGLTexture2D::Resize(int width, int height)
+    {
+        glBindTexture(GL_TEXTURE_2D, m_texture);
+        glTexImage2D(GL_TEXTURE_2D, 0, m_internalFormat, width, height, 0, m_format, GL_UNSIGNED_BYTE, nullptr);
+        glBindTexture(GL_TEXTURE_2D, 0);
+    }
+
+    void OpenGLTexture2D::FilteringMode(TextureFilteringMode filteringMode)
+    {
+        glBindTexture(GL_TEXTURE_2D, m_texture);
+        GLint mode = GL_NEAREST;
+        switch (filteringMode)
+        {
+            case TextureFilteringMode::POINT:
+                mode = GL_NEAREST;
+                break;
+            case TextureFilteringMode::BILINEAR:
+                mode = GL_LINEAR;
+                break;
+            case TextureFilteringMode::TRILINEAR:
+                mode = GL_LINEAR_MIPMAP_LINEAR;
+                break;
+            case TextureFilteringMode::MIN_MAG_POINT_MIPMAP_POINT:
+                mode = GL_NEAREST_MIPMAP_NEAREST;
+                break;
+            case TextureFilteringMode::MIN_MAG_LINEAR_MIPMAP_POINT:
+                mode = GL_LINEAR_MIPMAP_NEAREST;
+                break;
+            case TextureFilteringMode::MIN_MAG_POINT_MIPMAP_LINEAR:
+                mode = GL_NEAREST_MIPMAP_LINEAR;
+                break;
+        }
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, mode);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, mode);
+        glBindTexture(GL_TEXTURE_2D, 0);
+    }
+
+    void OpenGLTexture2D::WrapMode(TextureWrapMode wrapMode)
+    {
+        glBindTexture(GL_TEXTURE_2D, m_texture);
+        GLint mode = GL_REPEAT;
+        switch (wrapMode)
+        {
+            case TextureWrapMode::REPEAT:
+                mode = GL_REPEAT;
+                break;
+            case TextureWrapMode::CLAMP_TO_EDGE:
+                mode = GL_CLAMP_TO_EDGE;
+                break;
+            case TextureWrapMode::CLAMP_TO_BORDER:
+                mode = GL_CLAMP_TO_BORDER;
+                break;
+            case TextureWrapMode::MIRRORED_REPEAT:
+                mode = GL_MIRRORED_REPEAT;
+                break;
+            case TextureWrapMode::MIRROR_CLAMP_TO_EDGE:
+                mode = GL_MIRROR_CLAMP_TO_EDGE;
+                break;
+        }
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, mode);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, mode);
+        glBindTexture(GL_TEXTURE_2D, 0);
     }
 }

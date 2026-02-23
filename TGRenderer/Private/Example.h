@@ -13,7 +13,8 @@ namespace TG
     {
         virtual ~Example() = default;
 
-        virtual void Render() = 0;
+        virtual void Draw() = 0;
+        virtual void DrawUI() = 0;
     };
 
     enum class ExampleEnum

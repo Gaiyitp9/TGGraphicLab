@@ -3,7 +3,7 @@
 * Copyright (c) Gaiyitp9. All rights reserved.					*
 * This code is licensed under the MIT License (MIT).			*
 *****************************************************************/
-#include "ViewportCompass.h"
+#include "Rendering/Gizmo/ViewportCompass.h"
 #include "Rendering/ViewProjectionMatrix.hpp"
 #include "Base/Utility.h"
 
@@ -29,8 +29,8 @@ namespace TG::Rendering
         glGenVertexArrays(1, &m_axisVAO);
         glGenProgramPipelines(1, &m_axisPipeline);
 
-        glUseProgramStages(m_axisPipeline, GL_VERTEX_SHADER_BIT, CastID<GLuint>(m_axisVertexShader.GetID()));
-        glUseProgramStages(m_axisPipeline, GL_FRAGMENT_SHADER_BIT, CastID<GLuint>(m_axisFragmentShader.GetID()));
+        glUseProgramStages(m_axisPipeline, GL_VERTEX_SHADER_BIT, CastID<OpenGLID>(m_axisVertexShader.GetID()));
+        glUseProgramStages(m_axisPipeline, GL_FRAGMENT_SHADER_BIT, CastID<OpenGLID>(m_axisFragmentShader.GetID()));
 
         glBindVertexArray(m_axisVAO);
         glBindBuffer(GL_ARRAY_BUFFER, m_axisVBO);
@@ -51,8 +51,8 @@ namespace TG::Rendering
         glGenVertexArrays(1, &m_axisNameVAO);
         glGenProgramPipelines(1, &m_axisNamePipeline);
 
-        glUseProgramStages(m_axisNamePipeline, GL_VERTEX_SHADER_BIT, CastID<GLuint>(m_axisNameVertexShader.GetID()));
-        glUseProgramStages(m_axisNamePipeline, GL_FRAGMENT_SHADER_BIT, CastID<GLuint>(m_axisNameFragmentShader.GetID()));
+        glUseProgramStages(m_axisNamePipeline, GL_VERTEX_SHADER_BIT, CastID<OpenGLID>(m_axisNameVertexShader.GetID()));
+        glUseProgramStages(m_axisNamePipeline, GL_FRAGMENT_SHADER_BIT, CastID<OpenGLID>(m_axisNameFragmentShader.GetID()));
 
         glBindVertexArray(m_axisNameVAO);
         glBindBuffer(GL_ARRAY_BUFFER, m_axisNameVBO);
@@ -151,7 +151,7 @@ namespace TG::Rendering
         m_axisNameVertexShader.SetMat4("model", model);
         m_axisNameFragmentShader.SetFloat3("fontColor", 1.0f, 0.0f, 0.0f);
         glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, CastID<GLuint>(m_axisNameTextures[0].GetID()));
+        glBindTexture(GL_TEXTURE_2D, CastID<OpenGLID>(m_axisNameTextures[0].GetID()));
     	glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(m_axisNameMesh.indices.size()), GL_UNSIGNED_INT, nullptr);
 
         model[0, 3] = 0.0f;
@@ -159,7 +159,7 @@ namespace TG::Rendering
         m_axisNameVertexShader.SetMat4("model", model);
         m_axisNameFragmentShader.SetFloat3("fontColor", 0.0f, 1.0f, 0.0f);
         glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, CastID<GLuint>(m_axisNameTextures[1].GetID()));
+        glBindTexture(GL_TEXTURE_2D, CastID<OpenGLID>(m_axisNameTextures[1].GetID()));
         glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(m_axisNameMesh.indices.size()), GL_UNSIGNED_INT, nullptr);
 
         model[0, 3] = 0.0f;
@@ -168,7 +168,7 @@ namespace TG::Rendering
         m_axisNameVertexShader.SetMat4("model", model);
         m_axisNameFragmentShader.SetFloat3("fontColor", 0.0f, 0.0f, 1.0f);
         glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, CastID<GLuint>(m_axisNameTextures[2].GetID()));
+        glBindTexture(GL_TEXTURE_2D, CastID<OpenGLID>(m_axisNameTextures[2].GetID()));
         glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(m_axisNameMesh.indices.size()), GL_UNSIGNED_INT, nullptr);
 
         glBindVertexArray(0);
