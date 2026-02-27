@@ -44,7 +44,7 @@ namespace TG::Rendering
 
         std::vector<char> m_fontBuffer;
         stbtt_fontinfo m_font{};
-        float m_fontSize = 20.0f;
+        float m_fontSize = 40.0f;
         float m_fontScale;
 
         OpenGLTexture2D m_axisNameTextures[3];

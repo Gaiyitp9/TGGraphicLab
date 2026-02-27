@@ -11,7 +11,7 @@
 namespace TG::Rendering
 {
     OpenGLRenderer::OpenGLRenderer(const IDefaultVideoPort& videoPort)
-		: m_context(videoPort)
+		: m_videoPort(videoPort), m_context(videoPort)
     {
     	// 查询OpenGL相关信息
     	auto glVersion = reinterpret_cast<char const*>(glGetString(GL_VERSION));
@@ -84,9 +84,21 @@ namespace TG::Rendering
     	glDeleteRenderbuffers(1, &m_depthStencilBuffer);
     }
 
-	void OpenGLRenderer::PreRender()
+    char const* OpenGLRenderer::Type()
+    {
+	    return "OpenGL";
+    }
+
+    const IDefaultVideoPort& OpenGLRenderer::VideoPort() const
+    {
+	    return m_videoPort;
+    }
+
+    void OpenGLRenderer::PreRender()
 	{
     	m_context.MakeCurrent();
+
+        glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, -1, "Draw Scene");
 
     	RenderToTexture();
 	}
@@ -98,6 +110,8 @@ namespace TG::Rendering
 
 	void OpenGLRenderer::Present()
 	{
+        glPopDebugGroup();
+
     	m_context.SwapBuffers();
 	}
 
@@ -129,6 +143,11 @@ namespace TG::Rendering
 	Texture const* OpenGLRenderer::RenderTarget()
 	{
 		return &m_framebufferTexture;
+	}
+
+	void OpenGLRenderer::SetVSync(bool enable) const
+	{
+		m_context.SetVSync(enable);
 	}
 
 	void OpenGLRenderer::ResizeFrameBuffer(unsigned int width, unsigned int height)

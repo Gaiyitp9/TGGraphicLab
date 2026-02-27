@@ -8,8 +8,7 @@
 #include "Rendering/RayTracing/PathTracer.h"
 #include "Math/Transform/Transform.hpp"
 #include "Diagnostic/Log.hpp"
-#include "imgui_impl_opengl3.h"
-#include "imgui_impl_win32.h"
+#include "imgui.h"
 #include "tiny_gltf.h"
 
 namespace TG
@@ -187,7 +186,7 @@ namespace TG
 
         Rendering::Color clearColor = Rendering::DimGray;
         glClearColor(clearColor.R(), clearColor.G(), clearColor.B(), clearColor.A());
-        glClearDepth(1.0);
+        glClearDepthf(1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         if (m_wireframe)
@@ -281,7 +280,7 @@ namespace TG
     void BasicLightExample::DrawUI()
     {
         const ImGuiIO& io = ImGui::GetIO();
-        ImGui::Begin("General");
+        ImGui::Begin("Basic Light Example Settings");
         ImGui::Text("Draw wireframe");
         ImGui::SameLine();
         ImGui::Checkbox("##Draw wireframe", &m_wireframe);

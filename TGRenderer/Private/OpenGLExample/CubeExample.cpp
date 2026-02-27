@@ -9,8 +9,7 @@
 #include "Rendering/ViewProjectionMatrix.hpp"
 #include "Math/Transform/Transform.hpp"
 #include "Math/Transform/AngleAxis.hpp"
-#include "imgui_impl_opengl3.h"
-#include "imgui_impl_win32.h"
+#include "imgui.h"
 
 namespace TG
 {
@@ -94,7 +93,7 @@ namespace TG
         Rendering::Color clearColor = Rendering::DimGray;
 
         glClearColor(clearColor.R(), clearColor.G(), clearColor.B(), clearColor.A());
-        glClearDepth(1.0);
+        glClearDepthf(1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         if (m_wireframe)
@@ -141,7 +140,7 @@ namespace TG
     void CubeExample::DrawUI()
     {
         const ImGuiIO& io = ImGui::GetIO();
-        ImGui::Begin("Settings");
+        ImGui::Begin("Cube Example Settings");
         ImGui::Checkbox("Draw wireframe", &m_wireframe);
         ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
         ImGui::End();

@@ -8,6 +8,7 @@
 #include "Module.h"
 #include "Base/CommonInterfaces.h"
 #include "Rendering/Renderer.h"
+#include "Editor/EditorContext.h"
 
 namespace TG
 {
@@ -22,7 +23,6 @@ namespace TG
         ~EditorModule() override;
 
         void SetRenderer(Rendering::Renderer* renderer);
-        void PlugInVideoPort(const IDefaultVideoPort& display);
 
         void Update() override;
         void PostUpdate() override;
@@ -35,7 +35,8 @@ namespace TG
 
     private:
         Rendering::Renderer* m_renderer{ nullptr };
-        bool m_isInitialized{ false };
+    	std::unique_ptr<Editor::EditorContext> m_editorContext;
+
         unsigned int m_sceneWidth{ 0 };
         unsigned int m_sceneHeight{ 0 };
     };

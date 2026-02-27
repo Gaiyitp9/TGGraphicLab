@@ -23,7 +23,7 @@ namespace TG::Rendering
           },
           m_axisNameVertexShader("Assets/Shaders/GLSL/compass_name.vert", ShaderStage::Vertex),
           m_axisNameFragmentShader("Assets/Shaders/GLSL/compass_name.frag", ShaderStage::Fragment),
-          m_fontBuffer(LoadBinaryFile("Assets/Fonts/consola.ttf"))
+          m_fontBuffer(LoadBinaryFile("Assets/Fonts/NotoSans/NotoSansSC-Regular.ttf"))
     {
         glGenBuffers(1, &m_axisVBO);
         glGenVertexArrays(1, &m_axisVAO);

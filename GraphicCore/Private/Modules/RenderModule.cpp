@@ -5,8 +5,7 @@
 *****************************************************************/
 #include "Modules/RenderModule.h"
 #include "Rendering/OpenGL/OpenGLRenderer.h"
-// #include "Rendering/VulkanExample/VulkanRenderer.h"
-#include "Rendering/Color/StandardColors.h"
+#include "Rendering/Vulkan/VulkanRenderer.h"
 
 namespace TG
 {
@@ -19,11 +18,6 @@ namespace TG
     	if (m_Renderer)
 			m_Renderer->PreRender();
 
-    	Rendering::Color clearColor = Rendering::DimGray;
-    	glClearColor(clearColor.R(), clearColor.G(), clearColor.B(), clearColor.A());
-    	glClearDepthf(1.0f);
-    	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
     	onDraw.Broadcast();
     }
 
@@ -33,7 +27,12 @@ namespace TG
     		m_Renderer->Present();
 	}
 
-    void RenderModule::SetupRenderer(const IDefaultVideoPort& videoPort)
+	void RenderModule::SetBackend(Rendering::GraphicsAPI api)
+	{
+		m_GraphicsAPI = api;
+	}
+
+	void RenderModule::SetupRenderer(const IDefaultVideoPort& videoPort)
     {
     	// 不能同时初始化Vulkan和OpenGLES，否则会报错，原因暂时未知(可能是不能使用相同窗口来初始化)
         switch (m_GraphicsAPI)
@@ -42,7 +41,7 @@ namespace TG
     	        m_Renderer = std::make_unique<Rendering::OpenGLRenderer>(videoPort);
                 break;
             case Rendering::GraphicsAPI::Vulkan:
-                // m_Renderer = std::make_unique<Rendering::VulkanRenderer>(videoPort);
+                m_Renderer = std::make_unique<Rendering::VulkanRenderer>(videoPort);
                 break;
             case Rendering::GraphicsAPI::DirectX11:
                 // m_Renderer = std::make_unique<Rendering::DirectX11Renderer>(videoPort);

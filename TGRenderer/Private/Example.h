@@ -19,7 +19,7 @@ namespace TG
 
     enum class ExampleEnum
     {
-        Quad,
+        Triangle,
         Cube,
         BasicLight,
     };

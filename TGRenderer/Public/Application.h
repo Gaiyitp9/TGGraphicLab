@@ -8,7 +8,7 @@
 #include "Modules/PlatformModule.h"
 #include "Modules/RenderModule.h"
 #include "Modules/EditorModule.h"
-#include "OpenGLExample/OpenGLExampleFactory.h"
+#include "Example.h"
 #include <vector>
 
 namespace TG
@@ -25,6 +25,8 @@ namespace TG
 
 		int Run();
 
+		void DrawUI();
+
 	private:
 		std::unique_ptr<PlatformModule> m_platformModule;
 		std::unique_ptr<RenderModule> m_renderModule;
@@ -33,6 +35,9 @@ namespace TG
 
 		std::unique_ptr<ExampleFactory> m_exampleFactory;
 		std::unique_ptr<Example> m_example;
-		ExampleEnum m_exampleEnum = ExampleEnum::BasicLight;
+		ExampleEnum m_exampleEnum = ExampleEnum::Triangle;
+
+		const char* m_items[3]{ "Triangle", "Cube", "Basic Light" };
+		int m_currentItem = 0;
 	};
 }

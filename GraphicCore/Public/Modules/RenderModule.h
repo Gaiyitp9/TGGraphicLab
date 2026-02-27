@@ -23,6 +23,7 @@ namespace TG
         RenderModule& operator=(RenderModule&&) = delete;
         ~RenderModule() override;
 
+    	void SetBackend(Rendering::GraphicsAPI api);
         void SetupRenderer(const IDefaultVideoPort& videoPort);
         void Subscribe(MulticastDelegate<void(unsigned, unsigned)>& windowResizeDelegate,
             MulticastDelegate<void(unsigned, unsigned)>& sceneResizeDelegate);

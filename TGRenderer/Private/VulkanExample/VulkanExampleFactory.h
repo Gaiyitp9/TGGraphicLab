@@ -10,11 +10,11 @@
 
 namespace TG
 {
-    class OpenGLExampleFactory : public ExampleFactory
+    class VulkanExampleFactory : public ExampleFactory
     {
     public:
-        OpenGLExampleFactory(const IDefaultVideoPort& videoPort, const ITimer& timer);
-        ~OpenGLExampleFactory() override = default;
+        VulkanExampleFactory(const IDefaultVideoPort& videoPort, const ITimer& timer);
+        ~VulkanExampleFactory() override = default;
 
         std::unique_ptr<Example> CreateExample(ExampleEnum example) override;
 

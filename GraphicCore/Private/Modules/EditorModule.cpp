@@ -9,28 +9,18 @@
 #include "imgui_impl_win32.h"
 #include "imgui_impl_opengl3.h"
 #include "Rendering/Texture.h"
-#include "Rendering/Color/StandardColors.h"
 // #include "imgui_impl_vulkan.h"
-
-extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 namespace TG
 {
     EditorModule::EditorModule() = default;
 
-    EditorModule::~EditorModule()
-    {
-    	if (m_isInitialized)
-    	{
-    		ImGui_ImplOpenGL3_Shutdown();
-    		ImGui_ImplWin32_Shutdown();
-    		ImGui::DestroyContext();
-    	}
-    }
+    EditorModule::~EditorModule() = default;
 
 	void EditorModule::SetRenderer(Rendering::Renderer* renderer)
 	{
 		m_renderer = renderer;
+    	m_editorContext = std::make_unique<Editor::EditorContext>(m_renderer->VideoPort());
 	}
 
     void EditorModule::Update()
@@ -38,10 +28,11 @@ namespace TG
     	if (!m_renderer)
     		return;
 
+    	glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, -1, "Draw Editor UI");
+
     	m_renderer->RenderToScreen();
 
-    	Rendering::Color clearColor = Rendering::Black;
-    	glClearColor(clearColor.R(), clearColor.G(), clearColor.B(), clearColor.A());
+    	glClearColor(0.45f, 0.56f, 0.60f, 1.0f);
     	glClearDepthf(1.0f);
     	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -52,7 +43,7 @@ namespace TG
   		ImGui::NewFrame();
 
   		ImGuiWindowFlags windowFlags =
-  			ImGuiWindowFlags_MenuBar |
+  			// ImGuiWindowFlags_MenuBar |
   			ImGuiWindowFlags_NoDocking |
   			ImGuiWindowFlags_NoTitleBar |
   			ImGuiWindowFlags_NoCollapse |
@@ -77,24 +68,25 @@ namespace TG
     	static ImGuiDockNodeFlags dockSpaceFlags = ImGuiDockNodeFlags_None | ImGuiDockNodeFlags_PassthruCentralNode;
 		ImGui::DockSpace(dockSpaceId, ImVec2(0.0f, 0.0f), dockSpaceFlags);
 
-		if (ImGui::BeginMenuBar())
-		{
-		  if (ImGui::BeginMenu("Options"))
-		  {
-		      if (ImGui::MenuItem("Flag: NoDockingOverCentralNode", "", (dockSpaceFlags & ImGuiDockNodeFlags_NoDockingOverCentralNode) != 0)) { dockSpaceFlags ^= ImGuiDockNodeFlags_NoDockingOverCentralNode; }
-		      if (ImGui::MenuItem("Flag: NoDockingSplit",         "", (dockSpaceFlags & ImGuiDockNodeFlags_NoDockingSplit) != 0))             { dockSpaceFlags ^= ImGuiDockNodeFlags_NoDockingSplit; }
-		      if (ImGui::MenuItem("Flag: NoUndocking",            "", (dockSpaceFlags & ImGuiDockNodeFlags_NoUndocking) != 0))                { dockSpaceFlags ^= ImGuiDockNodeFlags_NoUndocking; }
-		      if (ImGui::MenuItem("Flag: NoResize",               "", (dockSpaceFlags & ImGuiDockNodeFlags_NoResize) != 0))                   { dockSpaceFlags ^= ImGuiDockNodeFlags_NoResize; }
-		      if (ImGui::MenuItem("Flag: AutoHideTabBar",         "", (dockSpaceFlags & ImGuiDockNodeFlags_AutoHideTabBar) != 0))             { dockSpaceFlags ^= ImGuiDockNodeFlags_AutoHideTabBar; }
-		      ImGui::Separator();
-
-		      ImGui::EndMenu();
-		  }
-		  ImGui::EndMenuBar();
-		}
+		// if (ImGui::BeginMenuBar())
+		// {
+		//   if (ImGui::BeginMenu("Options"))
+		//   {
+		//       if (ImGui::MenuItem("Flag: NoDockingOverCentralNode", "", (dockSpaceFlags & ImGuiDockNodeFlags_NoDockingOverCentralNode) != 0)) { dockSpaceFlags ^= ImGuiDockNodeFlags_NoDockingOverCentralNode; }
+		//       if (ImGui::MenuItem("Flag: NoDockingSplit",         "", (dockSpaceFlags & ImGuiDockNodeFlags_NoDockingSplit) != 0))             { dockSpaceFlags ^= ImGuiDockNodeFlags_NoDockingSplit; }
+		//       if (ImGui::MenuItem("Flag: NoUndocking",            "", (dockSpaceFlags & ImGuiDockNodeFlags_NoUndocking) != 0))                { dockSpaceFlags ^= ImGuiDockNodeFlags_NoUndocking; }
+		//       if (ImGui::MenuItem("Flag: NoResize",               "", (dockSpaceFlags & ImGuiDockNodeFlags_NoResize) != 0))                   { dockSpaceFlags ^= ImGuiDockNodeFlags_NoResize; }
+		//       if (ImGui::MenuItem("Flag: AutoHideTabBar",         "", (dockSpaceFlags & ImGuiDockNodeFlags_AutoHideTabBar) != 0))             { dockSpaceFlags ^= ImGuiDockNodeFlags_AutoHideTabBar; }
+		//       ImGui::Separator();
+		//
+		//       ImGui::EndMenu();
+		//   }
+		//   ImGui::EndMenuBar();
+		// }
 
 		ImGui::End();
 
+    	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
     	ImGui::Begin("Scene");
     	ImVec2 availRegion = ImGui::GetContentRegionAvail();
     	auto targetWidth = static_cast<unsigned int>(availRegion.x);
@@ -112,8 +104,15 @@ namespace TG
     		ImVec2(1.0f, 0.0f)
     	);
     	ImGui::End();
+    	ImGui::PopStyleVar(1);
+
+    	ImGui::Begin("Log");
+    	ImGui::TextUnformatted("Test");
+    	ImGui::End();
 
     	onDrawUI.Broadcast();
+
+    	glPopDebugGroup();
     }
 
 	void EditorModule::PostUpdate()
@@ -124,106 +123,5 @@ namespace TG
 
     	ImGui::UpdatePlatformWindows();
     	ImGui::RenderPlatformWindowsDefault();
-    }
-
-	using Win32Proc = LRESULT (WINAPI*)(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
-	static Win32Proc g_prevWndProc = nullptr;
-	static LRESULT ImGuiWindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
-	{
-		assert(g_prevWndProc != nullptr);
-
-		if (ImGui_ImplWin32_WndProcHandler(hwnd, msg, wParam, lParam))
-			return 1;
-		return g_prevWndProc(hwnd, msg, wParam, lParam);
-	}
-
-	struct WGLWindowData
-	{
-		HDC hdc;
-		HGLRC hglrc;
-	};
-
-    void EditorModule::PlugInVideoPort(const IDefaultVideoPort& display)
-    {
-    	// 初始化IMGUI
-    	IMGUI_CHECKVERSION();
-    	ImGui::CreateContext();
-    	ImGui_ImplWin32_InitForOpenGL(display.Handle());
-    	ImGui_ImplOpenGL3_Init();
-    	m_isInitialized = true;
-
-        // 窗口程序插入ImGui处理输入事件的代码
-    	g_prevWndProc = reinterpret_cast<Win32Proc>(GetWindowLongPtrW(display.Handle(), GWLP_WNDPROC));
-    	if (!g_prevWndProc)
-    		throw Win32Exception::Create("Failed to get window procedure");
-    	SetLastError(0);
-	    if (SetWindowLongPtrW(display.Handle(), GWLP_WNDPROC, reinterpret_cast<LONG_PTR>(ImGuiWindowProc)) == 0
-	    	&& GetLastError() != 0)
-	    {
-    		throw Win32Exception::Create("Failed to set window procedure");
-	    }
-
-    	ImGuiIO& io = ImGui::GetIO();
-    	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
-    	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
-    	io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
-
-    	ImGui::StyleColorsDark();
-    	// ImGuiStyle& style = ImGui::GetStyle();
-		// style.WindowRounding = 0.0f;
-    	// style.Colors[ImGuiCol_WindowBg].w = 1.0f;
-
-    	ImGuiPlatformIO& platformIO = ImGui::GetPlatformIO();
-		assert(platformIO.Renderer_CreateWindow == nullptr);
-    	assert(platformIO.Renderer_DestroyWindow == nullptr);
-    	assert(platformIO.Renderer_SwapBuffers == nullptr);
-    	assert(platformIO.Platform_RenderWindow == nullptr);
-    	platformIO.Renderer_CreateWindow = [](ImGuiViewport* viewport) {
-    		assert(viewport->RendererUserData == nullptr);
-
-    		auto wglData = TG_NEW WGLWindowData;
-    		wglData->hdc = GetDC(static_cast<HWND>(viewport->PlatformHandle));
-    	    // 这里的PIXELFORMATDESCRIPTOR要与OpenGLContext类构造函数里的PIXELFORMATDESCRIPTOR一致
-    	    // 可能是因为需要共用HGLRC
-    	    PIXELFORMATDESCRIPTOR pfd{
-    	        sizeof(PIXELFORMATDESCRIPTOR),
-                1,
-                PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL | PFD_DOUBLEBUFFER,
-                PFD_TYPE_RGBA,
-                32,
-                0, 0, 0, 0, 0, 0, 8, 0,
-                0, 0, 0, 0, 0,
-                24,
-                8,
-                0,
-                0,
-                0, 0, 0, 0
-            };
-    		int pixelFormat = ChoosePixelFormat(wglData->hdc, &pfd);
-    		if (pixelFormat == 0)
-    			throw BaseException::Create("Failed to get a valid ChoosePixelFormat");
-    		if (!SetPixelFormat(wglData->hdc, pixelFormat, &pfd))
-    			throw BaseException::Create("Failed to set the pixel format");
-    		wglData->hglrc = wglGetCurrentContext();
-
-    		viewport->RendererUserData = wglData;
-    	};
-    	platformIO.Renderer_DestroyWindow = [](ImGuiViewport* viewport) {
-    		if (auto* data = static_cast<WGLWindowData*>(viewport->RendererUserData))
-    		{
-    			wglMakeCurrent(nullptr, nullptr);
-    			ReleaseDC(static_cast<HWND>(viewport->PlatformHandle), data->hdc);
-    			delete data;
-    			viewport->RendererUserData = nullptr;
-    		}
-    	};
-    	platformIO.Renderer_SwapBuffers = [](ImGuiViewport* viewport, void*) {
-    		if (auto* data = static_cast<WGLWindowData*>(viewport->RendererUserData))
-    			SwapBuffers(data->hdc);
-    	};
-    	platformIO.Platform_RenderWindow = [](ImGuiViewport* viewport, void*) {
-    		if (auto* data = static_cast<WGLWindowData*>(viewport->RendererUserData))
-    			wglMakeCurrent(data->hdc, data->hglrc);
-    	};
     }
 }

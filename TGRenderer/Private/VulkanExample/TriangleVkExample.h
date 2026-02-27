@@ -5,11 +5,11 @@
 *****************************************************************/
 #pragma once
 
-#include "Rendering/Renderer.h"
+#include "Example.h"
 #include "Base/CommonInterfaces.h"
 #include "vulkan/vulkan.h"
 
-namespace TG::Rendering
+namespace TG
 {
     enum class VkQueueType
     {
@@ -19,16 +19,14 @@ namespace TG::Rendering
         Present,
     };
     
-    class VulkanRenderer final : public Renderer
+    class TriangleVkExample : public Example
     {
     public:
-        explicit VulkanRenderer(const IDefaultVideoPort& videoPort);
-        ~VulkanRenderer() override;
+        explicit TriangleVkExample(const IDefaultVideoPort& videoPort);
+        ~TriangleVkExample() override;
 
-        void PreRender() override;
-        void Draw(Mesh const* mesh, Material const* material) override;
-        void Present() override;
-        void ScreenFrameBufferResizeCallback(unsigned int width, unsigned int height) override;
+        void Draw() override;
+    	void DrawUI() override;
 
     private:
         void CheckLayerAndExtension();
@@ -54,11 +52,16 @@ namespace TG::Rendering
         VkShaderModule CreateShaderModule(const std::vector<char>& code);
         void CreateFrameBuffers();
         void CreateCommandPool();
+    	void CreateVertexBuffer();
+    	uint32_t FindMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties);
         void CreateCommandBuffer();
         void RecordCommandBuffer(uint32_t commandIndex, uint32_t imageIndex);
         void CreateSyncObjects();
         void DrawFrame();
         void RecreateSwapChain();
+    	void Present();
+
+    	const IDefaultVideoPort& m_videoPort;
 
         // 名称比较器，按字典序排列
         constexpr static auto NameComparer = [](char const* lhs, char const* rhs) {
@@ -98,6 +101,15 @@ namespace TG::Rendering
         VkFormat m_swapChainImageFormat{ VK_FORMAT_UNDEFINED };
         VkExtent2D m_swapChainExtent{};
         std::vector<VkImageView> m_swapChainImageViews;
+
+    	VkBuffer m_vertexBuffer{ VK_NULL_HANDLE };
+    	VkDeviceMemory m_vertexBufferMemory{ VK_NULL_HANDLE };
+    	float m_vertices[15] =
+    	{
+    		-0.5f, -0.5f, 1.0f, 0.0f, 0.0f,
+			 0.5f, -0.5f, 0.0f, 1.0f, 0.0f,
+			 0.0f,  0.5f, 0.0f, 0.0f, 1.0f
+    	};
 
         VkRenderPass m_renderPass{ VK_NULL_HANDLE };
         VkPipelineLayout m_pipelineLayout{ VK_NULL_HANDLE };

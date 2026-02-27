@@ -3,7 +3,7 @@
 * Copyright (c) Gaiyitp9. All rights reserved.					*
 * This code is licensed under the MIT License (MIT).			*
 *****************************************************************/
-#include "VulkanRenderer.h"
+#include "TriangleVkExample.h"
 #include "Base/Utility.h"
 #include "Diagnostic/Log.hpp"
 #include "Exception/BaseException.h"
@@ -11,9 +11,10 @@
 #include <ranges>
 #include <unordered_set>
 
-namespace TG::Rendering
+namespace TG
 {
-    VulkanRenderer::VulkanRenderer(const IDefaultVideoPort& videoPort)
+    TriangleVkExample::TriangleVkExample(const IDefaultVideoPort& videoPort)
+	    : m_videoPort(videoPort)
     {
         CheckLayerAndExtension();
         CreateInstance();
@@ -26,12 +27,13 @@ namespace TG::Rendering
         CreateRenderPass();
         CreateGraphicsPipeline();
         CreateCommandPool();
+    	CreateVertexBuffer();
         CreateCommandBuffer();
         CreateFrameBuffers();
         CreateSyncObjects();
     }
 
-    VulkanRenderer::~VulkanRenderer()
+    TriangleVkExample::~TriangleVkExample()
     {
         if (m_instance == VK_NULL_HANDLE || m_device == VK_NULL_HANDLE)
             return;
@@ -46,7 +48,8 @@ namespace TG::Rendering
         }
 
         CleanupSwapChain();
-
+		vkDestroyBuffer(m_device, m_vertexBuffer, nullptr);
+    	vkFreeMemory(m_device, m_vertexBufferMemory, nullptr);
         vkDestroyCommandPool(m_device, m_cmdPool, nullptr);
         vkDestroyPipeline(m_device, m_graphicsPipeline, nullptr);
         vkDestroyPipelineLayout(m_device, m_pipelineLayout, nullptr);
@@ -63,17 +66,18 @@ namespace TG::Rendering
         vkDestroyInstance(m_instance, nullptr);
     }
 
-    void VulkanRenderer::PreRender()
+    void TriangleVkExample::Draw()
     {
-        DrawFrame();
+	    DrawFrame();
+    	Present();
     }
 
-    void VulkanRenderer::Draw(Mesh const* mesh, Material const* material)
+    void TriangleVkExample::DrawUI()
     {
 
     }
 
-    void VulkanRenderer::Present()
+    void TriangleVkExample::Present()
     {
         VkPresentInfoKHR presentInfo{};
         presentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
@@ -97,14 +101,7 @@ namespace TG::Rendering
         m_currentFrame = (m_currentFrame + 1) % MAX_FRAMES_IN_FLIGHT;
     }
 
-    void VulkanRenderer::ScreenFrameBufferResizeCallback(unsigned int width, unsigned int height)
-    {
-        m_framebufferResized = true;
-        m_width = width;
-        m_height = height;
-    }
-
-    void VulkanRenderer::CheckLayerAndExtension()
+    void TriangleVkExample::CheckLayerAndExtension()
     {
         // 假如安装了多个版本的vulkan，指定版本需要设置
         // 1. VK_LAYER_PATH=/path/to/vulkan/Bin来寻找VkLayer_khronos_validation.dll
@@ -165,7 +162,7 @@ namespace TG::Rendering
             throw BaseException::Create("Extensions required, but not available");
     }
 
-    void VulkanRenderer::PopulateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT& createInfo)
+    void TriangleVkExample::PopulateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT& createInfo)
     {
         createInfo = {};
         createInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
@@ -180,7 +177,7 @@ namespace TG::Rendering
         createInfo.pUserData = nullptr;
     }
 
-    VKAPI_ATTR VkBool32 VKAPI_CALL VulkanRenderer::DebugCallback(
+    VKAPI_ATTR VkBool32 VKAPI_CALL TriangleVkExample::DebugCallback(
         VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
         VkDebugUtilsMessageTypeFlagsEXT messageType,
         const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData,
@@ -194,7 +191,7 @@ namespace TG::Rendering
         return VK_FALSE;
     }
 
-    void VulkanRenderer::CreateInstance()
+    void TriangleVkExample::CreateInstance()
     {
         VkApplicationInfo appInfo{};
         appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
@@ -222,7 +219,7 @@ namespace TG::Rendering
             throw BaseException::Create("Failed to create instance");
     }
 
-    void VulkanRenderer::SetupDebugMessenger()
+    void TriangleVkExample::SetupDebugMessenger()
     {
         if (!m_enableValidationLayer)
             return;
@@ -236,7 +233,7 @@ namespace TG::Rendering
         vkCreateDebugUtilsMessengerEXT(m_instance, &createInfo, nullptr, &m_debugMessenger);
     }
 
-    void VulkanRenderer::CreateSurface(HWND handle)
+    void TriangleVkExample::CreateSurface(HWND handle)
     {
         VkWin32SurfaceCreateInfoKHR surfaceCreateInfo{};
         surfaceCreateInfo.sType = VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR;
@@ -246,7 +243,7 @@ namespace TG::Rendering
             throw BaseException::Create("Failed to create window surface");
     }
 
-    void VulkanRenderer::SelectPhysicalDevice()
+    void TriangleVkExample::SelectPhysicalDevice()
     {
         // 设备需要支持的扩展
         m_requiredDeviceExtensions.emplace_back(VK_KHR_SWAPCHAIN_EXTENSION_NAME);
@@ -279,7 +276,7 @@ namespace TG::Rendering
             throw BaseException::Create("Failed to find a suitable GPU");
     }
 
-    bool VulkanRenderer::IsDeviceSuitable(VkPhysicalDevice device)
+    bool TriangleVkExample::IsDeviceSuitable(VkPhysicalDevice device)
     {
         // 获取设备属性
         VkPhysicalDeviceProperties deviceProperties{};
@@ -361,7 +358,7 @@ namespace TG::Rendering
         return true;
     }
 
-    void VulkanRenderer::CreateLogicalDevice()
+    void TriangleVkExample::CreateLogicalDevice()
     {
         std::unordered_set<uint32_t> uniqueQueueFamilies;
         // 保证每个queue family是唯一的
@@ -398,7 +395,7 @@ namespace TG::Rendering
         }
     }
 
-    void VulkanRenderer::CreateSwapChain()
+    void TriangleVkExample::CreateSwapChain()
     {
         // 获取支持的交换链属性
         vkGetPhysicalDeviceSurfaceCapabilitiesKHR(m_physicalDevice, m_surface, &m_capabilities);
@@ -463,7 +460,7 @@ namespace TG::Rendering
         vkGetSwapchainImagesKHR(m_device, m_swapChain, &imageCount, m_swapChainImages.data());
     }
 
-    VkSurfaceFormatKHR VulkanRenderer::ChooseSwapSurfaceFormat()
+    VkSurfaceFormatKHR TriangleVkExample::ChooseSwapSurfaceFormat()
     {
         for (const auto& availableFormat : m_swapChainFormats)
         {
@@ -477,7 +474,7 @@ namespace TG::Rendering
         return m_swapChainFormats[0];
     }
 
-    VkPresentModeKHR VulkanRenderer::ChooseSwapPresentMode()
+    VkPresentModeKHR TriangleVkExample::ChooseSwapPresentMode()
     {
         // for (const auto& availablePresentMode : m_presentModes)
         // {
@@ -489,7 +486,7 @@ namespace TG::Rendering
         return VK_PRESENT_MODE_FIFO_KHR;
     }
 
-    void VulkanRenderer::CleanupSwapChain()
+    void TriangleVkExample::CleanupSwapChain()
     {
         for (const auto& framebuffer : m_swapChainFrameBuffers)
             vkDestroyFramebuffer(m_device, framebuffer, nullptr);
@@ -500,7 +497,7 @@ namespace TG::Rendering
         vkDestroySwapchainKHR(m_device, m_swapChain, nullptr);
     }
 
-    void VulkanRenderer::CreateImageViews()
+    void TriangleVkExample::CreateImageViews()
     {
         m_swapChainImageViews.resize(m_swapChainImages.size());
         for (std::size_t i = 0; i < m_swapChainImages.size(); ++i)
@@ -520,7 +517,7 @@ namespace TG::Rendering
         }
     }
 
-    void VulkanRenderer::CreateRenderPass()
+    void TriangleVkExample::CreateRenderPass()
     {
         VkAttachmentDescription colorAttachments{};
         colorAttachments.format = m_swapChainImageFormat;
@@ -562,7 +559,7 @@ namespace TG::Rendering
             throw BaseException::Create("Failed to create render pass!");
     }
 
-    void VulkanRenderer::CreateGraphicsPipeline()
+    void TriangleVkExample::CreateGraphicsPipeline()
     {
         // 创建顶点着色器
         std::vector<char> vertShaderCode = LoadBinaryFile("Assets/Shaders/GLSL/first_vert.spv");
@@ -583,13 +580,28 @@ namespace TG::Rendering
 
         VkPipelineShaderStageCreateInfo shaderStages[] = { vertShaderStageCreateInfo, fragShaderStageCreateInfo };
 
+    	VkVertexInputBindingDescription vertexInputBindingDescription{};
+    	vertexInputBindingDescription.binding = 0;
+    	vertexInputBindingDescription.stride =  5 * sizeof(float);
+    	vertexInputBindingDescription.inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
+
+    	std::array<VkVertexInputAttributeDescription, 2> attributeDescriptions{};
+    	attributeDescriptions[0].binding = 0;
+    	attributeDescriptions[0].location = 0;
+    	attributeDescriptions[0].format = VK_FORMAT_R32G32_SFLOAT;
+    	attributeDescriptions[0].offset = 0;
+
+    	attributeDescriptions[1].binding = 0;
+    	attributeDescriptions[1].location = 1;
+    	attributeDescriptions[1].format = VK_FORMAT_R32G32B32_SFLOAT;
+    	attributeDescriptions[1].offset = 2 * sizeof(float);
         // 顶点输入状态
         VkPipelineVertexInputStateCreateInfo vertexInputInfo{};
         vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
-        vertexInputInfo.vertexBindingDescriptionCount = 0;
-        vertexInputInfo.pVertexBindingDescriptions = nullptr;
-        vertexInputInfo.vertexAttributeDescriptionCount = 0;
-        vertexInputInfo.pVertexAttributeDescriptions = nullptr;
+        vertexInputInfo.vertexBindingDescriptionCount = 1;
+        vertexInputInfo.pVertexBindingDescriptions = &vertexInputBindingDescription;
+        vertexInputInfo.vertexAttributeDescriptionCount = 2;
+        vertexInputInfo.pVertexAttributeDescriptions = attributeDescriptions.data();
         // 顶点装配器
         VkPipelineInputAssemblyStateCreateInfo inputAssemblyInfo{};
         inputAssemblyInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
@@ -689,7 +701,7 @@ namespace TG::Rendering
         vkDestroyShaderModule(m_device, fragShaderModule, nullptr);
     }
 
-    VkShaderModule VulkanRenderer::CreateShaderModule(const std::vector<char>& code)
+    VkShaderModule TriangleVkExample::CreateShaderModule(const std::vector<char>& code)
     {
         VkShaderModuleCreateInfo createInfo{};
         createInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
@@ -701,7 +713,7 @@ namespace TG::Rendering
         return shaderModule;
     }
 
-    void VulkanRenderer::CreateFrameBuffers()
+    void TriangleVkExample::CreateFrameBuffers()
     {
         m_swapChainFrameBuffers.resize(m_swapChainImageViews.size());
         for (std::size_t i = 0; i < m_swapChainImageViews.size(); ++i)
@@ -724,7 +736,7 @@ namespace TG::Rendering
         }
     }
 
-    void VulkanRenderer::CreateCommandPool()
+    void TriangleVkExample::CreateCommandPool()
     {
         VkCommandPoolCreateInfo commandPoolCreateInfo{};
         commandPoolCreateInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
@@ -734,7 +746,51 @@ namespace TG::Rendering
             throw BaseException::Create("Failed to create command pool!");
     }
 
-    void VulkanRenderer::CreateCommandBuffer()
+	void TriangleVkExample::CreateVertexBuffer()
+    {
+	    VkBufferCreateInfo bufferInfo{};
+    	bufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
+    	bufferInfo.size = 15 * sizeof(float);
+    	bufferInfo.usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT;
+    	bufferInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+
+    	if (vkCreateBuffer(m_device, &bufferInfo, nullptr, &m_vertexBuffer) != VK_SUCCESS)
+    		throw BaseException::Create("Failed to create vertex buffer!");
+
+    	VkMemoryRequirements memRequirements;
+    	vkGetBufferMemoryRequirements(m_device, m_vertexBuffer, &memRequirements);
+
+		VkMemoryAllocateInfo allocInfo{};
+    	allocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
+    	allocInfo.allocationSize = memRequirements.size;
+    	allocInfo.memoryTypeIndex = FindMemoryType(memRequirements.memoryTypeBits,
+    		VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
+    	if (vkAllocateMemory(m_device, &allocInfo, nullptr, &m_vertexBufferMemory) != VK_SUCCESS)
+    		throw BaseException::Create("Failed to allocate vertex buffer memory!");
+    	vkBindBufferMemory(m_device, m_vertexBuffer, m_vertexBufferMemory, 0);
+
+    	void* data;
+    	vkMapMemory(m_device, m_vertexBufferMemory, 0, bufferInfo.size, 0, &data);
+    	memcpy(data, m_vertices, static_cast<size_t>(bufferInfo.size));
+    	vkUnmapMemory(m_device, m_vertexBufferMemory);
+    }
+
+	uint32_t TriangleVkExample::FindMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties)
+    {
+		VkPhysicalDeviceMemoryProperties memProperties;
+    	vkGetPhysicalDeviceMemoryProperties(m_physicalDevice, &memProperties);
+    	for (uint32_t i = 0; i < memProperties.memoryTypeCount; ++i)
+    	{
+    		if ((typeFilter & (1 << i)) && (memProperties.memoryTypes[i].propertyFlags & properties) == properties)
+    		{
+    			return i;
+    		}
+    	}
+
+    	throw BaseException::Create("Failed to find suitable memory type!");
+    }
+
+    void TriangleVkExample::CreateCommandBuffer()
     {
         m_cmdBuffers.resize(MAX_FRAMES_IN_FLIGHT);
 
@@ -747,7 +803,7 @@ namespace TG::Rendering
             throw BaseException::Create("Failed to allocate command buffer!");
     }
 
-    void VulkanRenderer::RecordCommandBuffer(uint32_t commandIndex, uint32_t imageIndex)
+    void TriangleVkExample::RecordCommandBuffer(uint32_t commandIndex, uint32_t imageIndex)
     {
         VkCommandBufferBeginInfo beginInfo{};
         beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
@@ -782,6 +838,10 @@ namespace TG::Rendering
         scissor.extent = m_swapChainExtent;
         vkCmdSetScissor(m_cmdBuffers[commandIndex], 0, 1, &scissor);
 
+    	VkBuffer vertexBuffers[] = { m_vertexBuffer };
+    	VkDeviceSize offsets[] = { 0 };
+    	vkCmdBindVertexBuffers(m_cmdBuffers[commandIndex], 0, 1, vertexBuffers, offsets);
+
         vkCmdDraw(m_cmdBuffers[commandIndex], 3, 1, 0, 0);
 
         vkCmdEndRenderPass(m_cmdBuffers[commandIndex]);
@@ -790,7 +850,7 @@ namespace TG::Rendering
             throw BaseException::Create("Failed to record command buffer!");
     }
 
-    void VulkanRenderer::CreateSyncObjects()
+    void TriangleVkExample::CreateSyncObjects()
     {
         m_imageAvailableSemaphores.resize(MAX_FRAMES_IN_FLIGHT);
         m_renderFinishedSemaphores.resize(MAX_FRAMES_IN_FLIGHT);
@@ -820,7 +880,7 @@ namespace TG::Rendering
         }
     }
 
-    void VulkanRenderer::DrawFrame()
+    void TriangleVkExample::DrawFrame()
     {
         vkWaitForFences(m_device, 1, &m_inFlightFences[m_currentFrame], VK_TRUE, UINT64_MAX);
 
@@ -859,7 +919,7 @@ namespace TG::Rendering
         }
     }
 
-    void VulkanRenderer::RecreateSwapChain()
+    void TriangleVkExample::RecreateSwapChain()
     {
         vkDeviceWaitIdle(m_device);
 

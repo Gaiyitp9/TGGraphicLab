@@ -7,6 +7,7 @@
 
 #include "Rendering/Mesh/Mesh.h"
 #include "Rendering/Material.h"
+#include "Base/CommonInterfaces.h"
 
 namespace TG::Rendering
 {
@@ -16,6 +17,10 @@ namespace TG::Rendering
     {
     public:
         virtual ~Renderer() = default;
+
+    	virtual char const* Type() = 0;
+
+    	[[nodiscard]] virtual const IDefaultVideoPort& VideoPort() const = 0;
 
         virtual void PreRender() = 0;
 
@@ -28,5 +33,7 @@ namespace TG::Rendering
         virtual void RenderToScreen() const = 0;
 
         virtual Texture const* RenderTarget() = 0;
+
+    	virtual void SetVSync(bool enable) const = 0;
     };
 }

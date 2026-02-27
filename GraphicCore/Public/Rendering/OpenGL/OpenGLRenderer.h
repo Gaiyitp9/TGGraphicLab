@@ -7,7 +7,6 @@
 
 #include "OpenGLTexture2D.h"
 #include "Rendering/Renderer.h"
-#include "Base/CommonInterfaces.h"
 #include "Rendering/OpenGL/OpenGLContext.h"
 
 namespace TG::Rendering
@@ -17,6 +16,10 @@ namespace TG::Rendering
     public:
         explicit OpenGLRenderer(const IDefaultVideoPort& videoPort);
         ~OpenGLRenderer() override;
+
+    	char const* Type() override;
+
+    	[[nodiscard]] const IDefaultVideoPort& VideoPort() const override;
 
         void PreRender() override;
         void Draw(Mesh const* mesh, Material const* material) override;
@@ -28,8 +31,12 @@ namespace TG::Rendering
 
         Texture const* RenderTarget() override;
 
+    	void SetVSync(bool enable) const override;
+
     private:
         void ResizeFrameBuffer(unsigned int width, unsigned int height);
+
+    	const IDefaultVideoPort& m_videoPort;
 
         OpenGLContext m_context;
 
