@@ -7,9 +7,9 @@
 
 namespace TG::Rendering
 {
-    ViewportGrid::ViewportGrid() : m_vertexShader("Assets/Shaders/GLSL/viewport_grid.vert", ShaderStage::Vertex),
-        m_fragmentShader("Assets/Shaders/GLSL/viewport_grid.frag", ShaderStage::Fragment),
-        m_geometryShader("Assets/Shaders/GLSL/viewport_grid.geom", ShaderStage::Geometry)
+    ViewportGrid::ViewportGrid() : m_vertexShader("Assets/Shaders/GLSL/OpenGL/viewport_grid.vert", ShaderStage::Vertex),
+        m_fragmentShader("Assets/Shaders/GLSL/OpenGL/viewport_grid.frag", ShaderStage::Fragment),
+        m_geometryShader("Assets/Shaders/GLSL/OpenGL/viewport_grid.geom", ShaderStage::Geometry)
     {
         glGenVertexArrays(1, &m_VAO);
         glGenProgramPipelines(1, &m_pipeline);

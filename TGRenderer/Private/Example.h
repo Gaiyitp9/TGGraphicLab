@@ -5,18 +5,8 @@
 *****************************************************************/
 #pragma once
 
-#include <memory>
-
 namespace TG
 {
-    struct Example
-    {
-        virtual ~Example() = default;
-
-        virtual void Draw() = 0;
-        virtual void DrawUI() = 0;
-    };
-
     enum class ExampleEnum
     {
         Triangle,
@@ -24,11 +14,13 @@ namespace TG
         BasicLight,
     };
 
-    class ExampleFactory
+    struct Example
     {
-    public:
-        virtual ~ExampleFactory() = default;
+        virtual ~Example() = default;
 
-        virtual std::unique_ptr<Example> CreateExample(ExampleEnum example) = 0;
+        virtual void Draw() = 0;
+        virtual void DrawUI() = 0;
+
+        virtual void OnViewportChanged(unsigned width, unsigned height) = 0;
     };
 }

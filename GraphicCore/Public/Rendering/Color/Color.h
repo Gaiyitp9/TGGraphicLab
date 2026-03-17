@@ -47,8 +47,8 @@ namespace TG::Rendering
 	    Color& operator+=(const Color& color);
 	    Color& operator/=(float c);
 
-	    Color LinearToGamma(float gamma = 2.2f);
-	    Color GammaToLinear(float gamma = 2.2f);
+	    static Color LinearToSRGB(Color color, float gamma = 2.2f);
+	    static Color SRGBToLinear(Color color, float gamma = 2.2f);
 
 	    static Color Random(float min = 0.0f, float max = 1.0f);
 

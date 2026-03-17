@@ -15,25 +15,29 @@ namespace TG
 
     void RenderModule::Update()
     {
-    	if (m_Renderer)
-			m_Renderer->PreRender();
+    	if (!m_Renderer)
+    		return;
+
+    	m_Renderer->BeginRender();
+
+    	m_Renderer->RenderToScene();
 
     	onDraw.Broadcast();
+
+    	m_Renderer->EndRender();
     }
 
 	void RenderModule::PostUpdate()
 	{
-    	if (m_Renderer)
-    		m_Renderer->Present();
+    	if (!m_Renderer)
+    		return;
+
+    	m_Renderer->Present();
 	}
 
-	void RenderModule::SetBackend(Rendering::GraphicsAPI api)
-	{
-		m_GraphicsAPI = api;
-	}
-
-	void RenderModule::SetupRenderer(const IDefaultVideoPort& videoPort)
+	void RenderModule::SetupRenderer(Rendering::GraphicsAPI api, const IDefaultVideoPort& videoPort)
     {
+    	m_GraphicsAPI = api;
     	// 不能同时初始化Vulkan和OpenGLES，否则会报错，原因暂时未知(可能是不能使用相同窗口来初始化)
         switch (m_GraphicsAPI)
         {
@@ -53,17 +57,17 @@ namespace TG
     }
 
 	void RenderModule::Subscribe(MulticastDelegate<void(unsigned, unsigned)>& windowResizeDelegate,
-		MulticastDelegate<void(unsigned, unsigned)>& sceneResizeDelegate)
+		MulticastDelegate<void(int, int, unsigned, unsigned)>& sceneViewportChangedDelegate)
 	{
 		windowResizeDelegate.Add(
 		    [&renderer = std::as_const(m_Renderer)](unsigned width, unsigned height) {
-			    renderer->ScreenFrameBufferResizeCallback(width, height);
+			    renderer->ScreenFramebufferResizeCallback(width, height);
 		    }
 		);
 
-    	sceneResizeDelegate.Add(
-    		[&renderer = std::as_const(m_Renderer)](unsigned width, unsigned height) {
-				renderer->SceneFrameBufferResizeCallback(width, height);
+    	sceneViewportChangedDelegate.Add(
+    		[&renderer = std::as_const(m_Renderer)](int posX, int posY, unsigned width, unsigned height) {
+				renderer->SceneViewportChangedCallback(posX, posY, width, height);
 			}
     	);
 	}

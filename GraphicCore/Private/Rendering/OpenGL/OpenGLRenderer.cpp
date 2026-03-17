@@ -11,7 +11,7 @@
 namespace TG::Rendering
 {
     OpenGLRenderer::OpenGLRenderer(const IDefaultVideoPort& videoPort)
-		: m_videoPort(videoPort), m_context(videoPort)
+		: m_context(videoPort)
     {
     	// 查询OpenGL相关信息
     	auto glVersion = reinterpret_cast<char const*>(glGetString(GL_VERSION));
@@ -84,61 +84,74 @@ namespace TG::Rendering
     	glDeleteRenderbuffers(1, &m_depthStencilBuffer);
     }
 
-    char const* OpenGLRenderer::Type()
+    GraphicsAPI OpenGLRenderer::API()
     {
-	    return "OpenGL";
+	    return GraphicsAPI::OpenGL;
     }
 
-    const IDefaultVideoPort& OpenGLRenderer::VideoPort() const
+    const OpenGLContext& OpenGLRenderer::GetContext() const
     {
-	    return m_videoPort;
+	    return m_context;
     }
 
-    void OpenGLRenderer::PreRender()
+    void OpenGLRenderer::BeginRender()
 	{
     	m_context.MakeCurrent();
 
         glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, -1, "Draw Scene");
 
-    	RenderToTexture();
+    	glClearColor(0.45f, 0.56f, 0.60f, 1.0f);
+    	glClearDepthf(1.0f);
+    	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	}
 
-	void OpenGLRenderer::Draw(Mesh const* mesh, Material const* material)
+    void OpenGLRenderer::EndRender()
+    {
+        glPopDebugGroup();
+    }
+
+    void OpenGLRenderer::Draw(Mesh const* mesh, Material const* material)
 	{
 
 	}
 
 	void OpenGLRenderer::Present()
 	{
-        glPopDebugGroup();
-
-    	m_context.SwapBuffers();
+    	m_context.Present();
 	}
 
-	void OpenGLRenderer::ScreenFrameBufferResizeCallback(unsigned int width, unsigned int height)
+	void OpenGLRenderer::ScreenFramebufferResizeCallback(unsigned int width, unsigned int height)
 	{
     	m_screenWidth = width;
     	m_screenHeight = height;
 	}
 
-	void OpenGLRenderer::SceneFrameBufferResizeCallback(unsigned int width, unsigned int height)
+	void OpenGLRenderer::SceneViewportChangedCallback(int posX, int posY, unsigned int width, unsigned int height)
 	{
+    	m_scenePosX = posX;
+    	m_scenePosY = posY;
 		m_sceneWidth = width;
     	m_sceneHeight = height;
-    	ResizeFrameBuffer(width, height);
 	}
 
-	void OpenGLRenderer::RenderToTexture() const
+	void OpenGLRenderer::RenderToTexture()
 	{
 	    glBindFramebuffer(GL_FRAMEBUFFER, CastID<OpenGLID>(m_framebufferTexture.GetID()));
 		glViewport(0, 0, static_cast<GLsizei>(m_sceneWidth), static_cast<GLsizei>(m_sceneHeight));
     }
 
-	void OpenGLRenderer::RenderToScreen() const
+	void OpenGLRenderer::RenderToScene()
 	{
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
-		glViewport(0, 0, static_cast<GLsizei>(m_screenWidth), static_cast<GLsizei>(m_screenHeight));
+    	glViewport(m_scenePosX, static_cast<GLint>(m_screenHeight - m_scenePosY - m_sceneHeight),
+    		static_cast<GLsizei>(m_sceneWidth), static_cast<GLsizei>(m_sceneHeight));
 	}
+
+	void OpenGLRenderer::RenderToUI()
+    {
+	    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		glViewport(0, 0, static_cast<GLsizei>(m_screenWidth), static_cast<GLsizei>(m_screenHeight));
+    }
 
 	Texture const* OpenGLRenderer::RenderTarget()
 	{
@@ -149,6 +162,16 @@ namespace TG::Rendering
 	{
 		m_context.SetVSync(enable);
 	}
+
+	unsigned int OpenGLRenderer::SceneWidth() const
+	{
+		return m_sceneWidth;
+	}
+
+	unsigned int OpenGLRenderer::SceneHeight() const
+    {
+	    return m_sceneHeight;
+    }
 
 	void OpenGLRenderer::ResizeFrameBuffer(unsigned int width, unsigned int height)
 	{

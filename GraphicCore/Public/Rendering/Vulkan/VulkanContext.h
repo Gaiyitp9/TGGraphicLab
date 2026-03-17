@@ -5,7 +5,7 @@
 *****************************************************************/
 #pragma once
 
-#include "Base/CommonInterfaces.h"
+#include "Rendering/Context.h"
 #include "vulkan/vulkan.h"
 
 namespace TG::Rendering
@@ -18,21 +18,43 @@ namespace TG::Rendering
 		Present,
 	};
 
-	class VulkanContext
+	class VulkanContext : public Context
 	{
 	public:
 		explicit VulkanContext(const IDefaultVideoPort& videoPort);
-		~VulkanContext();
+		~VulkanContext() override;
 
+		VulkanContext(const VulkanContext&) = delete;
+		VulkanContext(VulkanContext&&) = delete;
+		VulkanContext& operator=(const VulkanContext&) = delete;
+		VulkanContext& operator=(VulkanContext&&) = delete;
+
+		[[nodiscard]] const IDefaultVideoPort& VideoPort() const override;
+
+		[[nodiscard]] VkInstance GetInstance() const;
 		[[nodiscard]] VkDevice GetDevice() const;
-		[[nodiscard]] VkFormat GetSwapChainImageFormat() const;
+		[[nodiscard]] VkPhysicalDevice GetPhysicalDevice() const;
+		[[nodiscard]] uint32_t GetQueueFamily(VkQueueType type) const;
+		[[nodiscard]] VkQueue GetQueue(VkQueueType type) const;
+		[[nodiscard]] VkFormat GetSwapChainFormat() const;
+		[[nodiscard]] uint32_t GetSwapChainMinImageCount() const;
+		[[nodiscard]] uint32_t GetSwapChainImageCount() const;
 		[[nodiscard]] const std::vector<VkImageView>& GetSwapChainImageViews() const;
 		[[nodiscard]] VkExtent2D GetSwapChainExtent() const;
-		[[nodiscard]] std::unordered_map<VkQueueType, uint32_t> GetQueueFamilyIndices() const;
+		[[nodiscard]] uint32_t GetCurrentImageIndex() const;
+		[[nodiscard]] VkCommandPool GetCommandPool() const;
+		[[nodiscard]] VkCommandBuffer GetCommandBuffer() const;
+		[[nodiscard]] uint32_t GetMaxFramesInFlight() const;
+		[[nodiscard]] uint32_t GetCurrentFrameIndex() const;
+
+		bool AcquireNextImage();
+		void BeginCommandBuffer() const;
+		void EndCommandBuffer() const;
+		void Submit();
+		bool Present();
 
 	private:
 		void CheckLayerAndExtension();
-        void PopulateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT& createInfo);
 		static VKAPI_ATTR VkBool32 VKAPI_CALL DebugCallback(
 			VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
 			VkDebugUtilsMessageTypeFlagsEXT messageType,
@@ -46,38 +68,40 @@ namespace TG::Rendering
 		bool IsDeviceSuitable(VkPhysicalDevice device);
 		void CreateLogicalDevice();
 		void CreateSwapChain();
-		VkSurfaceFormatKHR ChooseSwapSurfaceFormat();
-		VkPresentModeKHR ChooseSwapPresentMode();
+		VkSurfaceFormatKHR ChooseSwapSurfaceFormat() const;
+		VkPresentModeKHR ChooseSwapPresentMode() const;
         void CleanupSwapChain();
-        void CreateImageViews();
 		void RecreateSwapChain();
+		void CreateCommandPool();
+        void CreateCommandBuffers();
+        void CreateSyncObjects();
 
-		// 名称比较器，按字典序排列
-		constexpr static auto NameComparer = [](char const* lhs, char const* rhs) {
-			return std::strcmp(lhs, rhs) < 0;
-		};
-		// 扩展投影
-		constexpr static auto ExtensionProjector =
-			[](const VkExtensionProperties& extensionProperties) {
-				return extensionProperties.extensionName;
-		};
-		// 层投影
-		constexpr static auto LayerProjector =
-			[](const VkLayerProperties& layerProperties) {
-				return layerProperties.layerName;
-		};
+		const IDefaultVideoPort& m_videoPort;
 
 		bool m_enableValidationLayer { true };
-		std::vector<char const*> m_requiredVulkanExtensions;
 		std::vector<char const*> m_requiredVulkanLayers;
+		std::vector<char const*> m_requiredVulkanExtensions{
+			VK_KHR_SURFACE_EXTENSION_NAME,
+			"VK_KHR_win32_surface",
+		};
 
-		VkInstance m_instance{};
-		VkDebugUtilsMessengerEXT m_debugMessenger{};
-		VkSurfaceKHR m_surface{};
+		VkInstance m_instance{ VK_NULL_HANDLE };
+		VkDebugUtilsMessengerEXT m_debugMessenger{ VK_NULL_HANDLE };
+		VkSurfaceKHR m_surface{ VK_NULL_HANDLE };
 
-		std::vector<char const*> m_requiredDeviceExtensions;
-		std::vector<VkQueueType> m_requiredQueueFamilies;
-		VkPhysicalDeviceFeatures m_deviceFeatures{};
+		std::vector<char const*> m_requiredDeviceExtensions{
+			VK_KHR_SWAPCHAIN_EXTENSION_NAME,
+			VK_KHR_DYNAMIC_RENDERING_EXTENSION_NAME,
+		};
+		std::vector<VkQueueType> m_requiredQueueFamilies{
+			VkQueueType::Graphic,
+			VkQueueType::Compute,
+			VkQueueType::Transfer,
+			VkQueueType::Present,
+		};
+		VkPhysicalDeviceFeatures m_deviceFeatures{
+			.samplerAnisotropy = VK_TRUE
+		};
 		VkPhysicalDevice m_physicalDevice{ VK_NULL_HANDLE };
 		std::unordered_map<VkQueueType, uint32_t> m_familyIndices;
 
@@ -89,9 +113,20 @@ namespace TG::Rendering
 		std::vector<VkPresentModeKHR> m_presentModes;
 		VkSwapchainKHR m_swapChain{ VK_NULL_HANDLE };
 		VkSwapchainKHR m_oldSwapChain{ VK_NULL_HANDLE };
+
 		std::vector<VkImage> m_swapChainImages;
 		VkFormat m_swapChainImageFormat{ VK_FORMAT_UNDEFINED };
 		VkExtent2D m_swapChainExtent{};
 		std::vector<VkImageView> m_swapChainImageViews;
+
+		const uint32_t MAX_FRAMES_IN_FLIGHT = 3;
+		VkCommandPool m_cmdPool{ VK_NULL_HANDLE };
+		std::vector<VkCommandBuffer> m_cmdBuffers;
+
+		std::vector<VkSemaphore> m_imageAvailableSemaphores;
+		std::vector<VkSemaphore> m_renderFinishedSemaphores;
+		std::vector<VkFence> m_inFlightFences;
+		uint32_t m_currentFrame { 0 };
+		uint32_t m_imageIndex{ 0 };
 	};
 }

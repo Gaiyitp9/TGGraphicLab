@@ -26,7 +26,7 @@ namespace TG::Rendering
     private:
         int m_width{ 0 };
         int m_height{ 0 };
-        GLint m_internalFormat{ GL_RGBA };
+        GLint m_internalFormat{ GL_SRGB8_ALPHA8 };
         GLenum m_format{ GL_RGBA };
     };
 }

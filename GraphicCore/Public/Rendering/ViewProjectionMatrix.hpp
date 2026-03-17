@@ -51,8 +51,10 @@ namespace TG::Rendering
         // 转换为左手坐标系，这样深度为正，远平面的深度大于近平面的深度
         Math::Matrix4<Scalar> perspective;
         Scalar tanHalfFov = std::tan(fov / static_cast<Scalar>(2));
-        perspective[0, 0] = static_cast<Scalar>(1) / (aspect * tanHalfFov);
-        perspective[1, 1] = static_cast<Scalar>(1) / (tanHalfFov);
+        // perspective[0, 0] = static_cast<Scalar>(1) / (aspect * tanHalfFov);
+        // perspective[1, 1] = static_cast<Scalar>(1) / (tanHalfFov);
+        perspective[0, 0] = static_cast<Scalar>(1) / tanHalfFov;
+        perspective[1, 1] = static_cast<Scalar>(1) * aspect / (tanHalfFov);
         perspective[2, 2] = -(zFar + zNear) / (zFar - zNear);
         perspective[3, 2] = -static_cast<Scalar>(1);
         perspective[2, 3] = -static_cast<Scalar>(2) * zFar * zNear / (zFar - zNear);

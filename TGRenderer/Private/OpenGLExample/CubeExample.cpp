@@ -4,6 +4,7 @@
 * This code is licensed under the MIT License (MIT).			*
 *****************************************************************/
 #include "CubeExample.h"
+#include "Rendering/OpenGL/OpenGLRenderer.h"
 #include "Rendering/Color/StandardColors.h"
 #include "Rendering/Mesh/Primitives.h"
 #include "Rendering/ViewProjectionMatrix.hpp"
@@ -13,13 +14,17 @@
 
 namespace TG
 {
-    CubeExample::CubeExample(const IDefaultVideoPort& videoPort, const ITimer& timer)
-        : m_camera(videoPort, timer),
-        m_vertexShader("Assets/Shaders/GLSL/cube.vert", Rendering::ShaderStage::Vertex),
-        m_fragmentShader("Assets/Shaders/GLSL/cube.frag", Rendering::ShaderStage::Fragment),
-        m_wireframeGeometryShader("Assets/Shaders/GLSL/wireframe.geom", Rendering::ShaderStage::Geometry),
-        m_wireframeFragmentShader("Assets/Shaders/GLSL/wireframe.frag", Rendering::ShaderStage::Fragment)
+    CubeExample::CubeExample(const Rendering::Renderer* renderer, const ITimer& timer)
+        : m_camera{ renderer->GetContext().VideoPort(), timer },
+        m_vertexShader{ "Assets/Shaders/GLSL/OpenGL/cube.vert", Rendering::ShaderStage::Vertex },
+        m_fragmentShader{ "Assets/Shaders/GLSL/OpenGL/cube.frag", Rendering::ShaderStage::Fragment },
+        m_wireframeGeometryShader{ "Assets/Shaders/GLSL/OpenGL/wireframe.geom", Rendering::ShaderStage::Geometry },
+        m_wireframeFragmentShader{ "Assets/Shaders/GLSL/OpenGL/wireframe.frag", Rendering::ShaderStage::Fragment }
     {
+        auto openglRenderer = dynamic_cast<const Rendering::OpenGLRenderer*>(renderer);
+        m_camera.aspectRatio = static_cast<float>(openglRenderer->SceneWidth()) /
+            static_cast<float>(openglRenderer->SceneHeight());
+
         m_cubeMesh = Rendering::CreatePrimitive(Rendering::PrimitiveType::Cube);
 
         m_cubePositions[0] = Math::Vector3f{ 0.0f, 0.0f, 0.0f };
@@ -90,8 +95,7 @@ namespace TG
         // 正面朝向设置为顺时针
         // glFrontFace(GL_CW);
 
-        Rendering::Color clearColor = Rendering::DimGray;
-
+        Rendering::Color clearColor = clearColor.SRGBToLinear(Rendering::DimGray);
         glClearColor(clearColor.R(), clearColor.G(), clearColor.B(), clearColor.A());
         glClearDepthf(1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -139,10 +143,13 @@ namespace TG
 
     void CubeExample::DrawUI()
     {
-        const ImGuiIO& io = ImGui::GetIO();
         ImGui::Begin("Cube Example Settings");
         ImGui::Checkbox("Draw wireframe", &m_wireframe);
-        ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
         ImGui::End();
+    }
+
+    void CubeExample::OnViewportChanged(unsigned width, unsigned height)
+    {
+        m_camera.aspectRatio = static_cast<float>(width) / static_cast<float>(height);
     }
 }

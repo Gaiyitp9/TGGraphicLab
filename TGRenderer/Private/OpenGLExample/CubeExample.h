@@ -6,7 +6,7 @@
 #pragma once
 
 #include "Example.h"
-#include "Base/CommonInterfaces.h"
+#include "Rendering/Renderer.h"
 #include "Rendering/Mesh/Mesh.h"
 #include "Rendering/Camera.h"
 #include "Rendering/OpenGL/OpenGLShader.h"
@@ -20,11 +20,13 @@ namespace TG
     class CubeExample final : public Example
     {
     public:
-        CubeExample(const IDefaultVideoPort& videoPort, const ITimer& timer);
+        CubeExample(const Rendering::Renderer* renderer, const ITimer& timer);
         ~CubeExample() override;
 
         void Draw() override;
         void DrawUI() override;
+
+        void OnViewportChanged(unsigned width, unsigned height) override;
 
     private:
         Camera m_camera;

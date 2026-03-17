@@ -8,7 +8,7 @@
 #include "Modules/PlatformModule.h"
 #include "Modules/RenderModule.h"
 #include "Modules/EditorModule.h"
-#include "Example.h"
+#include "ExampleManager.h"
 #include <vector>
 
 namespace TG
@@ -33,9 +33,8 @@ namespace TG
 		std::unique_ptr<EditorModule> m_editorModule;
 		std::vector<Module*> m_modules;
 
-		std::unique_ptr<ExampleFactory> m_exampleFactory;
-		std::unique_ptr<Example> m_example;
 		ExampleEnum m_exampleEnum = ExampleEnum::Triangle;
+		std::unique_ptr<ExampleManager> m_exampleManager;
 
 		const char* m_items[3]{ "Triangle", "Cube", "Basic Light" };
 		int m_currentItem = 0;

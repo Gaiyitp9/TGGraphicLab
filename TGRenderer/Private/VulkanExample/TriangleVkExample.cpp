@@ -7,69 +7,121 @@
 #include "Base/Utility.h"
 #include "Diagnostic/Log.hpp"
 #include "Exception/BaseException.h"
-#include "vulkan/vulkan_win32.h"
+#include "Math/Transform/Transform.hpp"
+#include "Math/Transform/AngleAxis.hpp"
+#include "Rendering/ViewProjectionMatrix.hpp"
+#include "stb_image.h"
 #include <ranges>
-#include <unordered_set>
 
 namespace TG
 {
-    TriangleVkExample::TriangleVkExample(const IDefaultVideoPort& videoPort)
-	    : m_videoPort(videoPort)
+    TriangleVkExample::TriangleVkExample(const Rendering::Renderer* renderer)
+	    : m_renderer{ dynamic_cast<const Rendering::VulkanRenderer*>(renderer) }
     {
-        CheckLayerAndExtension();
-        CreateInstance();
-        SetupDebugMessenger();
-        CreateSurface(videoPort.Handle());
-        SelectPhysicalDevice();
-        CreateLogicalDevice();
-        CreateSwapChain();
-        CreateImageViews();
-        CreateRenderPass();
-        CreateGraphicsPipeline();
-        CreateCommandPool();
     	CreateVertexBuffer();
-        CreateCommandBuffer();
-        CreateFrameBuffers();
-        CreateSyncObjects();
+    	CreateIndexBuffer();
+    	CreateUniformBuffers();
+    	CreateTextureImage();
+    	CreateTextureImageView();
+    	CreateTextureSampler();
+    	CreateDescriptorPool();
+    	CreateDescriptorSetLayout();
+    	CreateDescriptorSets();
+        CreateGraphicsPipeline();
     }
 
     TriangleVkExample::~TriangleVkExample()
     {
-        if (m_instance == VK_NULL_HANDLE || m_device == VK_NULL_HANDLE)
-            return;
+    	VkDevice device{ m_renderer->GetContext().GetDevice() };
 
-        vkDeviceWaitIdle(m_device);
+        vkDeviceWaitIdle(device);
 
-        for (uint32_t i = 0; i < MAX_FRAMES_IN_FLIGHT; ++i)
-        {
-            vkDestroySemaphore(m_device, m_imageAvailableSemaphores[i], nullptr);
-            vkDestroySemaphore(m_device, m_renderFinishedSemaphores[i], nullptr);
-            vkDestroyFence(m_device, m_inFlightFences[i], nullptr);
-        }
-
-        CleanupSwapChain();
-		vkDestroyBuffer(m_device, m_vertexBuffer, nullptr);
-    	vkFreeMemory(m_device, m_vertexBufferMemory, nullptr);
-        vkDestroyCommandPool(m_device, m_cmdPool, nullptr);
-        vkDestroyPipeline(m_device, m_graphicsPipeline, nullptr);
-        vkDestroyPipelineLayout(m_device, m_pipelineLayout, nullptr);
-        vkDestroyRenderPass(m_device, m_renderPass, nullptr);
-        vkDestroyDevice(m_device, nullptr);
-        vkDestroySurfaceKHR(m_instance, m_surface, nullptr);
-        if (m_enableValidationLayer)
-        {
-            const auto vkDestroyDebugUtilsMessengerEXT = reinterpret_cast<PFN_vkDestroyDebugUtilsMessengerEXT>(
-                vkGetInstanceProcAddr(m_instance, "vkDestroyDebugUtilsMessengerEXT"));
-            if (vkDestroyDebugUtilsMessengerEXT != nullptr)
-                vkDestroyDebugUtilsMessengerEXT(m_instance, m_debugMessenger, nullptr);
-        }
-        vkDestroyInstance(m_instance, nullptr);
+        vkDestroyPipeline(device, m_graphicsPipeline, nullptr);
+        vkDestroyPipelineLayout(device, m_pipelineLayout, nullptr);
+    	vkDestroyDescriptorSetLayout(device, m_descriptorSetLayout, nullptr);
+    	vkDestroyDescriptorPool(device, m_descriptorPool, nullptr);
+    	vkDestroySampler(device, m_textureSampler, nullptr);
+    	vkDestroyImageView(device, m_textureImageView, nullptr);
+    	vkFreeMemory(device, m_textureImageMemory, nullptr);
+    	vkDestroyImage(device, m_textureImage, nullptr);
+    	for (uint32_t i = 0; i < m_renderer->GetContext().GetMaxFramesInFlight(); ++i)
+    	{
+    		vkFreeMemory(device, m_uniformBuffersMemory[i], nullptr);
+    		vkDestroyBuffer(device, m_uniformBuffers[i], nullptr);
+    	}
+    	vkFreeMemory(device, m_indexBufferMemory, nullptr);
+    	vkDestroyBuffer(device, m_indexBuffer, nullptr);
+    	vkFreeMemory(device, m_vertexBufferMemory, nullptr);
+		vkDestroyBuffer(device, m_vertexBuffer, nullptr);
     }
+
+	struct UniformBufferObject
+    {
+    	Math::Matrix4f model;
+    	Math::Matrix4f view;
+    	Math::Matrix4f projection;
+    };
 
     void TriangleVkExample::Draw()
     {
-	    DrawFrame();
-    	Present();
+    	const Rendering::VulkanContext& context{ m_renderer->GetContext() };
+    	uint32_t currentFrame{ context.GetCurrentFrameIndex() };
+    	VkRect2D currentRect{ m_renderer->GetSceneRect() };
+
+    	// 更新Uniform buffer
+    	static auto startTime = std::chrono::high_resolution_clock::now();
+    	auto currentTime = std::chrono::high_resolution_clock::now();
+    	float time = std::chrono::duration<float>(currentTime - startTime).count();
+    	UniformBufferObject ubo{};
+    	Math::Transform<float, 3> modelTransform;
+    	modelTransform.Rotate(Math::AngleAxis{
+			time * static_cast<float>(90_deg_to_rad), Math::Vector3f{ 0.0f, 0.0f, 1.0f }});
+    	ubo.model = modelTransform.ToTransformMatrix();
+    	ubo.view = Rendering::LookAt(Math::Vector3f{ 2.0f, 2.0f, 2.0f },
+			Math::Vector3f{ 0.0f, 0.0f, 0.0f }, Math::Vector3f{ 0.0f, 0.0f, 1.0f });
+    	ubo.projection = Rendering::Perspective(70.0f * Math::Deg2RadF,
+			static_cast<float>(currentRect.extent.width) / static_cast<float>(currentRect.extent.height),
+			0.1f, 10.0f);
+    	ubo.projection[1, 1] *= -1;
+    	memcpy(m_uniformBuffersMapped[currentFrame], &ubo, sizeof(ubo));
+
+    	VkCommandBuffer cmdBuffer = context.GetCommandBuffer();
+
+        VkRenderPassBeginInfo renderPassBeginInfo{};
+        renderPassBeginInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+        renderPassBeginInfo.renderPass = m_renderer->GetRenderPass();
+        renderPassBeginInfo.framebuffer = m_renderer->GetFramebuffer();
+        renderPassBeginInfo.renderArea = currentRect;
+        VkClearValue clearValue = {{{ 0.0f, 0.0f, 0.0f, 1.0f }}};
+        renderPassBeginInfo.clearValueCount = 1;
+        renderPassBeginInfo.pClearValues = &clearValue;
+        vkCmdBeginRenderPass(cmdBuffer, &renderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
+
+        vkCmdBindPipeline(cmdBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, m_graphicsPipeline);
+
+        VkViewport viewport{};
+        viewport.x = static_cast<float>(currentRect.offset.x);
+        viewport.y = static_cast<float>(currentRect.offset.y);
+        viewport.width = static_cast<float>(currentRect.extent.width);
+        viewport.height = static_cast<float>(currentRect.extent.height);
+        viewport.minDepth = 0.0f;
+        viewport.maxDepth = 1.0f;
+        vkCmdSetViewport(cmdBuffer, 0, 1, &viewport);
+
+        vkCmdSetScissor(cmdBuffer, 0, 1, &currentRect);
+
+    	VkBuffer vertexBuffers[] = { m_vertexBuffer };
+    	VkDeviceSize offsets[] = { 0 };
+    	vkCmdBindVertexBuffers(cmdBuffer, 0, 1, vertexBuffers, offsets);
+
+    	vkCmdBindIndexBuffer(cmdBuffer, m_indexBuffer, 0, VK_INDEX_TYPE_UINT16);
+
+    	vkCmdBindDescriptorSets(cmdBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipelineLayout,
+    		0, 1, &m_descriptorSets[currentFrame], 0, nullptr);
+        // vkCmdDraw(cmdBuffer, 3, 1, 0, 0);
+    	vkCmdDrawIndexed(cmdBuffer, 6, 1, 0, 0, 0);
+
+        vkCmdEndRenderPass(cmdBuffer);
     }
 
     void TriangleVkExample::DrawUI()
@@ -77,492 +129,481 @@ namespace TG
 
     }
 
-    void TriangleVkExample::Present()
+    void TriangleVkExample::OnViewportChanged(unsigned width, unsigned height)
     {
-        VkPresentInfoKHR presentInfo{};
-        presentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
-        VkSemaphore signalSemaphores[] = { m_renderFinishedSemaphores[m_currentFrame] };
-        presentInfo.waitSemaphoreCount = 1;
-        presentInfo.pWaitSemaphores = signalSemaphores;
-        VkSwapchainKHR swapChains[] = { m_swapChain };
-        presentInfo.swapchainCount = 1;
-        presentInfo.pSwapchains = swapChains;
-        presentInfo.pImageIndices = &m_imageIndex;
-        presentInfo.pResults = nullptr;
-        VkResult result = vkQueuePresentKHR(m_queues[VkQueueType::Present], &presentInfo);
-        if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR || m_framebufferResized)
-        {
-            m_framebufferResized = false;
-            RecreateSwapChain();
-        }
-        else if (result != VK_SUCCESS)
-            throw std::runtime_error("failed to present swap chain image");
 
-        m_currentFrame = (m_currentFrame + 1) % MAX_FRAMES_IN_FLIGHT;
     }
 
-    void TriangleVkExample::CheckLayerAndExtension()
-    {
-        // 假如安装了多个版本的vulkan，指定版本需要设置
-        // 1. VK_LAYER_PATH=/path/to/vulkan/Bin来寻找VkLayer_khronos_validation.dll
-        // 2. VK_SDK_PATH=/path/to/vulkan/Bin
-        // 3. VULKAN_SDK=/path/to/vulkan/Bin
-        // Windows平台上，也可以在注册表中的下面两项中添加*.json文件路径
-        // HKEY_LOCAL_MACHINE\SOFTWARE\Khronos\Vulkan\ExplicitLayers
-        // HKEY_LOCAL_MACHINE\SOFTWARE\Khronos\Vulkan\ImplicitLayers
+    VkCommandBuffer TriangleVkExample::BeginSingleTimeCommands() const
+	{
+    	const Rendering::VulkanContext& context{ m_renderer->GetContext() };
 
-        // 需要开启的层
-        if (m_enableValidationLayer)
-            m_requiredVulkanLayers.emplace_back("VK_LAYER_KHRONOS_validation");
-        std::ranges::sort(m_requiredVulkanLayers, NameComparer);
-        // 查询可用的层
-        uint32_t layerCount = 0;
-        vkEnumerateInstanceLayerProperties(&layerCount, nullptr);
-        std::vector<VkLayerProperties> availableLayers(layerCount);
-        vkEnumerateInstanceLayerProperties(&layerCount, availableLayers.data());
-        std::ranges::sort(availableLayers, NameComparer, LayerProjector);
-        // 可用层输出到日志
-        std::string layersLog;
-        for (const auto& layerProperties : availableLayers)
-        {
-            layersLog += layerProperties.layerName;
-            layersLog += "\n";
-        }
-        LogInfo("\nAvailable layers:\n{}", layersLog);
-        // 检查是否包含所需层
-        const bool layerFound = std::ranges::includes(availableLayers, m_requiredVulkanLayers,
-            NameComparer, LayerProjector);
-        if (!layerFound)
-            throw BaseException::Create("Layers required, but not available");
+    	VkCommandBufferAllocateInfo allocInfo{};
+    	allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+    	allocInfo.commandPool = context.GetCommandPool();
+    	allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+    	allocInfo.commandBufferCount = 1;
 
-        // 需要支持的扩展
-        m_requiredVulkanExtensions.emplace_back(VK_KHR_SURFACE_EXTENSION_NAME);
-        m_requiredVulkanExtensions.emplace_back("VK_KHR_win32_surface");
-        if (m_enableValidationLayer)
-            m_requiredVulkanExtensions.emplace_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
-        std::ranges::sort(m_requiredVulkanExtensions, NameComparer);
-        // 查询可用的扩展
-        uint32_t extensionCount = 0;
-        vkEnumerateInstanceExtensionProperties(nullptr, &extensionCount, nullptr);
-        std::vector<VkExtensionProperties> availableExtensions(extensionCount);
-        vkEnumerateInstanceExtensionProperties(nullptr, &extensionCount, availableExtensions.data());
-        std::ranges::sort(availableExtensions, NameComparer, ExtensionProjector);
-        // 可用扩展输出到日志
-        std::string extensionsLog;
-        for (const auto& extensionProperties : availableExtensions)
-        {
-            extensionsLog += extensionProperties.extensionName;
-            extensionsLog += "\n";
-        }
-        LogInfo("\nAvailable extensions:\n{}", extensionsLog);
-        // 检查是否包含所需扩展
-        const bool extensionFound = std::ranges::includes(availableExtensions, m_requiredVulkanExtensions,
-            NameComparer, ExtensionProjector);
-        if (!extensionFound)
-            throw BaseException::Create("Extensions required, but not available");
+    	VkCommandBuffer commandBuffer;
+		if (vkAllocateCommandBuffers(context.GetDevice(), &allocInfo, &commandBuffer) != VK_SUCCESS)
+			throw BaseException::Create("Begin single time commands failed");
+
+    	VkCommandBufferBeginInfo beginInfo{};
+    	beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+    	beginInfo.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
+
+    	vkBeginCommandBuffer(commandBuffer, &beginInfo);
+
+    	return commandBuffer;
     }
 
-    void TriangleVkExample::PopulateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT& createInfo)
-    {
-        createInfo = {};
-        createInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
-        createInfo.messageSeverity = VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT |
-            VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT |
-            VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT;
-        createInfo.messageType = VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT |
-            VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT |
-            VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT |
-            VK_DEBUG_UTILS_MESSAGE_TYPE_DEVICE_ADDRESS_BINDING_BIT_EXT;
-        createInfo.pfnUserCallback = DebugCallback;
-        createInfo.pUserData = nullptr;
+	void TriangleVkExample::EndSingleTimeCommands(VkCommandBuffer commandBuffer) const
+	{
+    	const Rendering::VulkanContext& context{ m_renderer->GetContext() };
+
+    	vkEndCommandBuffer(commandBuffer);
+
+    	VkSubmitInfo submitInfo{};
+    	submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+    	submitInfo.commandBufferCount = 1;
+    	submitInfo.pCommandBuffers = &commandBuffer;
+
+    	vkQueueSubmit(context.GetQueue(Rendering::VkQueueType::Graphic), 1, &submitInfo, VK_NULL_HANDLE);
+    	vkQueueWaitIdle(context.GetQueue(Rendering::VkQueueType::Graphic));
+
+    	vkFreeCommandBuffers(context.GetDevice(), context.GetCommandPool(), 1, &commandBuffer);
     }
 
-    VKAPI_ATTR VkBool32 VKAPI_CALL TriangleVkExample::DebugCallback(
-        VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
-        VkDebugUtilsMessageTypeFlagsEXT messageType,
-        const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData,
-        void* pUserData)
-    {
-        LogInfo("validation layer: {}", pCallbackData->pMessage);
-        // The callback returns a boolean that indicates if the Vulkan call that
-        // triggered the validation layer message should be aborted. If the callback
-        // returns true, then the call is aborted with the VK_ERROR_VALIDATION_FAILED_EXT error.
-        // This is normally only used to test the validation layers themselves, so you should always return VK_FALSE.
-        return VK_FALSE;
+	uint32_t TriangleVkExample::FindMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties) const
+	{
+    	VkPhysicalDeviceMemoryProperties memProperties;
+    	vkGetPhysicalDeviceMemoryProperties(m_renderer->GetContext().GetPhysicalDevice(), &memProperties);
+    	for (uint32_t i = 0; i < memProperties.memoryTypeCount; ++i)
+    	{
+    		if ((typeFilter & (1 << i)) && (memProperties.memoryTypes[i].propertyFlags & properties) == properties)
+    		{
+    			return i;
+    		}
+    	}
+
+    	throw BaseException::Create("Failed to find suitable memory type!");
     }
 
-    void TriangleVkExample::CreateInstance()
-    {
-        VkApplicationInfo appInfo{};
-        appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
-        appInfo.pApplicationName = "TG Renderer";
-        appInfo.applicationVersion = VK_MAKE_API_VERSION(0, 1, 0, 0);
-        appInfo.pEngineName = "No Engine";
-        appInfo.engineVersion = VK_MAKE_API_VERSION(0, 1, 0, 0);
-        appInfo.apiVersion = VK_API_VERSION_1_4;
+	void TriangleVkExample::CreateBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties,
+										 VkBuffer& buffer, VkDeviceMemory& bufferMemory) const
+	{
+    	VkDevice device = m_renderer->GetContext().GetDevice();
 
-        VkInstanceCreateInfo createInfo{};
-        createInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
-        createInfo.pApplicationInfo = &appInfo;
-        createInfo.enabledExtensionCount = static_cast<uint32_t>(m_requiredVulkanExtensions.size());
-        createInfo.ppEnabledExtensionNames = m_requiredVulkanExtensions.data();
-        createInfo.enabledLayerCount = static_cast<uint32_t>(m_requiredVulkanLayers.size());
-        createInfo.ppEnabledLayerNames = m_requiredVulkanLayers.data();
-        VkDebugUtilsMessengerCreateInfoEXT debugCreateInfo{};
-        if (m_enableValidationLayer)
-        {
-            PopulateDebugMessengerCreateInfo(debugCreateInfo);
-            createInfo.pNext = &debugCreateInfo;
-        }
+    	VkBufferCreateInfo bufferInfo{};
+    	bufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
+    	bufferInfo.size = size;
+    	bufferInfo.usage = usage;
+    	bufferInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 
-        if (vkCreateInstance(&createInfo, nullptr, &m_instance) != VK_SUCCESS)
-            throw BaseException::Create("Failed to create instance");
+    	if (vkCreateBuffer(device, &bufferInfo, nullptr, &buffer) != VK_SUCCESS)
+    		throw BaseException::Create("Failed to create buffer!");
+
+    	VkMemoryRequirements memRequirements;
+    	vkGetBufferMemoryRequirements(device, buffer, &memRequirements);
+
+    	VkMemoryAllocateInfo allocInfo{};
+    	allocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
+    	allocInfo.allocationSize = memRequirements.size;
+    	allocInfo.memoryTypeIndex = FindMemoryType(memRequirements.memoryTypeBits, properties);
+    	if (vkAllocateMemory(device, &allocInfo, nullptr, &bufferMemory) != VK_SUCCESS)
+    		throw BaseException::Create("Failed to allocate buffer memory!");
+
+    	vkBindBufferMemory(device, buffer, bufferMemory, 0);
     }
 
-    void TriangleVkExample::SetupDebugMessenger()
-    {
-        if (!m_enableValidationLayer)
-            return;
+	void TriangleVkExample::CopyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size) const
+	{
+    	VkCommandBuffer commandBuffer = BeginSingleTimeCommands();
 
-        VkDebugUtilsMessengerCreateInfoEXT createInfo{};
-        PopulateDebugMessengerCreateInfo(createInfo);
-        const auto vkCreateDebugUtilsMessengerEXT = reinterpret_cast<PFN_vkCreateDebugUtilsMessengerEXT>(
-            vkGetInstanceProcAddr(m_instance, "vkCreateDebugUtilsMessengerEXT"));
-        if (vkCreateDebugUtilsMessengerEXT == nullptr)
-            throw BaseException::Create("Failed to set up debug messenger");
-        vkCreateDebugUtilsMessengerEXT(m_instance, &createInfo, nullptr, &m_debugMessenger);
+    	VkBufferCopy copyRegion{};
+    	copyRegion.size = size;
+    	vkCmdCopyBuffer(commandBuffer, srcBuffer, dstBuffer, 1, &copyRegion);
+
+    	EndSingleTimeCommands(commandBuffer);
     }
 
-    void TriangleVkExample::CreateSurface(HWND handle)
+	 void TriangleVkExample::CreateVertexBuffer()
     {
-        VkWin32SurfaceCreateInfoKHR surfaceCreateInfo{};
-        surfaceCreateInfo.sType = VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR;
-        surfaceCreateInfo.hwnd = handle;
-        surfaceCreateInfo.hinstance = GetModuleHandle(nullptr);
-        if (vkCreateWin32SurfaceKHR(m_instance, &surfaceCreateInfo, nullptr, &m_surface) != VK_SUCCESS)
-            throw BaseException::Create("Failed to create window surface");
+    	VkDevice device = m_renderer->GetContext().GetDevice();
+    	VkDeviceSize bufferSize = sizeof(m_vertices);
+
+    	VkBuffer stagingBuffer;
+    	VkDeviceMemory stagingBufferMemory;
+	    CreateBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
+	    	VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+	    	stagingBuffer, stagingBufferMemory);
+
+    	void* data;
+    	vkMapMemory(device, stagingBufferMemory, 0, bufferSize, 0, &data);
+    	memcpy(data, m_vertices, bufferSize);
+    	vkUnmapMemory(device, stagingBufferMemory);
+
+    	CreateBuffer(bufferSize,
+    		VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
+			VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
+			m_vertexBuffer, m_vertexBufferMemory);
+
+    	CopyBuffer(stagingBuffer, m_vertexBuffer, bufferSize);
+
+    	vkDestroyBuffer(device, stagingBuffer, nullptr);
+    	vkFreeMemory(device, stagingBufferMemory, nullptr);
     }
 
-    void TriangleVkExample::SelectPhysicalDevice()
+    void TriangleVkExample::CreateIndexBuffer()
     {
-        // 设备需要支持的扩展
-        m_requiredDeviceExtensions.emplace_back(VK_KHR_SWAPCHAIN_EXTENSION_NAME);
-        std::ranges::sort(m_requiredVulkanExtensions, NameComparer);
-        // 队列族需要支持的队列类型
-        m_requiredQueueFamilies.emplace_back(VkQueueType::Graphic);
-        m_requiredQueueFamilies.emplace_back(VkQueueType::Compute);
-        m_requiredQueueFamilies.emplace_back(VkQueueType::Transfer);
-        m_requiredQueueFamilies.emplace_back(VkQueueType::Present);
-        // 设备需要支持的特性
-        m_deviceFeatures.samplerAnisotropy = VK_TRUE;
+    	VkDevice device = m_renderer->GetContext().GetDevice();
+	    VkDeviceSize bufferSize = sizeof(m_indices);
 
-        // 获取所有显示设备
-        uint32_t deviceCount = 0;
-        vkEnumeratePhysicalDevices(m_instance, &deviceCount, nullptr);
-        if (deviceCount == 0)
-            throw BaseException::Create("Failed to find GPUs with Vulkan support");
-        std::vector<VkPhysicalDevice> availableDevices(deviceCount);
-        vkEnumeratePhysicalDevices(m_instance, &deviceCount, availableDevices.data());
-        // 选择合适的显示设备
-        for (const auto& device : availableDevices)
-        {
-            if (IsDeviceSuitable(device))
-            {
-                m_physicalDevice = device;
-                break;
-            }
-        }
-        if (m_physicalDevice == VK_NULL_HANDLE)
-            throw BaseException::Create("Failed to find a suitable GPU");
+    	VkBuffer stagingBuffer;
+    	VkDeviceMemory stagingBufferMemory;
+    	CreateBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
+			VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+			stagingBuffer, stagingBufferMemory);
+
+    	void* data;
+    	vkMapMemory(device, stagingBufferMemory, 0, bufferSize, 0, &data);
+    	memcpy(data, m_indices, bufferSize);
+    	vkUnmapMemory(device, stagingBufferMemory);
+
+    	CreateBuffer(bufferSize,
+			VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT,
+			VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
+			m_indexBuffer, m_indexBufferMemory);
+
+    	CopyBuffer(stagingBuffer, m_indexBuffer, bufferSize);
+
+    	vkDestroyBuffer(device, stagingBuffer, nullptr);
+    	vkFreeMemory(device, stagingBufferMemory, nullptr);
     }
 
-    bool TriangleVkExample::IsDeviceSuitable(VkPhysicalDevice device)
+    void TriangleVkExample::CreateUniformBuffers()
     {
-        // 获取设备属性
-        VkPhysicalDeviceProperties deviceProperties{};
-        vkGetPhysicalDeviceProperties(device, &deviceProperties);
+    	VkDevice device = m_renderer->GetContext().GetDevice();
+    	uint32_t maxFramesInFlight = m_renderer->GetContext().GetMaxFramesInFlight();
 
-        // 获取显示设备支持的扩展
-        uint32_t extensionCount;
-        vkEnumerateDeviceExtensionProperties(device, nullptr, &extensionCount, nullptr);
-        std::vector<VkExtensionProperties> availableExtensions(extensionCount);
-        vkEnumerateDeviceExtensionProperties(device, nullptr, &extensionCount, availableExtensions.data());
-        std::ranges::sort(availableExtensions, NameComparer, ExtensionProjector);
-        // 设备扩展输出到日志
-        std::string deviceExtensionsLog;
-        for (const auto& extensionProperties : availableExtensions)
-        {
-            deviceExtensionsLog += extensionProperties.extensionName;
-            deviceExtensionsLog += "\n";
-        }
-        LogInfo("\nDevice type: {} Device name: {}\nExtensions:\n{}",
-                std::to_underlying(deviceProperties.deviceType),
-                deviceProperties.deviceName,
-                deviceExtensionsLog);
-        // 检查是否包含所需扩展
-        const bool extensionFound = std::ranges::includes(availableExtensions, m_requiredDeviceExtensions,
-            NameComparer, ExtensionProjector);
-        if (!extensionFound)
-            return false;
+	    m_uniformBuffers.resize(maxFramesInFlight);
+    	m_uniformBuffersMemory.resize(maxFramesInFlight);
+    	m_uniformBuffersMapped.resize(maxFramesInFlight);
 
-        // 获取设备支持的队列族
-        uint32_t queueFamilyCount = 0;
-        vkGetPhysicalDeviceQueueFamilyProperties(device, &queueFamilyCount, nullptr);
-        std::vector<VkQueueFamilyProperties> availableQueueFamilies(queueFamilyCount);
-        vkGetPhysicalDeviceQueueFamilyProperties(device, &queueFamilyCount, availableQueueFamilies.data());
-        // 检查是否包含所需的队列族
-        for (const auto& queueFamily : m_requiredQueueFamilies)
-        {
-            bool familyFound = false;
-            for (std::size_t i = 0; i < availableQueueFamilies.size(); ++i)
-            {
-                if (availableQueueFamilies[i].queueFlags & static_cast<VkQueueFlags>(queueFamily))
-                {
-                    m_familyIndices[queueFamily] = static_cast<uint32_t>(i);
-                    familyFound = true;
-                    break;
-                }
+    	for (uint32_t i = 0; i < maxFramesInFlight; ++i)
+    	{
+		    VkDeviceSize bufferSize = sizeof(UniformBufferObject);
+		    CreateBuffer(bufferSize, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
+		                 VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+		                 m_uniformBuffers[i],
+		                 m_uniformBuffersMemory[i]);
 
-                // 是否支持present
-                VkBool32 presentSupport = false;
-                vkGetPhysicalDeviceSurfaceSupportKHR(device, static_cast<uint32_t>(i),
-                    m_surface, &presentSupport);
-                if (presentSupport)
-                {
-                    m_familyIndices[VkQueueType::Present] = static_cast<uint32_t>(i);
-                    familyFound = true;
-                    break;
-                }
-            }
-            if (!familyFound)
-            {
-                m_familyIndices.clear();
-                return false;
-            }
-        }
-
-        // 检查交换链格式和present模式
-        uint32_t formatCount = 0;
-        uint32_t presentModeCount = 0;
-        vkGetPhysicalDeviceSurfaceFormatsKHR(device, m_surface, &formatCount, nullptr);
-        vkGetPhysicalDeviceSurfacePresentModesKHR(device, m_surface, &presentModeCount, nullptr);
-        if (formatCount == 0 || presentModeCount == 0)
-            return false;
-
-        // 检查设备是否支持所需特性
-        VkPhysicalDeviceFeatures supportedFeatures{};
-        vkGetPhysicalDeviceFeatures(device, &supportedFeatures);
-        if (m_deviceFeatures.samplerAnisotropy && !supportedFeatures.samplerAnisotropy)
-            return false;
-
-        return true;
+    		vkMapMemory(device, m_uniformBuffersMemory[i], 0, bufferSize, 0, &m_uniformBuffersMapped[i]);
+    	}
     }
 
-    void TriangleVkExample::CreateLogicalDevice()
-    {
-        std::unordered_set<uint32_t> uniqueQueueFamilies;
-        // 保证每个queue family是唯一的
-        for (const auto &index: m_familyIndices | std::views::values)
-            uniqueQueueFamilies.insert(index);
+	void TriangleVkExample::CreateImage(uint32_t width, uint32_t height, VkFormat format, VkImageTiling tiling,
+		VkImageUsageFlags usage, VkMemoryPropertyFlags properties, VkImage& image, VkDeviceMemory& imageMemory) const
+	{
+    	VkDevice device = m_renderer->GetContext().GetDevice();
 
-        std::vector<VkDeviceQueueCreateInfo> queueCreateInfos;
-        constexpr float queuePriority = 1.0f;
-        for (const auto& queueFamily : uniqueQueueFamilies)
-        {
-            VkDeviceQueueCreateInfo queueCreateInfo{};
-            queueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
-            queueCreateInfo.queueFamilyIndex = queueFamily;
-            queueCreateInfo.queueCount = 1;
-            queueCreateInfo.pQueuePriorities = &queuePriority;
-            queueCreateInfos.emplace_back(queueCreateInfo);
-        }
+    	VkImageCreateInfo imageInfo{};
+    	imageInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
+    	imageInfo.imageType = VK_IMAGE_TYPE_2D;
+    	imageInfo.extent.width = width;
+    	imageInfo.extent.height = height;
+    	imageInfo.extent.depth = 1;
+    	imageInfo.mipLevels = 1;
+    	imageInfo.arrayLayers = 1;
+    	imageInfo.format = format;
+    	imageInfo.tiling = tiling;
+    	imageInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+    	imageInfo.usage = usage;
+    	imageInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+    	imageInfo.samples = VK_SAMPLE_COUNT_1_BIT;
+    	if (vkCreateImage(device, &imageInfo, nullptr, &image) != VK_SUCCESS)
+    		throw BaseException::Create("Failed to create image!");
 
-        VkDeviceCreateInfo createInfo{};
-        createInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
-        createInfo.queueCreateInfoCount = static_cast<uint32_t>(queueCreateInfos.size());
-        createInfo.pQueueCreateInfos = queueCreateInfos.data();
-        createInfo.pEnabledFeatures = &m_deviceFeatures;
-        createInfo.enabledExtensionCount = static_cast<uint32_t>(m_requiredDeviceExtensions.size());
-        createInfo.ppEnabledExtensionNames = m_requiredDeviceExtensions.data();
-        if (vkCreateDevice(m_physicalDevice, &createInfo, nullptr, &m_device) != VK_SUCCESS)
-            throw BaseException::Create("Failed to create logical device!");
+    	VkMemoryRequirements memRequirements;
+    	vkGetImageMemoryRequirements(device, image, &memRequirements);
 
-        for (const auto& pair : m_familyIndices)
-        {
-            VkQueue queue;
-            vkGetDeviceQueue(m_device, pair.second, 0, &queue);
-            m_queues[pair.first] = queue;
-        }
+    	VkMemoryAllocateInfo memoryAllocateInfo{};
+    	memoryAllocateInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
+    	memoryAllocateInfo.allocationSize = memRequirements.size;
+    	memoryAllocateInfo.memoryTypeIndex = FindMemoryType(memRequirements.memoryTypeBits, properties);
+
+    	if (vkAllocateMemory(device, &memoryAllocateInfo, nullptr, &imageMemory) != VK_SUCCESS)
+    		throw BaseException::Create("Failed to allocate image memory!");
+
+    	vkBindImageMemory(device, image, imageMemory, 0);
     }
 
-    void TriangleVkExample::CreateSwapChain()
+	void TriangleVkExample::CopyBufferToImage(VkBuffer buffer, VkImage image, uint32_t width, uint32_t height) const
     {
-        // 获取支持的交换链属性
-        vkGetPhysicalDeviceSurfaceCapabilitiesKHR(m_physicalDevice, m_surface, &m_capabilities);
-        // 获取支持的交换链格式
-        uint32_t formatCount;
-        vkGetPhysicalDeviceSurfaceFormatsKHR(m_physicalDevice, m_surface, &formatCount, nullptr);
-        m_swapChainFormats.resize(formatCount);
-        vkGetPhysicalDeviceSurfaceFormatsKHR(m_physicalDevice, m_surface, &formatCount,
-            m_swapChainFormats.data());
-        // 获取支持的交换链present模式
-        uint32_t presentModeCount;
-        vkGetPhysicalDeviceSurfacePresentModesKHR(m_physicalDevice, m_surface, &presentModeCount, nullptr);
-        m_presentModes.resize(presentModeCount);
-        vkGetPhysicalDeviceSurfacePresentModesKHR(m_physicalDevice, m_surface, &presentModeCount,
-            m_presentModes.data());
+    	VkCommandBuffer commandBuffer = BeginSingleTimeCommands();
 
-        VkSurfaceFormatKHR surfaceFormat = ChooseSwapSurfaceFormat();
-        VkPresentModeKHR presentMode = ChooseSwapPresentMode();
-        m_swapChainImageFormat = surfaceFormat.format;
-        m_swapChainExtent = m_capabilities.currentExtent;
+    	VkBufferImageCopy region{};
+    	region.bufferOffset = 0;
+    	region.bufferRowLength = 0;
+    	region.bufferImageHeight = 0;
+    	region.imageOffset = { 0, 0, 0 };
+    	region.imageExtent = { width, height, 1 };
+    	region.imageSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+    	region.imageSubresource.mipLevel = 0;
+    	region.imageSubresource.baseArrayLayer = 0;
+    	region.imageSubresource.layerCount = 1;
 
-        uint32_t imageCount = m_capabilities.minImageCount + 1;
-        if (m_capabilities.maxImageCount > 0 && imageCount > m_capabilities.maxImageCount)
-            imageCount = m_capabilities.maxImageCount;
+    	vkCmdCopyBufferToImage(commandBuffer, buffer, image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &region);
 
-        VkSwapchainCreateInfoKHR createInfo{};
-        createInfo.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
-        createInfo.surface = m_surface;
-        createInfo.minImageCount = imageCount;
-        createInfo.imageFormat = m_swapChainImageFormat;
-        createInfo.imageColorSpace = surfaceFormat.colorSpace;
-        createInfo.imageExtent = m_swapChainExtent;
-        createInfo.imageArrayLayers = 1;
-        createInfo.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
-        uint32_t presentGraphicFamilyIndices[] = {
-            m_familyIndices[VkQueueType::Present],
-            m_familyIndices[VkQueueType::Graphic],
-        };
-        if (m_familyIndices[VkQueueType::Graphic] != m_familyIndices[VkQueueType::Present])
-        {
-            createInfo.imageSharingMode = VK_SHARING_MODE_CONCURRENT;
-            createInfo.queueFamilyIndexCount = 2;
-            createInfo.pQueueFamilyIndices = presentGraphicFamilyIndices;
-        }
-        else
-        {
-            createInfo.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE;
-            createInfo.queueFamilyIndexCount = 0;
-            createInfo.pQueueFamilyIndices = nullptr;
-        }
-        createInfo.preTransform = m_capabilities.currentTransform;
-        createInfo.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
-        createInfo.presentMode = presentMode;
-        createInfo.clipped = VK_TRUE;
-        createInfo.oldSwapchain = m_oldSwapChain;
-
-        if (vkCreateSwapchainKHR(m_device, &createInfo, nullptr, &m_swapChain) != VK_SUCCESS)
-            throw BaseException::Create("Failed to create swap chain!");
-
-        vkGetSwapchainImagesKHR(m_device, m_swapChain, &imageCount, nullptr);
-        m_swapChainImages.resize(imageCount);
-        vkGetSwapchainImagesKHR(m_device, m_swapChain, &imageCount, m_swapChainImages.data());
+    	EndSingleTimeCommands(commandBuffer);
     }
 
-    VkSurfaceFormatKHR TriangleVkExample::ChooseSwapSurfaceFormat()
-    {
-        for (const auto& availableFormat : m_swapChainFormats)
-        {
-            if (availableFormat.format == VK_FORMAT_R8G8B8A8_SRGB &&
-                availableFormat.colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR)
-            {
-                return availableFormat;
-            }
-        }
+	void TriangleVkExample::TransitionImageLayout(VkImage image, VkFormat format, VkImageLayout oldLayout,
+		VkImageLayout newLayout) const
+	{
+    	VkCommandBuffer commandBuffer = BeginSingleTimeCommands();
 
-        return m_swapChainFormats[0];
+    	VkImageMemoryBarrier barrier{};
+    	barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+    	barrier.image = image;
+    	barrier.oldLayout = oldLayout;
+    	barrier.newLayout = newLayout;
+    	barrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+    	barrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+    	barrier.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+    	barrier.subresourceRange.baseMipLevel = 0;
+    	barrier.subresourceRange.levelCount = 1;
+    	barrier.subresourceRange.baseArrayLayer = 0;
+    	barrier.subresourceRange.layerCount = 1;
+    	barrier.srcAccessMask = 0;
+    	barrier.dstAccessMask = 0;
+
+    	VkPipelineStageFlags sourceFlags, destinationFlags;
+    	if (oldLayout == VK_IMAGE_LAYOUT_UNDEFINED && newLayout == VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL)
+    	{
+    		barrier.srcAccessMask = 0;
+    		barrier.dstAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+
+    		sourceFlags = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;
+    		destinationFlags = VK_PIPELINE_STAGE_TRANSFER_BIT;
+    	}
+    	else if (oldLayout == VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL && newLayout == VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL)
+    	{
+    		barrier.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+    		barrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
+
+    		sourceFlags = VK_PIPELINE_STAGE_TRANSFER_BIT;
+    		destinationFlags = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
+    	}
+    	else
+    		throw BaseException::Create("Unsupported layout transition!");
+
+    	vkCmdPipelineBarrier(commandBuffer,
+			sourceFlags, destinationFlags,
+			0,
+			0, nullptr,
+			0, nullptr,
+			1, &barrier);
+
+    	EndSingleTimeCommands(commandBuffer);
     }
 
-    VkPresentModeKHR TriangleVkExample::ChooseSwapPresentMode()
+	void TriangleVkExample::CreateTextureImage()
     {
-        // for (const auto& availablePresentMode : m_presentModes)
-        // {
-        //     if (availablePresentMode == VK_PRESENT_MODE_MAILBOX_KHR)
-        //         return availablePresentMode;
-        // }
+    	VkDevice device = m_renderer->GetContext().GetDevice();
 
-        // 开启垂直同步
-        return VK_PRESENT_MODE_FIFO_KHR;
+	    int width, height, channels;
+    	stbi_uc* pixels = stbi_load("Assets/Textures/wall.jpg", &width, &height, &channels, STBI_rgb_alpha);
+    	if (pixels == nullptr)
+    		throw BaseException::Create("Failed to load image!");
+
+    	VkDeviceSize imageSize = width * height * 4;
+
+    	VkBuffer stagingBuffer;
+    	VkDeviceMemory stagingBufferMemory;
+    	CreateBuffer(imageSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
+    		VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+    		stagingBuffer, stagingBufferMemory);
+
+    	void* data;
+    	vkMapMemory(device, stagingBufferMemory, 0, imageSize, 0, &data);
+    	memcpy(data, pixels, imageSize);
+		vkUnmapMemory(device, stagingBufferMemory);
+
+    	stbi_image_free(pixels);
+
+    	CreateImage(width, height, VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_TILING_OPTIMAL,
+    		VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT,
+    		VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
+    		m_textureImage, m_textureImageMemory);
+
+    	TransitionImageLayout(m_textureImage, VK_FORMAT_R8G8B8_SRGB, VK_IMAGE_LAYOUT_UNDEFINED,
+    		VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
+    	CopyBufferToImage(stagingBuffer, m_textureImage, static_cast<uint32_t>(width), static_cast<uint32_t>(height));
+		TransitionImageLayout(m_textureImage, VK_FORMAT_R8G8B8_SRGB, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
+			VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+
+    	vkDestroyBuffer(device, stagingBuffer, nullptr);
+    	vkFreeMemory(device, stagingBufferMemory, nullptr);
     }
 
-    void TriangleVkExample::CleanupSwapChain()
+    void TriangleVkExample::CreateTextureImageView()
     {
-        for (const auto& framebuffer : m_swapChainFrameBuffers)
-            vkDestroyFramebuffer(m_device, framebuffer, nullptr);
+    	VkImageViewCreateInfo viewInfo{};
+    	viewInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
+    	viewInfo.image = m_textureImage;
+    	viewInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
+    	viewInfo.format = VK_FORMAT_R8G8B8A8_SRGB;
+    	viewInfo.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+    	viewInfo.subresourceRange.baseMipLevel = 0;
+    	viewInfo.subresourceRange.levelCount = 1;
+    	viewInfo.subresourceRange.baseArrayLayer = 0;
+    	viewInfo.subresourceRange.layerCount = 1;
 
-        for (const auto& swapChainImageView : m_swapChainImageViews)
-            vkDestroyImageView(m_device, swapChainImageView, nullptr);
-
-        vkDestroySwapchainKHR(m_device, m_swapChain, nullptr);
+    	if (vkCreateImageView(m_renderer->GetContext().GetDevice(), &viewInfo, nullptr, &m_textureImageView) != VK_SUCCESS)
+    		throw BaseException::Create("Failed to create image view!");
     }
 
-    void TriangleVkExample::CreateImageViews()
+    void TriangleVkExample::CreateTextureSampler()
     {
-        m_swapChainImageViews.resize(m_swapChainImages.size());
-        for (std::size_t i = 0; i < m_swapChainImages.size(); ++i)
-        {
-            VkImageViewCreateInfo createInfo{};
-            createInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
-            createInfo.image = m_swapChainImages[i];
-            createInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
-            createInfo.format = m_swapChainImageFormat;
-            createInfo.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
-            createInfo.subresourceRange.baseMipLevel = 0;
-            createInfo.subresourceRange.levelCount = 1;
-            createInfo.subresourceRange.baseArrayLayer = 0;
-            createInfo.subresourceRange.layerCount = 1;
-            if (vkCreateImageView(m_device, &createInfo, nullptr, &m_swapChainImageViews[i]) != VK_SUCCESS)
-                throw BaseException::Create("Failed to create image view!");
-        }
+	    VkSamplerCreateInfo samplerInfo{};
+    	samplerInfo.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
+    	samplerInfo.magFilter = VK_FILTER_LINEAR;
+    	samplerInfo.minFilter = VK_FILTER_LINEAR;
+    	samplerInfo.addressModeU = VK_SAMPLER_ADDRESS_MODE_REPEAT;
+    	samplerInfo.addressModeV = VK_SAMPLER_ADDRESS_MODE_REPEAT;
+    	samplerInfo.addressModeW = VK_SAMPLER_ADDRESS_MODE_REPEAT;
+    	samplerInfo.anisotropyEnable = VK_TRUE;
+    	VkPhysicalDeviceProperties properties{};
+    	vkGetPhysicalDeviceProperties(m_renderer->GetContext().GetPhysicalDevice(), &properties);
+    	samplerInfo.maxAnisotropy = properties.limits.maxSamplerAnisotropy;
+    	samplerInfo.borderColor = VK_BORDER_COLOR_FLOAT_OPAQUE_BLACK;
+    	samplerInfo.unnormalizedCoordinates = VK_FALSE;
+    	samplerInfo.compareEnable = VK_FALSE;
+    	samplerInfo.compareOp = VK_COMPARE_OP_ALWAYS;
+    	samplerInfo.mipmapMode = VK_SAMPLER_MIPMAP_MODE_LINEAR;
+    	samplerInfo.mipLodBias = 0.0f;
+    	samplerInfo.minLod = 0.0f;
+    	samplerInfo.maxLod = 0.0f;
+
+    	if (vkCreateSampler(m_renderer->GetContext().GetDevice(), &samplerInfo, nullptr, &m_textureSampler) != VK_SUCCESS)
+    		throw BaseException::Create("Failed to create texture sampler!");
     }
 
-    void TriangleVkExample::CreateRenderPass()
+	VkShaderModule TriangleVkExample::CreateShaderModule(const std::vector<char>& code) const
+	{
+    	VkShaderModuleCreateInfo createInfo{};
+    	createInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
+    	createInfo.codeSize = code.size();
+    	createInfo.pCode = reinterpret_cast<const uint32_t*>(code.data());
+    	VkShaderModule shaderModule;
+    	if (vkCreateShaderModule(m_renderer->GetContext().GetDevice(), &createInfo, nullptr, &shaderModule) != VK_SUCCESS)
+    		throw BaseException::Create("Failed to create shader module!");
+    	return shaderModule;
+    }
+
+	void TriangleVkExample::CreateDescriptorPool()
+	{
+    	uint32_t maxFrameInFlight = m_renderer->GetContext().GetMaxFramesInFlight();
+
+    	std::array<VkDescriptorPoolSize, 2> poolSizes{};
+    	poolSizes[0].type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+    	poolSizes[0].descriptorCount = maxFrameInFlight;
+    	poolSizes[1].type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+    	poolSizes[1].descriptorCount = maxFrameInFlight;
+
+    	VkDescriptorPoolCreateInfo poolInfo{};
+    	poolInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
+    	poolInfo.poolSizeCount = static_cast<uint32_t>(poolSizes.size());
+    	poolInfo.pPoolSizes = poolSizes.data();
+    	poolInfo.maxSets = maxFrameInFlight;
+
+    	if (vkCreateDescriptorPool(m_renderer->GetContext().GetDevice(), &poolInfo, nullptr, &m_descriptorPool) != VK_SUCCESS)
+    		throw BaseException::Create("Failed to create descriptor pool!");
+	}
+
+	void TriangleVkExample::CreateDescriptorSetLayout()
     {
-        VkAttachmentDescription colorAttachments{};
-        colorAttachments.format = m_swapChainImageFormat;
-        colorAttachments.samples = VK_SAMPLE_COUNT_1_BIT;
-        colorAttachments.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
-        colorAttachments.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
-        colorAttachments.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
-        colorAttachments.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
-        colorAttachments.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-        colorAttachments.finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
+    	VkDescriptorSetLayoutBinding uboLayoutBinding{};
+    	uboLayoutBinding.binding = 0;
+    	uboLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+    	uboLayoutBinding.descriptorCount = 1;
+    	uboLayoutBinding.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
 
-        VkAttachmentReference colorAttachmentRef{};
-        colorAttachmentRef.attachment = 0;
-        colorAttachmentRef.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+    	VkDescriptorSetLayoutBinding samplerLayoutBinding{};
+    	samplerLayoutBinding.binding = 1;
+    	samplerLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+    	samplerLayoutBinding.descriptorCount = 1;
+    	samplerLayoutBinding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
 
-        VkSubpassDescription subpass{};
-        subpass.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
-        subpass.colorAttachmentCount = 1;
-        subpass.pColorAttachments = &colorAttachmentRef;
+    	std::array<VkDescriptorSetLayoutBinding, 2> bindings{ uboLayoutBinding, samplerLayoutBinding };
+		VkDescriptorSetLayoutCreateInfo layoutCreateInfo{};
+    	layoutCreateInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
+    	layoutCreateInfo.bindingCount = static_cast<uint32_t>(bindings.size());
+		layoutCreateInfo.pBindings = bindings.data();
 
-        VkSubpassDependency dependency{};
-        dependency.srcSubpass = VK_SUBPASS_EXTERNAL;
-        dependency.dstSubpass = 0;
-        dependency.srcStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
-        dependency.srcAccessMask = 0;
-        dependency.dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
-        dependency.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+    	if (vkCreateDescriptorSetLayout(m_renderer->GetContext().GetDevice(), &layoutCreateInfo, nullptr, &m_descriptorSetLayout) != VK_SUCCESS)
+    		throw BaseException::Create("Failed to create descriptor set layout!");
+    }
 
-        VkRenderPassCreateInfo renderPassInfo{};
-        renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
-        renderPassInfo.attachmentCount = 1;
-        renderPassInfo.pAttachments = &colorAttachments;
-        renderPassInfo.subpassCount = 1;
-        renderPassInfo.pSubpasses = &subpass;
-        renderPassInfo.dependencyCount = 1;
-        renderPassInfo.pDependencies = &dependency;
+    void TriangleVkExample::CreateDescriptorSets()
+    {
+    	VkDevice device = m_renderer->GetContext().GetDevice();
+    	uint32_t maxFramesInFlight = m_renderer->GetContext().GetMaxFramesInFlight();
 
-        if (vkCreateRenderPass(m_device, &renderPassInfo, nullptr, &m_renderPass) != VK_SUCCESS)
-            throw BaseException::Create("Failed to create render pass!");
+		std::vector<VkDescriptorSetLayout> descriptorSetLayouts(maxFramesInFlight, m_descriptorSetLayout);
+    	VkDescriptorSetAllocateInfo allocInfo{};
+    	allocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
+    	allocInfo.descriptorPool = m_descriptorPool;
+    	allocInfo.descriptorSetCount = maxFramesInFlight;
+    	allocInfo.pSetLayouts = descriptorSetLayouts.data();
+
+    	m_descriptorSets.resize(maxFramesInFlight);
+    	if (vkAllocateDescriptorSets(device, &allocInfo, m_descriptorSets.data()) != VK_SUCCESS)
+    		throw BaseException::Create("Failed to allocate descriptor sets!");
+
+    	for (uint32_t i = 0; i < maxFramesInFlight; ++i)
+    	{
+    		VkDescriptorBufferInfo bufferInfo{};
+    		bufferInfo.buffer = m_uniformBuffers[i];
+    		bufferInfo.offset = 0;
+    		bufferInfo.range = VK_WHOLE_SIZE;
+
+    		VkDescriptorImageInfo imageInfo{};
+    		imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+    		imageInfo.imageView = m_textureImageView;
+    		imageInfo.sampler = m_textureSampler;
+
+    		std::array<VkWriteDescriptorSet, 2> descriptorWrites{};
+			descriptorWrites[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+    		descriptorWrites[0].dstSet = m_descriptorSets[i];
+    		descriptorWrites[0].dstBinding = 0;
+    		descriptorWrites[0].dstArrayElement = 0;
+    		descriptorWrites[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+    		descriptorWrites[0].descriptorCount = 1;
+    		descriptorWrites[0].pBufferInfo = &bufferInfo;
+    		descriptorWrites[0].pImageInfo = nullptr;
+    		descriptorWrites[0].pTexelBufferView = nullptr;
+
+    		descriptorWrites[1].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+    		descriptorWrites[1].dstSet = m_descriptorSets[i];
+    		descriptorWrites[1].dstBinding = 1;
+    		descriptorWrites[1].dstArrayElement = 0;
+    		descriptorWrites[1].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+    		descriptorWrites[1].descriptorCount = 1;
+    		descriptorWrites[1].pBufferInfo = nullptr;
+    		descriptorWrites[1].pImageInfo = &imageInfo;
+    		descriptorWrites[1].pTexelBufferView = nullptr;
+
+    		vkUpdateDescriptorSets(device, static_cast<uint32_t>(descriptorWrites.size()),
+    			descriptorWrites.data(), 0, nullptr);
+    	}
     }
 
     void TriangleVkExample::CreateGraphicsPipeline()
     {
         // 创建顶点着色器
-        std::vector<char> vertShaderCode = LoadBinaryFile("Assets/Shaders/GLSL/first_vert.spv");
+        std::vector<char> vertShaderCode = LoadBinaryFile("Assets/Shaders/GLSL/Vulkan/simple_vert.spv");
         VkShaderModule vertShaderModule = CreateShaderModule(vertShaderCode);
         VkPipelineShaderStageCreateInfo vertShaderStageCreateInfo = {};
         vertShaderStageCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
@@ -570,7 +611,7 @@ namespace TG
         vertShaderStageCreateInfo.module = vertShaderModule;
         vertShaderStageCreateInfo.pName = "main";
         // 创建片元着色器
-        std::vector<char> fragShaderCode = LoadBinaryFile("Assets/Shaders/GLSL/first_frag.spv");
+        std::vector<char> fragShaderCode = LoadBinaryFile("Assets/Shaders/GLSL/Vulkan/simple_frag.spv");
         VkShaderModule fragShaderModule = CreateShaderModule(fragShaderCode);
         VkPipelineShaderStageCreateInfo fragShaderStageCreateInfo = {};
         fragShaderStageCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
@@ -582,10 +623,10 @@ namespace TG
 
     	VkVertexInputBindingDescription vertexInputBindingDescription{};
     	vertexInputBindingDescription.binding = 0;
-    	vertexInputBindingDescription.stride =  5 * sizeof(float);
+    	vertexInputBindingDescription.stride =  7 * sizeof(float);
     	vertexInputBindingDescription.inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
 
-    	std::array<VkVertexInputAttributeDescription, 2> attributeDescriptions{};
+    	std::array<VkVertexInputAttributeDescription, 3> attributeDescriptions{};
     	attributeDescriptions[0].binding = 0;
     	attributeDescriptions[0].location = 0;
     	attributeDescriptions[0].format = VK_FORMAT_R32G32_SFLOAT;
@@ -595,12 +636,17 @@ namespace TG
     	attributeDescriptions[1].location = 1;
     	attributeDescriptions[1].format = VK_FORMAT_R32G32B32_SFLOAT;
     	attributeDescriptions[1].offset = 2 * sizeof(float);
+
+    	attributeDescriptions[2].binding = 0;
+    	attributeDescriptions[2].location = 2;
+    	attributeDescriptions[2].format = VK_FORMAT_R32G32_SFLOAT;
+    	attributeDescriptions[2].offset = 5 * sizeof(float);
         // 顶点输入状态
         VkPipelineVertexInputStateCreateInfo vertexInputInfo{};
         vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
         vertexInputInfo.vertexBindingDescriptionCount = 1;
         vertexInputInfo.pVertexBindingDescriptions = &vertexInputBindingDescription;
-        vertexInputInfo.vertexAttributeDescriptionCount = 2;
+        vertexInputInfo.vertexAttributeDescriptionCount = static_cast<uint32_t>(attributeDescriptions.size());
         vertexInputInfo.pVertexAttributeDescriptions = attributeDescriptions.data();
         // 顶点装配器
         VkPipelineInputAssemblyStateCreateInfo inputAssemblyInfo{};
@@ -629,7 +675,7 @@ namespace TG
         rasterizationStateCreateInfo.polygonMode = VK_POLYGON_MODE_FILL;
         rasterizationStateCreateInfo.lineWidth = 1.0f;
         rasterizationStateCreateInfo.cullMode = VK_CULL_MODE_BACK_BIT;
-        rasterizationStateCreateInfo.frontFace = VK_FRONT_FACE_CLOCKWISE;
+        rasterizationStateCreateInfo.frontFace = VK_FRONT_FACE_COUNTER_CLOCKWISE;
         rasterizationStateCreateInfo.depthBiasEnable = VK_FALSE;
         rasterizationStateCreateInfo.depthBiasConstantFactor = 0.0f;
         rasterizationStateCreateInfo.depthBiasClamp = 0.0f;
@@ -667,11 +713,12 @@ namespace TG
         // Pipeline layout
         VkPipelineLayoutCreateInfo pipelineLayoutCreateInfo{};
         pipelineLayoutCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-        pipelineLayoutCreateInfo.setLayoutCount = 0;
-        pipelineLayoutCreateInfo.pSetLayouts = nullptr;
+        pipelineLayoutCreateInfo.setLayoutCount = 1;
+        pipelineLayoutCreateInfo.pSetLayouts = &m_descriptorSetLayout;
         pipelineLayoutCreateInfo.pushConstantRangeCount = 0;
         pipelineLayoutCreateInfo.pPushConstantRanges = nullptr;
-        if (vkCreatePipelineLayout(m_device, &pipelineLayoutCreateInfo, nullptr, &m_pipelineLayout) != VK_SUCCESS)
+    	VkDevice device = m_renderer->GetContext().GetDevice();
+        if (vkCreatePipelineLayout(device, &pipelineLayoutCreateInfo, nullptr, &m_pipelineLayout) != VK_SUCCESS)
             throw BaseException::Create("Failed to create pipeline layout!");
 
         VkGraphicsPipelineCreateInfo pipelineCreateInfo{};
@@ -687,246 +734,17 @@ namespace TG
         pipelineCreateInfo.pDepthStencilState = nullptr;
         pipelineCreateInfo.pColorBlendState = &colorBlendStateCreateInfo;
         pipelineCreateInfo.layout = m_pipelineLayout;
-        pipelineCreateInfo.renderPass = m_renderPass;
+        pipelineCreateInfo.renderPass = m_renderer->GetRenderPass();
         pipelineCreateInfo.subpass = 0;
         pipelineCreateInfo.basePipelineHandle = VK_NULL_HANDLE;
         pipelineCreateInfo.basePipelineIndex = -1;
-        if (vkCreateGraphicsPipelines(m_device, VK_NULL_HANDLE, 1, &pipelineCreateInfo, nullptr,
+        if (vkCreateGraphicsPipelines(device, VK_NULL_HANDLE, 1, &pipelineCreateInfo, nullptr,
             &m_graphicsPipeline) != VK_SUCCESS)
         {
             throw BaseException::Create("Failed to create graphics pipeline!");
         }
 
-        vkDestroyShaderModule(m_device, vertShaderModule, nullptr);
-        vkDestroyShaderModule(m_device, fragShaderModule, nullptr);
-    }
-
-    VkShaderModule TriangleVkExample::CreateShaderModule(const std::vector<char>& code)
-    {
-        VkShaderModuleCreateInfo createInfo{};
-        createInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
-        createInfo.codeSize = code.size();
-        createInfo.pCode = reinterpret_cast<const uint32_t*>(code.data());
-        VkShaderModule shaderModule;
-        if (vkCreateShaderModule(m_device, &createInfo, nullptr, &shaderModule) != VK_SUCCESS)
-            throw BaseException::Create("Failed to create shader module!");
-        return shaderModule;
-    }
-
-    void TriangleVkExample::CreateFrameBuffers()
-    {
-        m_swapChainFrameBuffers.resize(m_swapChainImageViews.size());
-        for (std::size_t i = 0; i < m_swapChainImageViews.size(); ++i)
-        {
-            VkImageView attachments[] = { m_swapChainImageViews[i] };
-
-            VkFramebufferCreateInfo framebufferCreateInfo{};
-            framebufferCreateInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
-            framebufferCreateInfo.renderPass = m_renderPass;
-            framebufferCreateInfo.attachmentCount = 1;
-            framebufferCreateInfo.pAttachments = attachments;
-            framebufferCreateInfo.width = m_swapChainExtent.width;
-            framebufferCreateInfo.height = m_swapChainExtent.height;
-            framebufferCreateInfo.layers = 1;
-            if (vkCreateFramebuffer(m_device, &framebufferCreateInfo, nullptr,
-                &m_swapChainFrameBuffers[i]) != VK_SUCCESS)
-            {
-                throw BaseException::Create("Failed to create framebuffer!");
-            }
-        }
-    }
-
-    void TriangleVkExample::CreateCommandPool()
-    {
-        VkCommandPoolCreateInfo commandPoolCreateInfo{};
-        commandPoolCreateInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
-        commandPoolCreateInfo.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
-        commandPoolCreateInfo.queueFamilyIndex = m_familyIndices[VkQueueType::Graphic];
-        if (vkCreateCommandPool(m_device, &commandPoolCreateInfo, nullptr, &m_cmdPool) != VK_SUCCESS)
-            throw BaseException::Create("Failed to create command pool!");
-    }
-
-	void TriangleVkExample::CreateVertexBuffer()
-    {
-	    VkBufferCreateInfo bufferInfo{};
-    	bufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
-    	bufferInfo.size = 15 * sizeof(float);
-    	bufferInfo.usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT;
-    	bufferInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
-
-    	if (vkCreateBuffer(m_device, &bufferInfo, nullptr, &m_vertexBuffer) != VK_SUCCESS)
-    		throw BaseException::Create("Failed to create vertex buffer!");
-
-    	VkMemoryRequirements memRequirements;
-    	vkGetBufferMemoryRequirements(m_device, m_vertexBuffer, &memRequirements);
-
-		VkMemoryAllocateInfo allocInfo{};
-    	allocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
-    	allocInfo.allocationSize = memRequirements.size;
-    	allocInfo.memoryTypeIndex = FindMemoryType(memRequirements.memoryTypeBits,
-    		VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
-    	if (vkAllocateMemory(m_device, &allocInfo, nullptr, &m_vertexBufferMemory) != VK_SUCCESS)
-    		throw BaseException::Create("Failed to allocate vertex buffer memory!");
-    	vkBindBufferMemory(m_device, m_vertexBuffer, m_vertexBufferMemory, 0);
-
-    	void* data;
-    	vkMapMemory(m_device, m_vertexBufferMemory, 0, bufferInfo.size, 0, &data);
-    	memcpy(data, m_vertices, static_cast<size_t>(bufferInfo.size));
-    	vkUnmapMemory(m_device, m_vertexBufferMemory);
-    }
-
-	uint32_t TriangleVkExample::FindMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties)
-    {
-		VkPhysicalDeviceMemoryProperties memProperties;
-    	vkGetPhysicalDeviceMemoryProperties(m_physicalDevice, &memProperties);
-    	for (uint32_t i = 0; i < memProperties.memoryTypeCount; ++i)
-    	{
-    		if ((typeFilter & (1 << i)) && (memProperties.memoryTypes[i].propertyFlags & properties) == properties)
-    		{
-    			return i;
-    		}
-    	}
-
-    	throw BaseException::Create("Failed to find suitable memory type!");
-    }
-
-    void TriangleVkExample::CreateCommandBuffer()
-    {
-        m_cmdBuffers.resize(MAX_FRAMES_IN_FLIGHT);
-
-        VkCommandBufferAllocateInfo allocateInfo{};
-        allocateInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
-        allocateInfo.commandPool = m_cmdPool;
-        allocateInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-        allocateInfo.commandBufferCount = static_cast<uint32_t>(m_cmdBuffers.size());
-        if (vkAllocateCommandBuffers(m_device, &allocateInfo, m_cmdBuffers.data()) != VK_SUCCESS)
-            throw BaseException::Create("Failed to allocate command buffer!");
-    }
-
-    void TriangleVkExample::RecordCommandBuffer(uint32_t commandIndex, uint32_t imageIndex)
-    {
-        VkCommandBufferBeginInfo beginInfo{};
-        beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-        beginInfo.flags = 0;
-        beginInfo.pInheritanceInfo = nullptr;
-        if (vkBeginCommandBuffer(m_cmdBuffers[commandIndex], &beginInfo) != VK_SUCCESS)
-            throw BaseException::Create("Failed to begin recording command buffer!");
-
-        VkRenderPassBeginInfo renderPassBeginInfo{};
-        renderPassBeginInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
-        renderPassBeginInfo.renderPass = m_renderPass;
-        renderPassBeginInfo.framebuffer = m_swapChainFrameBuffers[imageIndex];
-        renderPassBeginInfo.renderArea.offset = { 0, 0 };
-        renderPassBeginInfo.renderArea.extent = m_swapChainExtent;
-        VkClearValue clearValue = {{{ 0.0f, 0.0f, 0.0f, 1.0f }}};
-        renderPassBeginInfo.clearValueCount = 1;
-        renderPassBeginInfo.pClearValues = &clearValue;
-        vkCmdBeginRenderPass(m_cmdBuffers[commandIndex], &renderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
-
-        vkCmdBindPipeline(m_cmdBuffers[commandIndex], VK_PIPELINE_BIND_POINT_GRAPHICS, m_graphicsPipeline);
-
-        VkViewport viewport{};
-        viewport.x = 0.0f;
-        viewport.y = 0.0f;
-        viewport.width = static_cast<float>(m_swapChainExtent.width);
-        viewport.height = static_cast<float>(m_swapChainExtent.height);
-        viewport.minDepth = 0.0f;
-        viewport.maxDepth = 1.0f;
-        vkCmdSetViewport(m_cmdBuffers[commandIndex], 0, 1, &viewport);
-        VkRect2D scissor{};
-        scissor.offset = { 0, 0 };
-        scissor.extent = m_swapChainExtent;
-        vkCmdSetScissor(m_cmdBuffers[commandIndex], 0, 1, &scissor);
-
-    	VkBuffer vertexBuffers[] = { m_vertexBuffer };
-    	VkDeviceSize offsets[] = { 0 };
-    	vkCmdBindVertexBuffers(m_cmdBuffers[commandIndex], 0, 1, vertexBuffers, offsets);
-
-        vkCmdDraw(m_cmdBuffers[commandIndex], 3, 1, 0, 0);
-
-        vkCmdEndRenderPass(m_cmdBuffers[commandIndex]);
-
-        if (vkEndCommandBuffer(m_cmdBuffers[commandIndex]) != VK_SUCCESS)
-            throw BaseException::Create("Failed to record command buffer!");
-    }
-
-    void TriangleVkExample::CreateSyncObjects()
-    {
-        m_imageAvailableSemaphores.resize(MAX_FRAMES_IN_FLIGHT);
-        m_renderFinishedSemaphores.resize(MAX_FRAMES_IN_FLIGHT);
-        m_inFlightFences.resize(MAX_FRAMES_IN_FLIGHT);
-
-        VkSemaphoreCreateInfo semaphoreCreateInfo{};
-        semaphoreCreateInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
-        VkFenceCreateInfo fenceCreateInfo{};
-        fenceCreateInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
-        fenceCreateInfo.flags = VK_FENCE_CREATE_SIGNALED_BIT;
-        for (uint32_t i = 0; i < MAX_FRAMES_IN_FLIGHT; ++i)
-        {
-            if (vkCreateSemaphore(m_device, &semaphoreCreateInfo, nullptr,
-                &m_imageAvailableSemaphores[i]) != VK_SUCCESS)
-            {
-                throw BaseException::Create("Failed to create image available semaphore!");
-            }
-            if (vkCreateSemaphore(m_device, &semaphoreCreateInfo, nullptr,
-                &m_renderFinishedSemaphores[i]) != VK_SUCCESS)
-            {
-                throw BaseException::Create("Failed to create render finished semaphore!");
-            }
-            if (vkCreateFence(m_device, &fenceCreateInfo, nullptr, &m_inFlightFences[i]) != VK_SUCCESS)
-            {
-                throw BaseException::Create("Failed to create inFlight fence!");
-            }
-        }
-    }
-
-    void TriangleVkExample::DrawFrame()
-    {
-        vkWaitForFences(m_device, 1, &m_inFlightFences[m_currentFrame], VK_TRUE, UINT64_MAX);
-
-        VkResult result = vkAcquireNextImageKHR(m_device, m_swapChain, UINT64_MAX,
-            m_imageAvailableSemaphores[m_currentFrame], VK_NULL_HANDLE, &m_imageIndex);
-        if (result == VK_ERROR_OUT_OF_DATE_KHR)
-        {
-            RecreateSwapChain();
-            return;
-        }
-        if (result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR)
-            throw BaseException::Create("Failed to acquire image!");
-        // 放在这里防止死锁，因为vkAcquireNextImageKHR返回VK_ERROR_OUT_OF_DATE_KHR后会直接返回，
-        // 导致Fence不会激活，所以确保获取成功后再重置Fence
-        vkResetFences(m_device, 1, &m_inFlightFences[m_currentFrame]);
-
-        vkResetCommandBuffer(m_cmdBuffers[m_currentFrame], 0);
-        RecordCommandBuffer(m_currentFrame, m_imageIndex);
-
-        VkSubmitInfo submitInfo{};
-        submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-        submitInfo.commandBufferCount = 1;
-        submitInfo.pCommandBuffers = &m_cmdBuffers[m_currentFrame];
-        VkSemaphore waitSemaphores[] = { m_imageAvailableSemaphores[m_currentFrame] };
-        VkPipelineStageFlags waitStages[] = { VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT };
-        submitInfo.waitSemaphoreCount = 1;
-        submitInfo.pWaitSemaphores = waitSemaphores;
-        submitInfo.pWaitDstStageMask = waitStages;
-        VkSemaphore signalSemaphores[] = { m_renderFinishedSemaphores[m_currentFrame] };
-        submitInfo.signalSemaphoreCount = 1;
-        submitInfo.pSignalSemaphores = signalSemaphores;
-        if (vkQueueSubmit(m_queues[VkQueueType::Graphic], 1, &submitInfo,
-            m_inFlightFences[m_currentFrame]) != VK_SUCCESS)
-        {
-            throw BaseException::Create("Failed to submit command buffer!");
-        }
-    }
-
-    void TriangleVkExample::RecreateSwapChain()
-    {
-        vkDeviceWaitIdle(m_device);
-
-        CleanupSwapChain();
-
-        CreateSwapChain();
-        CreateImageViews();
-        CreateFrameBuffers();
+        vkDestroyShaderModule(device, vertShaderModule, nullptr);
+        vkDestroyShaderModule(device, fragShaderModule, nullptr);
     }
 }

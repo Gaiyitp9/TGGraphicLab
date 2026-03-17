@@ -132,7 +132,6 @@ namespace TG
 
     void TriangleExample::DrawUI()
     {
-    	const ImGuiIO& io = ImGui::GetIO();
     	ImGui::Begin("Triangle Example Settings");
     	if (ImGui::Checkbox("Draw wireframe", &m_wireframe))
     	{
@@ -141,7 +140,11 @@ namespace TG
     		else
     			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
     	}
-    	ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
     	ImGui::End();
+    }
+
+    void TriangleExample::OnViewportChanged(unsigned, unsigned)
+    {
+
     }
 }

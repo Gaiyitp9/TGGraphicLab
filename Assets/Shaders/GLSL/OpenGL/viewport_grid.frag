@@ -1,4 +1,5 @@
 #version 410 core
+
 layout(location = 0) in float gridAlpha;
 
 layout(location = 0) out vec4 FragColor;

@@ -84,12 +84,12 @@ namespace TG::Rendering
                 }
                 else if (channels == 3)
                 {
-                    internalFormat = GL_RGB;
+                    internalFormat = GL_SRGB8;
                     format = GL_RGB;
                 }
                 else
                 {
-                    internalFormat = GL_RGBA;
+                    internalFormat = GL_SRGB8_ALPHA8;
                     format = GL_RGBA;
                 }
 

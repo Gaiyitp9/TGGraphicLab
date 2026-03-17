@@ -5,21 +5,26 @@
 *****************************************************************/
 #pragma once
 
-#include "Base/CommonInterfaces.h"
+#include "Rendering/Context.h"
 
 namespace TG::Rendering
 {
-    class OpenGLContext
+    class OpenGLContext : public Context
     {
     public:
         explicit OpenGLContext(const IDefaultVideoPort& videoPort);
-        ~OpenGLContext();
+        ~OpenGLContext() override;
+
+		[[nodiscard]] const IDefaultVideoPort& VideoPort() const override;
 
         void MakeCurrent() const;
         void SetVSync(bool enable) const;
-        void SwapBuffers() const;
+        void Present() const;
 
     private:
+    	void LoadWGLExtension() const;
+
+    	const IDefaultVideoPort& m_videoPort;
         HDC m_hdc{};
         HGLRC m_wglContext{};
     };

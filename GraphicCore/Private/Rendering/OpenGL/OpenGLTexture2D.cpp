@@ -21,12 +21,12 @@ namespace TG::Rendering
             }
             else if (channels == 3)
             {
-                m_internalFormat = GL_RGB;
+            	m_internalFormat = GL_SRGB8;
                 m_format = GL_RGB;
             }
             else
             {
-                m_internalFormat = GL_RGBA;
+            	m_internalFormat = GL_SRGB8_ALPHA8;
                 m_format = GL_RGBA;
             }
 
@@ -64,13 +64,13 @@ namespace TG::Rendering
             }
             case TextureFormat::RGB:
             {
-                m_internalFormat = GL_RGB;
+                m_internalFormat = GL_SRGB8;
                 m_format = GL_RGB;
                 break;
             }
             case TextureFormat::RGBA:
             {
-                m_internalFormat = GL_RGBA;
+                m_internalFormat = GL_SRGB8_ALPHA8;
                 m_format = GL_RGBA;
                 break;
             }

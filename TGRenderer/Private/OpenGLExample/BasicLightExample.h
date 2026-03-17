@@ -6,6 +6,7 @@
 #pragma once
 
 #include "Example.h"
+#include "Rendering/Renderer.h"
 #include "Rendering/Mesh/Sphere.h"
 #include "Rendering/Mesh/Plane.h"
 #include "Rendering/RayTracing/PathTracer.h"
@@ -24,11 +25,13 @@ namespace TG
     class BasicLightExample final : public Example
     {
     public:
-        BasicLightExample(const IDefaultVideoPort& videoPort, const ITimer& timer);
+        BasicLightExample(const Rendering::Renderer* renderer, const ITimer& timer);
         ~BasicLightExample() override;
 
         void Draw() override;
         void DrawUI() override;
+
+        void OnViewportChanged(unsigned width, unsigned height) override;
 
     private:
         void LoadRubberToy();

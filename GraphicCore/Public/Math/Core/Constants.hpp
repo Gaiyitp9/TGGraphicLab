@@ -24,13 +24,21 @@ namespace TG
 {
     constexpr long double operator""_deg_to_rad(long double degree)
     {
-        const long double radian = degree * std::numbers::pi_v<long double> / 180;
-        return radian;
+        return degree * std::numbers::pi_v<long double> / 180.0L;
+    }
+
+	constexpr long double operator""_deg_to_rad(unsigned long long degree)
+    {
+    	return static_cast<long double>(degree) * std::numbers::pi_v<long double> / 180.0l;
     }
 
     constexpr long double operator""_rad_to_deg(long double radian)
     {
-        const long double degree = radian * 180 / std::numbers::pi_v<long double>;
-        return degree;
+        return radian * 180.0l / std::numbers::pi_v<long double>;
+    }
+
+	constexpr long double operator""_rad_to_deg(unsigned long long radian)
+    {
+	    return static_cast<long double>(radian) * 180.0l / std::numbers::pi_v<long double>;
     }
 }

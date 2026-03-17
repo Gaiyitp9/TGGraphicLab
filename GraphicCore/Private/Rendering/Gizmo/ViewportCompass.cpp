@@ -10,8 +10,8 @@
 namespace TG::Rendering
 {
     ViewportCompass::ViewportCompass()
-        : m_axisVertexShader("Assets/Shaders/GLSL/viewport_compass.vert", ShaderStage::Vertex),
-          m_axisFragmentShader("Assets/Shaders/GLSL/viewport_compass.frag", ShaderStage::Fragment),
+        : m_axisVertexShader("Assets/Shaders/GLSL/OpenGL/viewport_compass.vert", ShaderStage::Vertex),
+          m_axisFragmentShader("Assets/Shaders/GLSL/OpenGL/viewport_compass.frag", ShaderStage::Fragment),
           m_axisVertices{
               // 位置           颜色
               0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f,
@@ -21,8 +21,8 @@ namespace TG::Rendering
               0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f,
               0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f,
           },
-          m_axisNameVertexShader("Assets/Shaders/GLSL/compass_name.vert", ShaderStage::Vertex),
-          m_axisNameFragmentShader("Assets/Shaders/GLSL/compass_name.frag", ShaderStage::Fragment),
+          m_axisNameVertexShader("Assets/Shaders/GLSL/OpenGL/compass_name.vert", ShaderStage::Vertex),
+          m_axisNameFragmentShader("Assets/Shaders/GLSL/OpenGL/compass_name.frag", ShaderStage::Fragment),
           m_fontBuffer(LoadBinaryFile("Assets/Fonts/NotoSans/NotoSansSC-Regular.ttf"))
     {
         glGenBuffers(1, &m_axisVBO);

@@ -1,4 +1,5 @@
 #version 420 core
+
 layout(location = 0) in vec2 fTexcoord;
 
 layout(location = 0) out vec4 FragColor;

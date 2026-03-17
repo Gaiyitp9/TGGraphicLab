@@ -19,6 +19,8 @@ namespace TG
         void Draw() override;
         void DrawUI() override;
 
+    	void OnViewportChanged(unsigned width, unsigned height) override;
+
     private:
         GLuint m_VAO{};
         GLuint m_VBO{};

@@ -5,17 +5,18 @@
 *****************************************************************/
 #pragma once
 
-#include "Base/CommonInterfaces.h"
+#include "ImGuiContext.h"
+#include "Rendering/OpenGL/OpenGLContext.h"
 
 namespace TG::Editor
 {
-	class EditorContext
+	class OpenGLImGuiContext : public ImGuiContext
 	{
 	public:
-		explicit EditorContext(const IDefaultVideoPort& display);
-		~EditorContext();
+		explicit OpenGLImGuiContext(const Rendering::OpenGLContext& context);
+		~OpenGLImGuiContext() override;
 
-	private:
-		bool m_isInitialized{ false };
+		void NewFrame() override;
+		void Render() override;
 	};
 }

@@ -8,8 +8,8 @@
 
 namespace TG::Rendering
 {
-    SkyBox::SkyBox() : m_vertexShader("Assets/Shaders/GLSL/skybox.vert", ShaderStage::Vertex),
-        m_fragmentShader("Assets/Shaders/GLSL/skybox.frag", ShaderStage::Fragment)
+    SkyBox::SkyBox() : m_vertexShader("Assets/Shaders/GLSL/OpenGL/skybox.vert", ShaderStage::Vertex),
+        m_fragmentShader("Assets/Shaders/GLSL/OpenGL/skybox.frag", ShaderStage::Fragment)
     {
         m_cubeMesh = CreatePrimitive(PrimitiveType::Cube);
 

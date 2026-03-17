@@ -30,17 +30,17 @@ namespace TG
         [[nodiscard]] Math::Matrix4f ViewMatrix() const;
         [[nodiscard]] Math::Matrix4f ProjectionMatrix() const;
         [[nodiscard]] Frustum ViewFrustum() const;
-        [[nodiscard]] float AspectRatio() const;
 
         void Update();
 
         CameraType cameraType{ CameraType::Perspective };
 
         Math::Vector3f position{ 0.0f, 1.0f, 4.0f };
-        float fov{ 45.0 };
+        float fov{ 90.0 };
         float nearPlane{ 0.1f };
         float farPlane{ 100.0f };
         float orthoWidth{ 3.0f };
+    	float aspectRatio{ 16.0f / 9.0f };
 
         Math::Vector3f front;
         Math::Vector3f right;

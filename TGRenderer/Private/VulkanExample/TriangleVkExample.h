@@ -6,128 +6,77 @@
 #pragma once
 
 #include "Example.h"
-#include "Base/CommonInterfaces.h"
-#include "vulkan/vulkan.h"
+#include "Rendering/Vulkan/VulkanRenderer.h"
 
 namespace TG
 {
-    enum class VkQueueType
-    {
-        Graphic = VK_QUEUE_GRAPHICS_BIT,
-        Compute = VK_QUEUE_COMPUTE_BIT,
-        Transfer = VK_QUEUE_TRANSFER_BIT,
-        Present,
-    };
-    
     class TriangleVkExample : public Example
     {
     public:
-        explicit TriangleVkExample(const IDefaultVideoPort& videoPort);
+        explicit TriangleVkExample(const Rendering::Renderer* renderer);
         ~TriangleVkExample() override;
 
         void Draw() override;
     	void DrawUI() override;
 
+    	void OnViewportChanged(unsigned width, unsigned height) override;
+
     private:
-        void CheckLayerAndExtension();
-        void PopulateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT& createInfo);
-        static VKAPI_ATTR VkBool32 VKAPI_CALL DebugCallback(
-            VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
-            VkDebugUtilsMessageTypeFlagsEXT messageType,
-            const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData,
-            void* pUserData);
-        void CreateInstance();
-        void SetupDebugMessenger();
-        void CreateSurface(HWND handle);
-        void SelectPhysicalDevice();
-        bool IsDeviceSuitable(VkPhysicalDevice device);
-        void CreateLogicalDevice();
-        void CreateSwapChain();
-        VkSurfaceFormatKHR ChooseSwapSurfaceFormat();
-        VkPresentModeKHR ChooseSwapPresentMode();
-        void CleanupSwapChain();
-        void CreateImageViews();
-        void CreateRenderPass();
-        void CreateGraphicsPipeline();
-        VkShaderModule CreateShaderModule(const std::vector<char>& code);
-        void CreateFrameBuffers();
-        void CreateCommandPool();
+    	VkCommandBuffer BeginSingleTimeCommands() const;
+    	void EndSingleTimeCommands(VkCommandBuffer commandBuffer) const;
+
+    	uint32_t FindMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties) const;
+    	void CreateBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties,
+    		VkBuffer& buffer, VkDeviceMemory& bufferMemory) const;
+    	void CopyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size) const;
     	void CreateVertexBuffer();
-    	uint32_t FindMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties);
-        void CreateCommandBuffer();
-        void RecordCommandBuffer(uint32_t commandIndex, uint32_t imageIndex);
-        void CreateSyncObjects();
-        void DrawFrame();
-        void RecreateSwapChain();
-    	void Present();
+    	void CreateIndexBuffer();
+    	void CreateUniformBuffers();
 
-    	const IDefaultVideoPort& m_videoPort;
+    	void CreateImage(uint32_t width, uint32_t height, VkFormat format, VkImageTiling tiling,
+    		VkImageUsageFlags usage, VkMemoryPropertyFlags properties, VkImage& image, VkDeviceMemory& imageMemory) const;
+    	void CopyBufferToImage(VkBuffer buffer, VkImage image, uint32_t width, uint32_t height) const;
+    	void TransitionImageLayout(VkImage image, VkFormat format, VkImageLayout oldLayout, VkImageLayout newLayout) const;
+    	void CreateTextureImage();
+    	void CreateTextureImageView();
+    	void CreateTextureSampler();
 
-        // 名称比较器，按字典序排列
-        constexpr static auto NameComparer = [](char const* lhs, char const* rhs) {
-            return std::strcmp(lhs, rhs) < 0;
-        };
-        // 扩展投影
-        constexpr static auto ExtensionProjector = [](const VkExtensionProperties& extensionProperties) {
-            return extensionProperties.extensionName;
-        };
-        // 层投影
-        constexpr static auto LayerProjector = [](const VkLayerProperties& layerProperties) {
-            return layerProperties.layerName;
-        };
+        VkShaderModule CreateShaderModule(const std::vector<char>& code) const;
+    	void CreateDescriptorPool();
+    	void CreateDescriptorSetLayout();
+    	void CreateDescriptorSets();
+        void CreateGraphicsPipeline();
 
-        bool m_enableValidationLayer { true };
-        std::vector<char const*> m_requiredVulkanExtensions;
-        std::vector<char const*> m_requiredVulkanLayers;
-        VkInstance m_instance{ VK_NULL_HANDLE };
-        VkDebugUtilsMessengerEXT m_debugMessenger{};
-        VkSurfaceKHR m_surface{};
-
-        std::vector<char const*> m_requiredDeviceExtensions;
-        std::vector<VkQueueType> m_requiredQueueFamilies;
-        VkPhysicalDeviceFeatures m_deviceFeatures{};
-        VkPhysicalDevice m_physicalDevice{ VK_NULL_HANDLE };
-        std::unordered_map<VkQueueType, uint32_t> m_familyIndices;
-
-        VkDevice m_device{ VK_NULL_HANDLE };
-        std::unordered_map<VkQueueType, VkQueue> m_queues;
-
-        VkSurfaceCapabilitiesKHR m_capabilities{};
-        std::vector<VkSurfaceFormatKHR> m_swapChainFormats;
-        std::vector<VkPresentModeKHR> m_presentModes;
-        VkSwapchainKHR m_swapChain{ VK_NULL_HANDLE };
-        VkSwapchainKHR m_oldSwapChain{ VK_NULL_HANDLE };
-        std::vector<VkImage> m_swapChainImages;
-        VkFormat m_swapChainImageFormat{ VK_FORMAT_UNDEFINED };
-        VkExtent2D m_swapChainExtent{};
-        std::vector<VkImageView> m_swapChainImageViews;
+    	const Rendering::VulkanRenderer* m_renderer;
 
     	VkBuffer m_vertexBuffer{ VK_NULL_HANDLE };
     	VkDeviceMemory m_vertexBufferMemory{ VK_NULL_HANDLE };
-    	float m_vertices[15] =
+    	float m_vertices[28] =
     	{
-    		-0.5f, -0.5f, 1.0f, 0.0f, 0.0f,
-			 0.5f, -0.5f, 0.0f, 1.0f, 0.0f,
-			 0.0f,  0.5f, 0.0f, 0.0f, 1.0f
+    		-0.5f, -0.5f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f,
+			 0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f,
+			 0.5f,  0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f,
+    		-0.5f,  0.5f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f
     	};
 
-        VkRenderPass m_renderPass{ VK_NULL_HANDLE };
+    	VkBuffer m_indexBuffer{ VK_NULL_HANDLE };
+    	VkDeviceMemory m_indexBufferMemory{ VK_NULL_HANDLE };
+    	uint16_t m_indices[6] = { 0, 1, 2, 2, 3, 0 };
+
+    	std::vector<VkBuffer> m_uniformBuffers;
+    	std::vector<VkDeviceMemory> m_uniformBuffersMemory;
+    	std::vector<void*> m_uniformBuffersMapped;
+
+    	VkImage m_textureImage{ VK_NULL_HANDLE };
+    	VkDeviceMemory m_textureImageMemory{ VK_NULL_HANDLE };
+    	VkImageView m_textureImageView{ VK_NULL_HANDLE };
+    	VkSampler m_textureSampler{ VK_NULL_HANDLE };
+
+    	VkDescriptorPool m_descriptorPool{ VK_NULL_HANDLE };
+    	VkDescriptorSetLayout m_descriptorSetLayout{ VK_NULL_HANDLE };
+    	std::vector<VkDescriptorSet> m_descriptorSets;
+
         VkPipelineLayout m_pipelineLayout{ VK_NULL_HANDLE };
         VkPipeline m_graphicsPipeline{ VK_NULL_HANDLE };
-        std::vector<VkFramebuffer> m_swapChainFrameBuffers;
-
-        const uint32_t MAX_FRAMES_IN_FLIGHT = 3;
-        VkCommandPool m_cmdPool{ VK_NULL_HANDLE };
-        std::vector<VkCommandBuffer> m_cmdBuffers;
-
-        std::vector<VkSemaphore> m_imageAvailableSemaphores;
-        std::vector<VkSemaphore> m_renderFinishedSemaphores;
-        std::vector<VkFence> m_inFlightFences;
-        uint32_t m_currentFrame { 0 };
-        uint32_t m_imageIndex{ 0 };
-
-        bool m_framebufferResized{ false };
-        unsigned int m_width{ 0 };
-        unsigned int m_height{ 0 };
     };
 }

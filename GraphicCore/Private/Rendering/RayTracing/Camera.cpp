@@ -50,7 +50,7 @@ namespace TG::Rendering::RayTracing
                     pixelColor += scene.RayColor(GetRay(i, j), m_maxDepth);
                 }
                 pixelColor /= static_cast<float>(m_samplesPerPixel);
-                pixelColor = pixelColor.LinearToGamma();
+                pixelColor = Color::LinearToSRGB(pixelColor);
 
                 const std::size_t offset = (m_imageWidth * i + j) * 3;
                 imageData[offset] = static_cast<char>(std::clamp(pixelColor.R(), 0.0f, 1.0f) * 255);

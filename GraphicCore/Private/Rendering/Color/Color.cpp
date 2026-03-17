@@ -64,20 +64,20 @@ namespace TG::Rendering
         return *this;
     }
 
-    Color Color::LinearToGamma(float gamma)
+    Color Color::LinearToSRGB(Color color, float gamma)
     {
         const float pow = 1.0f / gamma;
-        float r = std::pow(m_channels[0], pow);
-        float g = std::pow(m_channels[1], pow);
-        float b = std::pow(m_channels[2], pow);
+        float r = std::pow(color.R(), pow);
+        float g = std::pow(color.G(), pow);
+        float b = std::pow(color.B(), pow);
         return { r, g, b };
     }
 
-    Color Color::GammaToLinear(float gamma)
+    Color Color::SRGBToLinear(Color color, float gamma)
     {
-        float r = std::pow(m_channels[0], gamma);
-        float g = std::pow(m_channels[1], gamma);
-        float b = std::pow(m_channels[2], gamma);
+        float r = std::pow(color.R(), gamma);
+        float g = std::pow(color.G(), gamma);
+        float b = std::pow(color.B(), gamma);
         return { r, g, b };
     }
 

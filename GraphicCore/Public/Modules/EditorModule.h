@@ -8,7 +8,7 @@
 #include "Module.h"
 #include "Base/CommonInterfaces.h"
 #include "Rendering/Renderer.h"
-#include "Editor/EditorContext.h"
+#include "Editor/ImGuiContext.h"
 
 namespace TG
 {
@@ -27,16 +27,18 @@ namespace TG
         void Update() override;
         void PostUpdate() override;
 
-        // Scene窗口尺寸变化委托
-        MulticastDelegate<void(unsigned, unsigned)> onSceneViewportResize;
+        // Scene窗口变化委托
+        MulticastDelegate<void(int, int, unsigned, unsigned)> onSceneViewportResize;
 
         // 绘制委托
         MulticastDelegate<void()> onDrawUI;
 
     private:
         Rendering::Renderer* m_renderer{ nullptr };
-    	std::unique_ptr<Editor::EditorContext> m_editorContext;
+    	std::unique_ptr<Editor::ImGuiContext> m_editorContext;
 
+        int m_scenePosX{ 0 };
+        int m_scenePosY{ 0 };
         unsigned int m_sceneWidth{ 0 };
         unsigned int m_sceneHeight{ 0 };
     };

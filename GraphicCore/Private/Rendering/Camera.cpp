@@ -25,8 +25,6 @@ namespace TG
 
     Math::Matrix4f Camera::ProjectionMatrix() const
     {
-        const float aspectRatio = static_cast<float>(m_videoPort.Width()) /
-            static_cast<float>(m_videoPort.Height());
         switch (cameraType)
         {
             case CameraType::Perspective:
@@ -46,8 +44,6 @@ namespace TG
 
     Frustum Camera::ViewFrustum() const
     {
-        const float aspectRatio = static_cast<float>(m_videoPort.Width()) /
-            static_cast<float>(m_videoPort.Height());
         Math::Vector3f nearFront = front.Normalized() * nearPlane;
         Math::Vector3f nearUp = nearPlane * std::tan(fov * Math::Deg2RadF * 0.5f) * up;
         Math::Vector3f nearRight = nearUp.Norm() * aspectRatio * right;
@@ -66,11 +62,6 @@ namespace TG
         frustum.corners[7] = position + farFront - farRight + farUp;
 
         return frustum;
-    }
-
-    float Camera::AspectRatio() const
-    {
-        return static_cast<float>(m_videoPort.Width()) / static_cast<float>(m_videoPort.Height());
     }
 
     void Camera::Update()

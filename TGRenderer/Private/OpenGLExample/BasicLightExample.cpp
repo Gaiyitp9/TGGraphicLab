@@ -4,6 +4,7 @@
 * This code is licensed under the MIT License (MIT).			*
 *****************************************************************/
 #include "BasicLightExample.h"
+#include "Rendering/OpenGL/OpenGLRenderer.h"
 #include "Rendering/Color/StandardColors.h"
 #include "Rendering/RayTracing/PathTracer.h"
 #include "Math/Transform/Transform.hpp"
@@ -26,18 +27,23 @@ namespace TG
         Math::Vector4f viewPosition;
     };
 
-    BasicLightExample::BasicLightExample(const IDefaultVideoPort& videoPort, const ITimer& timer)
-        : m_timer(timer), m_camera(videoPort, timer),
+    BasicLightExample::BasicLightExample(const Rendering::Renderer* renderer, const ITimer& timer)
+        : m_timer(timer), m_camera(renderer->GetContext().VideoPort(), timer),
         m_planeMesh(20.0f, 20.0f, 20, 20),
         m_planeProperty{
             Math::Vector3f{ 0.0f, 0.01f, -10.0f },
-            Rendering::SlateGray,
-            0.3f, 0.5f, 64.0f },
-        m_vertexShader("Assets/Shaders/GLSL/LightingModel/Phong/basic_lighting.vert", Rendering::ShaderStage::Vertex),
-        m_fragmentShader("Assets/Shaders/GLSL/LightingModel/Phong/phong.frag", Rendering::ShaderStage::Fragment),
-        m_wireframeGeometryShader("Assets/Shaders/GLSL/wireframe.geom", Rendering::ShaderStage::Geometry),
-        m_wireframeFragmentShader("Assets/Shaders/GLSL/wireframe.frag", Rendering::ShaderStage::Fragment)
+            Rendering::Color::SRGBToLinear(Rendering::SlateGray),
+            0.3f, 0.5f, 64.0f
+        },
+        m_vertexShader("Assets/Shaders/GLSL/OpenGL/LightingModel/Phong/basic_lighting.vert", Rendering::ShaderStage::Vertex),
+        m_fragmentShader("Assets/Shaders/GLSL/OpenGL/LightingModel/Phong/phong.frag", Rendering::ShaderStage::Fragment),
+        m_wireframeGeometryShader("Assets/Shaders/GLSL/OpenGL/wireframe.geom", Rendering::ShaderStage::Geometry),
+        m_wireframeFragmentShader("Assets/Shaders/GLSL/OpenGL/wireframe.frag", Rendering::ShaderStage::Fragment)
     {
+        auto openglRenderer = dynamic_cast<const Rendering::OpenGLRenderer*>(renderer);
+        m_camera.aspectRatio = static_cast<float>(openglRenderer->SceneWidth()) /
+            static_cast<float>(openglRenderer->SceneHeight());
+
         LoadRubberToy();
         m_rubberToyProperty = {
             Math::Vector3f{ 0.0f, 1.0f, -14.0f },
@@ -45,29 +51,30 @@ namespace TG
             0.3f, 0.5f, 64.0f
         };
 
+    	Rendering::Color sphereColor = Rendering::Color::SRGBToLinear(Rendering::SaddleBrown);
         m_sphereProperties[0] = {
             Math::Vector3f{ -6.0f, 1.0f, -10.0f },
-            Rendering::SaddleBrown,
+            sphereColor,
             0.3f, 0.5f, 8.0f
         };
         m_sphereProperties[1] = {
             Math::Vector3f{ -3.0f, 1.0f, -10.0f },
-            Rendering::SaddleBrown,
+            sphereColor,
             0.3f, 0.5f, 16.0f
         };
         m_sphereProperties[2] = {
             Math::Vector3f{ 0.0f, 1.0f, -10.0f },
-            Rendering::SaddleBrown,
+            sphereColor,
             0.3f, 0.5f, 32.0f
         };
         m_sphereProperties[3] = {
             Math::Vector3f{ 3.0f, 1.0f, -10.0f },
-            Rendering::SaddleBrown,
+            sphereColor,
             0.3f, 0.5f, 64.0f
         };
         m_sphereProperties[4] = {
             Math::Vector3f{ 6.0f, 1.0f, -10.0f },
-            Rendering::SaddleBrown,
+            sphereColor,
             0.3f, 0.5f, 128.0f
         };
 
@@ -184,7 +191,7 @@ namespace TG
         // 正面朝向设置为顺时针
         // glFrontFace(GL_CW);
 
-        Rendering::Color clearColor = Rendering::DimGray;
+        Rendering::Color clearColor = clearColor.SRGBToLinear(Rendering::DimGray);
         glClearColor(clearColor.R(), clearColor.G(), clearColor.B(), clearColor.A());
         glClearDepthf(1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -279,7 +286,6 @@ namespace TG
 
     void BasicLightExample::DrawUI()
     {
-        const ImGuiIO& io = ImGui::GetIO();
         ImGui::Begin("Basic Light Example Settings");
         ImGui::Text("Draw wireframe");
         ImGui::SameLine();
@@ -370,7 +376,7 @@ namespace TG
                 pathTraceData.front = m_camera.front;
                 pathTraceData.up = m_camera.up;
                 pathTraceData.right = m_camera.right;
-                pathTraceData.aspectRatio = m_camera.AspectRatio();
+                pathTraceData.aspectRatio = m_camera.aspectRatio;
                 pathTraceData.focalDistance = m_focal;
                 pathTraceData.fov = m_camera.fov;
                 pathTraceData.defocusAngle = m_defocusAngle;
@@ -382,8 +388,12 @@ namespace TG
         ImGui::EndDisabled();
         ImGui::SameLine();
         ImGui::ProgressBar(m_pathTracer.Process(), ImVec2(200.0f, 0.0f));
-        ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
         ImGui::End();
+    }
+
+    void BasicLightExample::OnViewportChanged(unsigned width, unsigned height)
+    {
+        m_camera.aspectRatio = static_cast<float>(width) / static_cast<float>(height);
     }
 
     void BasicLightExample::LoadRubberToy()

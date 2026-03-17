@@ -5,9 +5,9 @@
 *****************************************************************/
 #pragma once
 
+#include "Context.h"
 #include "Rendering/Mesh/Mesh.h"
 #include "Rendering/Material.h"
-#include "Base/CommonInterfaces.h"
 
 namespace TG::Rendering
 {
@@ -18,20 +18,23 @@ namespace TG::Rendering
     public:
         virtual ~Renderer() = default;
 
-    	virtual char const* Type() = 0;
+    	virtual GraphicsAPI API() = 0;
 
-    	[[nodiscard]] virtual const IDefaultVideoPort& VideoPort() const = 0;
+    	virtual const Context& GetContext() const = 0;
 
-        virtual void PreRender() = 0;
+        virtual void BeginRender() = 0;
+    	virtual void EndRender() = 0;
 
         virtual void Draw(Mesh const* mesh, Material const* material) = 0;
         virtual void Present() = 0;
 
-        virtual void ScreenFrameBufferResizeCallback(unsigned int width, unsigned int height) = 0;
-        virtual void SceneFrameBufferResizeCallback(unsigned int width, unsigned int height) = 0;
-        virtual void RenderToTexture() const = 0;
-        virtual void RenderToScreen() const = 0;
+        virtual void ScreenFramebufferResizeCallback(unsigned int width, unsigned int height) = 0;
+        virtual void SceneViewportChangedCallback(int posX, int posY, unsigned int width, unsigned int height) = 0;
 
+        virtual void RenderToScene() = 0;
+    	virtual void RenderToUI() = 0;
+
+        virtual void RenderToTexture() = 0;
         virtual Texture const* RenderTarget() = 0;
 
     	virtual void SetVSync(bool enable) const = 0;
