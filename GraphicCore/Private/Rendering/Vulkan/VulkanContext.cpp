@@ -103,6 +103,11 @@ namespace TG::Rendering
 		return static_cast<uint32_t>(m_swapChainImages.size());
 	}
 
+	const std::vector<VkImage>& VulkanContext::GetSwapChainImages() const
+	{
+		return m_swapChainImages;
+	}
+
 	const std::vector<VkImageView>& VulkanContext::GetSwapChainImageViews() const
 	{
 		return m_swapChainImageViews;

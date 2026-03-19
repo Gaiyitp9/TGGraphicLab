@@ -7,21 +7,19 @@
 
 #include "Example.h"
 #include "Rendering/Renderer.h"
-#include "Rendering/Mesh/Mesh.h"
-#include "Rendering/Camera.h"
-#include "Rendering/OpenGL/OpenGLShader.h"
+#include "Rendering/Color/Color.h"
+#include "Rendering/Mesh/Sphere.h"
 #include "Rendering/OpenGL/OpenGLTexture2D.h"
 #include "Rendering/OpenGL/SkyBox.h"
-#include "Rendering/Gizmo/ViewportGrid.h"
 #include "Rendering/Gizmo/ViewportCompass.h"
 
 namespace TG
 {
-    class CubeExample final : public Example
+    class PBRExample : public Example
     {
     public:
-        CubeExample(const Rendering::Renderer* renderer, const ITimer& timer);
-        ~CubeExample() override;
+        PBRExample(const Rendering::Renderer* renderer, const ITimer& timer);
+        ~PBRExample() override;
 
         void Draw() override;
         void DrawUI() override;
@@ -29,24 +27,35 @@ namespace TG
         void OnViewportChanged(unsigned width, unsigned height) override;
 
     private:
+        struct ObjectProperty
+        {
+            Math::Vector3f position;
+        };
+
         Camera m_camera;
 
-        Rendering::Mesh m_cubeMesh;
-        Math::Vector3f m_cubePositions[10];
+        Math::Vector4f m_lightDirection;
+        Rendering::Color m_lightColor;
 
-        GLuint m_VAO{};
-        GLuint m_VBO{};
-        GLuint m_EBO{};
-        bool m_wireframe{ false };
-        GLuint m_pipeline{};
+        Rendering::Sphere m_sphereMesh;
+        ObjectProperty m_sphereProperties;
+
+        GLuint m_sphereVAO{};
+        GLuint m_sphereVBO{};
+        GLuint m_sphereEBO{};
+
         Rendering::OpenGLShader m_vertexShader;
         Rendering::OpenGLShader m_fragmentShader;
-        Rendering::OpenGLShader m_wireframeGeometryShader;
-        Rendering::OpenGLShader m_wireframeFragmentShader;
-        Rendering::OpenGLTexture2D m_textures[2]{};
 
-        Rendering::SkyBox m_skyBox;
-        Rendering::ViewportGrid m_viewportGrid;
+        Rendering::OpenGLTexture2D m_albedo;
+        Rendering::OpenGLTexture2D m_normalMap;
+        Rendering::OpenGLTexture2D m_metallicRoughness;
+
+        GLuint m_pipeline{};
+        GLuint m_cameraUbo{};
+        GLuint m_renderUbo{};
+
+        Rendering::SkyBox m_skybox;
         Rendering::ViewportCompass m_viewportCompass;
     };
 }

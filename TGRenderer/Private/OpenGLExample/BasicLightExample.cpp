@@ -28,7 +28,7 @@ namespace TG
     };
 
     BasicLightExample::BasicLightExample(const Rendering::Renderer* renderer, const ITimer& timer)
-        : m_timer(timer), m_camera(renderer->GetContext().VideoPort(), timer),
+        : m_camera(renderer->GetContext().VideoPort(), timer),
         m_planeMesh(20.0f, 20.0f, 20, 20),
         m_planeProperty{
             Math::Vector3f{ 0.0f, 0.01f, -10.0f },

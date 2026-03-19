@@ -7,6 +7,7 @@
 #include "ExampleManager.h"
 #include "OpenGLExample/BasicLightExample.h"
 #include "OpenGLExample/CubeExample.h"
+#include "OpenGLExample/PBRExample.h"
 #include "OpenGLExample/TriangleExample.h"
 #include "VulkanExample/TriangleVkExample.h"
 
@@ -38,6 +39,9 @@ namespace TG
                     break;
                 case ExampleEnum::BasicLight:
                     m_example = std::make_unique<BasicLightExample>(m_renderer, m_timer);
+                    break;
+                case ExampleEnum::PBR:
+                    m_example = std::make_unique<PBRExample>(m_renderer, m_timer);
                     break;
                 default:
                     m_example = std::make_unique<BasicLightExample>(m_renderer, m_timer);

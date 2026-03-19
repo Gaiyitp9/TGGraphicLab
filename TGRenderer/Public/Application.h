@@ -36,7 +36,7 @@ namespace TG
 		ExampleEnum m_exampleEnum = ExampleEnum::Triangle;
 		std::unique_ptr<ExampleManager> m_exampleManager;
 
-		const char* m_items[3]{ "Triangle", "Cube", "Basic Light" };
+		const char* m_items[4]{ "Triangle", "Cube", "Basic Light", "PBR" };
 		int m_currentItem = 0;
 	};
 }

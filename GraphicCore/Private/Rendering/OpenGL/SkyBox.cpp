@@ -3,7 +3,7 @@
 * Copyright (c) Gaiyitp9. All rights reserved.					*
 * This code is licensed under the MIT License (MIT).			*
 *****************************************************************/
-#include "Rendering/Gizmo/SkyBox.h"
+#include "Rendering/OpenGL/SkyBox.h"
 #include "Rendering/Mesh/Primitives.h"
 
 namespace TG::Rendering

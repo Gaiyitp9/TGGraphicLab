@@ -132,11 +132,33 @@ namespace TG::Editor
 
 		VkCommandBuffer cmdBuffer = m_context.GetCommandBuffer();
 
+		VkImageMemoryBarrier barrier{};
+		barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+		barrier.oldLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
+		barrier.newLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+		barrier.srcAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+		barrier.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+		barrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+		barrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+		barrier.image = m_context.GetSwapChainImages()[m_context.GetCurrentImageIndex()];
+		barrier.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+		barrier.subresourceRange.levelCount = 1;
+		barrier.subresourceRange.layerCount = 1;
+		vkCmdPipelineBarrier(
+			cmdBuffer,
+			VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,
+			VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,
+			0,
+			0, nullptr,
+			0, nullptr,
+			1, &barrier
+		);
+
 		VkRenderingAttachmentInfo attachmentInfo{};
 		attachmentInfo.sType = VK_STRUCTURE_TYPE_RENDERING_ATTACHMENT_INFO;
 		attachmentInfo.imageView = m_context.GetSwapChainImageViews()[m_context.GetCurrentImageIndex()];
 		attachmentInfo.imageLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
-		attachmentInfo.loadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+		attachmentInfo.loadOp = VK_ATTACHMENT_LOAD_OP_LOAD;
 		attachmentInfo.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
 		attachmentInfo.clearValue = { 0.45f, 0.56f, 0.60f, 1.0f };
 
@@ -153,6 +175,28 @@ namespace TG::Editor
 		ImGui_ImplVulkan_RenderDrawData(ImGui::GetDrawData(), cmdBuffer);
 
 		vkCmdEndRendering(cmdBuffer);
+
+		VkImageMemoryBarrier barrier2{};
+		barrier2.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+		barrier2.oldLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+		barrier2.newLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
+		barrier2.srcAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+		barrier2.dstAccessMask = 0;
+		barrier2.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+		barrier2.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+		barrier2.image = m_context.GetSwapChainImages()[m_context.GetCurrentImageIndex()];
+		barrier2.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+		barrier2.subresourceRange.levelCount = 1;
+		barrier2.subresourceRange.layerCount = 1;
+		vkCmdPipelineBarrier(
+			cmdBuffer,
+			VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,
+			VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT,
+			0,
+			0, nullptr,
+			0, nullptr,
+			1, &barrier2
+		);
 
 		ImGui::UpdatePlatformWindows();
 		ImGui::RenderPlatformWindowsDefault();

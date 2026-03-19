@@ -45,7 +45,6 @@ namespace TG
             float shininess;
         };
 
-        const ITimer& m_timer;
         Camera m_camera;
         const char* m_cameraType[2]{ "Perspective", "Orthographic" };
         int m_currentType = 0;

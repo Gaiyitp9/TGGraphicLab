@@ -33,7 +33,7 @@ namespace TG
 
         m_mainWindow.Show(true);
         m_mainWindow.SetKeyCallback(
-            [&keyboard = m_keyboard](Input::KeyCode key, int scanCode, Input::Action action) {
+            [&keyboard = m_keyboard](Input::KeyCode key, int, Input::Action action) {
                 Input::Event<Input::Keyboard> event;
                 event.key = key;
                 if (action == Input::Action::Press || action == Input::Action::Repeat)
@@ -55,7 +55,7 @@ namespace TG
                 mouse.Handle(event);
             }
         );
-        m_mainWindow.SetScrollCallback([&mouse = m_mouse](int xOffset, int yOffset) {
+        m_mainWindow.SetScrollCallback([&mouse = m_mouse](int, int yOffset) {
             Input::Event<Input::Mouse> event;
             event.wheelDelta = static_cast<short>(yOffset);
             mouse.Handle(event);
@@ -66,7 +66,7 @@ namespace TG
             event.y = static_cast<short>(posY);
             mouse.Handle(event);
         });
-        m_mainWindow.SetWindowPosCallback([](int xPos, int yPos){});
+        m_mainWindow.SetWindowPosCallback([](int, int){});
         m_mainWindow.SetWindowSizeCallback(
             [&windowSizeDelegate = onWindowResize](unsigned int width, unsigned int height) {
                 windowSizeDelegate.Broadcast(width, height);

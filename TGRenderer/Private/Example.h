@@ -12,6 +12,7 @@ namespace TG
         Triangle,
         Cube,
         BasicLight,
+        PBR,
     };
 
     struct Example

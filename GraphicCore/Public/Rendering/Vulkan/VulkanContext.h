@@ -39,6 +39,7 @@ namespace TG::Rendering
 		[[nodiscard]] VkFormat GetSwapChainFormat() const;
 		[[nodiscard]] uint32_t GetSwapChainMinImageCount() const;
 		[[nodiscard]] uint32_t GetSwapChainImageCount() const;
+		[[nodiscard]] const std::vector<VkImage>& GetSwapChainImages() const;
 		[[nodiscard]] const std::vector<VkImageView>& GetSwapChainImageViews() const;
 		[[nodiscard]] VkExtent2D GetSwapChainExtent() const;
 		[[nodiscard]] uint32_t GetCurrentImageIndex() const;

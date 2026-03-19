@@ -90,6 +90,9 @@ namespace TG
 	            case 2:
 	                m_exampleEnum = ExampleEnum::BasicLight;
 	                break;
+				case 3:
+            		m_exampleEnum = ExampleEnum::PBR;
+            		break;
 	            default:
 	                m_exampleEnum = ExampleEnum::BasicLight;
             }
