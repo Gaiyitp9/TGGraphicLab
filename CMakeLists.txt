@@ -28,6 +28,8 @@ if(MSVC)
 	# 禁用Spectre攻击的缓解措施警告warning C5045
 	add_compile_options(/utf-8 /arch:AVX2 /fp:precise /Zc:__cplusplus /MP /W4 /wd5045)
 	add_compile_definitions(TG_WINDOWS)
+	# 强制所有目标使用动态链接CRT(/MD /MDd)
+	set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL")
 endif()
 
 # add_library是否默认编译成动态库

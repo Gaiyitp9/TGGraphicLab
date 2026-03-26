@@ -10,6 +10,7 @@
 int CALLBACK main()
 {
 	mi_version();
+
 	try
 	{
 		TG::Application app;

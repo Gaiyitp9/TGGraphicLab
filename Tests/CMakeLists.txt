@@ -1,7 +1,7 @@
 # 设置测试目录名称
 set(TestsFolderName Tests)
 
-find_package(GTest 1.16.0 REQUIRED)
+find_package(GTest 1.17.0 REQUIRED)
 include(GoogleTest)
 
 # 允许使用add_test()添加测试，生成适用于ctest的测试配置。

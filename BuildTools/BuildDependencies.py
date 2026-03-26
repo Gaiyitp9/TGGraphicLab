@@ -82,7 +82,7 @@ def build_dependencies():
 
     source_dir = root_dir / "ThirdParty" / "mimalloc"
     build_dir = root_dir / "build" / "mimalloc"
-    cmake_options = ["-DMI_BUILD_TESTS=OFF"]
+    cmake_options = ["-DMI_BUILD_TESTS=OFF", "-DMI_TRACK_ETW=ON"]
     build_library(source_dir, build_dir, generator, cmake_options, install_dir)
 
     source_dir = root_dir / "ThirdParty" / "spdlog"

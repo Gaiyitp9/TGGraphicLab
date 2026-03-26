@@ -43,8 +43,7 @@ git submodule update --init --recursive
   - 运行BuildTools/BuildAll.py，完成后会在build/TGGraphicLab目录下生成各种配置的文件夹。要使用VS调试时，打开配置文件夹下的sln文件即可。注意，在VS里运行时，Run Configuration要改为文件夹对应的配置，比如打开Debug文件夹下的sln时，Run Configuration就改为Debug
 - 使用clion
   - 运行BuildTools/BuildDependencies.py，再用clion打开项目即可
-- 运行TGRenderer时需要设置的环境变量： `MIMALLOC_DISABLE_REDIRECT=1` `MIMALLOC_SHOW_ERRORS=1` `MIMALLOC_SHOW_STATS=1`
-  `MIMALLOC_VERBOSE=1`
+- 如果需要查看mimalloc的状态，运行TGRenderer时设置环境变量：`MIMALLOC_VERBOSE=1` `MIMALLOC_SHOW_ERRORS=1` `MIMALLOC_SHOW_STATS=1`。如果不需要重定向malloc等函数，可以设置环境变量：`MIMALLOC_DISABLE_REDIRECT=0`
 
 ## 参考资料
 

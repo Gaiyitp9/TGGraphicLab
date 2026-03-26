@@ -1,6 +1,6 @@
 set(LIBRARY_NAME GraphicCore)
 
-find_package(mimalloc 3.1.5 REQUIRED)
+find_package(mimalloc 3.2.8 REQUIRED)
 find_package(spdlog 1.15.1 REQUIRED)
 find_package(glm REQUIRED)
 

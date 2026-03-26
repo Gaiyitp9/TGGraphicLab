@@ -4,10 +4,8 @@
 * This code is licensed under the MIT License (MIT).			*
 *****************************************************************/
 #include "Base/Utility.h"
-
-#include <algorithm>
-
 #include "Exception/BaseException.h"
+#include <algorithm>
 #include <locale>
 #include <fstream>
 
@@ -138,7 +136,7 @@ namespace TG
         };
 
         std::string ext(extension);
-        std::ranges::transform(ext, ext.begin(), ::tolower);
+        std::ranges::transform(ext, ext.begin(), tolower);
         return std::ranges::find(exts, ext) != exts.end();
     }
 }

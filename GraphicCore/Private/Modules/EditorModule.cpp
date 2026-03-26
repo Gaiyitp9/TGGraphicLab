@@ -88,7 +88,7 @@ namespace TG
 		ImGui::End();
 
     	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
-    	ImGui::Begin("Scene", nullptr, ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoMove);
+    	ImGui::Begin("Scene", nullptr, ImGuiWindowFlags_NoBackground);
 		ImVec2 cursorScreenPos  = ImGui::GetCursorScreenPos();
 		ImVec2 windowPos = ImGui::GetMainViewport()->Pos;
 		ImVec2 size = ImGui::GetContentRegionAvail();
