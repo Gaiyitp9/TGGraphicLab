@@ -5,26 +5,25 @@
 *****************************************************************/
 #pragma once
 
-#include "PlatformTraits.h"
+#include "PlatformTraits.hpp"
 
 namespace TG
 {
     // 显示接口
-    template <typename PlatformTraits> requires IsValidPlatformTraits<PlatformTraits>
-    struct IVideoPort
+    struct TG_API IVideoPort
     {
+        using PlatformTraitsT = PlatformTraits<g_platform>;
+
         virtual ~IVideoPort() = default;
 
-        [[nodiscard]] virtual PlatformTraits::WindowHandle Handle() const noexcept = 0;
-        [[nodiscard]] virtual PlatformTraits::DeviceContext Context() const noexcept = 0;
-        [[nodiscard]] virtual int Width() const noexcept = 0;
-        [[nodiscard]] virtual int Height() const noexcept = 0;
+        [[nodiscard]] virtual PlatformTraitsT::WindowHandle Handle() const noexcept = 0;
+        [[nodiscard]] virtual PlatformTraitsT::RenderSurface Surface() const noexcept = 0;
+        [[nodiscard]] virtual unsigned int Width() const noexcept = 0;
+        [[nodiscard]] virtual unsigned int Height() const noexcept = 0;
     };
 
-    using IDefaultVideoPort = IVideoPort<DefaultPlatformTraits>;
-
     // 计时器接口
-    struct ITimer
+    struct TG_API ITimer
     {
         virtual ~ITimer() = default;
 
@@ -33,7 +32,7 @@ namespace TG
     };
 
     // 输入接口
-    struct IInput
+    struct TG_API IInput
     {
         virtual ~IInput() = default;
 

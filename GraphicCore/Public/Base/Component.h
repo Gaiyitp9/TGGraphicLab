@@ -5,13 +5,14 @@
 *****************************************************************/
 #pragma once
 
+#include "Base/Core.h"
 #include <string>
 
 namespace TG
 {
     class Object;
 
-    class Component
+    class TG_API Component
     {
     public:
         explicit Component(Object* owner);

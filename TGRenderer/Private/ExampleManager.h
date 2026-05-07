@@ -7,6 +7,7 @@
 
 #include "Example.h"
 #include "Rendering/Renderer.h"
+#include <memory>
 
 namespace TG
 {

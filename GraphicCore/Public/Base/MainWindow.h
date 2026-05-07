@@ -5,11 +5,11 @@
 *****************************************************************/
 #pragma once
 
-#include "WindowBase.hpp"
+#include "Window.h"
 
 namespace TG
 {
-    class MainWindow final : public WindowBase
+    class TG_API MainWindow final : public Window
     {
     public:
         MainWindow(int x, int y, unsigned int width, unsigned int height, std::string_view name);

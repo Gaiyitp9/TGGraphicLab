@@ -24,7 +24,7 @@ namespace TG
     class Camera
     {
     public:
-        Camera(const IDefaultVideoPort& videoPort, const ITimer& timer);
+        Camera(const IVideoPort& videoPort, const ITimer& timer);
         ~Camera();
 
         [[nodiscard]] Math::Matrix4f ViewMatrix() const;
@@ -49,7 +49,7 @@ namespace TG
     private:
         void UpdateCameraVectors();
 
-        const IDefaultVideoPort& m_videoPort;
+        const IVideoPort& m_videoPort;
         const ITimer& m_timer;
 
         Math::Vector3f m_worldUp{ 0.0f, 1.0f, 0.0f };

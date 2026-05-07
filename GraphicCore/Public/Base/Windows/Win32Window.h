@@ -6,33 +6,36 @@
 #pragma once
 
 #include "Base/Core.h"
-#include "Base/WindowDeclarations.h"
+#include "Base/Windows/Win32API.h"
+#include "Base/WindowDelegates.h"
 #include <string>
 #include <optional>
 
 namespace TG
 {
-    // 封装Win32原生窗口
-    struct Win32Window
+    class TG_API Win32Window
     {
-        Win32Window(int x, int y, unsigned int width, unsigned int height, std::string_view name, WindowType type);
-        virtual ~Win32Window();
+    public:
+        Win32Window(int x, int y, unsigned int width, unsigned int height, std::string_view name);
+        ~Win32Window();
+
+        [[nodiscard]] HWND Handle() const;
+        [[nodiscard]] HDC Surface() const;
 
         // 轮询输入事件，需要每帧调用
-        static std::optional<int> PollEvents();
+        [[nodiscard]] std::optional<int> PollEvents();
 
-        void SetIcon(std::string_view iconPath) const;
-        void SetPosition(int x, int y) const;
-        void SetSize(unsigned int w, unsigned int h) const;
         void Show(bool show) const;
 
-        std::string name;
-        HWND handle{ nullptr };
-        HDC deviceContext{ nullptr };
-        int posX;
-        int posY;
-        unsigned int width;
-        unsigned int height;
+        void SetIcon(std::string_view iconPath) const;
+
+        [[nodiscard]] int PositionX() const noexcept;
+        [[nodiscard]] int PositionY() const noexcept;
+        void SetPosition(int x, int y);
+
+        [[nodiscard]] unsigned int Width() const noexcept;
+        [[nodiscard]] unsigned int Height() const noexcept;
+        void SetSize(unsigned int w, unsigned int h);
 
         KeyDelegate keyDelegate;
         CharDelegate charDelegate;
@@ -43,5 +46,14 @@ namespace TG
         WindowSizeDelegate windowSizeDelegate;
         SuspendDelegate suspendDelegate;
         ResumeDelegate resumeDelegate;
+
+    private:
+        std::string m_name;
+        HWND m_handle{ nullptr };
+        HDC m_deviceContext{ nullptr };
+        int m_posX;
+        int m_posY;
+        unsigned int m_width;
+        unsigned int m_height;
     };
 }

@@ -40,7 +40,6 @@ namespace TG
 
     std::wstring MultiBytesToWideChars(std::string_view str)
     {
-        std::setlocale(LC_ALL, "zh_CN.utf-8");
         // Windows上用安全的版本，Linux没有这个版本，所以用旧版本
 #ifdef TG_WINDOWS
         std::size_t length = 0;
@@ -60,7 +59,6 @@ namespace TG
 
     std::string WideCharsToMultiBytes(std::wstring_view wStr)
     {
-        std::setlocale(LC_ALL, "zh_CN.utf-8");
         // Windows上用安全的版本，Linux没有这个版本，所以用旧版本
 #ifdef TG_WINDOWS
         std::size_t length = 0;
@@ -69,9 +67,9 @@ namespace TG
         wcstombs_s(&length, data, length, wStr.data(), length);
 #else
         // 计算出的长度不包含'/0'，所以要加1
-        std::size_t length = std::wcstombs(nullptr, wstr.data(), 0) + 1;
+        std::size_t length = std::wcstombs(nullptr, wStr.data(), 0) + 1;
         auto* data = static_cast<char*>(malloc(length * sizeof(char)));
-        std::wcstombs(data, wstr.data(), length);
+        std::wcstombs(data, wStr.data(), length);
 #endif
         std::string str(data);
         std::free(data);

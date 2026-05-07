@@ -11,6 +11,11 @@ namespace TG
 {
     PlatformModule::PlatformModule() : m_mainWindow(0, 0, 1600, 900, "天工渲染器")
     {
+        if constexpr (g_platform == Platform::Windows)
+            std::setlocale(LC_CTYPE, ".UTF-8");
+        if constexpr (g_platform == Platform::Linux)
+            std::setlocale(LC_CTYPE, "C.UTF-8");
+
         // 注：使用CRT library检测内存泄漏时，文件的行分隔符要设置为CRLF(\r\n)，否则_CrtSetDbgFlag函数不起作用
         // 开启内存泄漏检测
         _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
@@ -89,7 +94,7 @@ namespace TG
         m_timer.Tick();
         m_mouse.Update();
         m_keyboard.Update();
-        m_exitCode = WindowBase::PollEvents();
+        m_exitCode = m_mainWindow.PollEvents();
     }
 
     void PlatformModule::PostUpdate()

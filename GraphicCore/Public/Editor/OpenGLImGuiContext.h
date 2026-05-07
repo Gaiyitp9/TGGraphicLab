@@ -18,5 +18,8 @@ namespace TG::Editor
 
 		void NewFrame() override;
 		void Render() override;
+
+	private:
+
 	};
 }

@@ -5,7 +5,7 @@
 *****************************************************************/
 #pragma once
 
-#include "Rendering/Context.h"
+#include "Rendering/IContext.h"
 #include "vulkan/vulkan.h"
 
 namespace TG::Rendering
@@ -18,10 +18,10 @@ namespace TG::Rendering
 		Present,
 	};
 
-	class VulkanContext : public Context
+	class VulkanContext : public IContext
 	{
 	public:
-		explicit VulkanContext(const IDefaultVideoPort& videoPort);
+		explicit VulkanContext(const IVideoPort& videoPort);
 		~VulkanContext() override;
 
 		VulkanContext(const VulkanContext&) = delete;
@@ -29,7 +29,7 @@ namespace TG::Rendering
 		VulkanContext& operator=(const VulkanContext&) = delete;
 		VulkanContext& operator=(VulkanContext&&) = delete;
 
-		[[nodiscard]] const IDefaultVideoPort& VideoPort() const override;
+		[[nodiscard]] const IVideoPort& VideoPort() const override;
 
 		[[nodiscard]] VkInstance GetInstance() const;
 		[[nodiscard]] VkDevice GetDevice() const;
@@ -64,7 +64,7 @@ namespace TG::Rendering
 		);
 		void CreateInstance();
 		void SetupDebugMessenger();
-		void CreateSurface(HWND handle);
+		void CreateSurface();
         void SelectPhysicalDevice();
 		bool IsDeviceSuitable(VkPhysicalDevice device);
 		void CreateLogicalDevice();
@@ -77,13 +77,12 @@ namespace TG::Rendering
         void CreateCommandBuffers();
         void CreateSyncObjects();
 
-		const IDefaultVideoPort& m_videoPort;
+		const IVideoPort& m_videoPort;
 
 		bool m_enableValidationLayer { true };
 		std::vector<char const*> m_requiredVulkanLayers;
 		std::vector<char const*> m_requiredVulkanExtensions{
 			VK_KHR_SURFACE_EXTENSION_NAME,
-			"VK_KHR_win32_surface",
 		};
 
 		VkInstance m_instance{ VK_NULL_HANDLE };

@@ -10,7 +10,7 @@
 
 namespace TG
 {
-    Camera::Camera(const IDefaultVideoPort& videoPort, const ITimer& timer)
+    Camera::Camera(const IVideoPort& videoPort, const ITimer& timer)
         : m_videoPort(videoPort), m_timer(timer)
     {
         UpdateCameraVectors();

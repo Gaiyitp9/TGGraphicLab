@@ -5,12 +5,12 @@
 *****************************************************************/
 #pragma once
 
-#include <exception>
+#include <stdexcept>
 #include <string_view>
 
 namespace TG
 {
-    class BaseException : public std::exception
+    class BaseException : public std::runtime_error
     {
     public:
         ~BaseException() override = default;

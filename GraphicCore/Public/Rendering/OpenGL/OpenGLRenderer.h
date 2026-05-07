@@ -14,7 +14,7 @@ namespace TG::Rendering
     class OpenGLRenderer final : public Renderer
     {
     public:
-        explicit OpenGLRenderer(const IDefaultVideoPort& videoPort);
+        explicit OpenGLRenderer(const IVideoPort& videoPort);
         ~OpenGLRenderer() override;
 
         GraphicsAPI API() override;

@@ -9,13 +9,13 @@
 
 namespace TG
 {
-    BaseException::BaseException(std::string_view message) : std::exception(message.data()) {}
+    BaseException::BaseException(std::string_view message) : std::runtime_error(message.data()) {}
 
     BaseException BaseException::Create(std::string_view message)
     {
         std::string whatBuffer = std::format("Exception type: Base Exception\n"
-                                 "{}\n"
-                                 "{}\n", message, std::stacktrace::current());
+                                            "{}\n"
+                                            "{}\n", message, std::stacktrace::current());
         return BaseException(whatBuffer);
     }
 }

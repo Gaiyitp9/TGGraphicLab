@@ -10,8 +10,8 @@
 
 namespace TG::Rendering
 {
-    OpenGLRenderer::OpenGLRenderer(const IDefaultVideoPort& videoPort)
-		: m_context(videoPort)
+    OpenGLRenderer::OpenGLRenderer(const IVideoPort& videoPort)
+		: m_context{videoPort}
     {
     	// 查询OpenGL相关信息
     	auto glVersion = reinterpret_cast<char const*>(glGetString(GL_VERSION));

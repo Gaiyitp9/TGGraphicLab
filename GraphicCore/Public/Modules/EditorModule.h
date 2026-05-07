@@ -6,7 +6,7 @@
 #pragma once
 
 #include "Module.h"
-#include "Base/CommonInterfaces.h"
+#include "Base/Interfaces.h"
 #include "Rendering/Renderer.h"
 #include "Editor/ImGuiContext.h"
 

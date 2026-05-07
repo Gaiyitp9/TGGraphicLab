@@ -12,6 +12,7 @@
 #include "Rendering/RayTracing/PathTracer.h"
 #include "Rendering/Gizmo/ViewportGrid.h"
 #include "Rendering/Gizmo/ViewportCompass.h"
+#include <thread>
 
 namespace tinygltf
 {

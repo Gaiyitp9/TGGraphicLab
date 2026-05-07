@@ -5,15 +5,17 @@
 *****************************************************************/
 #pragma once
 
-#include "Base/CommonInterfaces.h"
+#include "Base/Core.h"
 
-namespace TG::Rendering
+namespace TG::Editor
 {
-	class Context
-	{
-	public:
-		virtual ~Context() = default;
+    class TG_API LinuxOpenGLImGuiContext
+    {
+    public:
+        LinuxOpenGLImGuiContext();
+        ~LinuxOpenGLImGuiContext();
 
-		virtual const IDefaultVideoPort& VideoPort() const = 0;
-	};
+        void NewFrame();
+        void Render();
+    };
 }

@@ -1,26 +1,16 @@
-cmake_minimum_required(VERSION 3.29)
-
-# 设置toolchain文件，使用vcpkg管理部分三方库
-#if (DEFINED ENV{VCPKG_ROOT})
-#	set(VCPKG_ROOT $ENV{VCPKG_ROOT} CACHE PATH "vcpkg root path")
-#else()
-#	set(VCPKG_ROOT "" CACHE PATH "vcpkg root path")
-#endif()
-#
-#if (EXISTS ${VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake)
-#	message(STATUS "vcpkg root path: ${VCPKG_ROOT}")
-#else()
-#	message(FATAL_ERROR "VCPKG_ROOT is not a valid vcpkg root path")
-#endif()
-#
-#set(CMAKE_TOOLCHAIN_FILE "${VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake")
+cmake_minimum_required(VERSION 3.31)
 
 project(TGGraphicLab)
 
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-# 禁用编译器扩展
 set(CMAKE_CXX_EXTENSIONS OFF)
+
+# add_library是否默认编译成动态库
+option(BUILD_SHARED_LIBS "Build using shared libraries" OFF)
+
+# 将自定义模块目录添加到CMake的模块搜索路径中
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/CMake")
 
 if(MSVC)
 	set(TG_WINDOWS true)
@@ -30,21 +20,19 @@ if(MSVC)
 	add_compile_definitions(TG_WINDOWS)
 	# 强制所有目标使用动态链接CRT(/MD /MDd)
 	set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL")
+	# 开启使用文件夹选项，vs项目可以分类放在不同文件夹下
+	set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 endif()
 
-# add_library是否默认编译成动态库
-option(BUILD_SHARED_LIBS "Build using shared libraries" OFF)
-# 是否输出compile_commands.json文件
-option(CMAKE_EXPORT_COMPILE_COMMANDS ON)
-
-# 开启使用文件夹选项，vs项目可以分类放在不同文件夹下
-set_property(GLOBAL PROPERTY USE_FOLDERS ON)
-
-# 安装目录设置为install
-set(CMAKE_INSTALL_PREFIX ${CMAKE_SOURCE_DIR}/install/${CMAKE_BUILD_TYPE} CACHE PATH "Installation directory" FORCE)
-message(STATUS "Third party install path: ${CMAKE_INSTALL_PREFIX}")
-# 三方库查找目录
-set(CMAKE_PREFIX_PATH ${CMAKE_SOURCE_DIR}/install/${CMAKE_BUILD_TYPE})
+if(LINUX)
+	set(TG_LINUX true)
+	add_compile_definitions(TG_LINUX)
+	# 设置C++和C的默认符号可见性为隐藏
+	set(CMAKE_CXX_VISIBILITY_PRESET hidden)
+	set(CMAKE_C_VISIBILITY_PRESET hidden)
+	# 隐藏内联函数的符号，进一步减小体积
+	set(CMAKE_VISIBILITY_INLINES_HIDDEN ON)
+endif()
 
 add_subdirectory(BuildTools/TGHeaderTool)
 add_subdirectory(GraphicCore)

@@ -5,7 +5,7 @@
 *****************************************************************/
 #pragma once
 
-#include "Base/CommonInterfaces.h"
+#include "Base/Interfaces.h"
 #include "Input/Mouse.h"
 #include "Input/Keyboard.h"
 

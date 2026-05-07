@@ -28,7 +28,7 @@ namespace TG
 
         [[nodiscard]] bool ShouldExit() const;
         [[nodiscard]] int ExitCode() const;
-        [[nodiscard]] const IDefaultVideoPort& GetVideoPort() const { return m_mainWindow; }
+        [[nodiscard]] const IVideoPort& GetVideoPort() const { return m_mainWindow; }
         [[nodiscard]] const ITimer& GetTimer() const { return m_timer; };
 
         // 窗口尺寸变化委托

@@ -5,27 +5,27 @@
 *****************************************************************/
 #pragma once
 
-#include "Rendering/Context.h"
+#include "Rendering/IContext.h"
+#include <memory>
 
 namespace TG::Rendering
 {
-    class OpenGLContext : public Context
+    class TG_API OpenGLContext : public IContext
     {
+        using PlatformTraitsT = PlatformTraits<g_platform>;
+
     public:
-        explicit OpenGLContext(const IDefaultVideoPort& videoPort);
+        explicit OpenGLContext(const IVideoPort& videoPort);
         ~OpenGLContext() override;
 
-		[[nodiscard]] const IDefaultVideoPort& VideoPort() const override;
+		[[nodiscard]] const IVideoPort& VideoPort() const override;
 
         void MakeCurrent() const;
         void SetVSync(bool enable) const;
         void Present() const;
 
     private:
-    	void LoadWGLExtension() const;
-
-    	const IDefaultVideoPort& m_videoPort;
-        HDC m_hdc{};
-        HGLRC m_wglContext{};
+        const IVideoPort& m_videoPort;
+        std::unique_ptr<PlatformTraitsT::OpenGLContext> m_context;
     };
 }

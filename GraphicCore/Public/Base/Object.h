@@ -5,6 +5,7 @@
 *****************************************************************/
 #pragma once
 
+#include "Base/Core.h"
 #include <memory>
 #include <vector>
 
@@ -12,7 +13,7 @@ namespace TG
 {
     class Component;
 
-    class Object
+    class TG_API Object
     {
     public:
         Object();

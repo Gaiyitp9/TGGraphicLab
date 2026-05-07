@@ -5,13 +5,13 @@
 *****************************************************************/
 #pragma once
 
-#include "CommonInterfaces.h"
+#include "Base/Interfaces.h"
 #include <chrono>
 
 namespace TG
 {
 	// 高精度计时器
-	class Chronometer final : public ITimer
+	class TG_API Chronometer final : public ITimer
 	{
 	public:
 		Chronometer();

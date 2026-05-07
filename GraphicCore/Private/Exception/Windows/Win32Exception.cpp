@@ -38,9 +38,9 @@ namespace TG
 									  nullptr, hr, LANG_SYSTEM_DEFAULT, msgBuf, 256, nullptr);
 		std::string errorMsg = msgLen > 0 ? WideCharsToMultiBytes(msgBuf) : "Unidentified error code";
 		std::string whatBuffer = std::format("Exception type: Windows API Exception\n"
-										 "HRESULT: {:#010x}\nError Message: {}"
-										 "{}\n"
-										 "{}\n", hr, errorMsg, message, std::stacktrace::current());
+											"HRESULT: {:#010x}\nError Message: {}"
+											"{}\n"
+											"{}\n", hr, errorMsg, message, std::stacktrace::current());
 		return Win32Exception(whatBuffer);
 	}
 

@@ -11,23 +11,25 @@
 
 namespace TG
 {
-	Win32Window::Win32Window(int x, int y, unsigned int width, unsigned int height, std::string_view name,
-	    WindowType type) : name{ name }, posX{ x }, posY{ y }, width{ width }, height{ height }
+	Win32Window::Win32Window(int x, int y, unsigned int width, unsigned int height, std::string_view name)
+		: name{ name }, posX{ x }, posY{ y }, width{ width }, height{ height }
 	{
 		DWORD dwStyle = 0;
 		DWORD dwExStyle = 0;
-		switch (type)
-		{
-			case WindowType::Default:
-		    case WindowType::Main:
-				dwStyle = WS_OVERLAPPEDWINDOW;
-				break;
-			case WindowType::Load:
-				dwStyle = WS_POPUP;
-				dwExStyle = WS_EX_TOOLWINDOW;
-				dwExStyle &= ~WS_EX_APPWINDOW;
-				break;
-		}
+		// switch (type)
+		// {
+		// 	case WindowType::Default:
+		//     case WindowType::Main:
+		// 		dwStyle = WS_OVERLAPPEDWINDOW;
+		// 		break;
+		// 	case WindowType::Load:
+		// 		dwStyle = WS_POPUP;
+		// 		dwExStyle = WS_EX_TOOLWINDOW;
+		// 		dwExStyle &= ~WS_EX_APPWINDOW;
+		// 		break;
+		// }
+
+		dwStyle = WS_OVERLAPPEDWINDOW;
 
         // 获取桌面工作区尺寸(也就是去掉任务栏部分的区域)
         RECT workAreaRect;
@@ -85,6 +87,16 @@ namespace TG
 		ReleaseDC(handle, deviceContext);
 	}
 
+	HWND Win32Window::Handle() const
+	{
+		return m_handle;
+	}
+
+	HDC Win32Window::Surface() const
+	{
+		return m_deviceContext;
+	}
+
 	std::optional<int> Win32Window::PollEvents()
 	{
 		MSG msg = { nullptr };
@@ -112,13 +124,37 @@ namespace TG
 		SendMessageW(handle, WM_SETICON, ICON_SMALL, reinterpret_cast<LPARAM>(icon));
 	}
 
-	void Win32Window::SetPosition(int x, int y) const
+	int Win32Window::PositionX() const noexcept
 	{
+		return m_posX;
+	}
+
+	int Win32Window::PositionY() const noexcept
+	{
+		return m_posY;
+	}
+
+	void Win32Window::SetPosition(int x, int y)
+	{
+		m_posX = x;
+		m_posY = y;
 		SetWindowPos(handle, HWND_TOP, x, y, 0, 0, SWP_NOSIZE);
 	}
 
-	void Win32Window::SetSize(unsigned int w, unsigned int h) const
+	unsigned int Win32Window::Width() const noexcept
 	{
+		return m_width;
+	}
+
+	unsigned int Win32Window::Height() const noexcept
+	{
+		return m_height;
+	}
+
+	void Win32Window::SetSize(unsigned int w, unsigned int h)
+	{
+		m_width = w;
+		m_height = h;
 		SetWindowPos(handle, HWND_TOP, 0, 0, static_cast<int>(w), static_cast<int>(h), SWP_NOMOVE);
 	}
 

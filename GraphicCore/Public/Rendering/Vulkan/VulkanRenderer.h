@@ -13,7 +13,7 @@ namespace TG::Rendering
 	class VulkanRenderer : public Renderer
 	{
 	public:
-		explicit VulkanRenderer(const IDefaultVideoPort& videoPort);
+		explicit VulkanRenderer(const IVideoPort& videoPort);
 		~VulkanRenderer() override;
 
 		VulkanRenderer(const VulkanRenderer&) = delete;

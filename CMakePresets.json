@@ -1,0 +1,74 @@
+{
+	"version": 10,
+	"cmakeMinimumRequired": {
+		"major": 3,
+		"minor": 31,
+		"patch": 0
+	},
+	"configurePresets": [
+		{
+			"name": "default",
+			"hidden": true,
+			"binaryDir": "${sourceDir}/build",
+			"installDir": "${sourceDir}/install",
+			"cacheVariables": {
+				"CMAKE_EXPORT_COMPILE_COMMANDS": true
+			}
+		},
+		{
+			"name": "ninja-multi-config",
+			"inherits": "default",
+			"displayName": "Ninja Multi Config",
+			"description": "This configuration supports both Windows and Linux",
+			"generator": "Ninja Multi-Config"
+		},
+		{
+			"name": "visual-studio",
+			"inherits": "default",
+			"displayName": "Visual Studio",
+			"description": "This configuration applies only to Windows",
+			"generator": "Visual Studio 18 2026",
+			"condition": {
+				"type": "equals",
+				"lhs": "${hostSystemName}",
+				"rhs": "Windows"
+			}
+		}
+	],
+	"buildPresets": [
+		{
+			"name": "visual-studio-base",
+			"hidden": true,
+			"configurePreset": "visual-studio",
+			"condition": {
+				"type": "equals",
+				"lhs": "${hostSystemName}",
+				"rhs": "Windows"
+			}
+		},
+		{
+			"name": "visual-studio-debug",
+			"inherits": "visual-studio-base",
+			"displayName": "Visual Studio Debug",
+			"configuration": "Debug"
+		},
+		{
+			"name": "visual-studio-release",
+			"inherits": "visual-studio-base",
+			"displayName": "Visual Studio Release",
+			"configuration": "Release"
+		},
+		{
+			"name": "ninja-multi-config-debug",
+			"displayName": "Ninja Multi Config Debug",
+			"configurePreset": "ninja-multi-config",
+			"configuration": "Debug"
+		},
+		{
+			"name": "ninja-multi-config-release",
+			"displayName": "Ninja Multi Config Release",
+			"configurePreset": "ninja-multi-config",
+			"configuration": "Release"
+		}
+	]
+}

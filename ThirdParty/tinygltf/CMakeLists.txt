@@ -1,21 +1,19 @@
-cmake_minimum_required(VERSION 3.29)
+cmake_minimum_required(VERSION 3.31)
 
 project(tiny_gltf VERSION 2.9.7)
 message(STATUS "tiny_gltf version: ${PROJECT_VERSION}")
 
 FetchContent_Declare(
     nlohmann_json
-    SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../nlohmannjson"
+    SOURCE_DIR "${CMAKE_SOURCE_DIR}/ThirdParty/nlohmannjson"
 )
 FetchContent_MakeAvailable(nlohmann_json)
 
 FetchContent_Declare(
     stb
-    SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../stb"
+    SOURCE_DIR "${CMAKE_SOURCE_DIR}/ThirdParty/stb"
 )
 FetchContent_MakeAvailable(stb)
-
-include(GNUInstallDirs)
 
 file(GLOB_RECURSE HEADERS *.h)
 file(GLOB_RECURSE SOURCES *.cpp)
@@ -24,6 +22,8 @@ add_library(${PROJECT_NAME} STATIC ${HEADERS} ${SOURCES})
 add_library(TG::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
 
 set_target_properties(${PROJECT_NAME} PROPERTIES DEBUG_POSTFIX d)
+
+include(GNUInstallDirs)
 
 target_compile_definitions(${PROJECT_NAME}
     PUBLIC
@@ -41,25 +41,12 @@ target_include_directories(${PROJECT_NAME} SYSTEM
 )
 target_link_libraries(${PROJECT_NAME} PUBLIC TG::nlohmann_json TG::stb)
 
-set(PROJECT_CONFIG_IN "${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}Config.cmake.in")
-set(PROJECT_CONFIG_OUT "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake")
-set(CONFIG_TARGETS_FILE "${PROJECT_NAME}ConfigTargets.cmake")
-set(VERSION_CONFIG_FILE "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake")
-set(EXPORT_DEST_DIR "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}")
-export(TARGETS ${PROJECT_NAME} NAMESPACE TG:: FILE ${CMAKE_CURRENT_BINARY_DIR}/${CONFIG_TARGETS_FILE})
-install(FILES ${HEADERS} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_NAME})
-install(TARGETS ${PROJECT_NAME}
-    EXPORT ${PROJECT_NAME}
-    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
-    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+include(TGInstall)
+tg_install(
+    ${PROJECT_NAME}
+    ${CMAKE_CURRENT_SOURCE_DIR}
+    ${CMAKE_CURRENT_BINARY_DIR}
+    ${CMAKE_INSTALL_INCLUDEDIR}
+    ${CMAKE_INSTALL_LIBDIR}
+    ${CMAKE_INSTALL_BINDIR}
 )
-install(EXPORT ${PROJECT_NAME} FILE ${CONFIG_TARGETS_FILE} NAMESPACE TG:: DESTINATION ${EXPORT_DEST_DIR})
-include(CMakePackageConfigHelpers)
-configure_package_config_file(${PROJECT_CONFIG_IN} ${PROJECT_CONFIG_OUT} INSTALL_DESTINATION ${EXPORT_DEST_DIR})
-write_basic_package_version_file(
-    ${VERSION_CONFIG_FILE}
-    VERSION ${PROJECT_VERSION}
-    COMPATIBILITY ExactVersion
-)
-install(FILES ${PROJECT_CONFIG_OUT} ${VERSION_CONFIG_FILE} DESTINATION ${EXPORT_DEST_DIR})

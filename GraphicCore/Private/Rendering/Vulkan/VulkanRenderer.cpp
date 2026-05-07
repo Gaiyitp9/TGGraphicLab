@@ -7,7 +7,7 @@
 
 namespace TG::Rendering
 {
-	VulkanRenderer::VulkanRenderer(const IDefaultVideoPort& videoPort)
+	VulkanRenderer::VulkanRenderer(const IVideoPort& videoPort)
 		: m_context(videoPort)
 	{
 		CreateRenderPass();
@@ -192,8 +192,8 @@ namespace TG::Rendering
 	{
 		VkDevice device = m_context.GetDevice();
 
-		for (int i = 0; i < m_swapChainFrameBuffers.size(); ++i)
-			vkDestroyFramebuffer(device, m_swapChainFrameBuffers[i], nullptr);
+		for (auto& swapChainFrameBuffer : m_swapChainFrameBuffers)
+			vkDestroyFramebuffer(device, swapChainFrameBuffer, nullptr);
 		m_swapChainFrameBuffers.clear();
 	}
 

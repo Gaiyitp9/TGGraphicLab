@@ -10,13 +10,6 @@
 
 namespace TG
 {
-    // 窗口类型
-    enum class WindowType : unsigned char
-    {
-        Default,
-        Main,
-        Load,
-    };
     // 窗口消息委托类型
     using KeyDelegate = Delegate<void(Input::KeyCode key, int scanCode, Input::Action action)>;
     using CharDelegate = Delegate<void(char16_t c)>;

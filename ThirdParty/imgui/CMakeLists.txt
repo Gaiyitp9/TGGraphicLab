@@ -1,18 +1,23 @@
-cmake_minimum_required(VERSION 3.29)
+cmake_minimum_required(VERSION 3.31)
 
-project(ImGui VERSION 1.92.6)
+project(ImGui VERSION 1.92.7)
 message(STATUS "ImGui version: ${PROJECT_VERSION}")
 
 find_package(Vulkan REQUIRED)
 
 FetchContent_Declare(
     glad
-    SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../glad"
+    SOURCE_DIR "${CMAKE_SOURCE_DIR}/ThirdParty/glad"
 )
 FetchContent_MakeAvailable(glad)
 
 file(GLOB_RECURSE HEADERS *.h)
 file(GLOB_RECURSE SOURCES *.cpp)
+
+if (NOT TG_WINDOWS)
+    list(FILTER HEADERS EXCLUDE REGEX "Public/imgui_impl_win32.h")
+    list(FILTER SOURCES EXCLUDE REGEX "Private/imgui_impl_win32.cpp")
+endif()
 
 add_library(${PROJECT_NAME} STATIC ${HEADERS} ${SOURCES})
 add_library(TG::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
@@ -28,27 +33,14 @@ target_include_directories(${PROJECT_NAME} SYSTEM
         PRIVATE
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/Private>
 )
-target_link_libraries(${PROJECT_NAME} PUBLIC TG::glad opengl32 Vulkan::Vulkan)
+target_link_libraries(${PROJECT_NAME} PUBLIC TG::glad Vulkan::Vulkan)
 
-set(PROJECT_CONFIG_IN "${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}Config.cmake.in")
-set(PROJECT_CONFIG_OUT "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake")
-set(CONFIG_TARGETS_FILE "${PROJECT_NAME}ConfigTargets.cmake")
-set(VERSION_CONFIG_FILE "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake")
-set(EXPORT_DEST_DIR "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}")
-export(TARGETS ${PROJECT_NAME} NAMESPACE TG:: FILE ${CMAKE_CURRENT_BINARY_DIR}/${CONFIG_TARGETS_FILE})
-install(FILES ${HEADERS} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_NAME})
-install(TARGETS ${PROJECT_NAME}
-        EXPORT ${PROJECT_NAME}
-        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
-        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+include(TGInstall)
+tg_install(
+    ${PROJECT_NAME}
+    ${CMAKE_CURRENT_SOURCE_DIR}
+    ${CMAKE_CURRENT_BINARY_DIR}
+    ${CMAKE_INSTALL_INCLUDEDIR}
+    ${CMAKE_INSTALL_LIBDIR}
+    ${CMAKE_INSTALL_BINDIR}
 )
-install(EXPORT ${PROJECT_NAME} FILE ${CONFIG_TARGETS_FILE} NAMESPACE TG:: DESTINATION ${EXPORT_DEST_DIR})
-include(CMakePackageConfigHelpers)
-configure_package_config_file(${PROJECT_CONFIG_IN} ${PROJECT_CONFIG_OUT} INSTALL_DESTINATION ${EXPORT_DEST_DIR})
-write_basic_package_version_file(
-        ${VERSION_CONFIG_FILE}
-        VERSION ${PROJECT_VERSION}
-        COMPATIBILITY ExactVersion
-)
-install(FILES ${PROJECT_CONFIG_OUT} ${VERSION_CONFIG_FILE} DESTINATION ${EXPORT_DEST_DIR})

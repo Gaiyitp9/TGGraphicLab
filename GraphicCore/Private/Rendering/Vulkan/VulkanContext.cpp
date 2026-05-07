@@ -7,19 +7,25 @@
 #include "Base/Utility.h"
 #include "Diagnostic/Log.hpp"
 #include "Exception/BaseException.h"
-#include "vulkan/vulkan_win32.h"
 #include <ranges>
 #include <unordered_set>
 
+#ifdef TG_WINDOWS
+	#include "vulkan/vulkan_win32.h"
+#elifdef TG_LINUX
+	#include "vulkan/vulkan_wayland.h"
+#endif
+
+
 namespace TG::Rendering
 {
-	VulkanContext::VulkanContext(const IDefaultVideoPort& videoPort)
+	VulkanContext::VulkanContext(const IVideoPort& videoPort)
 		: m_videoPort{ videoPort }
 	{
 		CheckLayerAndExtension();
 		CreateInstance();
 		SetupDebugMessenger();
-		CreateSurface(videoPort.Handle());
+		CreateSurface();
 		SelectPhysicalDevice();
 		CreateLogicalDevice();
 		CreateSwapChain();
@@ -58,7 +64,7 @@ namespace TG::Rendering
 		vkDestroyInstance(m_instance, nullptr);
 	}
 
-	const IDefaultVideoPort& VulkanContext::VideoPort() const
+	const IVideoPort& VulkanContext::VideoPort() const
 	{
 		return m_videoPort;
 	}
@@ -242,7 +248,8 @@ namespace TG::Rendering
         // Windows平台上，也可以在注册表中的下面两项中添加*.json文件路径
         // HKEY_LOCAL_MACHINE\SOFTWARE\Khronos\Vulkan\ExplicitLayers
         // HKEY_LOCAL_MACHINE\SOFTWARE\Khronos\Vulkan\ImplicitLayers
-
+		// Linux平台上，下载vulkansdk-linux-x86_64-1.4.x.x.tar.xz并解压
+		// 运行source vulkan/path/1.4.x.x/setup-env.sh设置上述环境变量
 		auto nameComparer = [](char const* lhs, char const* rhs) {
 			return std::strcmp(lhs, rhs) < 0;
 		};
@@ -276,6 +283,10 @@ namespace TG::Rendering
         if (!layerFound)
             throw BaseException::Create("Layers required, but not available");
 
+		if constexpr (g_platform == Platform::Windows)
+			m_requiredVulkanExtensions.emplace_back("VK_KHR_win32_surface");
+		else
+			m_requiredVulkanExtensions.emplace_back("VK_KHR_wayland_surface");
         if (m_enableValidationLayer)
             m_requiredVulkanExtensions.emplace_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
         std::ranges::sort(m_requiredVulkanExtensions, nameComparer);
@@ -375,14 +386,23 @@ namespace TG::Rendering
 		vkCreateDebugUtilsMessengerEXT(m_instance, &createInfo, nullptr, &m_debugMessenger);
 	}
 
-	void VulkanContext::CreateSurface(HWND handle)
+	void VulkanContext::CreateSurface()
 	{
+#ifdef TG_WINDOWS
 		VkWin32SurfaceCreateInfoKHR surfaceCreateInfo{};
 		surfaceCreateInfo.sType = VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR;
-		surfaceCreateInfo.hwnd = handle;
+		surfaceCreateInfo.hwnd = m_videoPort.Handle();
 		surfaceCreateInfo.hinstance = GetModuleHandle(nullptr);
 		if (vkCreateWin32SurfaceKHR(m_instance, &surfaceCreateInfo, nullptr, &m_surface) != VK_SUCCESS)
 			throw BaseException::Create("Failed to create window surface");
+#elifdef TG_LINUX
+		VkWaylandSurfaceCreateInfoKHR surfaceCreateInfo{};
+		surfaceCreateInfo.sType = VK_STRUCTURE_TYPE_WAYLAND_SURFACE_CREATE_INFO_KHR;
+		surfaceCreateInfo.display = m_videoPort.Handle();
+		surfaceCreateInfo.surface = m_videoPort.Surface();
+		if (vkCreateWaylandSurfaceKHR(m_instance, &surfaceCreateInfo, nullptr, &m_surface) != VK_SUCCESS)
+			throw BaseException::Create("Failed to create window surface");
+#endif
 	}
 
 	void VulkanContext::SelectPhysicalDevice()

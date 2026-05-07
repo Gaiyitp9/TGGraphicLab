@@ -7,7 +7,7 @@
 
 #include "Module.h"
 #include "Rendering/Renderer.h"
-#include "Base/CommonInterfaces.h"
+#include "Base/Interfaces.h"
 #include "Rendering/GraphicsAPIDefines.h"
 #include <memory>
 
@@ -23,7 +23,7 @@ namespace TG
         RenderModule& operator=(RenderModule&&) = delete;
         ~RenderModule() override;
 
-        void SetupRenderer(Rendering::GraphicsAPI api, const IDefaultVideoPort& videoPort);
+        void SetupRenderer(Rendering::GraphicsAPI api, const IVideoPort& videoPort);
         void Subscribe(MulticastDelegate<void(unsigned, unsigned)>& windowResizeDelegate,
             MulticastDelegate<void(int, int, unsigned, unsigned)>& sceneViewportChangedDelegate);
 

@@ -5,7 +5,7 @@
 *****************************************************************/
 #pragma once
 
-#include "Context.h"
+#include "IContext.h"
 #include "Rendering/Mesh/Mesh.h"
 #include "Rendering/Material.h"
 
@@ -20,7 +20,7 @@ namespace TG::Rendering
 
     	virtual GraphicsAPI API() = 0;
 
-    	virtual const Context& GetContext() const = 0;
+    	[[nodiscard]] virtual const IContext& GetContext() const = 0;
 
         virtual void BeginRender() = 0;
     	virtual void EndRender() = 0;
