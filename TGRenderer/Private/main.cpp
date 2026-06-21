@@ -7,7 +7,7 @@
 #include "Diagnostic/Log.hpp"
 #include "mimalloc.h"
 
-int CALLBACK main()
+int main()
 {
 	mi_version();
 

@@ -6,7 +6,7 @@
 #pragma once
 
 #include "Math/Core.hpp"
-#include "Base/CommonInterfaces.h"
+#include "Base/Interfaces.h"
 
 namespace TG
 {

@@ -9,6 +9,7 @@
 #include "Base/Interfaces.h"
 #include "Rendering/Renderer.h"
 #include "Editor/ImGuiContext.h"
+#include <memory>
 
 namespace TG
 {

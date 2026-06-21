@@ -10,7 +10,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 option(BUILD_SHARED_LIBS "Build using shared libraries" OFF)
 
 # 将自定义模块目录添加到CMake的模块搜索路径中
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/CMake")
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/BuildTools/CMake")
 
 if(MSVC)
 	set(TG_WINDOWS true)

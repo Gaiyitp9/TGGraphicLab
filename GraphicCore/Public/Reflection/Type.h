@@ -9,6 +9,7 @@
 #include "Reflection/Enumeration.h"
 #include <vector>
 #include <ranges>
+#include <cstdint>
 
 namespace TG::Reflection
 {

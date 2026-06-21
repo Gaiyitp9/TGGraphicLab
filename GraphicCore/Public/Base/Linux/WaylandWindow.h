@@ -8,6 +8,8 @@
 #include "Base/Core.h"
 #include "Base/WindowDelegates.h"
 #include "xdg-shell-client-protocol.h"
+#include <wayland-client-protocol.h>
+#include "xdg-shell-client-protocol.h"
 
 namespace TG
 {

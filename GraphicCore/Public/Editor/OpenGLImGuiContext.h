@@ -7,6 +7,7 @@
 
 #include "ImGuiContext.h"
 #include "Rendering/OpenGL/OpenGLContext.h"
+#include "Editor/Linux/LinuxOpenGLImGuiContext.h"
 
 namespace TG::Editor
 {
@@ -20,6 +21,6 @@ namespace TG::Editor
 		void Render() override;
 
 	private:
-
+		LinuxOpenGLImGuiContext m_context;
 	};
 }

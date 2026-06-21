@@ -7,6 +7,7 @@
 
 #include "Math/Core.hpp"
 #include <vector>
+#include <cstdint>
 
 namespace TG::Rendering
 {
